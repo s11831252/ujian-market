@@ -74,7 +74,6 @@ export default {
     }
   },
   mounted(){
-    console.log((this.$store.state.User.SingleTicket==null||this.$store.state.User.SingleTicket.length > 0));
     if (
       this.$store.state.User.SingleTicket==null ||
       this.$store.state.User.SingleTicket.length > 0

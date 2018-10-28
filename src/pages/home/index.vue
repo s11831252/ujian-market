@@ -191,27 +191,27 @@ export default {
     this.tabClick(this.Tabs[0]);
   },
   created() {
-    console.log("page index created", this);
+    // console.log("page index created", this);
   },
   onLoad() {
-    console.log("page index onLoad", this);
+    // console.log("page index onLoad", this);
   },
   onReady() {
-    console.log("page index onReady", this);
+    // console.log("page index onReady", this);
   },
   onShow() {
-    console.log("onShow", this);
+    // console.log("onShow", this);
   },
   mounted() {
-    console.log("mounted", this);
+    // console.log("mounted", this);
     this.marketGet();
     this.tabClick(this.Tabs[0]);
   },
   onUnload() {
-    console.log("onUnload", this);
+    // console.log("onUnload", this);
   },
   onHide() {
-    console.log("onHide", this);
+    // console.log("onHide", this);
   }
 };
 </script>

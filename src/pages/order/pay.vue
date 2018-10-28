@@ -1,28 +1,42 @@
 <template>
-    <div class="pay">
-        <div class="pay-info">
-            <div class="pay-info-title">交易金额</div>
-            <div class="pay-money">￥{{money}}</div>
-        </div>
-        <ul class="pay-mode">
-            <li :class="{action:PayMode==0}" @click="selectPayMode(0)">
-                <i class="icon icon-ye">&#xe62a;</i>余额支付
-                <i class="icon right" v-if="PayMode==0">&#xe633;</i>
-            </li>
-            <li :class="{action:PayMode==1}" @click="selectPayMode(1)">
-                <img class="zfb" src="/static/img/wx.png" mode="widthFix" />
-                <i class="icon right" v-if="PayMode==1">&#xe633;</i>
-            </li>
-            <li :class="{action:PayMode==2}" @click="selectPayMode(2)">
-                <img class="zfb" src="/static/img/zhifubao.png" mode="widthFix" />
-                <i class="icon right" v-if="PayMode==2">&#xe633;</i>
-            </li>
-        </ul>
-        <div class="pay-confirm">
-            <button class="btn-ok">确定支付</button>
-            <button class="btn-no">稍后付款</button>
-        </div>
+  <div class="pay">
+    <div class="pay-info">
+      <div class="pay-info-title">交易金额</div>
+      <div class="pay-money">￥{{money}}</div>
     </div>
+    <ul class="pay-mode">
+      <li :class="{action:PayMode==0}" @click="selectPayMode(0)">
+        <i class="icon icon-ye">&#xe62a;</i>余额支付
+        <i class="icon right" v-if="PayMode==0">&#xe633;</i>
+      </li>
+      <li :class="{action:PayMode==1}" @click="selectPayMode(1)">
+        <img class="wx" src="/static/img/wx.png" mode="aspectFit" />
+        <i class="icon right" v-if="PayMode==1">&#xe633;</i>
+      </li>
+      <li :class="{action:PayMode==2}" @click="selectPayMode(2)">
+        <img class="zfb" src="/static/img/zhifubao.png" mode="aspectFit" />
+        <i class="icon right" v-if="PayMode==2">&#xe633;</i>
+      </li>
+    </ul>
+    <div class="pay-confirm">
+      <button class="btn-ok" @click="pay">确定支付</button>
+      <button class="btn-no">稍后付款</button>
+    </div>
+    <div class="modal pay-validCodeBox" v-if="modalOpen">
+      <div class="modal-container">
+        <div class="box-title">
+          <i class="icon"></i><span>请输入验证码</span>
+        </div>
+        <div class="box-body">
+          <p>商城付款</p>
+          <p>￥{{money}}</p>
+          <p><a @click="countDown">{{countDownStr}}</a></p>
+          <div><input type="text" /></div>
+          <p>支付验证码已发送到您账号手机，“60秒”有效</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 export default {
@@ -36,13 +50,43 @@ export default {
         State: 0
       },
       PayMode: 0,
-      OrderId: ""
+      OrderId: "",
+      modalOpen: false,
+      countDownStr: "点击发送验证码",
+      sendTime: 0
     };
   },
-  methods:{
-      selectPayMode(paymode){
-          this.PayMode=paymode
+  computed: {
+
+  },
+  methods: {
+    selectPayMode(paymode) {
+      this.PayMode = paymode;
+    },
+    async pay() {
+      // var rep = await this.$ShoppingAPI.Order_ValidationCode();
+      // if (rep.ret == 0) {
+
+      // }
+        this.modalOpen = true;
+        this.countDown();
+    },
+    countDown() {
+      if (this.sendTime == 0) {
+          this.sendTime=60;
+          this.countDownStr = this.sendTime + "s后可重新发送";
+          var clock = setInterval(() => {
+          this.sendTime--;
+          if (this.sendTime <= 0) {
+            this.countDownStr = "点击发送验证码";
+            this.sendTime = 0;
+            clearInterval(clock);
+          } else {
+            this.countDownStr = this.sendTime + "s后可重新发送";
+          }
+        }, 1000);
       }
+    }
   },
   computed: {
     money() {
@@ -80,10 +124,10 @@ export default {
   }
   .pay-mode {
     margin: 0px 10px;
-    li{
+    li {
       height: 35px;
       padding: 10px;
-      border-bottom:1px solid #ecf0f1;
+      border-bottom: 1px solid #ecf0f1;
       i {
         display: inline-block;
         font-size: 28px;
@@ -92,40 +136,61 @@ export default {
       }
       .zfb,
       .wx {
+        display: inline-block;
         height: 35px;
+        max-width: 30%;
         margin-right: 10px;
       }
     }
   }
-.pay-confirm {
-  position: absolute;
-  bottom: 0px;
-  text-align: center;
-  width: 100%;
-  .btn-ok {
-    line-height: initial;
-    background-color: #12b7f5;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 4px 16px;
-    border: 0;
-    color: #ffffff;
-    border-radius: 5px;
-    display: inline-block;
-    width: 80%;
+  .pay-confirm {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
+    width: 100%;
+    .btn-ok {
+      line-height: initial;
+      background-color: #12b7f5;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 4px 16px;
+      border: 0;
+      color: #ffffff;
+      border-radius: 5px;
+      display: inline-block;
+      width: 80%;
+    }
+    .btn-no {
+      background-color: #fff;
+      line-height: initial;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 4px 16px;
+      border: 0;
+      color: #12b7f5;
+      display: inline-block;
+      width: 80%;
+    }
   }
-  .btn-no{
-    background-color: #fff;
-    line-height: initial;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 4px 16px;
-    border: 0;
-    color: #12b7f5;
-    display: inline-block;
-    width: 80%;
+  .modal {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.3);
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    text-align: center;
+    .modal-container {
+      top: 25%;
+      margin: 0 auto;
+      width: 70%;
+      background-color: #fff;
+      text-align: center;
+      position: relative;
+    }
   }
 }
-}
-
 </style>
