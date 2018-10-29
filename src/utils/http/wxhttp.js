@@ -63,6 +63,13 @@ const net = {
         success: function (res) {
           // success
           wx.hideLoading();
+          if(res.data.ret!=0){
+            wx.showToast({
+              title: res.data.msg,
+              icon: "none"
+            });
+            return false;
+          }
           resolve(res.data);
         },
         fail: function (error) {

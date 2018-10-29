@@ -3,7 +3,7 @@ import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
 // let BaseHost = "http://192.168.0.86:801/";
-let BaseHost = "https://app.ujianchina.net/";
+let BaseHost = "http://app.ujianchina.net:801/";
 
 export default {
     Account_Login: param => {

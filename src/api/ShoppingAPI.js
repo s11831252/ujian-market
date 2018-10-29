@@ -46,5 +46,8 @@ export default {
     Order_ValidationCode: param => {
         return http.get(BaseHost + "api/Order/ValidationCode", param)
     },
+    Order_Pay: param => {
+        return http.post(BaseHost + "api/Order/Pay", param)
+    },
     
 }

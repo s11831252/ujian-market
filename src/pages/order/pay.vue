@@ -22,17 +22,23 @@
       <button class="btn-ok" @click="pay">确定支付</button>
       <button class="btn-no">稍后付款</button>
     </div>
-    <div class="modal pay-validCodeBox" v-if="modalOpen">
-      <div class="modal-container">
+    <div class="modal pay-validCodeBox" v-if="modalOpen" @click="openModal">
+      <div class="modal-container" @click.stop>
         <div class="box-title">
           <i class="icon"></i><span>请输入验证码</span>
         </div>
         <div class="box-body">
           <p>商城付款</p>
-          <p>￥{{money}}</p>
-          <p><a @click="countDown">{{countDownStr}}</a></p>
-          <div><input type="text" /></div>
-          <p>支付验证码已发送到您账号手机，“60秒”有效</p>
+          <p class="pay-money">￥{{money}}</p>
+          <p><a class="countDown" @click="countDown">{{countDownStr}}</a></p>
+          <div class="blocks">
+            <input type="number" maxlength="4" v-model="code" focus=’true’ auto-focus=’true’ />
+            <div class="block"><span v-if="code.length">{{code[0]}}</span></div>
+            <div class="block"><span v-if="code.length>1">{{code[1]}}</span></div>
+            <div class="block"><span v-if="code.length>2">{{code[2]}}</span></div>
+            <div class="block"><span v-if="code.length>3">{{code[3]}}</span></div>
+          </div>
+          <p class="tip">支付验证码已发送到您账号手机，“5分钟”有效</p>
         </div>
       </div>
     </div>
@@ -49,6 +55,7 @@ export default {
         DifferenceAmount: 0.0,
         State: 0
       },
+      code: "",
       PayMode: 0,
       OrderId: "",
       modalOpen: false,
@@ -56,26 +63,43 @@ export default {
       sendTime: 0
     };
   },
-  computed: {
-
+  watch: {
+    code(newval, oldval) {
+      if (newval.length == 4) {
+        // console.log(oldval,newval);
+        var rep = this.$ShoppingAPI.Order_Pay({
+          OrderId: this.OrderId,
+          VerificationCode: newval
+        });
+        if (rep.ret == 0) {
+          this.replace({ path: "/pages/order/index" });
+        }
+      }
+    }
   },
   methods: {
     selectPayMode(paymode) {
       this.PayMode = paymode;
     },
+    openModal() {
+      this.modalOpen = !this.modalOpen;
+      this.code = "";
+    },
     async pay() {
-      // var rep = await this.$ShoppingAPI.Order_ValidationCode();
-      // if (rep.ret == 0) {
-
-      // }
-        this.modalOpen = true;
-        this.countDown();
+      this.openModal();
+      if(this.sendTime == 0)
+      {
+        var rep = await this.$ShoppingAPI.Order_ValidationCode();
+        if (rep.ret == 0) {
+          this.countDown();
+        }
+      }
     },
     countDown() {
       if (this.sendTime == 0) {
-          this.sendTime=60;
-          this.countDownStr = this.sendTime + "s后可重新发送";
-          var clock = setInterval(() => {
+        this.sendTime = 60;
+        this.countDownStr = this.sendTime + "s后可重新发送";
+        var clock = setInterval(() => {
           this.sendTime--;
           if (this.sendTime <= 0) {
             this.countDownStr = "点击发送验证码";
@@ -190,6 +214,53 @@ export default {
       background-color: #fff;
       text-align: center;
       position: relative;
+      .countDown{
+        color: #12b7f5;
+      }
+    .pay-money {
+      margin-top: 10px;
+      color: #ff5252;
+      font-size: 25px;
+    }
+      .tip{
+        font-size: 12px;
+      }
+      .blocks {
+        text-align: center;
+        position: relative;
+        .block {
+          display: inline-block;
+          width: 30px;
+          height: 30px;
+          border: 1px solid #5c5c5c;
+          margin-left: 10px;
+        }
+        .cursor {
+          text-align: center;
+          color: transparent;
+          // //光标的样式
+          // width: 1px;
+          // height: 10px;
+          // background-color: #000;
+          // animation: focus 0.7s infinite;
+        }
+        @keyframes focus {
+          from {
+            opacity: 1;
+          }
+
+          to {
+            opacity: 0;
+          }
+        }
+        input {
+          width: 150%;
+          position: absolute;
+          color: transparent;
+          left:-40%;
+          text-align:left;
+        }
+      }
     }
   }
 }
