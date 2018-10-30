@@ -49,5 +49,12 @@ export default {
     Order_Pay: param => {
         return http.post(BaseHost + "api/Order/Pay", param)
     },
+    Order_Cancel: param => {
+        return http.post(BaseHost + "api/Order/Cancel", param)
+    },
+    Order_ApplyCancel: param => {
+        return http.post(BaseHost + "api/Order/ApplyCancel", param)
+    },
+    
     
 }

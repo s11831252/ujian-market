@@ -36,7 +36,7 @@ var routes = [
         name: 'order',
         config: {
             navigationBarTitleText: '订单',
-            enablePullDownRefresh: false
+            enablePullDownRefresh: true
           },
     },
     {
