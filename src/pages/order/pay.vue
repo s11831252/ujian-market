@@ -33,10 +33,22 @@
           <p><a class="countDown" @click="countDown">{{countDownStr}}</a></p>
           <div class="blocks">
             <input type="number" maxlength="4" v-model="code" focus=’true’ auto-focus=’true’ />
-            <div class="block"><span v-if="code.length">{{code[0]}}</span></div>
-            <div class="block"><span v-if="code.length>1">{{code[1]}}</span></div>
-            <div class="block"><span v-if="code.length>2">{{code[2]}}</span></div>
-            <div class="block"><span v-if="code.length>3">{{code[3]}}</span></div>
+            <div class="block">
+              <span v-if="!code.length" class="cursor"></span>
+              <span v-if="code.length">{{code[0]}}</span>
+            </div>
+            <div class="block">
+              <span v-if="code.length==1" class="cursor"></span>
+              <span v-if="code.length>1">{{code[1]}}</span>
+            </div>
+            <div class="block">
+              <span v-if="code.length==2" class="cursor"></span>
+              <span v-if="code.length>2">{{code[2]}}</span>
+            </div>
+            <div class="block">
+              <span v-if="code.length==3" class="cursor"></span>
+              <span v-if="code.length>3">{{code[3]}}</span>
+            </div>
           </div>
           <p class="tip">支付验证码已发送到您账号手机，“5分钟”有效</p>
         </div>
@@ -87,8 +99,7 @@ export default {
     },
     async pay() {
       this.openModal();
-      if(this.sendTime == 0)
-      {
+      if (this.sendTime == 0) {
         var rep = await this.$ShoppingAPI.Order_ValidationCode();
         if (rep.ret == 0) {
           this.countDown();
@@ -214,35 +225,42 @@ export default {
       background-color: #fff;
       text-align: center;
       position: relative;
-      .countDown{
+      .countDown {
         color: #12b7f5;
       }
-    .pay-money {
-      margin-top: 10px;
-      color: #ff5252;
-      font-size: 25px;
-    }
-      .tip{
+      .pay-money {
+        margin-top: 10px;
+        color: #ff5252;
+        font-size: 25px;
+      }
+      .tip {
         font-size: 12px;
       }
       .blocks {
         text-align: center;
-        position: relative;
+          position: relative;
+          display: flex;
+          // flex-direction: row;
+          // align-items: center;
+          justify-content:center;
         .block {
-          display: inline-block;
           width: 30px;
           height: 30px;
           border: 1px solid #5c5c5c;
           margin-left: 10px;
+          span{
+            line-height: 30px;
+          }
         }
         .cursor {
           text-align: center;
           color: transparent;
-          // //光标的样式
-          // width: 1px;
-          // height: 10px;
-          // background-color: #000;
-          // animation: focus 0.7s infinite;
+          //光标的样式
+          width: 1px;
+          height: 30px;
+          display: block;
+          background-color: #000;
+          animation: focus 0.7s infinite;
         }
         @keyframes focus {
           from {
@@ -254,11 +272,13 @@ export default {
           }
         }
         input {
-          width: 150%;
+          width: 100%;
           position: absolute;
           color: transparent;
-          left:-40%;
-          text-align:left;
+          left: -40%;
+          text-align: left;
+          padding-right: 100%;
+          height: 30px;
         }
       }
     }

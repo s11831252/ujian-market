@@ -13,8 +13,9 @@ import mynav from '@/components/mynav.vue'
 export default {
   computed:{
     Enable(){
+      var that =this;
       var nowRouteConfig= this.$router.options.routes.find((item)=>{
-        return  item.path==this.$route.path;
+        return  item.alias==that.$route.path;
       });//此处判断当前route是否启动导航
       return nowRouteConfig&&nowRouteConfig.config&&nowRouteConfig.config.EnableNav;
     }
