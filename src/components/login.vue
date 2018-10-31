@@ -6,6 +6,7 @@
         </div>
 </template>
 <script>
+import $toast from '@/utils/toast'
 export default {
   props: {
     userInfo: Object
@@ -30,12 +31,7 @@ export default {
         // 切换至 tabBar页面
         this.$router.push({ path: "/pages/home/index", isTab: true });
       } else {
-        wx.showModal({
-          title: "登录失败",
-          content: req.msg,
-          showCancel: false,
-          confirmText: "返回"
-        });
+        this.toast("登录失败");
       }
     }
   }

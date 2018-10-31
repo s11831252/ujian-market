@@ -21,6 +21,12 @@ Vue.mixin({
         },
         replace: function () {
             this.$router.replace(path);
+        },
+        toast(title){
+            wx.showToast({
+                title: title,
+                icon: "none"
+              });
         }
     },
     onLoad () {

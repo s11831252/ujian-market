@@ -5,6 +5,9 @@ import router from './routerH5'
 import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
 
+import Toast from './components/Toast';
+Vue.use(Toast);
+
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
 Vue.mixin({
@@ -12,6 +15,9 @@ Vue.mixin({
       go: function(path) {
         this.$router.push(path);
       },
+      toast(title){
+        this.$toast.center(title);
+      }
     }
 });
 Vue.config.productionTip = false
