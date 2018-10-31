@@ -24,6 +24,8 @@ export default {
       });
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
+        var userinfo = await this.$UJAPI.User_Get();
+        this.$store.commit("GetUserInfo",  userinfo.data);
         if(this.$route.query.redirect)
           // 切换至 tabBar页面
           this.$router.push({ path: this.$route.query.redirect, isTab: true });

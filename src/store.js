@@ -21,8 +21,8 @@ export default new Vuex.Store({//store对象
           // 变更状态
           state.SingleTicket = payload.Ticket;
         },
-        GetUserInfo(state, payload) {
-          state.UserInfo = payload.UserInfo;
+        GetUserInfo(state, UserInfo) {
+          state.UserInfo = UserInfo;
         },
       }
     },
