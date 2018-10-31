@@ -18,14 +18,20 @@ export default {
       OrderList: null
     };
   },
-  methods: {},
-  async mounted() {
-    var rep = await this.$ShoppingAPI.Order_Get({ PageIndex: 1, PageSize: 10 });
-    if (rep.ret == 0) {
-      this.OrderList = rep.data;
-      console.log(this.OrderList);
+  methods: {
+   async init(){
+      var rep = await this.$ShoppingAPI.Order_Get({ PageIndex: 1, PageSize: 10 });
+      if (rep.ret == 0) {
+        this.OrderList = rep.data;
+      }
     }
-  }
+  },
+   mounted() {
+    this.init();
+  },
+  onPullDownRefresh(){
+    this.init();
+  },
 };
 </script>
 <style lang="less" scoped>
