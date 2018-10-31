@@ -2,8 +2,8 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = "http://app.ujianchina.net:811/";
-//let BaseHost = "http://192.168.0.86:811/";
+// let BaseHost = "http://app.ujianchina.net:811/";
+let BaseHost = "http://192.168.0.119:811/";
 
 
 export default {
