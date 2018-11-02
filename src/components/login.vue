@@ -13,18 +13,18 @@ export default {
   },
   data(){
     return {
-
+      
     };
   },
   methods: {
     async login() {
-      var req = await this.$UJAPI.Account_Login({
+      var req = await this.$ShoppingAPI.Account_Login({
         Account: this.userInfo.Account,
         PassWord: this.userInfo.PassWord
       });
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
-        var userinfo = await this.$UJAPI.User_Get();
+        var userinfo = await this.$ShoppingAPI.User_Get();
         this.$store.commit("GetUserInfo",  userinfo.data);
         if(this.$route.query.redirect)
           // 切换至 tabBar页面

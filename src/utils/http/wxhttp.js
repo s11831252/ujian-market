@@ -19,6 +19,7 @@ const net = {
           'X-Bmob-Application-Id': bmobConfig.applicationId,
           'X-Bmob-REST-API-Key': bmobConfig.restApiKey,
           'Content-Type': 'application/json',
+          'Device':"WebApp",
           'SingleTicket':store.state.User.SingleTicket
         }, // 设置请求的 header
         success: function (res) {
