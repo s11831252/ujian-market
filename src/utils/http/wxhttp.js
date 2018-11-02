@@ -32,10 +32,10 @@ const net = {
             });
             return false;
           }
-          debugger;
-          if(res.data.ret==10000||res.data.ret==10001)
+          if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
           {
             store.state.User.SingleTicket="";
+            wx.redirectTo({url:"/pages/index/index"});
           }else if(res.data.ret!=0)
           {
             wx.showToast({

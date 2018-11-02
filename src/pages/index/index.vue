@@ -9,11 +9,6 @@
     <button v-if="!userInfo.nickName" open-type="getUserInfo" @getuserinfo="getUserInfoData" >授权登录</button>
     <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button>
     <login v-if="userInfo.nickName" :userInfo="userInfo"></login>
-    <!-- <form v-if="userInfo.nickName">
-      <input class="form-control" v-model.lazy="userInfo.Account" type="text" placeholder="请输入U建登录账号" >
-      <input class="form-control" v-model.lazy="userInfo.PassWord" type="password" placeholder="请输入U建登录密码" >
-      <button @click="login">登录</button>
-    </form> -->
   </div>
 </template>
 
