@@ -14,8 +14,6 @@
       <input class="form-control" v-model.lazy="userInfo.PassWord" type="password" placeholder="请输入U建登录密码" >
       <button @click="login">登录</button>
     </form> -->
-    <a @click="go({path:'/pages/counter/index'})" class="counter">去往Vuex示例页面</a>
-    <a @click="go({path:'/pages/home/index',isTab: true})" class="counter">去往项目首页</a>
   </div>
 </template>
 

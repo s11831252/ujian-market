@@ -50,9 +50,6 @@ export default {
     })
   },
   components: {},
-  mounted() {
-    console.log(this.UserInfo);
-  }
 };
 </script>
 <style lang="less" scoped>

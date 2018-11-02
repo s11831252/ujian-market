@@ -8,22 +8,6 @@ var routes = [
           },
     },
     {
-        path: 'pages/counter/index',
-        name: 'counter',
-        config: {
-            navigationBarTitleText: '计算',
-            enablePullDownRefresh: false
-          },
-    },
-    {
-        path: 'pages/logs/index',
-        name: 'logs',
-        config: {
-            navigationBarTitleText: '日志',
-            enablePullDownRefresh: false
-          },
-    },
-    {
         path: 'pages/home/index',
         name: 'home',
         config: {

@@ -32,6 +32,18 @@ const net = {
             });
             return false;
           }
+          debugger;
+          if(res.data.ret==10000||res.data.ret==10001)
+          {
+            store.state.User.SingleTicket="";
+          }else if(res.data.ret!=0)
+          {
+            wx.showToast({
+              title: res.data.msg,
+              icon: "none"
+            });
+            return false;
+          }
           resolve(res.data);
         },
         fail: function (error) {

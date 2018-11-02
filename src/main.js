@@ -30,6 +30,10 @@ Vue.mixin({
         }
     },
     onLoad () {
+        if(!this.$store.getters.Logined)
+        {
+            wx.redirectTo({url:"/pages/index/index"});
+        }
         // debugger;
         // if (this.$initData$) {
         //   Object.assign(this, JSON.parse(this.$initData$))
