@@ -71,7 +71,7 @@
             <div :hidden="activeIndex != 1">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item">
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
                     </div><div class="shop-item-info">
@@ -86,7 +86,7 @@
             <div :hidden="activeIndex != 2">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item">
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
                     </div><div class="shop-item-info">
@@ -101,7 +101,7 @@
             <div :hidden="activeIndex != 3">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item">
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
                     </div><div class="shop-item-info">

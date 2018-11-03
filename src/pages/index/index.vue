@@ -1,13 +1,18 @@
 <template>
   <div class="container" >
+    <img class="logo" src="/static/img/logo108.png"  mode="widthFix" >
+    <p>U建商城</p>
     <div class="userinfo" @click="go({path:'/pages/logs/index'})">
       <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
       <div class="userinfo-nickname">
         <card :text="userInfo.nickName"></card>
       </div>
     </div>
-    <button v-if="!userInfo.nickName" open-type="getUserInfo" @getuserinfo="getUserInfoData" >授权登录</button>
-    <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button>
+    <div v-if="!userInfo.nickName" class="authorize" >
+      <p>申请获得你的公开信息(昵称、头像等)</p>
+      <button open-type="getUserInfo" @getuserinfo="getUserInfoData" >授权登录</button>
+    </div>
+    <!-- <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button> -->
     <login v-if="userInfo.nickName" :userInfo="userInfo"></login>
   </div>
 </template>
@@ -22,7 +27,9 @@ export default {
         Account: "",
         PassWord: "",
         avatarUrl: "",
-        nickName: ""
+        nickName: "",
+        unionid:"",
+        openid:"",
       }
     };
   },
@@ -36,7 +43,6 @@ export default {
       wx.openSetting();
     },
     getUserInfoData(obj) {
-      console.log(obj);
       if (obj.mp.detail.errMsg.indexOf("getUserInfo:ok") != -1) {
         this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
         this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
@@ -54,12 +60,27 @@ export default {
         });
       }
     },
-    wx_login() {
+     wx_login() {
       // 调用wx登录接口
       wx.login({
         success: obj => {
           if (obj.errMsg.indexOf("login:ok") > -1) {
-            console.log(obj);
+            // console.log(obj);
+            this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep=>{
+              if(rep.ret==0)
+              {
+                // console.log(rep);
+                this.userInfo.unionid = rep.data.result.unionid;
+                this.userInfo.openid = rep.data.result.openid;
+                // console.log(this.userInfo);
+
+                if(rep.data.ticket)
+                {
+                  this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
+                  this.$router.push({ path: "/pages/home/index", isTab: true });
+                }
+              }
+            })
           } else {
           }
         }
@@ -97,7 +118,27 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+.logo{
+  width: 100px;
+}
+.authorize{
+  text-align: center;
+  width: 100%;
+  button{
+  color:#12b7f5;
+  border: 1px solid #12b7f5;
+  border-radius: 10px;
+  padding: 0px;
+  width: 50%;
+  }
+  p{
+    margin: 10px 0 5px 0;
+    font-size: 12px;
+    color: #7f8699;
+  }
+}
+
 .userinfo {
   display: flex;
   flex-direction: column;

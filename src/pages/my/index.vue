@@ -37,6 +37,9 @@
                 <li>
                     <p><i class="icon icon-tsjy">&#xe64c;</i>投诉与建议<i class="icon right">&#xe601;</i></p>
                 </li>
+                <li @click="exit" >
+                    <p><i class="icon icon-tc">&#xe609;</i>退出登录<i class="icon right">&#xe601;</i></p>
+                </li>
             </ul>
         </div>
     </div>
@@ -48,6 +51,12 @@ export default {
     ...mapState({
       UserInfo: state => state.User.UserInfo
     })
+  },
+  methods:{
+    exit(){
+      this.$store.commit("Login", { Ticket: "" }); //存入Ticket
+      this.$router.push("/pages/index/index");//回到登录页
+    }
   },
   components: {},
 };
@@ -111,17 +120,17 @@ export default {
         margin-right: 10px;
         font-size: 30px;
       }
-      .icon-sh,
-      .icon-dw {
-        color: #ff5252;
-      }
-      .icon-sc,
-      .icon-lljl {
-        color: #6dff60;
-      }
-      .icon-tsjy {
-        color: #fccb5c;
-      }
+      // .icon-sh,
+      // .icon-dw {
+      //   color: #ff5252;
+      // }
+      // .icon-sc,
+      // .icon-lljl {
+      //   color: #6dff60;
+      // }
+      // .icon-tsjy,.tc {
+      //   color: #fccb5c;
+      // }
       line-height: 30px;
     }
   }

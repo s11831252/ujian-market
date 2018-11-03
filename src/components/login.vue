@@ -1,8 +1,9 @@
 <template>
         <div class="form">
-            <input class="form-control" v-model.lazy="userInfo.Account" type="text" placeholder="请输入U建登录账号">
-            <input class="form-control" v-model.lazy="userInfo.PassWord" type="password" placeholder="请输入U建登录密码">
-            <button @click="login">登录</button>
+            <input class="form-control" v-model="userInfo.Account" type="text" placeholder="输入U建账号或手机号码">
+            <!-- <input class="form-control" v-model.lazy="userInfo.PassWord" type="password" placeholder="输入登录密码"> -->
+            <p>如果您还没有使用这个手机号注册过U建,我们将为您创建U建账号</p>
+            <a class="button" :class="{action:loginAction}" @click="login">登录</a>
         </div>
 </template>
 <script>
@@ -16,11 +17,23 @@ export default {
       
     };
   },
+  computed:{
+    loginAction(){
+      return this.userInfo.Account&&this.userInfo.Account.length==11;
+    }
+  },
   methods: {
     async login() {
-      var req = await this.$ShoppingAPI.Account_Login({
-        Account: this.userInfo.Account,
-        PassWord: this.userInfo.PassWord
+      // var req = await this.$ShoppingAPI.Account_Login({
+      //   Account: this.userInfo.Account,
+      //   PassWord: this.userInfo.PassWord
+      // });
+      var req = await this.$ShoppingAPI.Account_SimpleLogin({
+        Phone: this.userInfo.Account,
+        unionid:this.userInfo.unionid,
+        openid:this.userInfo.openid,
+        UserName:this.userInfo.nickName,
+        VerificationCode:"1234",
       });
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
@@ -39,15 +52,36 @@ export default {
   }
 };
 </script>
-<style>
+<style lang="less" scoped>
 .form {
-  margin-top: 20px;
+  margin-top: 5px;
+  text-align: center;
+  width:70%;
 }
-
-.form-control {
-  display: block;
-  padding: 0 12px;
+.form-control,.button{
+  width:100%;
+}
+p{
+  color:#7f8699;
+  font-size:12px;
+  text-align: left;
   margin-bottom: 5px;
+}
+a.button{
+  color:#7f8699;
+  display: inline-block;
+  border: 1px solid #7f8699;
+  padding: 0px;
+}
+a.action{
+    border: 1px solid #12b7f5;
+    color:#12b7f5;
+}
+.form-control {
+  text-align: left;
+  font-size: 16px;
+  display:inline-block;
+  padding: 0 0 0 5px;
   border: 1px solid #ccc;
 }
 </style>

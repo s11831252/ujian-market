@@ -10,6 +10,12 @@ export default {
     Account_Login: param => {
         return http.post(BaseHost + "api/Account/Login", param)
     },
+    Account_wxLogin: (code,param) => {
+        return http.post(BaseHost + `api/Account/wxLogin?code=${code}`, param)
+    },
+    Account_SimpleLogin: param => {
+        return http.post(BaseHost + "api/Account/SimpleLogin", param)
+    },
     User_Get: param => {
         return http.get(BaseHost + "api/User/Get", param)
     },
