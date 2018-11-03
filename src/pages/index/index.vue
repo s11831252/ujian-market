@@ -1,16 +1,16 @@
 <template>
-  <div class="container" >
-    <img class="logo" src="/static/img/logo108.png"  mode="widthFix" >
+  <div class="container">
+    <img class="logo" src="/static/img/logo108.png" mode="widthFix">
     <p>U建商城</p>
-    <div class="userinfo" @click="go({path:'/pages/logs/index'})">
+    <div class="userinfo">
       <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
       <div class="userinfo-nickname">
         <card :text="userInfo.nickName"></card>
       </div>
     </div>
-    <div v-if="!userInfo.nickName" class="authorize" >
+    <div v-if="!userInfo.nickName" class="authorize">
       <p>申请获得你的公开信息(昵称、头像等)</p>
-      <button open-type="getUserInfo" @getuserinfo="getUserInfoData" >授权登录</button>
+      <button open-type="getUserInfo" @getuserinfo="getUserInfoData">授权登录</button>
     </div>
     <!-- <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button> -->
     <login v-if="userInfo.nickName" :userInfo="userInfo"></login>
@@ -19,7 +19,7 @@
 
 <script>
 import card from "@/components/card";
-import login from '@/components/login';
+import login from "@/components/login";
 export default {
   data() {
     return {
@@ -28,8 +28,8 @@ export default {
         PassWord: "",
         avatarUrl: "",
         nickName: "",
-        unionid:"",
-        openid:"",
+        unionid: "",
+        openid: ""
       }
     };
   },
@@ -60,36 +60,42 @@ export default {
         });
       }
     },
-     wx_login() {
+    wx_login() {
       // 调用wx登录接口
       wx.login({
         success: obj => {
           if (obj.errMsg.indexOf("login:ok") > -1) {
             // console.log(obj);
-            this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep=>{
-              if(rep.ret==0)
-              {
+            this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+              if (rep.ret == 0) {
                 // console.log(rep);
                 this.userInfo.unionid = rep.data.result.unionid;
                 this.userInfo.openid = rep.data.result.openid;
                 // console.log(this.userInfo);
 
-                if(rep.data.ticket)
-                {
+                if (rep.data.ticket) {
                   this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
-                  this.$router.push({ path: "/pages/home/index", isTab: true });
+                  this.$ShoppingAPI.User_Get().then(userinfo => {
+                    if (userinfo.ret == 0) {
+                      this.$store.commit("GetUserInfo", userinfo.data);
+                      this.$router.push({
+                        path: "/pages/home/index",
+                        isTab: true
+                      });
+                    }
+                  });
                 }
               }
-            })
+            });
           } else {
           }
         }
       });
     }
   },
-  mounted(){
+  mounted() {
     if (
-      this.$store.state.User.SingleTicket==null ||
+      this.$store.state.User.SingleTicket == null ||
       this.$store.state.User.SingleTicket.length > 0
     ) {
       // 切换至 tabBar 页面
@@ -119,20 +125,20 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.logo{
+.logo {
   width: 100px;
 }
-.authorize{
+.authorize {
   text-align: center;
   width: 100%;
-  button{
-  color:#12b7f5;
-  border: 1px solid #12b7f5;
-  border-radius: 10px;
-  padding: 0px;
-  width: 50%;
+  button {
+    color: #12b7f5;
+    border: 1px solid #12b7f5;
+    border-radius: 10px;
+    padding: 0px;
+    width: 50%;
   }
-  p{
+  p {
     margin: 10px 0 5px 0;
     font-size: 12px;
     color: #7f8699;
