@@ -42,7 +42,7 @@
       </div>
       <div class="box-body">
         <div class="nearby-location">
-          <p>我的定位:<span>龙光水悦龙湾</span></p>
+          <p @click="openLocation">我的定位:<span>龙光水悦龙湾</span></p>
           <span class="icon">&#xe65e;</span>
         </div>
         <div class="nearby-merchants">
@@ -59,7 +59,8 @@
                   <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
-                    </div><div class="shop-item-info">
+                    </div>
+                    <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
                       <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
@@ -74,7 +75,8 @@
                   <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
-                    </div><div class="shop-item-info">
+                    </div>
+                    <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
                       <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
@@ -89,7 +91,8 @@
                   <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
-                    </div><div class="shop-item-info">
+                    </div>
+                    <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
                       <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
@@ -104,7 +107,8 @@
                   <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
                       <img :src="item.sLogo">
-                    </div><div class="shop-item-info">
+                    </div>
+                    <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
                       <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
@@ -117,8 +121,6 @@
         </div>
       </div>
     </div>
-    <!-- <h1>行业市场首页</h1>
-        <a @click="go('/pages/index/index')" class="counter">去往授权页</a> -->
   </div>
 </template>
 <script>
@@ -134,6 +136,8 @@ export default {
         },
         News: {}
       },
+      latitude: 0,
+      longitude: 0,
       ShopList: [],
       Tabs: [
         {
@@ -170,6 +174,14 @@ export default {
     }
   },
   methods: {
+    openLocation() {
+      var that = this;
+      wx.openLocation({
+        latitude: that.latitude,
+        longitude: that.longitude,
+        scale: 28
+      });
+    },
     async marketGet() {
       var rep = await this.$ShoppingAPI.Market_Get();
       if (rep.ret == 0) {
@@ -178,15 +190,21 @@ export default {
     },
     async tabClick(tab, e) {
       if (e) this.activeIndex = e.currentTarget.id;
-      var rep = await this.$ShoppingAPI.Shop_Get(tab.parm);
+      var rep = await this.$ShoppingAPI.Shop_Get({
+        PageIndex: tab.parm.PageIndex,
+        PageSize: tab.parm.PageSize,
+        OrderType: tab.parm.OrderType,
+        Lon: this.longitude,
+        Lat: this.latitude
+      });
       if (rep.ret == 0) {
         this.ShopList = rep.data;
       }
     }
   },
-  onPullDownRefresh(){
-    console.log("page index onPullDownRefresh", this);
-    this.activeIndex=0;
+  onPullDownRefresh() {
+    // console.log("page index onPullDownRefresh", this);
+    this.activeIndex = 0;
     this.marketGet();
     this.tabClick(this.Tabs[0]);
   },
@@ -199,13 +217,23 @@ export default {
   onReady() {
     // console.log("page index onReady", this);
   },
-  onShow() {
-    // console.log("onShow", this);
-  },
+  onShow() {},
   mounted() {
     // console.log("mounted", this);
-    this.marketGet();
-    this.tabClick(this.Tabs[0]);
+    var that = this;
+    that.marketGet();
+    // wx.authorize({scope: "scope.userLocation"});
+    wx.getLocation({
+      success(res) {
+        console.log(res);
+        that.latitude = res.latitude;
+        that.longitude = res.longitude;
+      },
+      fail() {},
+      complete() {
+        that.tabClick(that.Tabs[0]);
+      }
+    });
   },
   onUnload() {
     // console.log("onUnload", this);
@@ -358,58 +386,60 @@ export default {
 .navbar_slider_3 {
   transform: translateX(300%);
 }
-.nearby{
-  .nearby-location{
-    color:#6b6b6b;
-    border-bottom:1px solid @borderColor;
+.nearby {
+  .nearby-location {
+    color: #6b6b6b;
+    border-bottom: 1px solid @borderColor;
     padding: 10px;
-    .icon,p{
+    .icon,
+    p {
       display: inline;
     }
   }
-  .nearby-merchants{
-    
-    .nearby-merchants-list{
+  .nearby-merchants {
+    .nearby-merchants-list {
       margin-top: 10px;
       margin: 10px;
-      .shop-item{
-        margin-top:10px;
-        .shop-item-logo{
+      .shop-item {
+        margin-top: 10px;
+        .shop-item-logo {
           width: 25%;
-          img{
+          img {
             width: 100%;
             height: 100%;
             border-radius: 10%;
           }
         }
-        .shop-item-info{
+        .shop-item-info {
           padding-left: 8px;
           width: 66%;
-          .shop-item-info-name{
+          .shop-item-info-name {
             font-size: 16px;
             color: #021218;
             margin-bottom: 10px;
             position: relative;
-            .shop-item-info-distance{
+            .shop-item-info-distance {
               position: absolute;
               right: 0;
             }
           }
-          .shop-item-info-score{
+          .shop-item-info-score {
             color: #5c5c5c;
             margin-bottom: 10px;
-            span{
+            span {
               color: #ff5252;
             }
           }
-          .shop-item-info-maintype{
+          .shop-item-info-maintype {
             color: #a2a2a2;
           }
-          .shop-item-info-score,.shop-item-info-maintype{
+          .shop-item-info-score,
+          .shop-item-info-maintype {
             font-size: 14px;
           }
         }
-        .shop-item-logo,.shop-item-info{
+        .shop-item-logo,
+        .shop-item-info {
           display: inline-block;
           vertical-align: top;
           height: 80px;
@@ -418,6 +448,5 @@ export default {
     }
   }
 }
-
 </style>
 
