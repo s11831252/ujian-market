@@ -99,6 +99,7 @@ a.button {
 }
 
 .form-control {
+  margin-bottom: 5px;
   text-align: left;
   font-size: 16px;
   height: 30px;
