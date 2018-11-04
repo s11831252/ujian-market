@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <img class="logo" src="/static/img/logo108.png" mode="widthFix">
+    <img class="logo" :class="{logoHide:logoHide}" src="/static/img/logo108.png" mode="widthFix">
     <p>U建商城</p>
     <div class="userinfo">
       <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
@@ -30,7 +30,8 @@ export default {
         nickName: "",
         unionid: "",
         openid: ""
-      }
+      },
+      logoHide:false,
     };
   },
   components: {
@@ -46,6 +47,7 @@ export default {
       if (obj.mp.detail.errMsg.indexOf("getUserInfo:ok") != -1) {
         this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
         this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
+        this.logoHide=true;
       } else {
         wx.showModal({
           title: "警告",
@@ -127,6 +129,14 @@ export default {
 <style lang="less" scoped>
 .logo {
   width: 100px;
+  transition:height 0.5s;
+  -moz-transition:height 0.5s; /* Firefox 4 */
+  -webkit-transition:height 0.5s; /* Safari and Chrome */
+  -o-transition:height 0.5s; /* Opera */
+}
+.logoHide{
+   width:0px;
+  height: 0px;
 }
 .authorize {
   text-align: center;

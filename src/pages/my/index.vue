@@ -2,7 +2,7 @@
     <div class="page">
         <div class="my-head">
             <div class="my-head-tool"><i class="icon"></i><i class="icon"></i></div>
-            <img :src="UserInfo.Portrait">
+            <img :src="UserInfo.Portrait" v-if="UserInfo.Portrait">
         </div>
         <div class="my-info">
             <p>{{UserInfo.UserName}}</p>

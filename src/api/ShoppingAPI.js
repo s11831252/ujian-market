@@ -10,6 +10,9 @@ export default {
     Account_Login: param => {
         return http.post(BaseHost + "api/Account/Login", param)
     },
+    Account_ValidationCode: (param) => {
+        return http.get(BaseHost + "api/Account/ValidationCode", param)
+    },
     Account_wxLogin: (code,param) => {
         return http.post(BaseHost + `api/Account/wxLogin?code=${code}`, param)
     },
