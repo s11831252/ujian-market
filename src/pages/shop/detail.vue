@@ -106,10 +106,15 @@ export default {
     shoppingCar
   },
   async mounted() {
+    wx.showShareMenu({
+      withShareTicket: true
+    });
     if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
       this.sId = this.$route.query.sId;
       this.gId = this.$route.query.gId;
-      this.sName= this.$route.query.sName;
+      console.log(this.$route.query.sName);
+      this.sName= decodeURI(this.$route.query.sName);
+      console.log(this.sName);
       var rep = await this.$ShoppingAPI.Goods_Get({
         sId: this.sId,
         gId: this.gId

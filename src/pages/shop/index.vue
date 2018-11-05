@@ -106,6 +106,9 @@ export default {
     }
   },
   async mounted() {
+    wx.showShareMenu({
+      withShareTicket: true
+    });
     this.activeIndex = 0;
     this.Tabs = [
       { name: "商品", type: "1", checked: true },
