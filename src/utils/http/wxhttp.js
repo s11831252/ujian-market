@@ -32,18 +32,19 @@ const net = {
             });
             return false;
           }
-          if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
-          {
-            store.state.User.SingleTicket="";
-            wx.redirectTo({url:"/pages/index/index"});
-          }else if(res.data.ret!=0)
-          {
-            wx.showToast({
-              title: res.data.msg,
-              icon: "none"
-            });
-            return false;
-          }
+          if(res.data&&res.data.ret)
+            if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
+            {
+              store.state.User.SingleTicket="";
+              wx.redirectTo({url:"/pages/index/index"});
+            }else if(res.data.ret!=0)
+            {
+              wx.showToast({
+                title: res.data.msg,
+                icon: "none"
+              });
+              return false;
+            }
           resolve(res.data);
         },
         fail: function (error) {

@@ -42,7 +42,7 @@
       </div>
       <div class="box-body">
         <div class="nearby-location">
-          <p @click="openLocation">我的定位:<span>龙光水悦龙湾</span></p>
+          <p @click="openLocation">我的定位:<span>{{LocationAddress}}</span></p>
           <span class="icon">&#xe65e;</span>
         </div>
         <div class="nearby-merchants">
@@ -136,8 +136,13 @@ export default {
         },
         News: {}
       },
+      gcj02: {
+        latitude: 0,
+        longitude: 0
+      },
       latitude: 0,
       longitude: 0,
+      LocationAddress: "",
       ShopList: [],
       Tabs: [
         {
@@ -177,8 +182,8 @@ export default {
     openLocation() {
       var that = this;
       wx.openLocation({
-        latitude: that.latitude,
-        longitude: that.longitude,
+        latitude: that.gcj02.latitude,
+        longitude: that.gcj02.longitude,
         scale: 28
       });
     },
@@ -188,18 +193,21 @@ export default {
         this.Market = rep.data;
       }
     },
-    async tabClick(tab, e) {
+    tabClick(tab, e) {
       if (e) this.activeIndex = e.currentTarget.id;
-      var rep = await this.$ShoppingAPI.Shop_Get({
-        PageIndex: tab.parm.PageIndex,
-        PageSize: tab.parm.PageSize,
-        OrderType: tab.parm.OrderType,
-        Lon: this.longitude,
-        Lat: this.latitude
-      });
-      if (rep.ret == 0) {
-        this.ShopList = rep.data;
-      }
+      this.$ShoppingAPI
+        .Shop_Get({
+          PageIndex: tab.parm.PageIndex,
+          PageSize: tab.parm.PageSize,
+          OrderType: tab.parm.OrderType,
+          Lon: this.longitude,
+          Lat: this.latitude
+        })
+        .then(rep => {
+          if (rep.ret == 0) {
+            this.ShopList = rep.data;
+          }
+        });
     }
   },
   onPullDownRefresh() {
@@ -224,15 +232,24 @@ export default {
     that.marketGet();
     // wx.authorize({scope: "scope.userLocation"});
     wx.getLocation({
+      type: "gcj02",
       success(res) {
-        console.log(res);
-        that.latitude = res.latitude;
-        that.longitude = res.longitude;
+        that.gcj02.latitude = res.latitude;
+        that.gcj02.longitude = res.longitude;
+        that.$ShoppingAPI
+          .baidu_geocoder({ location: `${res.latitude},${res.longitude}` })
+          .then(rep2 => {
+            if (rep2.status == 0)
+            {
+              that.LocationAddress = rep2.result.formatted_address;
+              that.latitude = rep2.result.location.lat;
+              that.longitude = rep2.result.location.lng;
+              that.tabClick(that.Tabs[0]);
+            }
+          });
       },
       fail() {},
-      complete() {
-        that.tabClick(that.Tabs[0]);
-      }
+      complete() {}
     });
   },
   onUnload() {
