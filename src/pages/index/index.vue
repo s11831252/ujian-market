@@ -31,7 +31,7 @@ export default {
         unionid: "",
         openid: ""
       },
-      logoHide:false,
+      logoHide: false
     };
   },
   components: {
@@ -47,7 +47,7 @@ export default {
       if (obj.mp.detail.errMsg.indexOf("getUserInfo:ok") != -1) {
         this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
         this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
-        this.logoHide=true;
+        this.logoHide = true;
       } else {
         wx.showModal({
           title: "警告",
@@ -80,10 +80,18 @@ export default {
                   this.$ShoppingAPI.User_Get().then(userinfo => {
                     if (userinfo.ret == 0) {
                       this.$store.commit("GetUserInfo", userinfo.data);
-                      this.$router.push({
-                        path: "/pages/home/index",
-                        isTab: true
-                      });
+                      if (this.$route.query.redirect)
+                        // 切换至 tabBar页面
+                        this.$router.push({
+                          path: this.$route.query.redirect,
+                          isTab: true
+                        });
+                      // 切换至 tabBar页面
+                      else
+                        this.$router.push({
+                          path: "/pages/home/index",
+                          isTab: true
+                        });
                     }
                   });
                 }
@@ -129,13 +137,13 @@ export default {
 <style lang="less" scoped>
 .logo {
   width: 100px;
-  transition:height 0.5s;
-  -moz-transition:height 0.5s; /* Firefox 4 */
-  -webkit-transition:height 0.5s; /* Safari and Chrome */
-  -o-transition:height 0.5s; /* Opera */
+  transition: height 0.5s;
+  -moz-transition: height 0.5s; /* Firefox 4 */
+  -webkit-transition: height 0.5s; /* Safari and Chrome */
+  -o-transition: height 0.5s; /* Opera */
 }
-.logoHide{
-   width:0px;
+.logoHide {
+  width: 0px;
   height: 0px;
 }
 .authorize {
