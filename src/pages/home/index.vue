@@ -215,6 +215,7 @@ export default {
     this.activeIndex = 0;
     this.marketGet();
     this.tabClick(this.Tabs[0]);
+    wx.stopPullDownRefresh()
   },
   created() {
     // console.log("page index created", this);

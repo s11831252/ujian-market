@@ -31,6 +31,7 @@ export default {
   },
   onPullDownRefresh(){
     this.init();
+    wx.stopPullDownRefresh()
   },
 };
 </script>

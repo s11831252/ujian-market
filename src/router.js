@@ -4,7 +4,7 @@ var routes = [
         name: 'index',
         config: {
             navigationBarTitleText: 'APP授权',
-            enablePullDownRefresh: true
+            enablePullDownRefresh: false
           },
     },
     {
@@ -35,7 +35,7 @@ var routes = [
         name: 'shop',
         config: {
             navigationBarTitleText: '店铺主页',
-            enablePullDownRefresh: true
+            enablePullDownRefresh: false
           },
     },
     {
