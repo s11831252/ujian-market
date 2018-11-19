@@ -11,6 +11,11 @@ Vue.use(Toast);
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
 Vue.mixin({
+  computed: {
+    isMP(){
+        return false;
+    }
+  },
   methods: {
       go: function(path) {
         this.$router.push(path);

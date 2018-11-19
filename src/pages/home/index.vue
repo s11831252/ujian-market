@@ -195,14 +195,18 @@ export default {
     },
     tabClick(tab, e) {
       if (e) this.activeIndex = e.currentTarget.id;
-      this.$ShoppingAPI
-        .Shop_Get({
+      var param = {
           PageIndex: tab.parm.PageIndex,
           PageSize: tab.parm.PageSize,
           OrderType: tab.parm.OrderType,
-          Lon: this.longitude,
-          Lat: this.latitude
-        })
+        };
+        if(this.longitude&&this.latitude)
+        {
+          param.Lon=this.longitude,
+          param.Lat = this.latitude
+        }
+      this.$ShoppingAPI
+        .Shop_Get(param)
         .then(rep => {
           if (rep.ret == 0) {
             this.ShopList = rep.data;
@@ -215,7 +219,7 @@ export default {
     this.activeIndex = 0;
     this.marketGet();
     this.tabClick(this.Tabs[0]);
-    wx.stopPullDownRefresh()
+    wx.stopPullDownRefresh();
   },
   created() {
     // console.log("page index created", this);
@@ -228,30 +232,32 @@ export default {
   },
   onShow() {},
   mounted() {
-    // console.log("mounted", this);
     var that = this;
     that.marketGet();
     // wx.authorize({scope: "scope.userLocation"});
-    wx.getLocation({
-      type: "gcj02",
-      success(res) {
-        that.gcj02.latitude = res.latitude;
-        that.gcj02.longitude = res.longitude;
-        that.$ShoppingAPI
-          .baidu_geocoder({ location: `${res.latitude},${res.longitude}` })
-          .then(rep2 => {
-            if (rep2.status == 0)
-            {
-              that.LocationAddress = rep2.result.formatted_address;
-              that.latitude = rep2.result.location.lat;
-              that.longitude = rep2.result.location.lng;
-              that.tabClick(that.Tabs[0]);
-            }
-          });
-      },
-      fail() {},
-      complete() {}
-    });
+    if (this.isMP) {
+      wx.getLocation({
+        type: "gcj02",
+        success(res) {
+          that.gcj02.latitude = res.latitude;
+          that.gcj02.longitude = res.longitude;
+          that.$ShoppingAPI
+            .baidu_geocoder({ location: `${res.latitude},${res.longitude}` })
+            .then(rep2 => {
+              if (rep2.status == 0) {
+                that.LocationAddress = rep2.result.formatted_address;
+                that.latitude = rep2.result.location.lat;
+                that.longitude = rep2.result.location.lng;
+                that.tabClick(that.Tabs[0]);
+              }
+            });
+        },
+        fail() {},
+        complete() {}
+      });
+    } else {
+      that.tabClick(that.Tabs[0]);
+    }
   },
   onUnload() {
     // console.log("onUnload", this);

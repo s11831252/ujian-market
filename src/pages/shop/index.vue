@@ -105,10 +105,15 @@ export default {
       });
     }
   },
-  async mounted() {
+  onLoad (query) {
+    // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
+    this.sId = decodeURIComponent(query.scene);
     wx.showShareMenu({
       withShareTicket: true
     });
+  },
+  async mounted() {
+
     this.activeIndex = 0;
     this.Tabs = [
       { name: "商品", type: "1", checked: true },
@@ -116,8 +121,8 @@ export default {
       { name: "商家", type: "3", checked: true }
     ];
     this.goodList = [];
-    if (this.$route.query && this.$route.query.sId.length > 0) {
-      this.sId = this.$route.query.sId;
+    if (this.sId||(this.$route.query && this.$route.query.sId.length > 0) ) {
+      this.sId =this.sId|| this.$route.query.sId;
       var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId }); //获取店铺详情
       if (rep.ret == 0) {
         this.shopDetail = rep.data;

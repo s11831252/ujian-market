@@ -13,6 +13,9 @@ Vue.mixin({
     computed: {
         $route: function () {
             return this.$router.currentRoute
+        },
+        isMP(){
+            return true;
         }
     },
     methods: {

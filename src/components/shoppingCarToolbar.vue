@@ -133,7 +133,7 @@ export default {
     }
   }
   .shoppingcar-toolbar {
-    padding: 10px;
+    padding: 0px 10px 5px 10px;
     position: absolute;
     width: 96%;
     bottom: 0;
