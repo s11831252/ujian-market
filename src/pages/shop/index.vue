@@ -57,7 +57,7 @@
         </div>
         <div :hidden="activeIndex != 1">
           &nbsp;
-          <h1>评价列表正在开发中</h1>
+          <h1>商家信息正在开发中</h1>
         </div>
         <div :hidden="activeIndex != 2">
           <h1>商家信息正在开发中</h1>
@@ -105,6 +105,14 @@ export default {
       });
     }
   },
+  onShareAppMessage (result) {
+    let title = this.shopDetail.sName;
+    let path = `/pages/shop/index?sId=${this.sId}`
+    return {
+      title,
+      path
+    }
+  },
   onLoad (query) {
     // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
     if(query.scene)
@@ -118,16 +126,18 @@ export default {
     this.activeIndex = 0;
     this.Tabs = [
       { name: "商品", type: "1", checked: true },
-      { name: "评价", type: "2", checked: true },
+      // { name: "评价", type: "2", checked: true },
       { name: "商家", type: "3", checked: true }
     ];
     this.goodList = [];
     if (this.sId||(this.$route.query && this.$route.query.sId.length > 0) ) {
       this.sId =this.sId|| this.$route.query.sId;
       var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId }); //获取店铺详情
+
       if (rep.ret == 0) {
         this.shopDetail = rep.data;
-        this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
+        if(this.isMP) wx.setNavigationBarTitle({title:this.shopDetail.sName});
+        // this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
       }
       var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
       if (rep3.ret == 0) {
