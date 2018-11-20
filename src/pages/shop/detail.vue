@@ -112,16 +112,16 @@ export default {
     if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
       this.sId = this.$route.query.sId;
       this.gId = this.$route.query.gId;
-      console.log(this.$route.query.sName);
+      // console.log(this.$route.query.sName);
       this.sName= decodeURI(this.$route.query.sName);
-      console.log(this.sName);
+      // console.log(this.sName);
       var rep = await this.$ShoppingAPI.Goods_Get({
         sId: this.sId,
         gId: this.gId
       });
       if (rep.ret == 0) {
         this.goods_detail = rep.data;
-        console.log(this.goods_detail);
+         console.log(this.goods_detail);
       }
     }
   }

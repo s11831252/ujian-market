@@ -78,10 +78,10 @@ export default {
   }
   img {
     position: relative;
-    bottom: -10px;
+    bottom: -20px;
     width: 80px;
     height: 80px;
-    border-radius: 50%;
+    border-radius: 10px;
   }
 }
 .my-info {

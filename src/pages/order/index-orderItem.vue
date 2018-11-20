@@ -1,7 +1,8 @@
 <template>
     <div v-if="order">
         <div class="shopinfo">
-            <p v-if="order.sName">{{order.sName}}
+            <p>
+                <span v-if="order.sName">{{order.sName}}</span>
                 <span class="icon">&#xe601;</span>
                 <span class="right">{{stateName}}</span>
             </p>
