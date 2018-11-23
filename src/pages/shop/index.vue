@@ -4,7 +4,7 @@
       <div class="shop-detail-logo">
         <img :src="shopDetail.sLogo">
       </div>
-      <div class="shop-detail-info">
+      <div class="shop-simple-info">
         <p class="shop-detail-name">{{shopDetail.sName}}</p>
         <p class="shop-detail-notice">店铺公告：
           <span>{{shopDetail.Notice}}</span>
@@ -36,7 +36,7 @@
             </ul>
             <ul class="shop-detail-tab-goods-list">
               <li v-for="(item,index) in goodList" :key="index" class="shop-detail-tab-goods-detail" @click="go({path:'/pages/shop/detail',query:{sId:item.sId,gId:item.gId,sName:shopDetail.sName}})">
-                <div class="shop-detail-tab-goods-logo" >
+                <div class="shop-detail-tab-goods-logo">
                   <img :src="item.Images[0].Thumbnail_url">
                 </div>
                 <div class="shop-detail-tab-goods-info">
@@ -56,8 +56,22 @@
           </div>
         </div>
         <div :hidden="activeIndex != 1">
-          &nbsp;
-          <h1>商家信息正在开发中</h1>
+          <ul class="shop-detail-info">
+            <li><i class="icon">&#xe61f;</i><span>{{shopDetail.Address}}</span></li>
+            <li><i class="icon">&#xe654;</i><span>查看相关证件</span></li>
+            <li><i class="icon">&#xe628;</i><span>主营：{{shopDetail.MainType}}</span></li>
+            <li><i class="icon">&#xe60a;</i><span>{{shopDetail.Mobile}}&nbsp;{{shopDetail.Tel}}</span></li>
+            <li><i class="icon">&#xe623;</i><span>{{shopDetail.Notice}}</span></li>
+            <li><i class="icon">店铺图片</i>
+              <ul>
+                <li v-for="(item,index) in shopDetail.ShopImages" :key="index">
+                  <!-- <img mode="widthFix" :src="item.ThumbnailUrl"> -->
+                  <img :src="item.ThumbnailUrl">
+                </li>
+              </ul>
+            </li>
+            <li><i class="icon">店铺简介</i><span>{{shopDetail.Brief}}</span></li>
+          </ul>
         </div>
         <div :hidden="activeIndex != 2">
           <h1>商家信息正在开发中</h1>
@@ -71,7 +85,7 @@
 import buy from "@/components/buy";
 import shoppingCar from "@/components/shoppingCarToolbar";
 
-import {mapGetters,mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -105,24 +119,22 @@ export default {
       });
     }
   },
-  onShareAppMessage (result) {
+  onShareAppMessage(result) {
     let title = this.shopDetail.sName;
-    let path = `/pages/shop/index?sId=${this.sId}`
+    let path = `/pages/shop/index?sId=${this.sId}`;
     return {
       title,
       path
-    }
+    };
   },
-  onLoad (query) {
+  onLoad(query) {
     // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
-    if(query.scene)
-      this.sId = decodeURIComponent(query.scene);
+    if (query.scene) this.sId = decodeURIComponent(query.scene);
     wx.showShareMenu({
       withShareTicket: true
     });
   },
   async mounted() {
-
     this.activeIndex = 0;
     this.Tabs = [
       { name: "商品", type: "1", checked: true },
@@ -130,13 +142,14 @@ export default {
       { name: "商家", type: "3", checked: true }
     ];
     this.goodList = [];
-    if (this.sId||(this.$route.query && this.$route.query.sId.length > 0) ) {
-      this.sId =this.sId|| this.$route.query.sId;
+    if (this.sId || (this.$route.query && this.$route.query.sId.length > 0)) {
+      this.sId = this.sId || this.$route.query.sId;
       var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId }); //获取店铺详情
 
       if (rep.ret == 0) {
         this.shopDetail = rep.data;
-        if(this.isMP) wx.setNavigationBarTitle({title:this.shopDetail.sName});
+        if (this.isMP)
+          wx.setNavigationBarTitle({ title: this.shopDetail.sName });
         // this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
       }
       var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
@@ -155,9 +168,9 @@ export default {
 </script>
 <style lang="less" scoped>
 .shop-detail {
-  background-color: #12b7f5;
-  margin-bottom: 65px;
+  padding-bottom: 65px;
   .shop-detail-head {
+    background-color: #12b7f5;
     padding: 20px 5px 0 10px;
     color: #fff;
     .shop-detail-logo {
@@ -169,7 +182,7 @@ export default {
         position: absolute;
       }
     }
-    .shop-detail-info {
+    .shop-simple-info {
       padding-left: 10px;
       width: 71%;
       .shop-detail-name {
@@ -197,7 +210,7 @@ export default {
       }
     }
     .shop-detail-logo,
-    .shop-detail-info {
+    .shop-simple-info {
       display: inline-block;
       vertical-align: top;
     }
@@ -264,7 +277,7 @@ export default {
               display: inline-block;
               vertical-align: top;
             }
-            .shop-detail-tab-goods-choose{
+            .shop-detail-tab-goods-choose {
               display: inline-block;
               float: right;
               color: #fccb5c;
@@ -286,8 +299,38 @@ export default {
         vertical-align: top;
       }
     }
+    ul.shop-detail-info {
+      > li {
+        border-bottom: 1px solid #d6d6d6;
+        padding: 7px 0;
+        i {
+          font-size: 20px;
+          display: inline-block;
+          vertical-align: top;
+          margin: 0 10px;
+        }
+        ul {
+          display: inline-block;
+          li {
+            float: left;
+          }
+        }
+        i.icon {
+          vertical-align: initial;
+          font-size: 20px;
+        }
+        span {
+          color: #444444;
+          font-size: 13px;
+        }
+        img {
+          width: 87px;
+          height: 87px;
+          margin: 0 0 0 5px;
+        }
+      }
+    }
   }
-
 }
 
 .navbar {

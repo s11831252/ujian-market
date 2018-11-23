@@ -17,6 +17,7 @@
     "axios": "^0.18.0",
     "mpvue": "^1.0.11",
     "mpvue-router-patch": "^0.2.1",
+    "mpvue-wxparse": "^0.6.5",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",

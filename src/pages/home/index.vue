@@ -63,7 +63,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
+                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
                     </div>
                   </div>
                 </li>
@@ -77,10 +77,11 @@
                       <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
-                      <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
+                      <p class="shop-item-info-name">{{item.sName}}</p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
                       <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
                     </div>
+                    <span class="shop-item-info-distance">{{item.Distance}}米</span>
                   </div>
                 </li>
               </ul>
@@ -425,6 +426,7 @@ export default {
       margin-top: 10px;
       margin: 10px;
       .shop-item {
+        position: relative;
         margin-top: 10px;
         .shop-item-logo {
           width: 25%;
@@ -434,19 +436,24 @@ export default {
             border-radius: 10%;
           }
         }
+          .shop-item-info-distance {
+              position: absolute;
+              right: 0;
+            }
         .shop-item-info {
           padding-left: 8px;
           width: 66%;
+
           .shop-item-info-name {
             font-size: 16px;
             color: #021218;
             margin-bottom: 10px;
-            position: relative;
-            .shop-item-info-distance {
-              position: absolute;
-              right: 0;
-            }
+            width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
+
           .shop-item-info-score {
             color: #5c5c5c;
             margin-bottom: 10px;
