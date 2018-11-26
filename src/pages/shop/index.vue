@@ -122,9 +122,11 @@ export default {
   onShareAppMessage(result) {
     let title = this.shopDetail.sName;
     let path = `/pages/shop/index?sId=${this.sId}`;
+    let imageUrl = '/static/img/share.png'
     return {
       title,
-      path
+      path,
+      imageUrl
     };
   },
   onLoad(query) {

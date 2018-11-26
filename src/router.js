@@ -12,7 +12,8 @@ var routes = [
         name: 'home',
         config: {
             navigationBarTitleText: '主页',
-            enablePullDownRefresh: true
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
           },
     },
     {

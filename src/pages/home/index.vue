@@ -77,11 +77,10 @@
                       <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
-                      <p class="shop-item-info-name">{{item.sName}}</p>
+                      <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
                       <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
                     </div>
-                    <span class="shop-item-info-distance">{{item.Distance}}米</span>
                   </div>
                 </li>
               </ul>
@@ -148,26 +147,41 @@ export default {
       Tabs: [
         {
           name: "综合",
-          type: "1",
-          parm: { PageIndex: 1, PageSize: 20, OrderType: "DEFAULT" },
+          index: 0,
+          parm: {
+            PageIndex: 1,
+            PageSize: 10,
+            OrderType: "DEFAULT",
+            hasPage: true
+          },
           checked: true
         },
         {
           name: "人气",
-          type: "2",
-          parm: { PageIndex: 1, PageSize: 20, OrderType: "HOT" },
+          index: 1,
+          parm: { PageIndex: 1, PageSize: 10, OrderType: "HOT", hasPage: true },
           checked: true
         },
         {
           name: "销量",
-          type: "3",
-          parm: { PageIndex: 1, PageSize: 20, OrderType: "SALE" },
+          index: 2,
+          parm: {
+            PageIndex: 1,
+            PageSize: 10,
+            OrderType: "SALE",
+            hasPage: true
+          },
           checked: true
         },
         {
           name: "距离",
-          type: "4",
-          parm: { PageIndex: 1, PageSize: 20, OrderType: "DISTANCE" },
+          index: 3,
+          parm: {
+            PageIndex: 1,
+            PageSize: 10,
+            OrderType: "DISTANCE",
+            hasPage: true
+          },
           checked: true
         }
       ],
@@ -195,24 +209,26 @@ export default {
       }
     },
     tabClick(tab, e) {
-      if (e) this.activeIndex = e.currentTarget.id;
+      if (e)
+      {
+        let _tab = this.Tabs[this.activeIndex];
+        _tab.parm.PageIndex=1;
+        _tab.parm.hasPage=true;
+        this.activeIndex = e.currentTarget.id;
+      }
       var param = {
-          PageIndex: tab.parm.PageIndex,
-          PageSize: tab.parm.PageSize,
-          OrderType: tab.parm.OrderType,
-        };
-        if(this.longitude&&this.latitude)
-        {
-          param.Lon=this.longitude,
-          param.Lat = this.latitude
+        PageIndex: tab.parm.PageIndex,
+        PageSize: tab.parm.PageSize,
+        OrderType: tab.parm.OrderType
+      };
+      if (this.longitude && this.latitude) {
+        (param.Lon = this.longitude), (param.Lat = this.latitude);
+      }
+      this.$ShoppingAPI.Shop_Get(param).then(rep => {
+        if (rep.ret == 0) {
+          this.ShopList = rep.data;
         }
-      this.$ShoppingAPI
-        .Shop_Get(param)
-        .then(rep => {
-          if (rep.ret == 0) {
-            this.ShopList = rep.data;
-          }
-        });
+      });
     }
   },
   onPullDownRefresh() {
@@ -221,6 +237,37 @@ export default {
     this.marketGet();
     this.tabClick(this.Tabs[0]);
     wx.stopPullDownRefresh();
+  },
+  onReachBottom() {
+    var that =this;
+    var tab = this.Tabs.find(item=>{ 
+      return item.index==that.activeIndex
+      });
+    console.log(tab);
+    if (tab.parm.hasPage) {
+      tab.parm.PageIndex++;
+      var param = {
+        PageIndex: tab.parm.PageIndex,
+        PageSize: tab.parm.PageSize,
+        OrderType: tab.parm.OrderType
+      };
+      if (this.longitude && this.latitude) {
+        (param.Lon = this.longitude), (param.Lat = this.latitude);
+      }
+      this.$ShoppingAPI.Shop_Get(param).then(rep => {
+        if (rep.ret == 0) {
+          if (rep.data && rep.data.length) {
+            for (let index = 0; index < rep.data.length; index++) {
+              const element = rep.data[index];
+
+              that.ShopList.push(element);
+            }
+          } else {
+            tab.parm.hasPage = false;
+          }
+        }
+      });
+    }
   },
   created() {
     // console.log("page index created", this);
@@ -436,10 +483,10 @@ export default {
             border-radius: 10%;
           }
         }
-          .shop-item-info-distance {
-              position: absolute;
-              right: 0;
-            }
+        .shop-item-info-distance {
+          position: absolute;
+          right: 0;
+        }
         .shop-item-info {
           padding-left: 8px;
           width: 66%;
