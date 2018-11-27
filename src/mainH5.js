@@ -4,7 +4,7 @@ import store from './store'
 import router from './routerH5'
 import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
-
+import fts from './utils/autorem'
 import Toast from './components/Toast';
 Vue.use(Toast);
 

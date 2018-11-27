@@ -59,7 +59,7 @@
           <ul class="shop-detail-info">
             <li><i class="icon">&#xe61f;</i><span>{{shopDetail.Address}}</span></li>
             <li><i class="icon">&#xe654;</i><span>查看相关证件</span></li>
-            <li><i class="icon">&#xe628;</i><span>主营：{{shopDetail.MainType}}</span></li>
+            <li><i class="icon">&#xe628;</i><span>主营：{{shopDetail.MainTypeName}}</span></li>
             <li><i class="icon">&#xe60a;</i><span>{{shopDetail.Mobile}}&nbsp;{{shopDetail.Tel}}</span></li>
             <li><i class="icon">&#xe623;</i><span>{{shopDetail.Notice}}</span></li>
             <li><i class="icon">店铺图片</i>

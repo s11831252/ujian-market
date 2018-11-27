@@ -79,7 +79,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
+                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
                     </div>
                   </div>
                 </li>
@@ -95,7 +95,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
+                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
                     </div>
                   </div>
                 </li>
@@ -111,7 +111,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
                       <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainType}}</span></p>
+                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
                     </div>
                   </div>
                 </li>
@@ -150,7 +150,7 @@ export default {
           index: 0,
           parm: {
             PageIndex: 1,
-            PageSize: 10,
+            PageSize: 20,
             OrderType: "DEFAULT",
             hasPage: true
           },
@@ -159,7 +159,7 @@ export default {
         {
           name: "人气",
           index: 1,
-          parm: { PageIndex: 1, PageSize: 10, OrderType: "HOT", hasPage: true },
+          parm: { PageIndex: 1, PageSize: 20, OrderType: "HOT", hasPage: true },
           checked: true
         },
         {
@@ -167,7 +167,7 @@ export default {
           index: 2,
           parm: {
             PageIndex: 1,
-            PageSize: 10,
+            PageSize: 20,
             OrderType: "SALE",
             hasPage: true
           },
@@ -178,7 +178,7 @@ export default {
           index: 3,
           parm: {
             PageIndex: 1,
-            PageSize: 10,
+            PageSize: 20,
             OrderType: "DISTANCE",
             hasPage: true
           },
@@ -208,7 +208,7 @@ export default {
         this.Market = rep.data;
       }
     },
-    tabClick(tab, e) {
+    async tabClick(tab, e) {
       if (e)
       {
         let _tab = this.Tabs[this.activeIndex];
@@ -224,11 +224,11 @@ export default {
       if (this.longitude && this.latitude) {
         (param.Lon = this.longitude), (param.Lat = this.latitude);
       }
-      this.$ShoppingAPI.Shop_Get(param).then(rep => {
+      var rep = await this.$ShoppingAPI.Shop_Get(param)
         if (rep.ret == 0) {
           this.ShopList = rep.data;
         }
-      });
+      
     }
   },
   onPullDownRefresh() {
@@ -238,12 +238,11 @@ export default {
     this.tabClick(this.Tabs[0]);
     wx.stopPullDownRefresh();
   },
-  onReachBottom() {
+  async onReachBottom() {
     var that =this;
     var tab = this.Tabs.find(item=>{ 
       return item.index==that.activeIndex
       });
-    console.log(tab);
     if (tab.parm.hasPage) {
       tab.parm.PageIndex++;
       var param = {
@@ -254,7 +253,7 @@ export default {
       if (this.longitude && this.latitude) {
         (param.Lon = this.longitude), (param.Lat = this.latitude);
       }
-      this.$ShoppingAPI.Shop_Get(param).then(rep => {
+      var rep =  await this.$ShoppingAPI.Shop_Get(param)
         if (rep.ret == 0) {
           if (rep.data && rep.data.length) {
             for (let index = 0; index < rep.data.length; index++) {
@@ -266,7 +265,6 @@ export default {
             tab.parm.hasPage = false;
           }
         }
-      });
     }
   },
   created() {

@@ -1,17 +1,25 @@
 <template>
-  <div class="form">
-    <div v-if="isMP">
-      <input class="form-control" v-model="userInfo.Account" type="text" placeholder="输入U建账号或手机号码">
-      <input class="form-control VerificationCode" v-model="VerificationCode" type="text" placeholder="输入验证码">
-      <a class="VerificationCode" :class="{action:codeAction}" @click="countDown">{{countDownStr}}</a>
-      <!-- <input class="form-control" v-model.lazy="userInfo.PassWord" type="password" placeholder="输入登录密码"> -->
-      <p>如果您还没有使用这个手机号注册过U建,我们将为您创建U建账号</p>
-      <a class="button" :class="{action:loginAction}" @click="login">登录</a>
-    </div>
-    <div v-else>
-      <input class="form-control" v-model.lazy="userInfo.Account" type="text" placeholder="请输入U建登录账号">
-      <input class="form-control" v-model.lazy="userInfo.PassWord" type="password" placeholder="请输入U建登录密码">
-      <button @click="login2">登录</button>
+  <div>
+    <div class="index">
+        <div class="nr">
+            <!-- 输入手机号码 -->
+            <div class="tel">
+                <i class="icon">&#xe60d;</i>
+                <input type="tel" placeholder="请输入手机号码" v-model="userInfo.Account">
+            </div>
+            <!-- 输入验证码 -->
+            <div class="message">
+                <div class="emal">
+                    <i class="icon">&#xe60b;</i>
+                    <input type="number" placeholder="请输入验证码"  v-model="VerificationCode" >
+                </div>
+                <p class="yzm" :class="{action:codeAction}" @click="countDown">{{countDownStr}}</p>
+           </div>
+           <!-- 登录按钮 -->
+           <div class="btn" :class="{action:loginAction}" @click="login">立即登录</div>
+           <!-- 底部提示文字 -->
+           <div class="fttext"><p>欢迎使用U建行业市场,</p><p>请您输入手机号码进入下步购物环节</p></div>
+        </div>
     </div>
   </div>
 
@@ -24,7 +32,7 @@ export default {
   },
   data() {
     return {
-      countDownStr: "发送验证码",
+      countDownStr: "获取验证码",
       sendTime: 0,
       VerificationCode: ""
     };
@@ -45,7 +53,7 @@ export default {
         });
         if (rep.ret == 0) {
           this.sendTime = 60;
-          this.countDownStr = this.sendTime + "s后可重新发送";
+          this.countDownStr = this.sendTime + "s后可重发";
           var clock = setInterval(() => {
             this.sendTime--;
             if (this.sendTime <= 0) {
@@ -53,7 +61,7 @@ export default {
               this.sendTime = 0;
               clearInterval(clock);
             } else {
-              this.countDownStr = this.sendTime + "s后可重新发送";
+              this.countDownStr = this.sendTime + "s后可重发";
             }
           }, 1000);
         }
@@ -103,59 +111,146 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.form {
-  margin-top: 5px;
-  // text-align: center;
-  width: 70%;
-}
-.form-control,
-.button {
-  width: 100%;
-}
-p {
-  color: #7f8699;
-  font-size: 12px;
-  text-align: left;
-  margin-bottom: 5px;
-}
-a.button {
-  color: #7f8699;
-  display: inline-block;
-  text-align: center;
-  border: 1px solid #7f8699;
-  padding: 0px;
-  height: 30px;
+
+.index .nr {
+  margin-top: 1.5rem;
+  /*input提示文字颜色*/
+  /*输入手机号码*/
+  /*输入验证码*/
+  /*立即登录按钮*/
+  /*底部提示文字*/
 }
 
-.form-control {
-  margin-bottom: 5px;
-  text-align: left;
-  font-size: 16px;
-  height: 30px;
-  display: inline-block;
-  padding: 0 0 0 5px;
-  border: 1px solid #ccc;
+.index .nr ::-webkit-input-placeholder {
+  color: #999999;
 }
-a.VerificationCode {
-  margin-left: 5%;
-  width: 40%;
-  padding: 0 0 0 5px;
-  height: 30px;
-  line-height: 30px;
-  display: inline-block;
-  font-size: 14px;
-  border: 1px solid #7f8699;
-  color: #7f8699;
-  border-radius: 5px;
-  vertical-align: top;
+
+.index .nr ::-o--input-placeholder {
+  color: #999999;
 }
-input.VerificationCode {
-  width: 50%;
-  display: inline-block;
+
+.index .nr ::-moz-input-placeholder {
+  color: #999999;
 }
-a.action {
-  border: 1px solid #12b7f5;
+
+.index .nr ::-ms-input-placeholder {
+  color: #999999;
+}
+
+.index .nr .tel {
+  width: 8rem;
+  height: 1.4rem;
+  margin-left: 1.4rem;
+  border-radius: 0.7rem;
+  background-color: #ffffff;
+  box-shadow: 0 0.03rem 0.21rem 0 rgba(51, 150, 254, 0.35);
+}
+
+.index .nr .tel i {
+  width: 0.44rem;
+  height: 0.69rem;
+  margin-top: 0.35rem;
+  margin-left: 0.65rem;
+  margin-right: 0.47rem;
+  float: left;
+      font-size: 22px;
+      color: #93e4fc;
+}
+
+.index .nr .tel input {
+  border: none;
+  width: 5rem;
+  height: 0.7rem;
+  float: left;
+  margin-top: 0.35rem;
+  color: #999999;
+}
+
+.index .nr .message {
+  width: 10.8rem;
+  height: 1.4rem;
+  margin-top: 0.64rem;
+  /*验证码文字*/
+}
+
+.index .nr .message .emal {
+  width: 5.5rem;
+  height: 1.4rem;
+  margin-left: 1.4rem;
+  border-radius: 0.7rem;
+  background-color: #ffffff;
+  box-shadow: 0 0.03rem 0.21rem 0 rgba(51, 150, 254, 0.35);
+  float: left;
+}
+
+.index .nr .message .emal i {
+  width: 0.56rem;
+  height: 0.43rem;
+  margin-left: 0.65rem;
+  margin-right: 0.35rem;
+  margin-top: 0.49rem;
+  float: left;
+    font-size: 22px;
+      color: #93e4fc;
+}
+.index {
+  input{
+     font-size: 0.4rem;
+  }
+}
+
+.index .nr .message .emal input {
+  border: none;
+  width: 2.8rem;
+  height: 0.7rem;
+  color: #999999;
+  float: left;
+  margin-top: 0.35rem;
+ 
+}
+
+.index .nr .message .yzm {
+  color: #3396fe;
+  font-size: 0.4rem;
+  margin-left: 0.52rem;
+  float: left;
+  line-height: 1.4rem;
+}
+
+.index .nr .btn {
+  width: 8rem;
+  height: 1.21rem;
+  margin-top: 1.04rem;
+  margin-left: 1.4rem;
+  background-image: linear-gradient(-20deg, #3396fe 0%, #65c1fd 100%), linear-gradient(#ffffff, #ffffff);
+  background-blend-mode: normal, 
+ normal;
+  box-shadow: 0 0.03rem 0.21rem 0 rgba(51, 150, 254, 0.35);
+  border-radius: 0.6rem;
+  font-size: 0.5rem;
+  line-height: 1.21rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.index .nr .btn P {
+  font-size: 0.5rem;
+  line-height: 1.21rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.index .nr .fttext {
+  margin-top: 0.9rem;
+}
+
+.index .nr .fttext p {
+  letter-spacing: 0.01rem;
   color: #12b7f5;
+  font-size: 0.4rem;
+  opacity: 0.6;
+  line-height: 0.9rem;
+  text-align: center;
 }
 </style>
 
