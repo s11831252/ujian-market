@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import home from './pages/home/index'
 import order from './pages/order/index'
 import my from './pages/my/index'
+import address from './pages/my/address'
+import addressadd from './pages/my/addressadd'
 import index from './pages/index/indexH5'
 import shop from './pages/shop/index'
 import shopgoods from './pages/shop/detail'
@@ -62,6 +64,26 @@ var routes = [
         },
         alias: '/pages/my/index',
         component: my
+    },
+    {
+        path: 'pages/my/address',
+        name: 'address',
+        config: {
+            navigationBarTitleText: '收货地址管理',
+            enablePullDownRefresh: false,
+          },
+          alias: '/pages/my/address',
+          component: address
+    },
+    {
+        path: 'pages/my/addressadd',
+        name: 'addressadd',
+        config: {
+            navigationBarTitleText: '新增收货地址',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/addressadd',
+          component: addressadd
     },
     {
         path: 'pages/shop/index',

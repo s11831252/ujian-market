@@ -329,9 +329,11 @@ export default {
     border-bottom: 1px solid @borderColor;
     p {
       color: #12b7f5;
+      font-size: 0.4rem;
       span {
         padding-left: 10px;
         color: #7f8699;
+        font-size: 0.35rem;
       }
     }
   }
@@ -342,6 +344,7 @@ export default {
 .news p {
   border-left: 2px solid #12b7f5;
   padding-left: 5px;
+  font-size: 0.4rem;
 }
 .category {
   margin: 10px;
@@ -394,8 +397,9 @@ export default {
   line-height: 40px;
   width: 100%;
   // background-color: #298de5;
-  border-bottom: 1rpx solid #ccc;
+  border-bottom: 1px solid #ccc;
   position: relative;
+  font-size: 0.41rem;
 }
 
 .navbar_item {
@@ -458,6 +462,7 @@ export default {
 }
 .nearby {
   .nearby-location {
+    font-size: 0.4rem;
     color: #6b6b6b;
     border-bottom: 1px solid @borderColor;
     padding: 10px;
@@ -484,6 +489,7 @@ export default {
         .shop-item-info-distance {
           position: absolute;
           right: 0;
+          color: #5c5c5c;
         }
         .shop-item-info {
           padding-left: 8px;

@@ -5,7 +5,7 @@
             <img :src="UserInfo.Portrait" v-if="UserInfo.Portrait">
         </div>
         <div class="my-info">
-            <p>{{UserInfo.UserName}}</p>
+            <p class="my-info-username">{{UserInfo.UserName}}</p>
             <p>手机号码：{{UserInfo.Phone}}</p>
             <ul class="my-info-vital">
                 <li>
@@ -23,11 +23,11 @@
             </ul>
             <ul class="my-info-action">
                 <li>
-                    <p><i class="icon icon-sh">&#xe65e;</i>收货地址<i class="icon right">&#xe601;</i></p>
+                    <p @click="go({path:'/pages/my/address'})"><i class="icon icon-sh">&#xe65e;</i>收货地址<i class="icon right">&#xe601;</i></p>
                 </li>
-                <li>
+                <!-- <li>
                     <p><i class="icon icon-dw">&#xe620;</i>项目定位<i class="icon right">&#xe601;</i></p>
-                </li>
+                </li> -->
                 <li>
                     <p><i class="icon icon-sc">&#xe60c;</i>我的收藏<i class="icon right">&#xe601;</i></p>
                 </li>
@@ -59,6 +59,13 @@ export default {
     }
   },
   components: {},
+  async mounted(){
+    if(!this.UserInfo)
+    {
+     var userinfo = await this.$ShoppingAPI.User_Get();
+        this.$store.commit("GetUserInfo", userinfo.data);
+    }
+  }
 };
 </script>
 <style lang="less" scoped>
@@ -86,8 +93,15 @@ export default {
 }
 .my-info {
   background-color: #fff;
-  margin-top: 15px;
+  padding-top: 20px;
   text-align: center;
+  .my-info-username{
+    color: #2d2a2a;
+    font-weight: bold;
+  }
+  p{
+    font-size: 0.44rem;
+  }
   .my-info-vital {
     margin-top: 10px;
     display: flex;
@@ -115,6 +129,7 @@ export default {
     border-bottom: 1px solid #ecf0f1;
     p {
         padding: 5px 0 5px 10px;
+        font-size: 0.41rem;
       i {
         display: inline-block;
         margin-right: 10px;

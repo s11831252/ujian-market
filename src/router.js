@@ -3,7 +3,7 @@ var routes = [
         path: 'pages/index/index',
         name: 'index',
         config: {
-            navigationBarTitleText: 'APP授权',
+            navigationBarTitleText: '授权登录',
             enablePullDownRefresh: false
           },
     },
@@ -31,7 +31,24 @@ var routes = [
             navigationBarTitleText: '我的',
             enablePullDownRefresh: false
           },
-    },{
+    },
+    {
+        path: 'pages/my/address',
+        name: 'address',
+        config: {
+            navigationBarTitleText: '收货地址管理',
+            enablePullDownRefresh: false
+          },
+    },
+    {
+        path: 'pages/my/addressadd',
+        name: 'addressadd',
+        config: {
+            navigationBarTitleText: '新增收货地址',
+            enablePullDownRefresh: false
+          },
+    },
+    {
         path: 'pages/shop/index',
         name: 'shop',
         config: {

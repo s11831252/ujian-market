@@ -23,8 +23,9 @@ export default {
         padding-top: 10px;
     }
     nav a{
-        line-height: 2rem;
-        width: 32%;
+        line-height: 1.41rem;
+        width: 31%;
+        font-size: 0.32rem;
         text-decoration:none;
         display: inline-block;
     }
