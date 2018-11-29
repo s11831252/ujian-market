@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
+import ShoppingAPI from "./api/ShoppingAPI"
 import { debug } from 'util';
 
 Vue.use(Vuex);
@@ -151,6 +152,61 @@ export default new Vuex.Store({//store对象
             var index = state.List.indexOf(shoppingcar);
             state.List.splice(index, 1,shoppingcar);//清除该店铺购物清单
           }
+        }
+      }
+    },
+    UserAddress:{
+      state:{
+        UserAddressList:[],
+      },
+      getters:{
+        UserAddressBysId: state => (Order_Address_Id) => {
+          return state.UserAddressList.find(item => item.Order_Address_Id == Order_Address_Id);
+        }
+      },
+      mutations:{
+        GetUserAddressList(state,payload){
+          state.UserAddressList=payload;
+        },
+        AddUserAddress(state,UserAddress){
+          state.UserAddressList.push(UserAddress);
+        },
+        DeleteUserAddress(state,id){
+          var finditem = state.UserAddressList.filter(item => item.Order_Address_Id == id)[0];//先查找项
+          if(finditem)
+          {
+            var index = state.UserAddressList.indexOf(finditem);
+            state.UserAddressList.splice(index, 1);//清除该项
+          }
+        },
+        EditUserAddress(state,item){
+          var finditem = state.UserAddressList.filter(item => item.Order_Address_Id == item.Order_Address_Id)[0];//先查找项
+          if(finditem)
+          {
+            var index = state.UserAddressList.indexOf(finditem);
+            state.UserAddressList.splice(index, 1,item);//更换该项
+          }
+        },
+        SetDefault(state,item){
+          state.UserAddressList.forEach((i,index)=>{
+              if(i.IsDefault)
+              i.IsDefault=false;
+          });
+
+          var finditem = state.UserAddressList.filter(i => i.Order_Address_Id == item.Order_Address_Id)[0];//先查找项
+          if(finditem)
+          {
+            finditem.IsDefault=true;
+            var index = state.UserAddressList.indexOf(finditem);
+            state.UserAddressList.splice(index, 1,item);//更换该项
+          }
+        }
+      },
+      actions: {
+        async GetUserAddressList (context) {
+          var rep = await ShoppingAPI.OrderAddress_Get();
+          if(rep.ret==0)
+            context.commit('GetUserAddressList',rep.data);
         }
       }
     }

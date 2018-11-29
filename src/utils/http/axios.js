@@ -33,11 +33,11 @@ axios.interceptors.response.use(response => {
 
 axios.defaults.baseURL = '/'
 //设置默认请求头
-axios.defaults.headers = {
-    'X-Requested-With': 'XMLHttpRequest',
-    'Device':"WebApp",
-    'SingleTicket':store.state.User.SingleTicket
-}
+// axios.defaults.headers = {
+//     'X-Requested-With': 'XMLHttpRequest',
+//     'Device':"WebApp",
+//     'SingleTicket':store.state.User.SingleTicket
+// }
 axios.defaults.timeout = 10000
 
 export default {
@@ -46,6 +46,11 @@ export default {
       return new Promise((resolve,reject) => {
         axios({
           method: 'get',
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest',
+            'Device':"WebApp",
+            'SingleTicket':store.state.User.SingleTicket
+          },
           url,
           params: param,
           cancelToken: new CancelToken(c => {
@@ -62,6 +67,11 @@ export default {
       return new Promise((resolve,reject) => {
         axios({
           method: 'post',
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest',
+            'Device':"WebApp",
+            'SingleTicket':store.state.User.SingleTicket
+          },
           url,
           data: param,
           cancelToken: new CancelToken(c => {

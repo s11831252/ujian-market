@@ -22,6 +22,16 @@ Vue.mixin({
       },
       toast(title){
         this.$toast.center(title);
+      },
+      modal(title,content,confirm,cancel){
+        if(window.confirm(content)){
+          if(confirm)
+            confirm();
+        }else
+        {
+          if(cancel)
+            cancel();
+        }
       }
     }
 });

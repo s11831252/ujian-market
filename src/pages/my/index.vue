@@ -28,7 +28,7 @@
                 <!-- <li>
                     <p><i class="icon icon-dw">&#xe620;</i>项目定位<i class="icon right">&#xe601;</i></p>
                 </li> -->
-                <li>
+                <!-- <li>
                     <p><i class="icon icon-sc">&#xe60c;</i>我的收藏<i class="icon right">&#xe601;</i></p>
                 </li>
                 <li>
@@ -36,7 +36,7 @@
                 </li>
                 <li>
                     <p><i class="icon icon-tsjy">&#xe64c;</i>投诉与建议<i class="icon right">&#xe601;</i></p>
-                </li>
+                </li> -->
                 <li @click="exit" >
                     <p><i class="icon icon-tc">&#xe609;</i>退出登录<i class="icon right">&#xe601;</i></p>
                 </li>

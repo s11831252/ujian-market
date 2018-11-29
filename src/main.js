@@ -22,7 +22,7 @@ Vue.mixin({
         go: function (path) {
             this.$router.push(path);
         },
-        replace: function () {
+        replace: function (path) {
             this.$router.replace(path);
         },
         toast(title){
@@ -30,6 +30,21 @@ Vue.mixin({
                 title: title,
                 icon: "none"
               });
+        },
+        modal(title,content,confirm,cancel){
+            wx.showModal({
+                title: title,
+                content: content,
+                success (res) {
+                  if (res.confirm) {
+                    if(confirm)
+                        confirm();
+                  } else if (res.cancel) {
+                    if(cancel)
+                        cancel();
+                  }
+                }
+              })
         }
     },
     onLoad () {

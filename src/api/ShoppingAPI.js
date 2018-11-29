@@ -54,6 +54,22 @@ export default {
     OrderAddress_Get: param => {
         return http.get(BaseHost + "api/OrderAddress/Get", param)
     },
+    OrderAddress_Add: param => {
+        return http.post(BaseHost + "api/OrderAddress/Add", param)
+    },
+    OrderAddress_Edit: param => {
+        return http.post(BaseHost + "api/OrderAddress/Edit", param)
+    },
+    OrderAddress_Delete: (Order_Address_Id) => {
+        if(!Order_Address_Id)
+            return;
+        return http.post(BaseHost + `api/OrderAddress/Delete?Order_Address_Id=${Order_Address_Id}`)
+    },
+    OrderAddress_SetDefault: (Order_Address_Id) => {
+        if(!Order_Address_Id)
+            return;
+        return http.post(BaseHost + `api/OrderAddress/SetDefault?Order_Address_Id=${Order_Address_Id}`)
+    },
     QueryFreight: param => {
         return http.post(BaseHost + "api/LogisticsDistribution/QueryFreight", param)
     },
