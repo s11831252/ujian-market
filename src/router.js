@@ -1,19 +1,19 @@
 var routes = [
     {
+        path: 'pages/home/index',
+        name: 'home',
+        config: {
+            navigationBarTitleText: '行业市场',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
+          },
+    },
+    {
         path: 'pages/index/index',
         name: 'index',
         config: {
             navigationBarTitleText: '授权登录',
             enablePullDownRefresh: false
-          },
-    },
-    {
-        path: 'pages/home/index',
-        name: 'home',
-        config: {
-            navigationBarTitleText: '主页',
-            enablePullDownRefresh: true,
-            onReachBottomDistance: true
           },
     },
     {

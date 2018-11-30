@@ -2,7 +2,7 @@
   <div class="shop-detail">
     <div class="shop-detail-head">
       <div class="shop-detail-logo">
-        <img :src="shopDetail.sLogo">
+        <img mode="widthFix" :src="shopDetail.sLogo">
       </div>
       <div class="shop-simple-info">
         <p class="shop-detail-name">{{shopDetail.sName}}</p>
@@ -176,17 +176,20 @@ export default {
     padding: 20px 5px 0 10px;
     color: #fff;
     .shop-detail-logo {
-      width: 24%;
+      width: 2.46rem;
       position: relative;
       img {
-        width: 100%;
-        height: 80px;
+        // width: 100%;
+        // height: 80px;
+        width: 2.46rem;
+        height: 2.46rem;
         position: absolute;
+        border-radius: 10%;
       }
     }
     .shop-simple-info {
       padding-left: 10px;
-      width: 71%;
+      width: 70%;
       .shop-detail-name {
         font-family: PingFangSC-Regular, sans-serif;
         font-size: 20px;
@@ -248,14 +251,16 @@ export default {
         .shop-detail-tab-goods-detail {
           margin-top: 10px;
           .shop-detail-tab-goods-logo {
-            width: 25%;
             img {
-              width: 100%;
-              height: 70px;
+              // width: 100%;
+              // height: 70px;
+              width:2.16rem;
+              height:2.16rem;
+              border: 1px solid #d6d6d6;
             }
           }
           .shop-detail-tab-goods-info {
-            width: 70%;
+            width: 65%;
             margin-left: 5px;
             .shop-detail-tab-goods-title {
               font-size: 15px;
@@ -286,6 +291,7 @@ export default {
               border: 1px solid;
               border-radius: 10px;
               padding: 0 4px;
+              font-size: 0.44rem;
             }
           }
           .shop-detail-tab-goods-logo,
@@ -305,6 +311,7 @@ export default {
       > li {
         border-bottom: 1px solid #d6d6d6;
         padding: 7px 0;
+        line-height: 0.40rem;
         i {
           font-size: 20px;
           display: inline-block;
@@ -315,19 +322,20 @@ export default {
           display: inline-block;
           li {
             float: left;
+            margin-top: 10px;
           }
         }
         i.icon {
           vertical-align: initial;
-          font-size: 20px;
+          font-size: 0.45rem;
         }
         span {
           color: #444444;
           font-size: 13px;
         }
         img {
-          width: 87px;
-          height: 87px;
+          width: 2.59rem;
+          height: 2.59rem;
           margin: 0 0 0 5px;
         }
       }
@@ -358,7 +366,7 @@ export default {
   display: inline-block;
 }
 .navbar-body {
-  margin-top: 10px;
+  // margin-top: 10px;
 }
 .navbar_slider {
   position: absolute;

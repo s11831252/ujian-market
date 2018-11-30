@@ -59,7 +59,7 @@ export default {
       if(!isNaN(newval))
       {
         var n= parseInt(newval);
-        if(n>=0&&n <this.goods.Stock)
+        if(n>=0&&n <=this.goods.Stock)
         {
           this.ShoppingCarPush({
             sId:this.goods.sId,
@@ -122,6 +122,7 @@ export default {
   .noStock{
     width: 100%;
     color: #979797;
+    font-size:0.42rem;
   }
   .buy-number {
     display: inline-block;

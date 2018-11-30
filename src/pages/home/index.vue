@@ -479,11 +479,14 @@ export default {
         position: relative;
         margin-top: 10px;
         .shop-item-logo {
-          width: 25%;
+          // width: 25%;
           img {
-            width: 100%;
-            height: 100%;
+            // width: 100%;
+            // height: 100%;
+            width: 2.3rem;
+            height: 2.3rem;
             border-radius: 10%;
+            border:1px solid #d7d7d7;
           }
         }
         .shop-item-info-distance {
@@ -524,7 +527,7 @@ export default {
         .shop-item-info {
           display: inline-block;
           vertical-align: top;
-          height: 80px;
+          // height: 80px;
         }
       }
     }

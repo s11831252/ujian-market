@@ -65,9 +65,9 @@ export default {
     ]),
     ...mapActions(['GetUserAddressList'])//`this.$store.dispatch('GetUserAddressList')`
   },
-  created(){
+  mounted(){
     this.GetUserAddressList();
-  },
+  }
 };
 </script>
 <style lang="less" scoped >
