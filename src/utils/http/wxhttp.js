@@ -77,6 +77,13 @@ const net = {
         success: function (res) {
           // success
           wx.hideLoading();
+          if(res.statusCode!=200){
+            wx.showToast({
+              title: "网络出错，稍后再试",
+              icon: "none"
+            });
+            return false;
+          }
           if(res.data.ret!=0){
             wx.showToast({
               title: res.data.msg,
