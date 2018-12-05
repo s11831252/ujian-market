@@ -10,6 +10,10 @@ export default {
     baidu_geocoder:param=>{
         //location=35.658651,139.745415
         let ak="yCCZ5HnYGnUoRQNfd0YkTHg8lluFGQRZ";
+        if(!param.coordtype)
+        {
+            param.coordtype="gcj02ll";
+        }
         return http.get(`https://api.map.baidu.com/geocoder/v2/?ak=${ak}&output=json&coordtype=gcj02ll`, param)
     },
     Account_Login: param => {

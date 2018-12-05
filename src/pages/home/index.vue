@@ -393,10 +393,10 @@ export default {
   // position: fixed;
   // z-index: 500;
   // top: 0;
+  // background-color: #298de5;
   height: 40px;
   line-height: 40px;
   width: 100%;
-  // background-color: #298de5;
   border-bottom: 1px solid #ccc;
   position: relative;
   font-size: 0.41rem;

@@ -2,7 +2,7 @@
   <div class="shop-detail">
     <div class="shop-detail-head">
       <div class="shop-detail-logo">
-        <img mode="widthFix" :src="shopDetail.sLogo">
+        <img :src="shopDetail.sLogo">
       </div>
       <div class="shop-simple-info">
         <p class="shop-detail-name">{{shopDetail.sName}}</p>
@@ -57,16 +57,22 @@
         </div>
         <div :hidden="activeIndex != 1">
           <ul class="shop-detail-info">
-            <li><i class="icon">&#xe61f;</i><span>{{shopDetail.Address}}</span></li>
-            <li><i class="icon">&#xe654;</i><span>查看相关证件</span></li>
+            <li @click="openLocation"><i class="icon">&#xe61f;</i><span>{{shopDetail.Address}}</span></li>
+            <li @click="previewImage(shopDetail.License[0],shopDetail.License)">
+              <i class="icon">&#xe654;</i><span>查看相关证件</span>
+            </li>
             <li><i class="icon">&#xe628;</i><span>主营：{{shopDetail.MainTypeName}}</span></li>
-            <li><i class="icon">&#xe60a;</i><span>{{shopDetail.Mobile}}&nbsp;{{shopDetail.Tel}}</span></li>
+            <li>
+                <i class="icon">&#xe60a;</i>
+                <span @click="makePhoneCall(shopDetail.Mobile)">{{shopDetail.Mobile}}</span>&nbsp;
+                <span @click="makePhoneCall(shopDetail.Tel)">{{shopDetail.Tel}}</span>
+            </li>
             <li><i class="icon">&#xe623;</i><span>{{shopDetail.Notice}}</span></li>
             <li><i class="icon">店铺图片</i>
               <ul>
                 <li v-for="(item,index) in shopDetail.ShopImages" :key="index">
                   <!-- <img mode="widthFix" :src="item.ThumbnailUrl"> -->
-                  <img :src="item.ThumbnailUrl">
+                  <img :src="item.ThumbnailUrl" @click="previewImage(item,shopDetail.ShopImages)">
                 </li>
               </ul>
             </li>
@@ -95,7 +101,11 @@ export default {
       GoodsType: [],
       Tabs: [],
       activeIndex: 0,
-      activeType: 0
+      activeType: 0,
+      gcj02: {
+        latitude: 0,
+        longitude: 0
+      }
     };
   },
   components: {
@@ -108,6 +118,33 @@ export default {
     }
   },
   methods: {
+    openLocation() {
+      var that = this;
+      console.log(that.gcj02);
+      wx.openLocation({
+        latitude: that.gcj02.latitude,
+        longitude: that.gcj02.longitude,
+        scale: 18
+      });
+    },
+    previewImage(item,images) {
+      if (this.isMP) {
+        let urls = images.map(item => {
+          return item.ImgUrl;
+        });
+        wx.previewImage({
+          current: item.ImgUrl, // 当前显示图片的http链接
+          urls // 需要预览的图片http链接列表
+        });
+      }
+    },
+    makePhoneCall(phoneNumber){
+      if(this.isMP){
+        wx.makePhoneCall({
+          phoneNumber: phoneNumber
+        })
+      }
+    },
     async tabClick(tab, e) {
       if (e) this.activeIndex = e.currentTarget.id;
     },
@@ -137,6 +174,7 @@ export default {
     });
   },
   async mounted() {
+    let that = this;
     this.activeIndex = 0;
     this.Tabs = [
       { name: "商品", type: "1", checked: true },
@@ -163,6 +201,17 @@ export default {
         this.GoodsType = rep2.data;
         this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
         this.changeGoodsType(this.GoodsType[0].TypeId);
+      }
+
+      if (this.isMP) {
+        that.$ShoppingAPI
+          .baidu_geocoder({ location: `${that.shopDetail.Latitude},${that.shopDetail.Longitude}`,coordtype:'bd09ll',ret_coordtype:'gcj02ll' })
+          .then(rep2 => {
+            if (rep2.status == 0) {
+              that.gcj02.latitude = rep2.result.location.lat;
+              that.gcj02.longitude = rep2.result.location.lng;
+            }
+          });
       }
     }
   }
