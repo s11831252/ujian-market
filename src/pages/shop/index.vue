@@ -30,7 +30,7 @@
         <div :hidden="activeIndex != 0">
           <div class="shop-detail-tab-goods">
             <ul class="shop-detail-tab-goods-types">
-              <li v-for="(item,index) in GoodsType " :key="index" :class="{'active': item.TypeId==activeType}" @click="changeGoodsType(item.TypeId)">
+              <li v-for="(item,index) in $GoodsType " :key="index" :class="{'active': item.TypeId==activeType}" @click="changeGoodsType(item.TypeId)">
                 <p>{{item.TypeName}}</p>
               </li>
             </ul>
@@ -115,6 +115,24 @@ export default {
   computed: {
     navbarSliderClass() {
       return "navbar_slider_" + this.activeIndex;
+    },
+    $GoodsType(){
+      var that = this;
+      var list =  that.GoodsType.filter(item=>{
+        if(item.TypeId>0)
+        {
+          var goods = that.shopDetail.Goods.find(v=>{
+             return v.TypeId.indexOf(item.TypeId)>=0;
+          })
+          return goods!=null;
+        }else{
+          var goods = that.shopDetail.Goods.find(v=>{
+             return v.TypeId.length==0
+          })
+          return goods!=null;
+        }
+      });
+      return list;
     }
   },
   methods: {
@@ -309,7 +327,7 @@ export default {
             }
           }
           .shop-detail-tab-goods-info {
-            width: 65%;
+            width: 64%;
             margin-left: 5px;
             .shop-detail-tab-goods-title {
               font-size: 15px;
