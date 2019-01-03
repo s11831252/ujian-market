@@ -10,29 +10,32 @@
         <i class="icon right" v-if="PayMode==0">&#xe633;</i>
       </li>
       <li :class="{action:PayMode==1}" @click="selectPayMode(1)">
-        <img class="wx" src="/static/img/wx.png" mode="aspectFit" />
+        <img class="wx" src="/static/img/wx.png" mode="aspectFit">
         <i class="icon right" v-if="PayMode==1">&#xe633;</i>
       </li>
-      <li :class="{action:PayMode==2}" @click="selectPayMode(2)">
+      <!-- <li :class="{action:PayMode==2}" @click="selectPayMode(2)">
         <img class="zfb" src="/static/img/zhifubao.png" mode="aspectFit" />
         <i class="icon right" v-if="PayMode==2">&#xe633;</i>
-      </li>
+      </li>-->
     </ul>
     <div class="pay-confirm">
       <button class="btn-ok" @click="pay">确定支付</button>
-      <button class="btn-no">稍后付款</button>
+      <button class="btn-no" @click="$router.back();">稍后付款</button>
     </div>
     <div class="modal pay-validCodeBox" v-if="modalOpen" @click="openModal">
       <div class="modal-container" @click.stop>
         <div class="box-title">
-          <i class="icon"></i><span>请输入验证码</span>
+          <i class="icon"></i>
+          <span>请输入验证码</span>
         </div>
         <div class="box-body">
           <p>商城付款</p>
           <p class="pay-money">￥{{money}}</p>
-          <p><a class="countDown" @click="countDown">{{countDownStr}}</a></p>
+          <p>
+            <a class="countDown" @click="countDown">{{countDownStr}}</a>
+          </p>
           <div class="blocks">
-            <input type="number" maxlength="4" v-model="code" focus=’true’ auto-focus=’true’ />
+            <input type="number" maxlength="4" v-model="code" focus="’true’" auto-focus="’true’">
             <div class="block">
               <span v-if="!code.length" class="cursor"></span>
               <span v-if="code.length">{{code[0]}}</span>
@@ -57,6 +60,8 @@
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
+
 export default {
   data() {
     return {
@@ -79,13 +84,18 @@ export default {
     code(newval, oldval) {
       if (newval.length == 4) {
         // console.log(oldval,newval);
-        var rep = this.$ShoppingAPI.Order_Pay({
-          OrderId: this.OrderId,
-          VerificationCode: newval
-        });
-        if (rep.ret == 0) {
-          this.replace({ path: "/pages/order/index" });
-        }
+        var that = this;
+        this.$ShoppingAPI
+          .Order_Pay({
+            OrderId: this.OrderId,
+            VerificationCode: newval
+          })
+          .then(rep => {
+            // console.log(rep)
+            if (rep.ret == 0) {
+              that.go({ path: "/pages/order/index", reLaunch: true });
+            }
+          });
       }
     }
   },
@@ -98,11 +108,60 @@ export default {
       this.code = "";
     },
     async pay() {
-      this.openModal();
-      if (this.sendTime == 0) {
-        var rep = await this.$ShoppingAPI.Order_ValidationCode();
+      let that = this;
+      if (this.PayMode == 0) {
+        this.openModal();
+        if (this.sendTime == 0) {
+          var rep = await this.$ShoppingAPI.Order_ValidationCode();
+          if (rep.ret == 0) {
+            this.countDown();
+          }
+        }
+      } else if (this.PayMode == 1) {
+        var rep = await this.$ShoppingAPI.Order_Pay({
+          OrderId: this.OrderId,
+          Type: 1,
+          UserId: this.UserInfo.UserId,
+          appiId: "wx443ed32fe34ba2f0",
+          OpenId: this.UserInfo.openid
+        });
         if (rep.ret == 0) {
-          this.countDown();
+          var payData = JSON.parse(rep.data);
+          var payData = {
+            ...payData,
+            success(res) {
+              // console.log(res);
+              // that.$ShoppingAPI
+              //   .Order_UpdatePayState({
+              //     OrderId: that.OrderId,
+              //     Type: 1,
+              //     UserId: that.UserInfo.UserId,
+              //     appiId: "wx443ed32fe34ba2f0",
+              //     OpenId: that.UserInfo.openid
+              //   })
+              //   .then(rep => {
+              //   });
+              
+              //弹出提示框
+                that.modal("支付成功","您已支付成功,请稍后检查订单状态。",
+                ()=>{
+                  that.go({ path: "/pages/order/index", reLaunch: true });
+                },
+                ()=>{
+                  that.go({ path: "/pages/order/index", reLaunch: true });
+                });
+                
+                
+            },
+            fail: function(res) {
+              that.toast({
+                title: res.errMsg || res.err_desc,
+                icon: "none"
+              });
+            }
+          };
+          // console.log(payData);
+          wx.requestPayment(payData);
         }
       }
     },
@@ -126,7 +185,10 @@ export default {
   computed: {
     money() {
       return (this.OrderInfo.TotalAmount - this.OrderInfo.PayAmount).toFixed(2);
-    }
+    },
+    ...mapState({
+      UserInfo: state => state.User.UserInfo
+    })
   },
   async mounted() {
     if (this.$route.query && this.$route.query.OrderId) {
@@ -194,6 +256,7 @@ export default {
       border-radius: 5px;
       display: inline-block;
       width: 80%;
+      margin-bottom: 5px;
     }
     .btn-no {
       background-color: #fff;
@@ -205,6 +268,7 @@ export default {
       color: #12b7f5;
       display: inline-block;
       width: 80%;
+      margin-bottom: 5px;
     }
   }
   .modal {
@@ -238,17 +302,17 @@ export default {
       }
       .blocks {
         text-align: center;
-          position: relative;
-          display: flex;
-          // flex-direction: row;
-          // align-items: center;
-          justify-content:center;
+        position: relative;
+        display: flex;
+        // flex-direction: row;
+        // align-items: center;
+        justify-content: center;
         .block {
           width: 30px;
           height: 30px;
           border: 1px solid #5c5c5c;
           margin-left: 10px;
-          span{
+          span {
             line-height: 30px;
           }
         }

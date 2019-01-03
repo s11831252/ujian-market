@@ -3,7 +3,7 @@ import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
 let BaseHost = "https://market.ujianchina.net/";
-// let BaseHost = "http://192.168.0.86:811/";
+// let BaseHost = "http://192.168.0.119:811/";
 
 
 export default {
@@ -31,6 +31,11 @@ export default {
     User_Get: param => {
         return http.get(BaseHost + "api/User/Get", param)
     },
+    User_Coupon_Get: param => {
+        //api/User_Coupon/Get?Coupon_RuleId={Coupon_RuleId}&State={State}&PageIndex={PageIndex}&PageSize={PageSize}
+        return http.get(BaseHost + "api/User_Coupon/Get", param)
+    },
+
     Market_Get: param => {
         return http.get(BaseHost + "api/Market/Get", param)
     },
@@ -88,6 +93,9 @@ export default {
     },
     Order_Pay: param => {
         return http.post(BaseHost + "api/Order/Pay", param)
+    },
+    Order_UpdatePayState: param => {
+        return http.post(BaseHost + "api/Order/UpdatePayState", param)
     },
     Order_Cancel: param => {
         return http.post(BaseHost + "api/Order/Cancel", param)

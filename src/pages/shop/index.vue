@@ -206,9 +206,19 @@ export default {
 
       if (rep.ret == 0) {
         this.shopDetail = rep.data;
-        if (this.isMP)
-          wx.setNavigationBarTitle({ title: this.shopDetail.sName });
         // this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
+        if (this.isMP)
+        {
+          wx.setNavigationBarTitle({ title: this.shopDetail.sName });
+          that.$ShoppingAPI
+          .baidu_geocoder({ location: `${that.shopDetail.Latitude},${that.shopDetail.Longitude}`,coordtype:'bd09ll',ret_coordtype:'gcj02ll' })
+          .then(rep2 => {
+            if (rep2.status == 0) {
+              that.gcj02.latitude = rep2.result.location.lat;
+              that.gcj02.longitude = rep2.result.location.lng;
+            }
+          });
+        }
       }
       var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
       if (rep3.ret == 0) {
@@ -219,17 +229,6 @@ export default {
         this.GoodsType = rep2.data;
         this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
         this.changeGoodsType(this.GoodsType[0].TypeId);
-      }
-
-      if (this.isMP) {
-        that.$ShoppingAPI
-          .baidu_geocoder({ location: `${that.shopDetail.Latitude},${that.shopDetail.Longitude}`,coordtype:'bd09ll',ret_coordtype:'gcj02ll' })
-          .then(rep2 => {
-            if (rep2.status == 0) {
-              that.gcj02.latitude = rep2.result.location.lat;
-              that.gcj02.longitude = rep2.result.location.lng;
-            }
-          });
       }
     }
   }

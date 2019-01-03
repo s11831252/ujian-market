@@ -81,8 +81,8 @@ export default {
         this.toast("请填写完整信息");
         return;
       }
-      console.log(this.AddressInfo);
-      debugger;
+      // console.log(this.AddressInfo);
+      // debugger;
       this.AddressInfo.Address = (this.Area=='点击选择位置'?'':this.Area) + this.AddressInfo.Address;
       var rep = await this.$ShoppingAPI.OrderAddress_Edit(this.AddressInfo);
       if (rep.ret == 0) {

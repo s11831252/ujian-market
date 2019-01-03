@@ -21,7 +21,8 @@ var routes = [
         name: 'order',
         config: {
             navigationBarTitleText: '订单',
-            enablePullDownRefresh: true
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
           },
     },
     {

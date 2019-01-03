@@ -87,7 +87,7 @@ export default {
       }
     },
     async ApplyCancel() {
-      var rep = this.$ShoppingAPI.Order_ApplyCancel({
+      var rep = await this.$ShoppingAPI.Order_ApplyCancel({
         OrderId: this.order.OrderId,
         CancelType: 0,
         IsCancelling: true

@@ -67,7 +67,7 @@ export default {
       wx.login({
         success: obj => {
           if (obj.errMsg.indexOf("login:ok") > -1) {
-            // console.log(obj);
+           
             this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
               if (rep.ret == 0) {
                 // console.log(rep);
@@ -79,6 +79,9 @@ export default {
                   this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
                   this.$ShoppingAPI.User_Get().then(userinfo => {
                     if (userinfo.ret == 0) {
+                      userinfo.data.unionid= rep.data.result.unionid;
+                      userinfo.data.openid = rep.data.result.openid;
+                      // console.log(userinfo.data);
                       this.$store.commit("GetUserInfo", userinfo.data);
                       if (this.$route.query.redirect)
                         // 切换至 tabBar页面

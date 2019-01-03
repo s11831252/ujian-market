@@ -12,7 +12,7 @@
                     <p class="goods-name">{{item.gName}}</p>
                     <p class="goods-price">单价：
                         <span>￥{{item.Price}}</span>/件</p>
-                    <p class="goods-iteminfo">规格：{{item.ItemName}}</p>
+                    <p class="goods-iteminfo" v-if="item.ItemName">规格：{{item.ItemName}}</p>
                 </span>
                 <div class="buy">
                     <buy :goods="item" :image="item.Image" :sName="getShoppingCarBysId.sName"></buy>
@@ -23,9 +23,9 @@
             <div class="orderinfo-item">商品金额
                 <span>￥{{getShoppingCarAmountBysId}}</span>
             </div>
-            <div class="orderinfo-item">配送方式
-                <span v-if="!Logistics.Name" @click="go({path:'/pages/order/logistics',query:{sId:sId}})">请选择<span class="icon">&#xe601;</span></span>
-                <span v-else @click="go({path:'/pages/order/logistics',query:{sId:sId}})" >{{Logistics.LogisticsId?Logistics.Name:Logistics.DistributionMode.DistributionModeText}}</span>
+            <div class="orderinfo-item" @click="go({path:'/pages/order/logistics',query:{sId:sId}})">配送方式
+                <span v-if="!Logistics.Name" >请选择<span class="icon">&#xe601;</span></span>
+                <span v-else >{{Logistics.LogisticsId?Logistics.Name:Logistics.DistributionMode.DistributionModeText}}</span>
             </div>
             <div class="orderinfo-item">送货路程
                 <span>{{Logistics.FreightInfo?Logistics.FreightInfo.distance.text:''}}</span>

@@ -1,34 +1,40 @@
 <template>
-    <div class="page">
-        <div class="my-head">
-            <div class="my-head-tool"><i class="icon"></i><i class="icon"></i></div>
-            <img :src="UserInfo.Portrait" v-if="UserInfo.Portrait">
-        </div>
-        <div class="my-info">
-            <p class="my-info-username">{{UserInfo.UserName}}</p>
-            <p>手机号码：{{UserInfo.Phone}}</p>
-            <ul class="my-info-vital">
-                <li>
-                    <p class="vital-value">0.00元</p>
-                    <p class="vital-title">我的钱包</p>
-                </li>
-                <li>
-                    <p class="vital-value">0张</p>
-                    <p class="vital-title">优惠券</p>
-                </li>
-                <li>
-                    <p class="vital-value">0分</p>
-                    <p class="vital-title">我的积分</p>
-                </li>
-            </ul>
-            <ul class="my-info-action">
-                <li>
-                    <p @click="go({path:'/pages/my/address'})"><i class="icon icon-sh">&#xe65e;</i>收货地址<i class="icon right">&#xe601;</i></p>
-                </li>
-                <!-- <li>
+  <div class="page">
+    <div class="my-head">
+      <div class="my-head-tool">
+        <i class="icon"></i>
+        <i class="icon"></i>
+      </div>
+      <img :src="UserInfo.Portrait" v-if="UserInfo.Portrait">
+    </div>
+    <div class="my-info">
+      <p class="my-info-username">{{UserInfo.UserName}}</p>
+      <p>手机号码：{{UserInfo.Phone}}</p>
+      <ul class="my-info-vital">
+        <li>
+          <p class="vital-value">{{Balance}}元</p>
+          <p class="vital-title">我的钱包</p>
+        </li>
+        <li>
+          <p class="vital-value">{{Coupon}}张</p>
+          <p class="vital-title">优惠券</p>
+        </li>
+        <li>
+          <p class="vital-value">0分</p>
+          <p class="vital-title">我的积分</p>
+        </li>
+      </ul>
+      <ul class="my-info-action">
+        <li>
+          <p @click="go({path:'/pages/my/address'})">
+            <i class="icon icon-sh">&#xe65e;</i>收货地址
+            <i class="icon right">&#xe601;</i>
+          </p>
+        </li>
+        <!-- <li>
                     <p><i class="icon icon-dw">&#xe620;</i>项目定位<i class="icon right">&#xe601;</i></p>
-                </li> -->
-                <!-- <li>
+        </li>-->
+        <!-- <li>
                     <p><i class="icon icon-sc">&#xe60c;</i>我的收藏<i class="icon right">&#xe601;</i></p>
                 </li>
                 <li>
@@ -36,41 +42,58 @@
                 </li>
                 <li>
                     <p><i class="icon icon-tsjy">&#xe64c;</i>投诉与建议<i class="icon right">&#xe601;</i></p>
-                </li> -->
-                <li @click="exit" >
-                    <p><i class="icon icon-tc">&#xe609;</i>退出登录<i class="icon right">&#xe601;</i></p>
-                </li>
-            </ul>
-        </div>
+        </li>-->
+        <li @click="exit">
+          <p>
+            <i class="icon icon-tc">&#xe609;</i>退出登录
+            <i class="icon right">&#xe601;</i>
+          </p>
+        </li>
+      </ul>
     </div>
+  </div>
 </template>
 <script>
 import { mapState } from "vuex";
 export default {
+  data() {
+    return {
+      Balance: 0,
+      Coupon:0,
+    };
+  },
   computed: {
     ...mapState({
       UserInfo: state => state.User.UserInfo
     })
   },
-  methods:{
-    exit(){
+  methods: {
+    exit() {
       this.$store.commit("Login", { Ticket: "" }); //存入Ticket
-      this.$router.push("/pages/index/index");//回到登录页
+      this.$router.push("/pages/index/index"); //回到登录页
     }
   },
   components: {},
-  async mounted(){
-    if(!this.UserInfo)
-    {
-     var userinfo = await this.$ShoppingAPI.User_Get();
-        this.$store.commit("GetUserInfo", userinfo.data);
+  async mounted() {
+    if (!this.UserInfo) {
+      var rep = await this.$ShoppingAPI.User_Get();
+      if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
     }
+
+    this.$UJAPI.Balance_Purse().then(rep => {
+      this.Balance = rep.data;
+    });
+    this.$ShoppingAPI.User_Coupon_Get({State:-1}).then(rep => {
+      if(rep.ret==0)
+        this.Coupon = rep.total;
+    });
+    
   }
 };
 </script>
 <style lang="less" scoped>
-.page{
-    color: #5c5c5c;
+.page {
+  color: #5c5c5c;
 }
 .my-head {
   margin: 0 auto;
@@ -95,11 +118,11 @@ export default {
   background-color: #fff;
   padding-top: 20px;
   text-align: center;
-  .my-info-username{
+  .my-info-username {
     color: #2d2a2a;
     font-weight: bold;
   }
-  p{
+  p {
     font-size: 0.44rem;
   }
   .my-info-vital {
@@ -121,15 +144,15 @@ export default {
   }
 }
 .my-info-action {
-    background-color: #fff;
+  background-color: #fff;
   text-align: initial;
   margin-top: 10px;
   li {
     margin-bottom: 10px;
     border-bottom: 1px solid #ecf0f1;
     p {
-        padding: 5px 0 5px 10px;
-        font-size: 0.41rem;
+      padding: 5px 0 5px 10px;
+      font-size: 0.41rem;
       i {
         display: inline-block;
         margin-right: 10px;

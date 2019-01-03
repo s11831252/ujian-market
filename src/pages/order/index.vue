@@ -15,12 +15,17 @@ export default {
   },
   data() {
     return {
-      OrderList: null
+      OrderList: null,
+      searchModel:{
+         PageIndex: 1,
+         PageSize: 10
+      },
+      hasPage:true,
     };
   },
   methods: {
    async init(){
-      var rep = await this.$ShoppingAPI.Order_Get({ PageIndex: 1, PageSize: 10 });
+      var rep = await this.$ShoppingAPI.Order_Get(this.searchModel);
       if (rep.ret == 0) {
         this.OrderList = rep.data;
       }
@@ -33,6 +38,22 @@ export default {
     this.init();
     wx.stopPullDownRefresh()
   },
+   async onReachBottom() {
+     if(this.hasPage)
+     {
+        this.searchModel.PageIndex++;
+        var rep = await this.$ShoppingAPI.Order_Get(this.searchModel);
+        
+        if (rep.data && rep.data.length) {
+          for (const item of rep.data) {
+            this.OrderList.push(item);
+          }
+        }else
+        {
+          this.hasPage=false;
+        }
+     }
+   }
 };
 </script>
 <style lang="less" scoped>
