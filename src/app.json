@@ -1,6 +1,11 @@
 {
   "pages": [
   ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将展示附近项目或店铺"
+    }
+  },
   "window": {},
   "tabBar": {
     "color":"#000",
