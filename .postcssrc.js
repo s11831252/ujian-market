@@ -3,7 +3,7 @@
 module.exports = {
   "plugins": {
       "postcss-mpvue-wxss": {
-        remToRpx: 75,
+        remToRpx: 69.5,
       },
   }
 }
