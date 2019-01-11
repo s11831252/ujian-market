@@ -35,7 +35,6 @@ export default {
         //api/User_Coupon/Get?Coupon_RuleId={Coupon_RuleId}&State={State}&PageIndex={PageIndex}&PageSize={PageSize}
         return http.get(BaseHost + "api/User_Coupon/Get", param)
     },
-
     Market_Get: param => {
         return http.get(BaseHost + "api/Market/Get", param)
     },
@@ -53,6 +52,15 @@ export default {
     },
     Goods_Get: param => {
         return http.get(BaseHost + "api/Goods/Get", param)
+    },
+    Goods_Search: param => {
+        return http.get(BaseHost + "api/Goods/Search", param)
+    },
+    GoodsSearchHistory_GetHot: param => {
+        return http.get(BaseHost + "api/GoodsSearchHistory/GetHot", param)
+    },
+    GoodsSearchHistory_Get: param => {
+        return http.get(BaseHost + "api/GoodsSearchHistory/Get", param)
     },
     GetLogisticsMode: param => {
         return http.get(BaseHost + "api/LogisticsDistribution/GetLogisticsMode", param)

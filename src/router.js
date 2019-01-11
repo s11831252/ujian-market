@@ -9,6 +9,22 @@ var routes = [
           },
     },
     {
+        path: 'pages/home/search',
+        name: 'home-search',
+        config: {
+            navigationBarTitleText: '商品搜索',
+          },
+    },
+    {
+        path: 'pages/home/searchresult',
+        name: 'home-searchresult',
+        config: {
+            navigationBarTitleText: '商品搜索结果',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
+          },
+    },
+    {
         path: 'pages/index/index',
         name: 'index',
         config: {

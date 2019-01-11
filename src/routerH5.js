@@ -11,6 +11,10 @@ import shopgoods from './pages/shop/detail'
 import settle from './pages/order/settle'
 import logistics from './pages/order/logistics'
 import pay from './pages/order/pay'
+import home_search from './pages/home/search'
+import home_searchresult from './pages/home/searchresult'
+
+
 
 
 import store from './store'
@@ -41,6 +45,26 @@ var routes = [
         },
         alias: '/pages/home/index',
         component: home
+    },
+    {
+        path: 'pages/home/search',
+        name: 'home-search',
+        config: {
+            navigationBarTitleText: '商品搜索',
+          },
+        alias: '/pages/home/search',
+        component: home_search
+    },
+    {
+        path: 'pages/home/searchresult',
+        name: 'home-searchresult',
+        config: {
+            navigationBarTitleText: '商品搜索结果',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
+        },
+        alias: '/pages/home/searchresult',
+        component: home_searchresult
     },
     {
         path: 'pages/order/index',

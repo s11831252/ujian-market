@@ -138,7 +138,7 @@ export default {
   methods: {
     openLocation() {
       var that = this;
-      console.log(that.gcj02);
+      // console.log(that.gcj02);
       wx.openLocation({
         latitude: that.gcj02.latitude,
         longitude: that.gcj02.longitude,
