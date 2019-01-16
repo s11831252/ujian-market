@@ -1,9 +1,7 @@
 <template>
   <div class="buy" @click.stop>
     <div v-if="goods.Stock>0">
-      <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span>
-      <input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number">
-      <span class="icon buy-plus" :class="{'action':getShoppingCarNumberByItemId<goods.Stock}" @click="Plus">&#xe64b;</span>
+      <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span><input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number"><span class="icon buy-plus" :class="{'action':getShoppingCarNumberByItemId<goods.Stock}" @click="Plus">&#xe64b;</span>
     </div>
     <div v-else>
         <p class="noStock">库存不足</p>
@@ -114,7 +112,8 @@ export default {
     display: inline-block;
     width: 20px;
     vertical-align: top;
-    font-size: 20px;
+    font-size: 0.45rem;
+    margin: 0;
   }
   .action {
     color: #fccb5c;
@@ -126,10 +125,11 @@ export default {
   }
   .buy-number {
     display: inline-block;
-    font-size: 17px;
+    font-size: 0.4rem;
     width: 30px;
-    margin: 0 5px;
-    line-height: 24px;
+    line-height: 0.5rem;
+    height: 0.5rem;
+    min-height: 0.5rem;
     text-align: center;
     vertical-align: top;
   }
