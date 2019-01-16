@@ -305,7 +305,7 @@ export default {
       .shop-detail-tab-goods-types,
       .shop-detail-tab-goods-list {
         display: inline-block;
-        float: left;
+        // float: left;
         vertical-align: top;
       }
     }
