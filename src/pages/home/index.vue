@@ -17,11 +17,11 @@
       <p v-text="Market.News.title"></p>
     </div>
     <ul class="box category">
-      <li v-for="(item,index) in Market.Category" :key="index">
+      <li v-for="(item,index) in Market.Category" :key="index" @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.Ios.Parameter.title,MainType:item.ActionParameter.Ios.Parameter.MainType}})">
         <img :src="item.ImageUrl" :title="item.Title">
       </li>
     </ul>
-    <div class="box service">
+    <div class="box service" v-if="false">
       <div class="box-head">
         <p>
           市场焦点
@@ -334,8 +334,11 @@ export default {
   onReady() {
     // console.log("page index onReady", this);
   },
-  onShow() {},
+  onShow() {
+
+  },
   mounted() {
+
     var that = this;
     that.marketGet();
     // wx.authorize({scope: "scope.userLocation"});
@@ -373,7 +376,6 @@ export default {
     // console.log("onUnload", this);
   },
   onHide() {
-    // console.log("onHide", this);
   }
 };
 </script>

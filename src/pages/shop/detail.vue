@@ -21,9 +21,9 @@
             <div class="goods-items">
                 <div class="goods-items-buy">
                     <span>数量：</span>
-                    <div v-for="(item,index) in goods_detail.Goods_Items" :key="index">
+                    <span v-for="(item,index) in goods_detail.Goods_Items" :key="index" >
                       <buy :goods="item" :image="goods_detail.Images[0].Thumbnail_url" :sName="sName" v-if="index==selectItem_index" ></buy>
-                    </div>
+                    </span>
                 </div>
                 <div class="goods-items-show" v-if="HasItems">
                     <span>规格：</span>

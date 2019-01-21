@@ -49,6 +49,7 @@ export default {
           headers:{
             'X-Requested-With': 'XMLHttpRequest',
             'Device':"WebApp",
+            'DisplayVersion':"2.0.11",
             'SingleTicket':store.state.User.SingleTicket
           },
           url,
@@ -70,6 +71,7 @@ export default {
           headers:{
             'X-Requested-With': 'XMLHttpRequest',
             'Device':"WebApp",
+            'DisplayVersion':"2.0.11",
             'SingleTicket':store.state.User.SingleTicket
           },
           url,

@@ -9,6 +9,15 @@ var routes = [
           },
     },
     {
+        path: 'pages/home/subject',
+        name: 'subject',
+        config: {
+            navigationBarTitleText: '行业专题',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
+          },
+    },
+    {
         path: 'pages/home/search',
         name: 'home-search',
         config: {
