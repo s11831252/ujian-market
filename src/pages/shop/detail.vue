@@ -3,9 +3,10 @@
         <swipeWeb :swiperData="good_images"></swipeWeb>
         <div class="goods">
             <div class="goods-info">
-                <p class="goods-item-price">￥{{selectedItem.Price}}
+                <p class="goods-item-price" v-if="goods_detail.gType==0">￥{{selectedItem.Price}}
                     <!-- <span class="original">原价{{selectedItem.MarketingPrice}}</span> -->
                 </p>
+                <p class="goods-item-price" v-else>议价</p>
                 <p class="goods-name">{{goods_detail.gName}}</p>
                 <div class="goods-item-info">
                     <span style="float:left;">月销
@@ -19,7 +20,7 @@
                 </div>
             </div>
             <div class="goods-items">
-                <div class="goods-items-buy">
+                <div class="goods-items-buy" v-if="goods_detail.gType==0">
                     <span>数量：</span>
                     <span v-for="(item,index) in goods_detail.Goods_Items" :key="index" >
                       <buy :goods="item" :image="goods_detail.Images[0].Thumbnail_url" :sName="sName" v-if="index==selectItem_index" ></buy>
