@@ -56,7 +56,7 @@
           </div>
           <div class="bor">
             <ul>
-              <li v-for="(item2,index2) in item.Goods_list" :key="index2" v-if="index2<3" @click="go({path:'/pages/shop/detail',query:{sId:item.sId,gId:item2.gId}})">
+              <li v-for="(item2,index2) in item.Goods_list" :key="index2" v-if="index2<3" @click.stop="go({path:'/pages/shop/detail',query:{sId:item.sId,gId:item2.gId}})">
                   <img v-if="item2.Images.length>0" :src="item2.Images[0].Thumbnail_url" alt>
                   <img v-else src="">
                   <p>{{item2.gName}}</p>
