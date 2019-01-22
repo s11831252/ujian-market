@@ -28,14 +28,23 @@ export default {
     buy
   },
   computed: {
-    Price_fmt() {
-      if (this.goodsInfo.Goods_Items.length > 0) {
-          //如果有多个规格,则根据单规格价钱排序,显示价格格式为: 最低价格 - 最高价格
+    Price_fmt() {//商品单价格式化
+      if(this.goodsInfo.gType==1)
+      {
+        //gType==1显示议价
+        return "议价";
+      }
+      else if (this.goodsInfo.Goods_Items.length > 1) {
+          //如果有多个规格,则根据单规格价钱排序,显示格式为: 最低价格 - 最高价格
         var sortGoods = this.goodsInfo.Goods_Items.sort((a, b) => {
           return a.Price - b.Price;
         });
-        return `${sortGoods[0].Price} - ${sortGoods[sortGoods.length - 1].Price}`;
-      } else return `${this.goodsInfo.Goods_Items[0].Price}`;
+        if(sortGoods[0].Price==sortGoods[sortGoods.length-1].Price)
+          return `${this.goodsInfo.Goods_Items[0].Price}`;
+        else
+          return `${sortGoods[0].Price} - ${sortGoods[sortGoods.length - 1].Price}`;
+      } 
+      else return `${this.goodsInfo.Goods_Items[0].Price}`;
     }
   }
 };
