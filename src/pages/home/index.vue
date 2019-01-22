@@ -17,7 +17,7 @@
       <p v-text="Market.News.title"></p>
     </div>
     <ul class="box category">
-      <li v-for="(item,index) in Market.Category" :key="index" @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.Ios.Parameter.title,MainType:item.ActionParameter.Ios.Parameter.MainType}})">
+      <li v-for="(item,index) in Market.Category" :key="index" @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})">
         <img :src="item.ImageUrl" :title="item.Title">
       </li>
     </ul>
