@@ -111,6 +111,16 @@ export default {
     Order_ApplyCancel: param => {
         return http.post(BaseHost + "api/Order/ApplyCancel", param)
     },
-    
-    
+    //获取订单评论列表
+    OrderComment_GetList: param => {
+        return http.get(BaseHost + "api/OrderComment/GetList", param)
+    },
+    //添加订单评论
+    OrderComment_GetList: param => {
+        return http.post(BaseHost + "api/OrderComment/Add", param)
+    },
+    //删除订单评论
+    OrderComment_GetList: CommentGoodsId => {
+        return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
+    },
 }
