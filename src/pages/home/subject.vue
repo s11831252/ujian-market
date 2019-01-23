@@ -99,8 +99,10 @@ export default {
   },
   async mounted() {
     if (this.$route.query.title && this.$route.query.MainType) {
+      //获取外部传进来的专题标题和专题类型标识
       this.title = this.$route.query.title;
       this.MainType = this.$route.query.MainType;
+      //获取推荐店铺
       var rep = await this.$ShoppingAPI.Shop_Get({
         PageIndex: 1,
         PageSize: 3,
@@ -109,6 +111,7 @@ export default {
       if (rep.ret == 0) {
         this.RecommendList = rep.data;
       }
+      //获取附近店铺
       var rep2 = await this.$ShoppingAPI.Shop_Get({
         OrderType: "DISTANCE",
         PageIndex: 1,
@@ -119,9 +122,9 @@ export default {
       });
       if (rep2.ret == 0) {
         this.NearbyList = rep2.data;
-        
         for (let index = 0; index < this.NearbyList.length; index++) {
           const element = this.NearbyList [index];
+          //获取店铺商品
           var rep3 = await this.$ShoppingAPI.Goods_GetByShop({sId:element.sId});
           if(rep3.ret==0)
           {
