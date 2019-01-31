@@ -159,6 +159,9 @@ export default {
       float: right;
       color: #ffffff;
       border-radius: 10px;
+      position: absolute;
+      right: 2%;
+      bottom: 20%;
     }
     .Invalid {
        background-color:#bfbfbf
@@ -166,6 +169,7 @@ export default {
     .btn-show{
       background-color: #fccb5c;
       margin-right: 10px;
+      right: 16%;
     }
   }
 }

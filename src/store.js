@@ -11,6 +11,7 @@ export default new Vuex.Store({//store对象
       state: {
         UserInfo: {},
         SingleTicket: "",
+        CurrentLocation:{}
       },
       getters:{
         Logined: state =>{
@@ -25,6 +26,9 @@ export default new Vuex.Store({//store对象
         GetUserInfo(state, UserInfo) {
           state.UserInfo = UserInfo;
         },
+        UpdateLocation(state,payload){
+          state.CurrentLocation = payload;
+        }
       }
     },
     ShoppingCar: {

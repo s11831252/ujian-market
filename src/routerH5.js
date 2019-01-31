@@ -11,6 +11,11 @@ import shopgoods from './pages/shop/detail'
 import settle from './pages/order/settle'
 import logistics from './pages/order/logistics'
 import pay from './pages/order/pay'
+import home_search from './pages/home/search'
+import home_searchresult from './pages/home/searchresult'
+import subject from './pages/home/subject'
+
+
 
 
 import store from './store'
@@ -18,7 +23,7 @@ Vue.use(Router)
 var routes = [
     {
         path:'/',
-        redirect:'pages/index/index'
+        redirect:'pages/home/index'
     },
     {
         path: 'pages/index/index',
@@ -31,6 +36,7 @@ var routes = [
         alias: '/pages/index/index',
         component: index
     },
+
     {
         path: 'pages/home/index',
         name: 'home',
@@ -41,6 +47,38 @@ var routes = [
         },
         alias: '/pages/home/index',
         component: home
+    },
+    {
+        path: 'pages/home/search',
+        name: 'home-search',
+        config: {
+            navigationBarTitleText: '商品搜索',
+          },
+        alias: '/pages/home/search',
+        component: home_search
+    },
+    {
+        path: 'pages/home/subject',
+        name: 'subject',
+        config: {
+            navigationBarTitleText: '行业专题',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
+          },
+          meta: { noAuth: true },
+          alias: '/pages/home/subject',
+          component: subject
+    },
+    {
+        path: 'pages/home/searchresult',
+        name: 'home-searchresult',
+        config: {
+            navigationBarTitleText: '商品搜索结果',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true
+        },
+        alias: '/pages/home/searchresult',
+        component: home_searchresult
     },
     {
         path: 'pages/order/index',
