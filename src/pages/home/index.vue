@@ -1,9 +1,15 @@
 <template>
   <div class="page">
+    <div class="search">
+      <div @click="go({path:'/pages/home/search'})">
+        <i class="icon">&#xe6e3;</i>&nbsp;
+        <span>搜索</span>
+      </div>
+    </div>
     <swiper class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <swiper-item>
-          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill" />
+          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill">
         </swiper-item>
       </block>
     </swiper>
@@ -11,13 +17,14 @@
       <p v-text="Market.News.title"></p>
     </div>
     <ul class="box category">
-      <li v-for="(item,index) in Market.Category" :key="index">
+      <li v-for="(item,index) in Market.Category" :key="index" @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})">
         <img :src="item.ImageUrl" :title="item.Title">
       </li>
     </ul>
-    <div class="box service">
+    <div class="box service" v-if="false">
       <div class="box-head">
-        <p>市场焦点
+        <p>
+          市场焦点
           <span>Market focus</span>
         </p>
       </div>
@@ -36,13 +43,16 @@
     </div>
     <div class="box nearby">
       <div class="box-head">
-        <p>附近商家
+        <p>
+          附近商家
           <span>Nearby merchants</span>
         </p>
       </div>
       <div class="box-body">
         <div class="nearby-location">
-          <p @click="openLocation">我的定位:<span>{{LocationAddress}}</span></p>
+          <p @click="openLocation">我的定位:
+            <span>{{CurrentLocation.LocationAddress}}</span>
+          </p>
           <span class="icon">&#xe65e;</span>
         </div>
         <div class="nearby-merchants">
@@ -61,9 +71,16 @@
                       <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
-                      <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
-                      <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
+                      <p class="shop-item-info-name">
+                        {{item.sName}}
+                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                      </p>
+                      <p class="shop-item-info-score">店铺综合评分：
+                        <span class>{{item.Score}}</span>
+                      </p>
+                      <p class="shop-item-info-maintype">主营：
+                        <span class>{{item.MainTypeName}}</span>
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -77,9 +94,16 @@
                       <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
-                      <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
-                      <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
+                      <p class="shop-item-info-name">
+                        {{item.sName}}
+                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                      </p>
+                      <p class="shop-item-info-score">店铺综合评分：
+                        <span class>{{item.Score}}</span>
+                      </p>
+                      <p class="shop-item-info-maintype">主营：
+                        <span class>{{item.MainTypeName}}</span>
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -93,9 +117,16 @@
                       <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
-                      <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
-                      <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
+                      <p class="shop-item-info-name">
+                        {{item.sName}}
+                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                      </p>
+                      <p class="shop-item-info-score">店铺综合评分：
+                        <span class>{{item.Score}}</span>
+                      </p>
+                      <p class="shop-item-info-maintype">主营：
+                        <span class>{{item.MainTypeName}}</span>
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -109,9 +140,16 @@
                       <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
-                      <p class="shop-item-info-name">{{item.sName}}<span class="shop-item-info-distance">{{item.Distance}}米</span></p>
-                      <p class="shop-item-info-score">店铺综合评分：<span class="">{{item.Score}}</span></p>
-                      <p class="shop-item-info-maintype">主营：<span class="">{{item.MainTypeName}}</span></p>
+                      <p class="shop-item-info-name">
+                        {{item.sName}}
+                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                      </p>
+                      <p class="shop-item-info-score">店铺综合评分：
+                        <span class>{{item.Score}}</span>
+                      </p>
+                      <p class="shop-item-info-maintype">主营：
+                        <span class>{{item.MainTypeName}}</span>
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -124,6 +162,8 @@
   </div>
 </template>
 <script>
+import { mapState, mapMutations } from "vuex";
+
 export default {
   data() {
     return {
@@ -191,7 +231,10 @@ export default {
   computed: {
     navbarSliderClass() {
       return "navbar_slider_" + this.activeIndex;
-    }
+    },
+    ...mapState({
+      CurrentLocation: state => state.User.CurrentLocation
+    })
   },
   methods: {
     openLocation() {
@@ -209,40 +252,54 @@ export default {
       }
     },
     async tabClick(tab, e) {
-      if (e)
-      {
+      if (e) {
+        //切换tab动作赋值
         let _tab = this.Tabs[this.activeIndex];
-        _tab.parm.PageIndex=1;
-        _tab.parm.hasPage=true;
+        _tab.parm.PageIndex = 1;
+        _tab.parm.hasPage = true;
         this.activeIndex = e.currentTarget.id;
       }
+
+      //填充查询条件
       var param = {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
         OrderType: tab.parm.OrderType
       };
-      if (this.longitude && this.latitude) {
-        (param.Lon = this.longitude), (param.Lat = this.latitude);
+      //赋值用户当前定位
+      if (
+        this.CurrentLocation &&
+        this.CurrentLocation.longitude &&
+        this.CurrentLocation.latitude
+      ) {
+        param.Lon = this.CurrentLocation.longitude;
+        param.Lat = this.CurrentLocation.latitude;
       }
-      var rep = await this.$ShoppingAPI.Shop_Get(param)
-        if (rep.ret == 0) {
-          this.ShopList = rep.data;
-        }
-      
-    }
+
+      //获取满足条件的店铺
+      var rep = await this.$ShoppingAPI.Shop_Get(param);
+      if (rep.ret == 0) {
+        this.ShopList = rep.data;
+      }
+    },
+    ...mapMutations([
+      "UpdateLocation" //`this.$store.commit('UpdateLocation')`
+    ])
   },
   onPullDownRefresh() {
     // console.log("page index onPullDownRefresh", this);
     this.activeIndex = 0;
     this.marketGet();
+    this.Tabs[0].parm.PageIndex = 1;
+    this.Tabs[0].parm.hasPage = true;
     this.tabClick(this.Tabs[0]);
     wx.stopPullDownRefresh();
   },
   async onReachBottom() {
-    var that =this;
-    var tab = this.Tabs.find(item=>{ 
-      return item.index==that.activeIndex
-      });
+    var that = this;
+    var tab = this.Tabs.find(item => {
+      return item.index == that.activeIndex;
+    });
     if (tab.parm.hasPage) {
       tab.parm.PageIndex++;
       var param = {
@@ -250,21 +307,22 @@ export default {
         PageSize: tab.parm.PageSize,
         OrderType: tab.parm.OrderType
       };
-      if (this.longitude && this.latitude) {
-        (param.Lon = this.longitude), (param.Lat = this.latitude);
+      if (this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
+        (param.Lon = this.CurrentLocation.longitude),
+          (param.Lat = this.CurrentLocation.latitude);
       }
-      var rep =  await this.$ShoppingAPI.Shop_Get(param)
-        if (rep.ret == 0) {
-          if (rep.data && rep.data.length) {
-            for (let index = 0; index < rep.data.length; index++) {
-              const element = rep.data[index];
+      var rep = await this.$ShoppingAPI.Shop_Get(param);
+      if (rep.ret == 0) {
+        if (rep.data && rep.data.length) {
+          for (let index = 0; index < rep.data.length; index++) {
+            const element = rep.data[index];
 
-              that.ShopList.push(element);
-            }
-          } else {
-            tab.parm.hasPage = false;
+            that.ShopList.push(element);
           }
+        } else {
+          tab.parm.hasPage = false;
         }
+      }
     }
   },
   created() {
@@ -276,8 +334,11 @@ export default {
   onReady() {
     // console.log("page index onReady", this);
   },
-  onShow() {},
+  onShow() {
+
+  },
   mounted() {
+
     var that = this;
     that.marketGet();
     // wx.authorize({scope: "scope.userLocation"});
@@ -291,9 +352,15 @@ export default {
             .baidu_geocoder({ location: `${res.latitude},${res.longitude}` })
             .then(rep2 => {
               if (rep2.status == 0) {
-                that.LocationAddress = rep2.result.formatted_address;
-                that.latitude = rep2.result.location.lat;
-                that.longitude = rep2.result.location.lng;
+                // that.LocationAddress = rep2.result.formatted_address;
+                // that.latitude = rep2.result.location.lat;
+                // that.longitude = rep2.result.location.lng;
+
+                that.UpdateLocation({
+                  LocationAddress: rep2.result.formatted_address,
+                  latitude: rep2.result.location.lat,
+                  longitude: rep2.result.location.lng
+                });
                 that.tabClick(that.Tabs[0]);
               }
             });
@@ -309,13 +376,40 @@ export default {
     // console.log("onUnload", this);
   },
   onHide() {
-    // console.log("onHide", this);
   }
 };
 </script>
 <style  lang="less">
 .page {
   background: #ecf0f1;
+  padding-top: 42px;
+}
+.search {
+  background-color: #12b7f5;
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    border: solid 1px #d0f1fd;
+    border-radius: 0.5rem;
+    color: #d0f1fd;
+    margin: 0 10%;
+    i,
+    span {
+      font-size: 14px;
+    }
+  }
 }
 .swiper .slide-image {
   width: 100%;
@@ -409,8 +503,8 @@ export default {
   // -webkit-flex: 1;
   // flex: 1;
   // padding: 13px 0;
-  text-align: center;
   // font-size: 0;
+  text-align: center;
   display: inline-block;
   width: 25%;
 }
@@ -421,9 +515,9 @@ export default {
 }
 
 .navbar_title {
-  // color: white;
   font-weight: 500;
   display: inline-block;
+  // color: white;
   // font-size: 15px;
   // max-width: 8em;
   // width: auto;
@@ -486,7 +580,7 @@ export default {
             width: 2.3rem;
             height: 2.3rem;
             border-radius: 10%;
-            border:1px solid #d7d7d7;
+            border: 1px solid #d7d7d7;
           }
         }
         .shop-item-info-distance {

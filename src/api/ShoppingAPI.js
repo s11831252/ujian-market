@@ -35,7 +35,6 @@ export default {
         //api/User_Coupon/Get?Coupon_RuleId={Coupon_RuleId}&State={State}&PageIndex={PageIndex}&PageSize={PageSize}
         return http.get(BaseHost + "api/User_Coupon/Get", param)
     },
-
     Market_Get: param => {
         return http.get(BaseHost + "api/Market/Get", param)
     },
@@ -53,6 +52,15 @@ export default {
     },
     Goods_Get: param => {
         return http.get(BaseHost + "api/Goods/Get", param)
+    },
+    Goods_Search: param => {
+        return http.get(BaseHost + "api/Goods/Search", param)
+    },
+    GoodsSearchHistory_GetHot: param => {
+        return http.get(BaseHost + "api/GoodsSearchHistory/GetHot", param)
+    },
+    GoodsSearchHistory_Get: param => {
+        return http.get(BaseHost + "api/GoodsSearchHistory/Get", param)
     },
     GetLogisticsMode: param => {
         return http.get(BaseHost + "api/LogisticsDistribution/GetLogisticsMode", param)
@@ -103,6 +111,16 @@ export default {
     Order_ApplyCancel: param => {
         return http.post(BaseHost + "api/Order/ApplyCancel", param)
     },
-    
-    
+    //获取订单评论列表
+    OrderComment_GetList: param => {
+        return http.get(BaseHost + "api/OrderComment/GetList", param)
+    },
+    //添加订单评论
+    OrderComment_GetList: param => {
+        return http.post(BaseHost + "api/OrderComment/Add", param)
+    },
+    //删除订单评论
+    OrderComment_GetList: CommentGoodsId => {
+        return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
+    },
 }

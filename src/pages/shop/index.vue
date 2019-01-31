@@ -33,24 +33,9 @@
               <li v-for="(item,index) in $GoodsType " :key="index" :class="{'active': item.TypeId==activeType}" @click="changeGoodsType(item.TypeId)">
                 <p>{{item.TypeName}}</p>
               </li>
-            </ul>
-            <ul class="shop-detail-tab-goods-list">
+            </ul><ul class="shop-detail-tab-goods-list">
               <li v-for="(item,index) in goodList" :key="index" class="shop-detail-tab-goods-detail" @click="go({path:'/pages/shop/detail',query:{sId:item.sId,gId:item.gId,sName:shopDetail.sName}})">
-                <div class="shop-detail-tab-goods-logo">
-                  <img :src="item.Images[0].Thumbnail_url">
-                </div>
-                <div class="shop-detail-tab-goods-info">
-                  <p class="shop-detail-tab-goods-title">{{item.gName}}</p>
-                  <p class="shop-detail-tab-goods-statistics">
-                    <span>月售{{item.Sales}}</span>
-                    <span>评论{{item.CommentCount}}</span>
-                  </p>
-                  <div>
-                    <p class="shop-detail-tab-goods-Price">￥{{item.Price}}</p>
-                    <span v-if="item.Goods_Items.length>1" class="shop-detail-tab-goods-choose">选规格</span>
-                    <buy v-else :goods="item.Goods_Items[0]" :image="item.Images[0].Thumbnail_url" :sName="shopDetail.sName"></buy>
-                  </div>
-                </div>
+                <indexGoodDetail :goodsInfo="item" :sName="shopDetail.sName"></indexGoodDetail>
               </li>
             </ul>
           </div>
@@ -88,9 +73,8 @@
   </div>
 </template>
 <script>
-import buy from "@/components/buy";
 import shoppingCar from "@/components/shoppingCarToolbar";
-
+import indexGoodDetail from "./index-good-detail";
 import { mapGetters, mapMutations } from "vuex";
 export default {
   data() {
@@ -109,8 +93,8 @@ export default {
     };
   },
   components: {
-    buy,
-    shoppingCar
+    shoppingCar,
+    indexGoodDetail
   },
   computed: {
     navbarSliderClass() {
@@ -138,7 +122,7 @@ export default {
   methods: {
     openLocation() {
       var that = this;
-      console.log(that.gcj02);
+      // console.log(that.gcj02);
       wx.openLocation({
         latitude: that.gcj02.latitude,
         longitude: that.gcj02.longitude,
@@ -313,63 +297,15 @@ export default {
         }
       }
       .shop-detail-tab-goods-list {
-        width: 70%;
+        width: 74%;
         .shop-detail-tab-goods-detail {
           margin-top: 10px;
-          .shop-detail-tab-goods-logo {
-            img {
-              // width: 100%;
-              // height: 70px;
-              width:2.16rem;
-              height:2.16rem;
-              border: 1px solid #d6d6d6;
-            }
-          }
-          .shop-detail-tab-goods-info {
-            width: 64%;
-            margin-left: 5px;
-            .shop-detail-tab-goods-title {
-              font-size: 15px;
-              color: #1b1b1b;
-              margin-bottom: 6px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-            .shop-detail-tab-goods-statistics {
-              font-size: 13px;
-              color: #979797;
-              margin-bottom: 6px;
-              span {
-                margin-right: 10px;
-              }
-            }
-            .shop-detail-tab-goods-Price {
-              font-size: 17px;
-              color: #ff5252;
-              display: inline-block;
-              vertical-align: top;
-            }
-            .shop-detail-tab-goods-choose {
-              display: inline-block;
-              float: right;
-              color: #fccb5c;
-              border: 1px solid;
-              border-radius: 10px;
-              padding: 0 4px;
-              font-size: 0.44rem;
-            }
-          }
-          .shop-detail-tab-goods-logo,
-          .shop-detail-tab-goods-info {
-            display: inline-block;
-            vertical-align: top;
-          }
         }
       }
       .shop-detail-tab-goods-types,
       .shop-detail-tab-goods-list {
         display: inline-block;
+        // float: left;
         vertical-align: top;
       }
     }
