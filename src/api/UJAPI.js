@@ -15,4 +15,7 @@ export default {
     Balance_Purse: () => {
         return http.get(BaseHost + "api/Purse/Balance")
     },
+    GetKeyword:getKeyword=>{
+        return http.get(BaseHost+ "api/CommonInfo/GetKeyword",getKeyword) 
+     }
 }

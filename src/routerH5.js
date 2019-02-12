@@ -14,7 +14,10 @@ import pay from './pages/order/pay'
 import home_search from './pages/home/search'
 import home_searchresult from './pages/home/searchresult'
 import subject from './pages/home/subject'
-
+import orderDetail from './pages/order/orderDetail'
+import orderreturn from './pages/order/orderreturn'
+import confirm_receipt from './pages/order/confirm_receipt'
+import write_review from './pages/order/write_review'
 
 
 
@@ -90,6 +93,46 @@ var routes = [
         },
         alias: '/pages/order/index',
         component: order
+    },
+    {
+        path: 'pages/order/orderDetail',
+        name: 'orderDetail',
+        config: {
+            navigationBarTitleText: '订单详情',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: true,
+            onReachBottomDistance: 50
+          },
+        alias: '/pages/order/orderDetail',
+        component: orderDetail
+    },
+    {
+        path: 'pages/order/orderreturn',
+        name: 'orderreturn',
+        config: {
+            navigationBarTitleText: '售后服务',
+          },
+        alias: '/pages/order/orderreturn',
+        component: orderreturn
+    },
+    {
+        path: 'pages/order/write_review',
+        name: 'write_review',
+        config: {
+            navigationBarTitleText: '写评论',
+          },
+        alias: '/pages/order/write_review',
+        component: write_review
+    },
+   
+    {
+        path: 'pages/order/confirm_receipt',
+        name: 'confirm_receipt',
+        config: {
+            navigationBarTitleText: '确认收货',
+          },
+        alias: '/pages/order/confirm_receipt',
+        component: confirm_receipt
     },
     {
         path: 'pages/my/index',
