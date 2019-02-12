@@ -7,7 +7,8 @@
                 <span class="right">{{stateName}}</span>
             </p>
         </div>
-        <ul class="shoppingcarList">
+         <!-- Query是一个查询参数类，封装了查询条件，分页，排序等功能。 -->
+        <ul class="shoppingcarList"  @click="go({path:'/pages/order/orderDetail',query:{OrderId:order.OrderId}  })">
             <li v-for="(item, index) in order.Order_Goods_items" :key="index">
                 <span class="goods-img"><img :src="item.Image_url"></span>
                 <span class="goods-info">

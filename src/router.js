@@ -5,7 +5,7 @@ var routes = [
         config: {
             navigationBarTitleText: '行业市场',
             enablePullDownRefresh: true,
-            onReachBottomDistance: true
+            onReachBottomDistance: 50
           },
     },
     {
@@ -14,7 +14,7 @@ var routes = [
         config: {
             navigationBarTitleText: '行业专题',
             enablePullDownRefresh: true,
-            onReachBottomDistance: true
+            onReachBottomDistance: 50
           },
     },
     {
@@ -30,7 +30,7 @@ var routes = [
         config: {
             navigationBarTitleText: '商品搜索结果',
             enablePullDownRefresh: true,
-            onReachBottomDistance: true
+            onReachBottomDistance: 50
           },
     },
     {
@@ -47,9 +47,42 @@ var routes = [
         config: {
             navigationBarTitleText: '订单',
             enablePullDownRefresh: true,
-            onReachBottomDistance: true
+            onReachBottomDistance: 50
           },
     },
+    
+    {
+        path: 'pages/order/orderDetail',
+        name: 'orderDetail',
+        config: {
+            navigationBarTitleText: '订单详情',
+            enablePullDownRefresh: true,
+            onReachBottomDistance: 50
+          },
+    },
+    {
+        path: 'pages/order/orderreturn',
+        name: 'orderreturn',
+        config: {
+            navigationBarTitleText: '售后服务',
+          },
+    },
+    {
+        path: 'pages/order/write_review',
+        name: 'write_review',
+        config: {
+            navigationBarTitleText: '写评论',
+          },
+    },
+    {
+        path: 'pages/order/confirm_receipt',
+        name: 'confirm_receipt',
+        config: {
+            navigationBarTitleText: '确认收货',
+          },
+    },
+
+
     {
         path: 'pages/my/index',
         name: 'my',

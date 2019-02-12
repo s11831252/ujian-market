@@ -123,4 +123,8 @@ export default {
     OrderComment_GetList: CommentGoodsId => {
         return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
     },
+     //商家处理退款申请,只能用于待发货的订单
+     Order_ApplyRefund: param => {
+        return http.post(BaseHost + "api/Order/ApplyRefund", param)
+    },
 }
