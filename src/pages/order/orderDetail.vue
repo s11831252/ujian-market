@@ -41,7 +41,7 @@
         <li>订单号：{{orderInfo.OrderNo}}</li>
         <li>申请时间：{{ orderInfo.OrderTime}}</li>
         <li>退款金额：¥{{orderInfo.GoodsAmount}}（仅退货款）</li>
-        <li>退款原因：商家缺货</li>
+        <li>退款原因：{{orderInfo.ReturnGoodsType}}</li>
         <ul>
           <li>上传凭证:</li>
           <li class="proof">
