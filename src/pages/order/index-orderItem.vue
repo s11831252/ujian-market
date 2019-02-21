@@ -32,7 +32,7 @@
             <div class="orderinfo-item btn-group">
                 <button v-if="stateName=='待付款'" @click="cancle" class="btn right">取消订单</button>
                 <button v-if="stateName=='待付款'" @click="go({path:'/pages/order/pay',query:{OrderId:order.OrderId}})" class="btn right pay">付款</button>
-                <button v-if="stateName=='待发货'" @click="ApplyCancel" class="btn right">申请退款</button>
+                <button v-if="stateName=='待发货'" @click="go({path:'/pages/order/orderreturn',query:{OrderId:order.OrderId,retreat:1}})" class="btn right">申请退款</button>
             </div>
         </div>
     </div>
@@ -53,7 +53,10 @@ export default {
             break;
           }
           case 1: {
-            _stateName = "待付款";
+            if (this.order.DifferenceAmount>0)
+              _stateName = "待补运费差价";
+            else
+              _stateName = "待付款";
             break;
           }
           case 2: {
@@ -66,7 +69,12 @@ export default {
             break;
           }
           case 4: {
-            _stateName = "已完成";
+            if(this.order.IsReturnGoods) 
+              _stateName = "退货中";
+            else if(this.order.Order_CommentState==0)
+              _stateName = "待评价";
+            else if(this.order.Order_CommentState==1)
+              _stateName = "已完成";
             break;
           }
           default: {
@@ -87,16 +95,6 @@ export default {
         this.order.State = 0;
       }
     },
-    async ApplyCancel() {
-      var rep = await this.$ShoppingAPI.Order_ApplyCancel({
-        OrderId: this.order.OrderId,
-        CancelType: 0,
-        IsCancelling: true
-      });
-      if (rep.ret == 0) {
-        this.order.IsCancelling = true;
-      }
-    }
   },
   mounted() {}
 };
