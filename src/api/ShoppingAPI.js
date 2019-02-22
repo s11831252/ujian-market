@@ -108,9 +108,6 @@ export default {
     Order_Cancel: param => {
         return http.post(BaseHost + "api/Order/Cancel", param)
     },
-    Order_ApplyCancel: param => {
-        return http.post(BaseHost + "api/Order/ApplyCancel", param)
-    },
     //获取订单评论列表
     OrderComment_GetList: param => {
         return http.get(BaseHost + "api/OrderComment/GetList", param)
@@ -123,8 +120,17 @@ export default {
     OrderComment_GetList: CommentGoodsId => {
         return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
     },
+    Order_ApplyCancel: (param,filePath,name) => {
+        if(filePath.length>0)
+            return http.upload(BaseHost + "api/Order/ApplyCancel", param,filePath,name);
+        else
+            return http.post(BaseHost + "api/Order/ApplyCancel", param);
+    },
      //商家处理退款申请,只能用于待发货的订单
-     Order_ApplyRefund: param => {
-        return http.post(BaseHost + "api/Order/ApplyRefund", param)
+     Order_ApplyRefund: (param,filePath,name) => {
+        if(filePath.length>0)
+            return http.upload(BaseHost + "api/Order/ApplyRefund", param,filePath,name);
+        else
+            return http.post(BaseHost + "api/Order/ApplyRefund", param);
     },
 }

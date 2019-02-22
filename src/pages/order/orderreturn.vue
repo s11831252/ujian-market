@@ -22,12 +22,15 @@
         <li class="reason">{{accountfor}}</li>
         <li class="textarea">
           <!-- textarea直接将保存的数据传给后台 -->
-          <textarea v-model="textarea"></textarea>
+          <textarea v-model="message"></textarea>
         </li>
       </ul>
       <ul>
         <li class="reason">上传凭证:</li>
-        <li>
+        <li class="img" v-for="(item,index) in imgArray" :key="index">
+          <img :src="item">
+        </li>
+        <li class="img" @click="chooseImage" v-if="imgArray.length==0">
           <img src="/static/img/Images.png">
         </li>
       </ul>
@@ -40,12 +43,12 @@ import mydrop from "@/components/myDrop";
 export default {
   data() { // 组件的data必须是函数
     return {
-      textarea: "",
       remaks: [],
       retreat: 1,
       orderInfo: {},
       message: "",
-      value: ""
+      value: "",
+      imgArray:[]
     };
   },
   // 计算
@@ -120,28 +123,44 @@ export default {
   },
 // 方法
   methods: {
+    //退货/退款回调
     reasonselect(selectOps) {
       this.value = selectOps.value;
       console.log(selectOps);
     },
-
+    //选择图片
+    chooseImage(){
+      var that = this;
+      if (this.imgArray.length < 9) {
+        wx.chooseImage({
+          sizeType: ['original', 'compressed'],
+          success: function (res) {
+            that.imgArray = that.imgArray.concat(res.tempFilePaths);
+          }
+        })
+      } else {
+       that.toast('最多上传9张图片');
+      }
+    },
     //提交按钮
     async submit() {
       if (this.$route.query.retreat == 1) {
+        console.log("退款了");
+
         //访问服务器，获取api传进来的申请取消表单信息 申请退款
         var rep = await this.$ShoppingAPI.Order_ApplyCancel({
           OrderId: this.orderInfo.OrderId,
           CancelType: this.value,
-          RevokeRemarks: this.textarea,
-          IsCancelling: true
-        });
+          RevokeRemarks: this.message,
+          IsCancelling: "true"
+        },this.imgArray,"Images");
+        console.log(rep);
         if (rep.ret == 0) {
           //this.order.IsCancelling = true;
-         this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
+        //  this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
           this.$router.back();
         //  console.log(this.go);
         }
-        
       } 
       else if (this.$route.query.retreat == 2) {
       //访问服务器，获取api传进来的申请取消表单信息 申请退货
@@ -149,8 +168,8 @@ export default {
           OrderId: this.orderInfo.OrderId,
           RevokeRemarks: this.textarea,
           ReturnGoodsType: this.value,
-          IsReturnGoods: true
-        });
+          IsReturnGoods: "true"
+        },this.imgArray,"Images");
         if (rep.ret == 0) {
           this.$router.back();
           //this.order.IsReturnGoods = true;
@@ -173,7 +192,7 @@ export default {
 .Refund {
   background-color: #ffffff;
   padding-left: 0.4rem;
-  height: 13.13rem;
+  /* height: 13.13rem; */
 }
 .Refund > ul {
   padding-top: 0.72rem;
@@ -230,5 +249,8 @@ export default {
   border-radius: 0.16rem;
   margin-top: 2.43rem;
   color: #ffffff;
+}
+ul li.img{
+  display: inline-block;
 }
 </style>

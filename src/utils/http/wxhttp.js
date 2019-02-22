@@ -16,8 +16,8 @@ const net = {
         data: data,
         method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         header: {
-          'X-Bmob-Application-Id': bmobConfig.applicationId,
-          'X-Bmob-REST-API-Key': bmobConfig.restApiKey,
+          // 'X-Bmob-Application-Id': bmobConfig.applicationId,
+          // 'X-Bmob-REST-API-Key': bmobConfig.restApiKey,
           'Content-Type': 'application/json',
           'Device':"WebApp",
           'DisplayVersion':"2.0.11",
@@ -70,8 +70,6 @@ const net = {
         data: data,
         method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         header: {
-          'X-Bmob-Application-Id': bmobConfig.applicationId,
-          'X-Bmob-REST-API-Key': bmobConfig.restApiKey,
           'Content-Type': 'application/json',
           'Device':"WebApp",
           'DisplayVersion':"2.0.11",
@@ -107,6 +105,112 @@ const net = {
         }
       })
     })
+  },
+  upload (url,data,filePath,name='file'){
+    var that = this;
+    // var  i = data.i ? data.i : 0,
+    // success = data.success ? data.success : 0,
+    // fail = data.fail ? data.fail : 0;
+    console.log(url,data,filePath,name);
+
+    //  return new Promise((resolve, reject) => {
+    //   wx.uploadFile({
+    //     url: url,
+    //     filePath: filePath[0],
+    //     name: `${name}[${0}]`,
+    //     formData: data,
+    //     header: {
+    //       'Content-Type': 'application/json',
+    //       'Device':"WebApp",
+    //       'DisplayVersion':"2.0.11",
+    //       'SingleTicket':store.state.User.SingleTicket
+    //     }, // 设置请求的 header
+    //     success: (resp) => {
+
+
+    //       resolve(resp.data);
+    //     },
+    //     fail: (res) => {
+    //     },
+    //     complete: () => {
+    //     }
+    //   });
+
+    // })
+
+    var promiseList=[];
+    for (let index = 0; index < filePath.length; index++) {
+      promiseList[index]=new Promise((resolve, reject) => {
+          wx.uploadFile({
+            url: url,
+            filePath: filePath[index],
+            name: `${name}[${index}]`,
+            formData: data,
+            header: {
+              'dataType-Type': 'application/json',
+              'Device':"WebApp",
+              'DisplayVersion':"2.0.11",
+              'SingleTicket':store.state.User.SingleTicket
+            }, // 设置请求的 header
+            success: (resp) => {
+              resolve(JSON.parse(resp.data));
+            },
+            fail: (res) => {
+            },
+            complete: () => {
+            }
+          });
+        })
+    }
+    Promise.all(promiseList)
+    .then(function (result){
+      resolve(result[result.length-1]);
+    })
+    .then(function(error){
+      reject(error);
+    })
+   
+
+    // return new Promise((resolve, reject) => {
+
+    //   wx.uploadFile({
+    //     url: url,
+    //     filePath: filePath[i],
+    //     name: `${name}[${i}]`,
+    //     formData: data,
+    //     header: {
+    //       'Content-Type': 'application/json',
+    //       'Device':"WebApp",
+    //       'DisplayVersion':"2.0.11",
+    //       'SingleTicket':store.state.User.SingleTicket
+    //     }, // 设置请求的 header
+    //     success: (resp) => {
+    //       success++;
+    //       console.log(resp)
+    //       console.log(data);
+    //       //这里可能有BUG，失败也会执行这里
+    //       resolve(resp.data);
+    //     },
+    //     fail: (res) => {
+    //       fail++;
+    //       console.log('fail:' + i + "fail:" + fail);
+    //     },
+    //     complete: () => {
+    //       console.log(i);
+    //       i++;
+    //       if (i == filePath.length) { //当图片传完时，停止调用   
+    //         console.log('执行完毕');
+    //         console.log('成功：' + success + " 失败：" + fail);
+    //       } else {//若图片还没有传完，则继续调用函数
+    //         console.log(i);
+    //         data.i = i;
+    //         data.success = success;
+    //         data.fail = fail;
+    //         that.upload(url,data,filePath);
+    //       }
+    //     }
+    //   });
+    // })
   }
 }
 
