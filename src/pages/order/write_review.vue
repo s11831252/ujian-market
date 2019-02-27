@@ -4,155 +4,195 @@
     <div class="OrderInfo">
       <ul class="OrderId">
         <li class="OrderNo">订单号:</li>
-        <li>3581273416555</li>
+        <li>{{ orderInfo.OrderNo}}</li>
       </ul>
-      <ul class="shoppingcarList">
-        <li>
-          <span class="goods-img">
-            <img src="/static/img/good.png/">
-          </span>
-          <span class="goods-info">
-            <p class="goods-name">304不锈钢圆环O型环不锈钢钢圈圆圈环焊接钢环实心手握</p>
-            <p class="goods-price">
-              单价：
-              <span>¥65.00</span>/件
-            </p>
-            <p class="goods-iteminfo">规格：xxx</p>
-          </span>
-        </li>
-      </ul>
-      <!-- 商家评论 -->
-      <ul class="comment">
-        <li class="comment-goods">评论商品：</li>
-        <li>
-          <span class="good">
-            <img src="/static/img/goods.png">
-            <p>好评</p>
-          </span>
-          <span class="good">
-            <img src="/static/img/goods.png">
-            <p>中评</p>
-          </span>
-          <span class="good1">
-            <img src="/static/img/goods.png">
-            <p>差评</p>
-          </span>
-        </li>
-      </ul>
-      <!-- 文本框 -->
-      <textarea class="textarea">写下您的评价，我们将不断改进希望能满足您的需求，
-您的宝贵意见也能帮助到其他小伙伴哦~</textarea>
-      <!-- 上传凭证 -->
-      <div class="Images">
-        <img src="/static/img/Images.png">
+      <div v-for="(item, index) in orderInfo.Order_Goods_items" v-bind:key="index">
+        <ul class="shoppingcarList">
+          <li class="comment">评论商品：</li>
+          <li>
+            <span class="goods-img">
+              <img :src="item.Image_url	">
+            </span>
+            <span class="goods-info">
+              <p class="goods-name">{{item.gName}}</p>
+              <p class="goods-price">
+                单价：
+                <span>¥{{item.Price}}</span>/件
+              </p>
+              <p class="goods-iteminfo">规格：{{item.ItemName}}</p>
+            </span>
+          </li>
+        </ul>
+        <!-- 商家评论 -->
+        <ul class="comment">
+          <Comments v-bind:index="index" v-on:CommentModel="goodsCommentModel"></Comments>
+        </ul>
+        <!-- 文本框 -->
+        <textarea class="textarea" v-on:input="Commentsmethod(index,$event)" placeholder="写下您的评价，我们将不断改进希望能满足您的需求，您的宝贵意见也能帮助到其他小伙伴哦~"></textarea>
+        <!-- 上传凭证 -->
+        <div class="Images">
+          <img src="/static/img/Images.png">
+        </div>
       </div>
     </div>
-    <!-- 2 -->
-    <div class="OrderInfo">
-      <ul class="shoppingcarList">
-        <li>
-          <span class="goods-img">
-            <img src="/static/img/good.png/">
-          </span>
-          <span class="goods-info">
-            <p class="goods-name">304不锈钢圆环O型环不锈钢钢圈圆圈环焊接钢环实心手握</p>
-            <p class="goods-price">
-              单价：
-              <span>¥65.00</span>/件
-            </p>
-            <p class="goods-iteminfo">规格：xxx</p>
-          </span>
-        </li>
-      </ul>
-      <!-- 商家评论 -->
-      <ul class="comment">
-        <li class="comment-goods">评论商品：</li>
-        <li>
-          <span class="good">
-            <img src="/static/img/goods.png">
-            <p>好评</p>
-          </span>
-          <span class="good">
-            <img src="/static/img/goods.png">
-            <p>中评</p>
-          </span>
-          <span class="good1">
-            <img src="/static/img/goods.png">
-            <p>差评</p>
-          </span>
-        </li>
-      </ul>
-      <!-- 文本框 -->
-      <textarea class="textarea">写下您的评价，我们将不断改进希望能满足您的需求，
-您的宝贵意见也能帮助到其他小伙伴哦~</textarea>
-      <!-- 上传凭证 -->
-      <div class="Images">
-        <img src="/static/img/Images.png">
-      </div>
-    </div>
+    <!-- 商品质量 -->
+    <ul class="logistics">
+      <li class="speed">商品质量</li>
+      <grade v-on:Passingscore="Processingscores"></grade>
+      <li>非常好</li>
+    </ul>
     <!-- 物流速度 -->
     <ul class="logistics">
       <li class="speed">物流速度</li>
-      <ul>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-      </ul>
+      <grade v-on:Passingscore="Speedmethod"></grade>
       <li>一般</li>
     </ul>
-
+    <!-- 商家服务 -->
     <ul class="logistics">
       <li class="speed">商家服务</li>
-      <ul>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-        <li>
-          <img src="/static/img/star.png">
-        </li>
-      </ul>
+      <grade v-on:Passingscore="Servicemethod"></grade>
       <li>非常好</li>
     </ul>
+    <button class="submit" @click="submit">发布</button>
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
+
+import grade from "@/components/grade"; //引入评论星星组件
+import Comments from "@/components/Comments";
 export default {
   data() {
     return {
-      orderInfo: {}
+      sId: "",
+      orderInfo: {},
+      postData: {
+        OrderId: "",
+        UserId: "",
+        sId: "",
+        Quality: 0,
+        Speed: 0,
+        Service: 0,
+        goodsCommentModelList: []
+      }
     };
   },
-  computed: {},
-  components: {},
-  methods: {}
+  computed: {
+    ...mapState({
+      //当前登录用户
+      UserInfo: state => state.User.UserInfo
+    })
+  },
+  //在components使用组件
+  components: {
+    grade,
+    Comments
+  },
+  methods: {
+    //发布按钮
+    //
+     async submit() {
+      //访问服务器 把发布的信息提交到添加订单评论API中
+      // console.log(this.postData);
+      if (
+        this.postData.Quality == 0 ||
+        this.postData.Speed == 0 ||
+        this.postData.Service == 0
+      ) {
+        var that = this;
+        wx.showModal({
+          title: "评分提示",
+          content: "您还没有进行评分呢?",
+          cancelText: "继续评分",
+          confirmText: "取消评分",
+          cancelColor: "#FF0000",
+          success(res) {
+            if (res.confirm) {
+              console.log("用户点击确定");
+            } else if (res.cancel) {
+              console.log("用户点击取消");
+            }
+          }
+        });
+      } else {
+    
+        var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData);
+        // console.log(this.postData);
+        console.log("页面跳转"+rep);
+        if (rep.ret == 0) {
+          this.replace({
+            path: "/pages/order/Comment",
+            query: { OrderId: this.orderInfo.OrderId },
+            reLaunch: true
+          });
+        }
+      }
+    },
+
+    //添加一个商品质量评分的处理方法Processingscores
+    Processingscores: function(data) {
+      this.postData.Quality = data;
+      console.log(data);
+    },
+    //添加一个运输速度评分处理方法Speedmethod
+    Speedmethod: function(data) {
+      this.postData.Speed = data;
+      console.log(data);
+    },
+    //添加一个服务质量评分方法Servicemethod
+    Servicemethod: function(data) {
+      this.postData.Service = data;
+      console.log(data);
+    },
+    //添加一个响应事件的商品评论信息处理方法goodsCommentModel
+    goodsCommentModel: function(data) {
+      console.log(data);
+      this.postData.goodsCommentModelList[data.index].State = data.score;
+    },
+    Commentsmethod: function(index, $el) {
+      console.log($el.target.value);
+      this.postData.goodsCommentModelList[index] = $el.target.value;
+    }
+  },
   //异步
+  async mounted() {
+    //打印外面传进来的参数
+    // console.log(this.$route.query);
+    //把vue this 指向that，方便在其他回调函数里面使用this
+    var that = this;
+    //访问服务端，请求api获取传进来的OrderId的订单信息
+    var res = await this.$ShoppingAPI.Order_Get({
+      OrderId: this.$route.query.OrderId
+    });
+    //res.ret==0表示服务端请求成功
+    if (res.ret == 0) {
+      //将返回的data数组第一项（因为接口返回的是数组）赋值给 this.orderInfo
+      //这里是把订单的Order_Goods_ItemInfo数组信息赋值添加评论里面的goodsCommentModel数组
+      this.orderInfo = res.data[0];
+      this.postData.OrderId = this.orderInfo.OrderId;
+      this.postData.UserId = this.UserInfo.UserId;
+      this.postData.sId = this.orderInfo.sId;
+      // 循环goodsCommentModelList数组，把里面的每一项循环出来
+      for (
+        let index = 0;
+        index < this.orderInfo.Order_Goods_items.length;
+        index++
+      ) {
+        // const定义的变量不可以修改，而且必须初始化。
+        //这里是把订单的Order_Goods_ItemInfo数组信息赋值element
+        const element = this.orderInfo.Order_Goods_items[index];
+        var goodsComment = {
+          //把订单的Order_Goods_ItemInfo数组信息赋值给goodsComment参数下的属性
+          gId: element.gId,
+          ItemId: element.ItemId,
+          Content: "",
+          State: 0
+        };
+        // push() 方法可向数组的末尾添加一个或多个元素，并返回新的长度。
+        this.postData.goodsCommentModelList.push(goodsComment);
+      }
+    }
+  }
 };
 </script>
 
@@ -163,7 +203,9 @@ export default {
   width: 10.8rem;
   background-color: #ecf0f1;
   padding-top: 0.21rem;
+  padding-bottom: 0.5rem;
 }
+
 /* 订单信息 */
 .OrderInfo {
   background-color: #ffffff;
@@ -178,6 +220,11 @@ export default {
 }
 .OrderNo {
   float: left;
+}
+.shoppingcarList {
+  border-top: solid #ecf0f1 0.02rem;
+  width: 10.26rem;
+  height: 3.22rem;
 }
 .goods-img img {
   width: 2.3rem;
@@ -203,38 +250,19 @@ export default {
   color: #5c5c5c;
   font-size: 0.36rem;
 }
-/* 评价 */
+/* 评价的商品 */
 .comment {
-  margin-top: 0.62rem;
+  padding-top: 0.12rem;
   font-size: 0.36rem;
   color: #5c5c5c;
-}
-.comment-goods {
-  float: left;
-}
-.good img {
-  height: 0.52rem;
-  width: 0.52rem;
-  float: left;
-}
-.good p {
-  float: left;
-}
-.good1 img {
-  float: left;
-  height: 0.52rem;
-  width: 0.52rem;
-}
-.good p {
-  padding-left: 0.23rem;
-  padding-right: 1.2rem;
+  padding-bottom: 0.21rem;
 }
 /* 文本框 */
 .textarea {
   width: 10.2rem;
   height: 3.58rem;
   border: solid 0.02rem #e4e5e5;
-  margin-top: 0.38rem;
+  margin-top: 0.68rem;
   font-size: 0.4rem;
   color: #cccaca;
 }
@@ -244,14 +272,15 @@ export default {
   height: 1.61rem;
   border: solid 0.01rem #b4b4b4;
   margin-top: 0.31rem;
+  margin-left: 0.2rem;
 }
 .logistics {
   font-size: 0.36rem;
   color: #5c5c5c;
   background-color: #ffffff;
-  padding-top: 0.53rem;
+  padding-top: 0.23rem;
   padding-left: 0.21rem;
-  padding-bottom: 0.59rem;
+  padding-bottom: 0.3rem;
 }
 .logistics img {
   width: 0.46rem;
@@ -262,5 +291,15 @@ export default {
 .speed {
   float: left;
   padding-right: 0.84rem;
+}
+/* 发布按钮 */
+.submit {
+  width: 10.2rem;
+  font-size: 0.48rem;
+  height: 1.2rem;
+  background-color: #12b7f5;
+  border-radius: 0.16rem;
+  margin-top: 0.5rem;
+  color: #ffffff;
 }
 </style>

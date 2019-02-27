@@ -81,7 +81,13 @@ var routes = [
             navigationBarTitleText: '确认收货',
           },
     },
-
+    {
+        path: 'pages/order/Comment',
+        name: 'Comment',
+        config: {
+            navigationBarTitleText: '评价完成',
+          },
+    },
 
     {
         path: 'pages/my/index',

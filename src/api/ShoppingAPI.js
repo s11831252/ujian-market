@@ -3,7 +3,10 @@ import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
 // let BaseHost = "https://market.ujianchina.net/";
+// let BaseHost = "http://192.168.0.86:811/";
 let BaseHost = "http://192.168.0.119:811/";
+
+
 
 
 export default {
@@ -105,6 +108,11 @@ export default {
     Order_UpdatePayState: param => {
         return http.post(BaseHost + "api/Order/UpdatePayState", param)
     },
+     //确认收货
+    Order_OrderOver: param => {
+        return http.post(BaseHost + "api/Order/OrderOver?OrderId="+param.OrderId, )     
+    },
+    //取消订单,只能取消待付款的订单
     Order_Cancel: param => {
         return http.post(BaseHost + "api/Order/Cancel", param)
     },
@@ -113,13 +121,15 @@ export default {
         return http.get(BaseHost + "api/OrderComment/GetList", param)
     },
     //添加订单评论
-    OrderComment_GetList: param => {
-        return http.post(BaseHost + "api/OrderComment/Add", param)
+    OrderComment_GetListAdd: param => {
+        return http.post(BaseHost + "api/OrderComment/Add", param)     
     },
+    
     //删除订单评论
-    OrderComment_GetList: CommentGoodsId => {
+    OrderComment_GetListdelete: CommentGoodsId => {
         return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
     },
+
     Order_ApplyCancel: (param,filePath,name) => {
         if(filePath.length>0)
             return http.upload(BaseHost + "api/Order/ApplyCancel", param,filePath,name);
@@ -133,4 +143,5 @@ export default {
         else
             return http.post(BaseHost + "api/Order/ApplyRefund", param);
     },
+      
 }
