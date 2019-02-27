@@ -18,11 +18,11 @@ import orderDetail from './pages/order/orderDetail'
 import orderreturn from './pages/order/orderreturn'
 import confirm_receipt from './pages/order/confirm_receipt'
 import write_review from './pages/order/write_review'
-
+import write_review from './pages/order/Comment'
 
 
 import store from './store'
-Vue.use(Router)
+Vue.use(Router)//使用/注册路由
 var routes = [
     {
         path:'/',
@@ -133,6 +133,15 @@ var routes = [
           },
         alias: '/pages/order/confirm_receipt',
         component: confirm_receipt
+    },
+    {
+        path: 'pages/order/Comment',
+        name: 'Comment',
+        config: {
+            navigationBarTitleText: '评价完成',
+          },
+        alias: '/pages/order/Comment',
+        component: Comment
     },
     {
         path: 'pages/my/index',
