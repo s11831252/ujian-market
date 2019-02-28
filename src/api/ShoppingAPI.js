@@ -112,6 +112,10 @@ export default {
     Order_OrderOver: param => {
         return http.post(BaseHost + "api/Order/OrderOver?OrderId="+param.OrderId, )     
     },
+    //取消申请
+    Order_CancelAudti: param => {
+        return http.post(BaseHost + "api/Shop/CancelAudti?sId="+param.sId, )     
+    },
     //取消订单,只能取消待付款的订单
     Order_Cancel: param => {
         return http.post(BaseHost + "api/Order/Cancel", param)
@@ -131,17 +135,22 @@ export default {
     },
 
     Order_ApplyCancel: (param,filePath,name) => {
-        if(filePath.length>0)
+        console.log("进来")
+        if(filePath&&filePath.length>0)
             return http.upload(BaseHost + "api/Order/ApplyCancel", param,filePath,name);
         else
             return http.post(BaseHost + "api/Order/ApplyCancel", param);
     },
      //商家处理退款申请,只能用于待发货的订单
      Order_ApplyRefund: (param,filePath,name) => {
-        if(filePath.length>0)
+        if(filePath&&filePath.length>0)
             return http.upload(BaseHost + "api/Order/ApplyRefund", param,filePath,name);
         else
             return http.post(BaseHost + "api/Order/ApplyRefund", param);
+    },
+    //平台介入
+     Order_ApplyPlatform: param => {
+        return http.post(BaseHost + "api/Order/ApplyPlatform?OrderId="+param.OrderId, )     
     },
       
 }
