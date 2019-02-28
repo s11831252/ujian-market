@@ -73,7 +73,7 @@ export default {
               _stateName = "退货中";
             else if(this.order.Order_CommentState==0)
               _stateName = "待评价";
-            else if(this.order.Order_CommentState==1)
+            else if(this.order.Order_CommentState==1||this.order.Order_CommentState==2)
               _stateName = "已完成";
             break;
           }
