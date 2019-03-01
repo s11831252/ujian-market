@@ -22,7 +22,7 @@
           </div>
         </div>
         <!-- 订单信息在退款退货页面不显示v-if="(orderInfo.State==2 && orderInfo.IsCancelling==false)|| (orderInfo.State==4&& orderInfo.IsReturnGoods==false )"-->
-        <div class="OrderInfo1"  >
+        <div class="OrderInfo1">
           <div class="OrderInfoltft">
             <ul>
               <li class="orleft">商品金额：</li>
@@ -47,11 +47,13 @@
         <li>订单号：{{orderInfo.OrderNo}}</li>
         <li>申请时间：{{ orderInfo.OrderTime}}</li>
         <li>退款金额：¥{{orderInfo.GoodsAmount}}（仅退货款）</li>
-        <li>退款原因：{{orderInfo.ReturnGoodsType}}</li>
+        <li>退款原因：{{orderInfo.ReturnGoodsType==null?"":orderInfo.ReturnGoodsType}}</li>
         <ul>
           <li>上传凭证:</li>
-          <li class="proof"  v-for="(item, index) in orderInfo.Order_Goods_items" v-bind:key="index">
-            <img :src="item.ReturnProcess_Images ">
+          <li class="proof" v-for="(item, index) in orderInfo.ReturnProcess_Images" v-bind:key="index">
+            <img :src="item">
+            <!-- <img src="/static/img/reimburse_iocp.png">
+            <img src="/static/img/reimburse_iocp.png"> -->
           </li>
         </ul>
       </ul>
@@ -137,7 +139,7 @@
             <img src="/static/img/delete.png">
           </div>
           <div class="delete">删除</div>
-        </div>      
+        </div>
       </div>
       <!-- 2 -->
       <div class="Buyers_information" v-for="(item, index) in getCommentModel.goodsCommentList" v-bind:key="index">
@@ -161,14 +163,14 @@
           <div class="content2">
             <div class="content3">{{ item.Content }}</div>
             <div class="content_time">{{ item.AddTime }}</div>
-          </div> 
+          </div>
           <div class="evaluate_img" v-for="(items, inde) in getCommentModel.goodsCommentList.imageInfoList" v-bind:key="inde">
-             <img :src="items.url">
-             <img :src="items.url">
+            <img :src="items.url">
+            <img :src="items.url">
           </div>
           <div class="review">[追加评价 / 2017.9.1】: 用了之后太好了，完美</div>
         </div>
-        <div class="Business_reply" >商家回复：非常感谢您的评价，欢迎下次再来购买。</div>
+        <div class="Business_reply">商家回复：非常感谢您的评价，欢迎下次再来购买。</div>
       </div>
     </div>
 
@@ -232,7 +234,7 @@
           <div class="phone-icon">
             <img src="/static/img/phone2.png">
           </div>
-          <div class="phone">tel:{{ orderInfo.Contact_Phone}}</div>
+          <div class="phone">{{ orderInfo.Contact_Phone}}</div>
         </div>
         <!--地址  中间 -->
         <div class="centre">
@@ -322,7 +324,7 @@
     </div>
 
     <!-- 处理记录 退款/退货 -->
-    <div class="Create" v-if="(orderInfo.IsCancelling || orderInfo.IsReturnGoods) &&orderInfo.Order_CommentState<0">
+    <div class="Create" v-if="orderInfo.IsCancelling || (orderInfo.IsReturnGoods && orderInfo.Order_CommentState<0)">
       <div class="Create1">处理记录</div>
       <div class="CreateTime" v-for="(item, index) in orderInfo.ReturnProcess_logs" v-bind:key="index">
         <!-- 买家申请 1买家 2商家 3平台-->
@@ -342,12 +344,14 @@
     </div>
     <!-- 取消页面 下面的按钮 -->
     <div v-if="orderInfo.State==0 && orderInfo.DifferenceAmount == 0 && (orderInfo.IsCancelling==false && orderInfo.IsReturnGoods==false)">
-      <button class="cancel_button btn" v-on:click="repeat">重新购买</button>
-    </div>
+      <!-- 重新购买跳转到 店铺详情中 -->
+      <button class="cancel_button btn" @click="go({path:'/pages/shop/index',query:{sId:orderInfo.sId}})">重新购买</button>
+    </div> 
     <!-- 退款中  待发货页面 State=2 并且IsCancelling=true -->
     <div class="buttommessage" v-if="orderInfo.State==2 && orderInfo.IsCancelling==true">
-      <button class="payment btn" v-on:click="pay" v-if="orderInfo.IsCancelling==true">平台介入</button>
-      <button class="cancellationoforder btn" @click="go({path:'/pages/order/orderreturn',query:{OrderId:orderInfo.OrderId,retreat:1}})">申请退款</button>
+      <button class="payment btn"  v-if="IsPlatformin">联系客服</button>
+      <button class="payment btn" v-on:click="Platform" v-else-if="orderInfo.IsCancelling==true">平台介入</button>
+      <button class="cancellationoforder btn"  @click.stop="CancelRequest" >取消申请</button>
     </div>
     <!-- 待发货页面 State=2并且IsCancelling=false -->
     <div class="buttommessage" v-if="orderInfo.State==2 && orderInfo.IsCancelling==false">
@@ -360,8 +364,8 @@
 
     <!-- 退货中 -->
     <div class="buttommessage" v-if="orderInfo.State==4 && orderInfo.IsReturnGoods4==true">
-      <button class="payment btn" v-on:click="pay" v-if="orderInfo.IsReturnGoods4==true">平台介入</button>
-      <button class="cancellationoforder btn" @click="go({path:'/pages/order/orderreturn',query:{OrderId:orderInfo.OrderId,retreat:2}})">申请退货</button>
+      <button class="payment btn" @click="Platform"  v-if="orderInfo.IsReturnGoods4==true">平台介入</button>
+      <button class="cancellationoforder btn" @click.stop="applyRefund" >取消申请</button>
     </div>
     <!-- 待评价页面 -->
     <div class="buttommessage" v-if="orderInfo.State==4 && orderInfo.Order_CommentState==0">
@@ -378,11 +382,11 @@
           <!-- 头部 -->
           <div class="message-box-content">
             <radio-group class="radio-group" @change="bindchange">
-            <!--value取值项，KeywordName显示项 //表单元素radio用radio-group组件进行代替 -->
-            <radio :value="item.KeywordId" :checked="item.checked" v-for="(item, index) in Cancelreason " v-bind:key="index">{{item.KeywordName}}</radio>
+              <!--value取值项，KeywordName显示项 //表单元素radio用radio-group组件进行代替 -->
+              <radio :value="item.KeywordId" :checked="item.checked" v-for="(item, index) in Cancelreason " v-bind:key="index">{{item.KeywordName}}</radio>
             </radio-group>
           </div>
-          <textarea class="textarea" v-model="Revokecause"  ></textarea>
+          <textarea class="textarea" v-model="Revokecause"></textarea>
           <button class="message-box-ascertain" @click="OrderCancelbtr">确定</button>
         </div>
       </div>
@@ -396,9 +400,9 @@
         </div>
       </div>
     </div>
-    
+
     <div class="message-box-wrapper" @click="checktan" v-if="sign">
-        <!-- 确认收货弹窗 -->
+      <!-- 确认收货弹窗 -->
       <div class="ReturnGoods" v-if="Over" @click.stop>
         <button class="ReturnGoods-cap">
           您可以选择
@@ -410,7 +414,7 @@
         </div>
       </div>
       <!-- 二维码签收弹框 -->
-      <div class="dialog" v-if="scan" @click.stop >
+      <div class="dialog" v-if="scan" @click.stop>
         <div class="OrderCancel-box">
           <div class="QR-content">
             <img src="/static/img/QR.png">
@@ -439,27 +443,29 @@
         </div>
       </div>
     </div>
+
   </div>
 </template> 
 
 
 <script>
-import { mapState } from "vuex";   //暖存
+import { mapState } from "vuex"; //暖存
 export default {
   data() {
     return {
-      cancellationreason:"",
-      Revokecause:"",
-      sign:false,
+      Notescontact:true,
+      cancellationreason: "",
+      Revokecause: "",
+      sign: false,
       hint: false,
       consignee: false,
       scan: false,
-      Over:true,
+      Over: true,
       Cancel: false,
       showed: false,
-      Cancelreason:[],
-      getCommentModel:{
-        UserName:""
+      Cancelreason: [],
+      getCommentModel: {
+        UserName: ""
       },
       orderInfo: {
         OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
@@ -644,10 +650,20 @@ export default {
     };
   },
   computed: {
-      ...mapState({
+    ...mapState({
       //当前登录用户
       UserInfo: state => state.User.UserInfo
     }),
+
+    // 根据ReturnProcess_logs数组里面是否有Role=3的项来判断是否有平台介入
+    IsPlatformin:function(){
+       for (const item of this.orderInfo.ReturnProcess_logs) {
+        if (item.Role == 3) {
+          return true;
+        }
+      }
+       return false;
+     },
 
     // 补运费差价：显示两位小数点
     DifferenceAmountToFixed: function() {
@@ -829,26 +845,7 @@ export default {
         }
       });
     },
-    //重新购买
-    repeat: function() {
-      var that = this;
-      wx.showModal({
-        title: "重购提示",
-        content: "是否重新购买?",
-        cancelText: "再想想",
-        confirmText: "确认重购",
-        cancelColor: "#FF0000",
-        success(res) {
-          if (res.confirm) {
-            that.orderInfo.State = 1;
-            console.log("用户点击确定");
-          } else if (res.cancel) {
-            console.log("用户点击取消");
-          }
-        }
-      });
-    },
-
+   
     //确认收货
     receipt: function() {
       var that = this;
@@ -873,25 +870,26 @@ export default {
     },
     checktanchuceng() {
       if ((this.showed = true)) {
-        this.showed = false; 
-        this.Cancel= false;
+        this.showed = false;
+        this.Cancel = false;
       }
     },
-    checktan(){
-      if((this.sign = true)){
-       this.sign = false;
-       this.consignee=false;
-       this.sign=false;
-       this.scan=false;
-       this.Over=true;
-       this.hint =false;
+
+    checktan() {
+      if ((this.sign = true)) {
+        this.sign = false;
+        this.consignee = false;
+        this.sign = false;
+        this.scan = false;
+        this.Over = true;
+        this.hint = false;
       }
     },
     // 取消订单
     unshow() {
       this.showed = !this.showed;
     },
-  
+
     // 扫码签收
     scanOver() {
       this.scan = true;
@@ -908,34 +906,89 @@ export default {
     },
 
     //订单取消表单
-    async OrderCancelbtr(){
-      var rep=await this.$ShoppingAPI.Order_Cancel({
-            OrderId: this.orderInfo.OrderId,//提交订单的ID
-            RevokeRemarks:this.Revokecause,//提交申请的内容
-            //	申请取消原因,0其他原因
-          CancelType:this.cancellationreason
+    async OrderCancelbtr() {
+      var rep = await this.$ShoppingAPI.Order_Cancel({
+        OrderId: this.orderInfo.OrderId, //提交订单的ID
+        RevokeRemarks: this.Revokecause, //提交申请的内容
+        //	申请取消原因,0其他原因
+        CancelType: this.cancellationreason
       });
       console.log(rep);
-      if(rep.ret==0){
-          this.Cancel = true;
+      if (rep.ret == 0) {
+        this.Cancel = true;
+      }
+    },
+
+    //确认收货
+    async Affirmreceipt() {
+      var rep = await this.$ShoppingAPI.Order_OrderOver({
+        OrderId: this.orderInfo.OrderId
+      });
+      console.log(rep);
+      if (rep.ret == 0) {
+        this.hint = true;
+        this.consignee = false;
       }
     },
     
-    //确认收货
-    async Affirmreceipt(){
-      var rep=await this.$ShoppingAPI.Order_OrderOver({
-             OrderId: this.orderInfo.OrderId
-            });
-            console.log(rep);
-       if(rep.ret==0){
-          this.hint =true;
-          this.consignee=false;
+    //买家退货中 取消申请
+    async CancelRequest(){
+      var rep=await this.$ShoppingAPI.Order_ApplyCancel({
+         OrderId:this.orderInfo.OrderId,
+         CancelType:0,
+         IsCancelling:false
+      });
+      if(rep.ret==0){
+        this.orderInfo.IsCancelling=false;
       }
     },
-    bindchange(e){
-      console.log("radio发生change事件，携带value的值" ,e.target.value);
-      this.cancellationreason= e.target.value; 
+    //以已签收订单  取消申请
+    async applyRefund(){
+      var rep=await this.$ShoppingAPI.Order_ApplyRefund({
+         OrderId:this.orderInfo.OrderId,
+         ReturnGoodsType:0,
+         IsReturnGoods:false
+      });
+      if(rep.ret==0){
+        this.orderInfo.IsReturnGoods=false;
+      }
     },
+
+    async Platform(){
+       var myDate = new Date();//获取系统当前时间
+       var year=myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+       var Month=myDate.getMonth()+1;//获取当前月份(0-11,0代表1月)
+       var day=myDate.getDate(); //获取当前日(1-31)
+       var hour=myDate.getHours();//获取当前小时数(0-23)
+       var minute=myDate.getMinutes();//获取当前分钟数(0-59)
+       var second=myDate.getSeconds();//获取当前秒数(0-59)
+       var currenttime =year+"-"+Month+"-"+day+" "+hour+":"+minute+":"+second;
+       var rep=await this.$ShoppingAPI.Order_ApplyPlatform({
+          OrderId:this.orderInfo.OrderId,
+      })
+      console.log(rep)
+       if(rep.ret==0){
+        //往一个数组里面插入一个对象 用push  //用push在数组后面插入元素
+        console.log("进来了")
+        this.orderInfo.ReturnProcess_logs.push({
+          Id: 1,
+          OrderId: "dade587b-eb85-4954-8219-2c5e7246e285",
+          UserId: "50b55f26-963d-4ed7-9bc4-11038bd491f1",
+          Log_Title: "平台已介入处理",
+          Log_Remarks: "sample string 5",
+          Role: 3,
+          CreateTime: currenttime,
+          Confirm: true
+        
+        });
+         console.log("已经插入数据")
+       }
+    },
+    //bindchange事件，每次勾选时，只能使一个选项呈现为选中状态，同时会将相应的值存在detail里。
+    bindchange(e) {
+      console.log("radio发生change事件，携带value的值", e.target.value);
+      this.cancellationreason = e.target.value;
+    }
   },
   //异步
   async mounted() {
@@ -945,7 +998,7 @@ export default {
     var that = this;
     //访问服务端，请求api获取传进来的OrderId的订单信息
     var res = await this.$ShoppingAPI.Order_Get({
-      OrderId: this.$route.query.OrderId//从外面传进来的订单ID
+      OrderId: this.$route.query.OrderId //从外面传进来的订单ID
     });
     //res.ret==0表示服务端请求成功
     if (res.ret == 0) {
@@ -956,22 +1009,22 @@ export default {
 
     //访问服务端，请求api获取传进来的数据 rep返回后台传回来行业市场店铺分类的数据
     var rep = await this.$UJAPI.GetKeyword({
-      TypeId:19
+      TypeId: 19
     });
     // console.log(rep);
-    if(rep.ret==0){ 
-     this.Cancelreason=rep.data;//把后台返回来的数据赋值给数组Cancelreason
+    if (rep.ret == 0) {
+      this.Cancelreason = rep.data; //把后台返回来的数据赋值给数组Cancelreason
     }
-    
+
     //获取订单评论
-    var rec=await this.$ShoppingAPI.OrderComment_GetList({
-        OrderId: this.$route.query.OrderId,//从外面传进来的订单ID
-        // sId:this.orderInfo.sId,
-        // userId:this.UserInfo.UserId//获取当前用户id  一开始就有
+    var rec = await this.$ShoppingAPI.OrderComment_GetList({
+      OrderId: this.$route.query.OrderId //从外面传进来的订单ID
+      // sId:this.orderInfo.sId,
+      // userId:this.UserInfo.UserId//获取当前用户id  一开始就有
     });
-    if(rec.ret==0){
-       this.getCommentModel=rec.data;
-        console.log(this.getCommentModel);
+    if (rec.ret == 0) {
+      this.getCommentModel = rec.data;
+      // console.log(this.getCommentModel);
     }
   },
   created() {
@@ -1038,7 +1091,6 @@ export default {
   border: solid 0.03rem #e4e5e5;
   font-size: 0.4rem;
   margin-left: 0.8rem;
-  
 }
 .message-box-ascertain {
   width: 5.6rem;
@@ -1664,7 +1716,8 @@ export default {
   padding-top: 0.34rem;
 }
 .motorcycletype .right {
-  padding-left: 7.5rem;
+  float: right;
+  padding-right: 0.41rem;
   color: #9b9b9b;
   font-size: 0.36rem;
   padding-top: 0.34rem;
@@ -1695,8 +1748,8 @@ export default {
 .length {
   float: left;
   overflow: hidden;
-  border-left: solid #616161;
-  border-right: solid #616161;
+  border-left: solid #616161 0.02rem;
+  border-right: solid #616161 0.02rem;
   margin-left: 1rem;
 }
 .length .shuzhi {
@@ -1713,7 +1766,7 @@ export default {
 .volume {
   overflow: hidden;
   float: left;
-  padding-left: 1.1rem;
+  padding-left: 0.81rem;
 }
 .volume .bulk {
   color: #9b9b9b;
@@ -1721,6 +1774,7 @@ export default {
 }
 .volume .Volumenumerical {
   color: #5c5c5c;
+  padding-left: 0.25rem;
   font-size: 0.42rem;
 }
 
@@ -1752,6 +1806,7 @@ export default {
   margin-top: 0.2rem;
   color: #a2a2a2;
   float: right;
+  text-align: right;
 }
 
 /* 处理记录  退货状态*/
@@ -1844,6 +1899,7 @@ export default {
   height: 1.34rem;
   padding-left: 0.29rem;
 }
+
 </style>
 <style>
 page {
