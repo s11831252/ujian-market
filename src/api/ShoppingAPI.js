@@ -135,16 +135,15 @@ export default {
     },
 
     Order_ApplyCancel: (param,filePath,name) => {
-        console.log("进来")
         if(filePath&&filePath.length>0)
-            return http.upload(BaseHost + "api/Order/ApplyCancel", param,filePath,name);
+            return http.upload(BaseHost + "api/Order/ApplyCancel?t=json", param,filePath,name);
         else
             return http.post(BaseHost + "api/Order/ApplyCancel", param);
     },
      //商家处理退款申请,只能用于待发货的订单
      Order_ApplyRefund: (param,filePath,name) => {
         if(filePath&&filePath.length>0)
-            return http.upload(BaseHost + "api/Order/ApplyRefund", param,filePath,name);
+            return http.upload(BaseHost + "api/Order/ApplyRefund?t=json", param,filePath,name);
         else
             return http.post(BaseHost + "api/Order/ApplyRefund", param);
     },

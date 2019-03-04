@@ -146,12 +146,13 @@ export default {
     },
     //添加一个响应事件的商品评论信息处理方法goodsCommentModel
     goodsCommentModel: function(data) {
-      console.log(data);
+      console.log(data,this.postData.goodsCommentModelList);
+
       this.postData.goodsCommentModelList[data.index].State = data.score;
     },
     Commentsmethod: function(index, $el) {
       console.log($el.target.value);
-      this.postData.goodsCommentModelList[index] = $el.target.value;
+      this.postData.goodsCommentModelList[index].Content = $el.target.value;
     }
   },
   //异步

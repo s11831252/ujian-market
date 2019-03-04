@@ -969,7 +969,6 @@ export default {
       console.log(rep)
        if(rep.ret==0){
         //往一个数组里面插入一个对象 用push  //用push在数组后面插入元素
-        console.log("进来了")
         this.orderInfo.ReturnProcess_logs.push({
           Id: 1,
           OrderId: "dade587b-eb85-4954-8219-2c5e7246e285",
@@ -979,9 +978,7 @@ export default {
           Role: 3,
           CreateTime: currenttime,
           Confirm: true
-        
         });
-         console.log("已经插入数据")
        }
     },
     //bindchange事件，每次勾选时，只能使一个选项呈现为选中状态，同时会将相应的值存在detail里。
@@ -990,9 +987,8 @@ export default {
       this.cancellationreason = e.target.value;
     }
   },
-  //异步
-  async mounted() {
-    //打印外面传进来的参数
+  async onShow(){
+  //打印外面传进来的参数
     // console.log(this.$route.query);
     //把vue this 指向that，方便在其他回调函数里面使用this
     var that = this;
@@ -1026,6 +1022,10 @@ export default {
       this.getCommentModel = rec.data;
       // console.log(this.getCommentModel);
     }
+  },
+  //异步
+  async mounted() {
+  
   },
   created() {
     // console.log(this.orderInfo.Contact_Name);
