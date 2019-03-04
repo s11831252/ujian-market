@@ -111,7 +111,7 @@ const net = {
     // var  i = data.i ? data.i : 0,
     // success = data.success ? data.success : 0,
     // fail = data.fail ? data.fail : 0;
-    console.log(url,data,filePath,name);
+    // console.log(url,data,filePath,name);
 
     //  return new Promise((resolve, reject) => {
     //   wx.uploadFile({
@@ -162,13 +162,13 @@ const net = {
           });
         })
     }
-    Promise.all(promiseList)
-    .then(function (result){
-      resolve(result[result.length-1]);
-    })
-    .then(function(error){
-      reject(error);
-    })
+   return Promise.all(promiseList);
+    // .then(function (result){
+    //   resolve(result[result.length-1]);
+    // })
+    // .then(function(error){
+    //   reject(error);
+    // })
    
 
     // return new Promise((resolve, reject) => {

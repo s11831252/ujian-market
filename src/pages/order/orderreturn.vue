@@ -126,7 +126,6 @@ export default {
     //退货/退款回调
     reasonselect(selectOps) {
       this.value = selectOps.value;
-      console.log(selectOps);
     },
     //选择图片
     chooseImage(){
@@ -145,8 +144,6 @@ export default {
     //提交按钮
     async submit() {
       if (this.$route.query.retreat == 1) {
-        console.log("退款了");
-
         //访问服务器，获取api传进来的申请取消表单信息 申请退款
         var rep = await this.$ShoppingAPI.Order_ApplyCancel({
           OrderId: this.orderInfo.OrderId,
@@ -154,12 +151,12 @@ export default {
           RevokeRemarks: this.message,
           IsCancelling: "true"
         },this.imgArray,"Images");
+        var rep = rep[rep.length-1];
         console.log(rep);
+
         if (rep.ret == 0) {
-          //this.order.IsCancelling = true;
-        //  this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
+          // this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
           this.$router.back();
-        //  console.log(this.go);
         }
       } 
       else if (this.$route.query.retreat == 2) {
@@ -170,11 +167,11 @@ export default {
           ReturnGoodsType: this.value,
           IsReturnGoods: "true"
         },this.imgArray,"Images");
+        var rep = rep[rep.length-1];
+        console.log(rep);
         if (rep.ret == 0) {
           this.$router.back();
-          //this.order.IsReturnGoods = true;
           //  this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
-            // console.log(this.go);
         }
       }
     }
