@@ -30,7 +30,10 @@
         <!-- 文本框 -->
         <textarea class="textarea" v-on:input="Commentsmethod(index,$event)" placeholder="写下您的评价，我们将不断改进希望能满足您的需求，您的宝贵意见也能帮助到其他小伙伴哦~"></textarea>
         <!-- 上传凭证 -->
-        <div class="Images">
+        <div class="Images" v-for="(item1,index1) in imgArray" :key="index1">
+          <img :src="item1">
+        </div>
+        <div class="Images"  @click="chooseImage(index)" v-if="imgArray.length==0">
           <img src="/static/img/Images.png">
         </div>
       </div>
@@ -74,7 +77,9 @@ export default {
         Speed: 0,
         Service: 0,
         goodsCommentModelList: []
-      }
+      },
+       imgArray:[],
+       uploadfilenames:[]
     };
   },
   computed: {
@@ -89,8 +94,30 @@ export default {
     Comments
   },
   methods: {
+     //选择图片
+    chooseImage(index){
+      var that = this;
+      if (this.imgArray.length < 9) {
+        wx.chooseImage({
+          sizeType: ['original', 'compressed'],//所选的图片的尺寸
+          //接口调用成功的回调函数
+          success: function (res) {
+            console.log(res.tempFilePaths);
+            for (let index1 = 0; index1 < res.tempFilePaths.length; index1++)
+            {
+               const element = res.tempFilePaths[index1];
+               that.imgArray.push(element);
+               that.uploadfilenames.push(`goodsCommentModelList[${index}].imagesList[${that.imgArray.length-1}]`);
+            }
+            // that.imgArray = that.imgArray.concat(res.tempFilePaths);
+            // that.uploadfilenames.push(`goodsCommentModelList[${index}].imagesList[${that.imgArray.length-1}]`);
+          }
+        })
+      } else {
+       that.toast('最多上传9张图片');
+      }
+    },
     //发布按钮
-    //
      async submit() {
       //访问服务器 把发布的信息提交到添加订单评论API中
       // console.log(this.postData);
@@ -115,10 +142,9 @@ export default {
           }
         });
       } else {
-    
-        var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData);
-        // console.log(this.postData);
-        console.log("页面跳转"+rep);
+        var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData,this.imgArray,this.uploadfilenames);
+        var rep = rep[rep.length-1];
+        console.log(rep);
         if (rep.ret == 0) {
           this.replace({
             path: "/pages/order/Comment",
@@ -151,7 +177,7 @@ export default {
       this.postData.goodsCommentModelList[data.index].State = data.score;
     },
     Commentsmethod: function(index, $el) {
-      console.log($el.target.value);
+      // console.log($el.target.value);
       this.postData.goodsCommentModelList[index].Content = $el.target.value;
     }
   },

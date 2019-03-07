@@ -106,12 +106,12 @@ const net = {
       })
     })
   },
-  upload (url,data,filePath,name='file'){
+  upload (url,data,filePath,names){
     var that = this;
     // var  i = data.i ? data.i : 0,
     // success = data.success ? data.success : 0,
     // fail = data.fail ? data.fail : 0;
-    // console.log(url,data,filePath,name);
+     console.log(url,data,filePath,names);
 
     //  return new Promise((resolve, reject) => {
     //   wx.uploadFile({
@@ -144,7 +144,7 @@ const net = {
           wx.uploadFile({
             url: url,
             filePath: filePath[index],
-            name: `${name}[${index}]`,
+            name:names[index],
             formData: data,
             header: {
               'dataType-Type': 'application/json',

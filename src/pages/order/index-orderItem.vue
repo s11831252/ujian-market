@@ -69,12 +69,12 @@ export default {
             break;
           }
           case 4: {
-            if(this.order.IsReturnGoods) 
-              _stateName = "退货中";
-            else if(this.order.Order_CommentState==0)
+            if(this.order.Order_CommentState==0)
               _stateName = "待评价";
             else if(this.order.Order_CommentState==1||this.order.Order_CommentState==2)
               _stateName = "已完成";
+            else if(this.order.IsReturnGoods) 
+              _stateName = "退货中";
             break;
           }
           default: {
