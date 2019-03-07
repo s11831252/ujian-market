@@ -1,7 +1,7 @@
 <template>
   <div class="content" v-if="orderInfo.OrderId" @click="checktanchuceng">
     <!-- 提示框 State=4时可以使用该值判断订单评价情况 0待评价-->
-    <div class="marked" v-if="orderInfo.State==4 && orderInfo.Order_CommentState==0">
+    <div class="marked" v-if="orderInfo.State==4 && orderInfo.Order_CommentState==0 && orderInfo.IsReturnGoods==false">
       <p>(订单已完成，请提出您的宝贵意见~)</p>
     </div>
     <!-- 头部 -->
@@ -41,8 +41,8 @@
       </div>
     </div>
 
-    <!-- 商品退货理由 -->
-    <div class="reimburse" v-if="(orderInfo.State==2 && orderInfo.IsCancelling==true)|| (orderInfo.State==4&& orderInfo.IsReturnGoods==true )">
+    <!-- 商品退货理由 上传凭证-->
+    <div class="reimburse" v-if="(orderInfo.State==2 && orderInfo.IsCancelling==true)|| (orderInfo.State==4&& orderInfo.IsReturnGoods==true && orderInfo.Order_CommentState!=1 )">
       <ul>
         <li>订单号：{{orderInfo.OrderNo}}</li>
         <li>申请时间：{{ orderInfo.OrderTime}}</li>
@@ -101,7 +101,7 @@
     </div>
 
     <!-- 退货处理 进度条状态-->
-    <div class="processing" v-if="orderInfo.IsReturnGoods && orderInfo.Order_CommentState!=0">
+    <div class="processing" v-if="orderInfo.IsReturnGoods && orderInfo.Order_CommentState!=1">
       <div class="sales_return">退货处理</div>
       <!-- 进度条 -->
       <div class="app">
@@ -130,16 +130,10 @@
     </div>
 
     <!-- 买家评论 -->
-    <div class="Order_Comment" v-if="(orderInfo.State==4 &&  orderInfo.IsReturnGoods==false) && orderInfo.Order_CommentState==1">
+    <div class="Order_Comment" v-if="orderInfo.Order_CommentState==1 ||orderInfo.Order_CommentState==2 ">
       <!-- 1 -->
       <div class="border_top">
         <div class="comments">买家评论</div>
-        <div>
-          <div class="delete_iocn">
-            <img src="/static/img/delete.png">
-          </div>
-          <div class="delete">删除</div>
-        </div>
       </div>
       <!-- 2 -->
       <div class="Buyers_information" v-for="(item, index) in getCommentModel.goodsCommentList" v-bind:key="index">
@@ -151,11 +145,11 @@
             <div class="useid">{{ item.UserName }}</div>
             <div class="credit">
               <li class="quality">质量:</li>
-              <li class="qualitynumber">{{getCommentModel.QualityAvg}}</li>
+              <li class="qualitynumber">{{getCommentModel.QualityVal}}</li>
               <li class="speed">速度：</li>
-              <li class="speednumber">{{getCommentModel.SpeedAvg}}</li>
+              <li class="speednumber">{{getCommentModel.SpeedVal}}</li>
               <li class="serve">服务：</li>
-              <li class="servenumber">{{getCommentModel.ServiceAvg}}</li>
+              <li class="servenumber">{{getCommentModel.ServiceVal}}</li>
             </div>
           </div>
         </div>
@@ -164,13 +158,13 @@
             <div class="content3">{{ item.Content }}</div>
             <div class="content_time">{{ item.AddTime }}</div>
           </div>
-          <div class="evaluate_img" v-for="(items, inde) in getCommentModel.goodsCommentList.imageInfoList" v-bind:key="inde">
-            <img :src="items.url">
-            <img :src="items.url">
+          <div class="evaluate_img">
+            <!-- <img src="/static/img/img1.png"> -->
+            <img v-for="(item2,inde2) in item.imageInfoList" v-bind:key="inde2" :src="item2.url">
           </div>
-          <div class="review">[追加评价 / 2017.9.1】: 用了之后太好了，完美</div>
         </div>
-        <div class="Business_reply">商家回复：非常感谢您的评价，欢迎下次再来购买。</div>
+        <!-- <div class="Business_reply">商家回复：非常感谢您的评价，欢迎下次再来购买。</div> -->
+        <div class="Business_reply" v-for="(item2, reply) in item.replyInfoList" v-bind:key="reply">商家回复:{{item2.Content}}</div>
       </div>
     </div>
 
@@ -368,7 +362,7 @@
       <button class="cancellationoforder btn" @click.stop="applyRefund" >取消申请</button>
     </div>
     <!-- 待评价页面 -->
-    <div class="buttommessage" v-if="orderInfo.State==4 && orderInfo.Order_CommentState==0">
+    <div class="buttommessage" v-if="orderInfo.State==4 && orderInfo.Order_CommentState==0 && orderInfo.IsReturnGoods==false">
       <button class="payment btn" @click="go({path:'/pages/order/orderreturn',query:{OrderId:orderInfo.OrderId,retreat:2}})">申请退货</button>
       <button class="cancellationoforder btn" @click="go({path:'/pages/order/write_review',query:{OrderId:orderInfo.OrderId}})">评论</button>
     </div>
@@ -759,7 +753,7 @@ export default {
       else if (
         this.orderInfo.State == 4 &&
         this.orderInfo.IsReturnGoods == true &&
-        this.orderInfo.Order_CommentState != 0
+        this.orderInfo.Order_CommentState == 0
       ) {
         for (const item of this.orderInfo.ReturnProcess_logs) {
           if (item.Role == 2) {
@@ -779,7 +773,8 @@ export default {
       //待评价 State=4并且Order_CommentState=0
       else if (
         this.orderInfo.State == 4 &&
-        this.orderInfo.Order_CommentState == 0
+        this.orderInfo.Order_CommentState == 0 &&
+        this.orderInfo.IsReturnGoods==false
       ) {
         return "待评价";
       }
@@ -928,6 +923,13 @@ export default {
       if (rep.ret == 0) {
         this.hint = true;
         this.consignee = false;
+      // 页面跳转  跳转去确认收货页面
+        this.replace({
+        path: "/pages/order/confirm_receipt",
+        query: { OrderId: this.orderInfo.OrderId },
+        reLaunch: true
+       })
+         
       }
     },
     
@@ -953,7 +955,7 @@ export default {
         this.orderInfo.IsReturnGoods=false;
       }
     },
-
+    //取消申请  点击平台介入插入一条记录，插进记录后文字变为联系客服
     async Platform(){
        var myDate = new Date();//获取系统当前时间
        var year=myDate.getFullYear(); //获取完整的年份(4位,1970-????)
@@ -969,6 +971,7 @@ export default {
       console.log(rep)
        if(rep.ret==0){
         //往一个数组里面插入一个对象 用push  //用push在数组后面插入元素
+        console.log("进来了")
         this.orderInfo.ReturnProcess_logs.push({
           Id: 1,
           OrderId: "dade587b-eb85-4954-8219-2c5e7246e285",
@@ -978,16 +981,28 @@ export default {
           Role: 3,
           CreateTime: currenttime,
           Confirm: true
+        
         });
+         console.log("已经插入数据")
        }
     },
+
+    // //删除评论
+    // async Deletecomment(){
+    //   var rep=await this.$ShoppingAPI.OrderComment_GetListdelete({
+    //     OrderId: this.orderInfo.OrderId  
+    //   });
+    //   if(rep.ret==0){
+        
+    //   }
+    // },
     //bindchange事件，每次勾选时，只能使一个选项呈现为选中状态，同时会将相应的值存在detail里。
     bindchange(e) {
       console.log("radio发生change事件，携带value的值", e.target.value);
       this.cancellationreason = e.target.value;
     }
   },
-  async onShow(){
+   async onShow(){
   //打印外面传进来的参数
     // console.log(this.$route.query);
     //把vue this 指向that，方便在其他回调函数里面使用this
@@ -1014,9 +1029,9 @@ export default {
 
     //获取订单评论
     var rec = await this.$ShoppingAPI.OrderComment_GetList({
-      OrderId: this.$route.query.OrderId //从外面传进来的订单ID
+      OrderId: this.$route.query.OrderId, //从外面传进来的订单ID
       // sId:this.orderInfo.sId,
-      // userId:this.UserInfo.UserId//获取当前用户id  一开始就有
+      userId:this.UserInfo.UserId//获取当前用户id  一开始就有
     });
     if (rec.ret == 0) {
       this.getCommentModel = rec.data;
@@ -1025,7 +1040,6 @@ export default {
   },
   //异步
   async mounted() {
-  
   },
   created() {
     // console.log(this.orderInfo.Contact_Name);
@@ -1384,7 +1398,7 @@ export default {
 .border_top {
   border-bottom: 0.04rem solid #12b7f5;
   margin-left: 0.2rem;
-  padding-top: 0.32rem;
+  padding-top: 0.21rem;
   padding-bottom: 0.32rem;
   width: 10rem;
   font-size: 0.38rem;
@@ -1395,21 +1409,10 @@ export default {
   padding-bottom: 0.23rem;
   border-left: 0.1rem solid #12b7f5;
   border-radius: 0.1rem;
-  float: left;
   overflow: hidden;
-}
-.border_top .delete_iocn img {
-  width: 0.39rem;
-  height: 0.45rem;
-  float: left;
-  margin-left: 6rem;
-}
-.border_top .delete {
-  padding-left: 8.3rem;
 }
 .Buyers_information {
   padding-left: 0.31rem;
-  /* padding-bottom: 0.82rem; */
 }
 .user_ID {
   padding-top: 0.32rem;
@@ -1471,16 +1474,16 @@ export default {
   padding-top: 0.41rem;
 }
 .comment_content .content2 {
-  float: left;
+  font-size: 0.36rem;
   width: 10.19rem;
+  padding-bottom: 0.26rem;
 }
 .comment_content .content3 {
-  font-size: 0.36rem;
   color: #191919;
-  float: left;
+  /* float: left; */
 }
 .comment_content .content_time {
-  font-size: 0.36rem;
+  /* float: right; */
   color: #9d9d9d;
 }
 .comment_content .evaluate_img img {
@@ -1488,20 +1491,12 @@ export default {
   height: 1.81rem;
   margin-right: 0.2rem;
   overflow: hidden;
-  margin-top: 0.26rem;
+  padding-bottom: 0.4rem;
 }
-.comment_content .review {
-  font-size: 0.34rem;
-  color: #000000;
-  padding-top: 0.27rem;
-  border-bottom: solid #d6d6d6 0.02rem;
-  width: 10rem;
-  padding-bottom: 0.39rem;
-}
+
 .Business_reply {
   color: #f57c2a;
   font-size: 0.32rem;
-  padding-top: 0.4rem;
   padding-bottom: 0.41rem;
 }
 
