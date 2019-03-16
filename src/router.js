@@ -56,8 +56,6 @@ var routes = [
         name: 'orderDetail',
         config: {
             navigationBarTitleText: '订单详情',
-            enablePullDownRefresh: true,
-            onReachBottomDistance: 50
           },
     },
     {

@@ -30,31 +30,29 @@
         <!-- 文本框 -->
         <textarea class="textarea" v-on:input="Commentsmethod(index,$event)" placeholder="写下您的评价，我们将不断改进希望能满足您的需求，您的宝贵意见也能帮助到其他小伙伴哦~"></textarea>
         <!-- 上传凭证 -->
-        <div class="Images" v-for="(item1,index1) in imgArray" :key="index1">
+        <!-- <div class="Images" v-for="(item1,index1) in imgArray" :key="index1">
           <img :src="item1">
         </div>
         <div class="Images"  @click="chooseImage(index)" v-if="imgArray.length==0">
           <img src="/static/img/Images.png">
-        </div>
+        </div> -->
       </div>
     </div>
     <!-- 商品质量 -->
     <ul class="logistics">
       <li class="speed">商品质量</li>
       <grade v-on:Passingscore="Processingscores"></grade>
-      <li>非常好</li>
+      
     </ul>
     <!-- 物流速度 -->
     <ul class="logistics">
       <li class="speed">物流速度</li>
       <grade v-on:Passingscore="Speedmethod"></grade>
-      <li>一般</li>
     </ul>
     <!-- 商家服务 -->
     <ul class="logistics">
       <li class="speed">商家服务</li>
       <grade v-on:Passingscore="Servicemethod"></grade>
-      <li>非常好</li>
     </ul>
     <button class="submit" @click="submit">发布</button>
   </div>
@@ -109,8 +107,6 @@ export default {
                that.imgArray.push(element);
                that.uploadfilenames.push(`goodsCommentModelList[${index}].imagesList[${that.imgArray.length-1}]`);
             }
-            // that.imgArray = that.imgArray.concat(res.tempFilePaths);
-            // that.uploadfilenames.push(`goodsCommentModelList[${index}].imagesList[${that.imgArray.length-1}]`);
           }
         })
       } else {
@@ -163,16 +159,16 @@ export default {
     //添加一个运输速度评分处理方法Speedmethod
     Speedmethod: function(data) {
       this.postData.Speed = data;
-      console.log(data);
+      // console.log(data);
     },
     //添加一个服务质量评分方法Servicemethod
     Servicemethod: function(data) {
       this.postData.Service = data;
-      console.log(data);
+      // console.log(data);
     },
     //添加一个响应事件的商品评论信息处理方法goodsCommentModel
     goodsCommentModel: function(data) {
-      console.log(data,this.postData.goodsCommentModelList);
+      // console.log(data,this.postData.goodsCommentModelList);
 
       this.postData.goodsCommentModelList[data.index].State = data.score;
     },
@@ -222,8 +218,6 @@ export default {
   }
 };
 </script>
-
-
 
 <style scoped>
 .content {
@@ -305,8 +299,11 @@ export default {
   font-size: 0.36rem;
   color: #5c5c5c;
   background-color: #ffffff;
-  padding-top: 0.23rem;
   padding-left: 0.21rem;
+}
+.logistics > li{
+  vertical-align:middle;
+  padding-top: 0.23rem;
   padding-bottom: 0.3rem;
 }
 .logistics img {

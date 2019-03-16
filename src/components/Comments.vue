@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="comment-root">
     <li class="comment-goods">评论商品：</li>
     <li>
        <!-- 子组件向父组件传值 给li绑定一个事件click -->
@@ -56,6 +56,11 @@ export default {
 
 
 <style>
+.comment-root{
+  float:left;
+width:100%;
+
+}
 .comment {
   padding-top: 0.12rem;
   font-size: 0.36rem;

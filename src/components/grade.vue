@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="grade">
     <!-- 子组件向父组件传值 给li绑定一个事件click -->
     <!-- 绑定事件 直接绑定到一个方法-->
     <li @click="click(1)">
@@ -22,13 +22,15 @@
       <img src="/static/img/star.png" v-if="score>4">
       <img src="/static/img/star (2).png" v-else>
     </li>
+    <li>{{scoreDisplay}}</li>
   </ul>
 </template>
 <script>
 export default {
   data() {
     return {
-      score: 5
+      score: 5,
+      scoreDisplayStrArr:["非常差","差","一般","好","非常好"]
     };
   },
   methods: {
@@ -37,6 +39,11 @@ export default {
       this.score = score;
       //使用$emit来触发一个自定义事件Passingscore，并传递一个参数score
       this.$emit("Passingscore", score);
+    }
+  },
+  computed:{
+    scoreDisplay(){
+      return this.scoreDisplayStrArr[this.score-1];
     }
   },
   // 页面显示/切入前台时触发
@@ -61,11 +68,19 @@ export default {
   padding-left: 0.21rem;
   padding-bottom: 0.3rem;
 } */
-.logistics img {
+.grade li{
+  padding-top: 0.23rem;
+  padding-bottom: 0.3rem;
+  display :inline-block;
+  vertical-align:middle;
+  text-align:center;
+}
+.grade img {
   width: 0.46rem;
   height: 0.44rem;
   float: left;
-  margin-right: 0.8rem;
+  /* display: inline-block; */
+  margin:0 0.4rem;
 }
 /* .speed {
   float: left;

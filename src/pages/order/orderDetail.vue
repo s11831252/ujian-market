@@ -17,7 +17,7 @@
             <div class="right-botton">单价：</div>
             <div class="unit_price">¥{{item.Price}}</div>
             <!-- 判断规格是否为空，为空就返回默认，否则返回规格值。 -->
-            <div class="specification">/件（规格：{{item.ItemName==null? "默认":item.ItemName}}）</div>
+            <div class="specification">/件（规格：{{item.ItemName?item.ItemName:"默认"}}）</div>
             <div class="quantity">x{{item.Number}}</div>
           </div>
         </div>
@@ -33,7 +33,7 @@
           <div class="OrderInforight">
             <ul class="rightfloat">
               <li class="ordecolor">￥{{orderInfo.GoodsAmount}}</li>
-              <li>￥{{orderInfo.LogisticsInfo.Amount}}</li>
+              <li v-if="orderInfo.LogisticsInfo">￥{{orderInfo.LogisticsInfo.Amount}}</li>
               <li class="pay">￥{{orderInfo.TotalAmount}}</li>
             </ul>
           </div>
@@ -377,7 +377,7 @@
           <div class="message-box-content">
             <radio-group class="radio-group" @change="bindchange">
               <!--value取值项，KeywordName显示项 //表单元素radio用radio-group组件进行代替 -->
-              <radio :value="item.KeywordId" :checked="item.checked" v-for="(item, index) in Cancelreason " v-bind:key="index">{{item.KeywordName}}</radio>
+              <radio :value="item.KeywordId" :checked="item.KeywordId==cancellationreason" v-for="(item, index) in Cancelreason " v-bind:key="index">{{item.KeywordName}}</radio>
             </radio-group>
           </div>
           <textarea class="textarea" v-model="Revokecause"></textarea>
@@ -462,182 +462,6 @@ export default {
         UserName: ""
       },
       orderInfo: {
-        OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-        OrderNo: "201808291523519697",
-        Contact_Phone: "13366985814",
-        UserId: "dd796938-ae8c-408b-b692-64ab18744f33",
-        State: 0,
-        Order_CommentState: 0,
-        Contact_Address: "广西壮族自治区南宁市西乡塘区",
-        Contact_Name: "小石",
-        RevokeRemarks: "hhd",
-        TotalAmount: 161.4,
-        DifferenceAmount: 0.0,
-        PayAmount: 161.4,
-        GoodsAmount: 134.0,
-        TotalNum: 10,
-        CancelType: 3422,
-        CancelDisplay: "暂时不需要",
-        ReturnGoodsType: null,
-        ReturnGoodsTypeDisplay: null,
-        OrderTime: "2018-08-29 15:23:51",
-        Invoice: false,
-        IsReturnGoods: false,
-        IsCancelling: true,
-        IsDelete: false,
-        Image_url:
-          "http://192.168.0.119:802/Goods/ShowImg/2018-08-27/201808271719461315NG6.jpg",
-        Thumbnail_url:
-          "http://192.168.0.119:802/Goods/ShowImg///2018-08-27/201808271719461315NG6.jpg",
-        gTitle: "钢材菜刀水泥焊丝服务网工程配送应有尽有快快来试试",
-        gUnit: "件",
-        gId: "a9dc4d7a-6707-4334-ba7b-bc5633c5b192",
-        sId: "ae0f4060-ec28-4cf5-b94d-9e237096498d",
-        sName: "这里是越知测试钢材店",
-        Remarks: "建信基金",
-        PayType: null,
-        ThridNumber: null,
-        ReturnProcess_logs: [
-          {
-            Id: 118,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "dd796938-ae8c-408b-b692-64ab18744f33",
-            Log_Title: "买家申请退款",
-            Log_Remarks: "",
-            Role: 1,
-            CreateTime: "2018-08-29 15:25:10",
-            Confirm: true
-          },
-          {
-            Id: 119,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "dd796938-ae8c-408b-b692-64ab18744f33",
-            Log_Title: "买家取消申请退款",
-            Log_Remarks: "",
-            Role: 1,
-            CreateTime: "2018-08-29 17:28:56",
-            Confirm: true
-          },
-          {
-            Id: 120,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "dd796938-ae8c-408b-b692-64ab18744f33",
-            Log_Title: "买家申请退款",
-            Log_Remarks: "",
-            Role: 1,
-            CreateTime: "2018-08-29 17:29:10",
-            Confirm: true
-          },
-          {
-            Id: 143,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "dd796938-ae8c-408b-b692-64ab18744f33",
-            Log_Title: "买家取消申请退款",
-            Log_Remarks: "",
-            Role: 1,
-            CreateTime: "2018-08-31 09:45:58",
-            Confirm: true
-          },
-          {
-            Id: 397,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "7893da8a-883c-4f33-a341-e8dddac905ec",
-            Log_Title: "商家不同意退款",
-            Log_Remarks: "这个货已近发了",
-            Role: 2,
-            CreateTime: "2018-09-9 16:57:36",
-            Confirm: false
-          },
-          {
-            Id: 374,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "dd796938-ae8c-408b-b692-64ab18744f33",
-            Log_Title: "买家申请退款",
-            Log_Remarks: "",
-            Role: 1,
-            CreateTime: "2018-09-10 16:27:39",
-            Confirm: true
-          },
-          {
-            Id: 397,
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            UserId: "7893da8a-883c-4f33-a341-e8dddac905ec",
-            Log_Title: "商家同意退款",
-            Log_Remarks: "",
-            Role: 2,
-            CreateTime: "2018-09-10 16:57:36",
-            Confirm: true
-          }
-        ],
-        ReturnProcess_Images: [],
-        Order_Goods_items: [
-          {
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            gId: "a9dc4d7a-6707-4334-ba7b-bc5633c5b192",
-            sId: "ae0f4060-ec28-4cf5-b94d-9e237096498d",
-            gName: "钢材菜刀水泥焊丝服务网工程配送应有尽有快快来试试",
-            gTitle: "钢材菜刀水泥焊丝服务网工程配送应有尽有快快来试试",
-            gUnit: "件",
-            Image_url:
-              "http://192.168.0.119:802/Goods/ShowImg/2018-08-27/201808271719461315NG6.jpg",
-            ItemId: "d6802376-4dd3-405a-afae-31acca64e59d",
-            ItemName: "三把手",
-            Price: 19.0,
-            Number: 2,
-            Stock: 69845,
-            Amount: 38.0,
-            KeywordId: 3675,
-            KeywordPath: ",3666,3675"
-          },
-          {
-            OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-            gId: "f3150def-3e83-476e-a96c-eed4cde47d25",
-            sId: "ae0f4060-ec28-4cf5-b94d-9e237096498d",
-            gName: "钢材螺丝铁木头板材焊丝防护手套安全帽安全把手螺丝批",
-            gTitle: "记得恒大华府好",
-            gUnit: "件",
-            Image_url:
-              "http://192.168.0.119:802/Goods/ShowImg/2018-08-27/2018082717203531836QO.jpg",
-            ItemId: "6b6dd1e3-2f5f-4736-9bc4-ec813f1816e3",
-            ItemName: null,
-            Price: 12.0,
-            Number: 8,
-            Stock: 1100,
-            Amount: 96.0,
-            KeywordId: 3614,
-            KeywordPath: ",3570,3614"
-          }
-        ],
-        LogisticsInfo: {
-          DistributionModeText: "小型轿车",
-          ActualAmount: 27.4,
-          OrderId: "5d8cd0bd-992a-4008-82e2-06755454a0a6",
-          LogisticsNo: "",
-          Contact_Phone: "13366985814",
-          Shipper_Phone: "13557595636",
-          Shipper_Tel: "0771525624",
-          UserId: "7893da8a-883c-4f33-a341-e8dddac905ec",
-          Shipper_Address: "广西壮族自治区南宁市西乡塘区相思湖西路",
-          Contact_Address: "广西壮族自治区南宁市西乡塘区",
-          Contact_Name: "小石",
-          Shipper_Name: "这里是越知测试钢材店",
-          Remarks: "",
-          LogisticsMode: 1,
-          DistributionModeId: 1,
-          LogisticsState: -1,
-          Distance: 6000.0,
-          Duration: 377.0,
-          Amount: 27.4,
-          ServiceAmount: 5.48,
-          DistributionAmount: 21.92,
-          Contact_Latitude: 22.849499,
-          Contact_Longitude: 108.221214,
-          Shipper_Latitude: 22.850658,
-          Shipper_Longitude: 108.246649,
-          CreateTime: "2018-08-29 15:23:51"
-        },
-        Distributions_Info: [],
-        OrderCouponList: []
       },
       StateNames: ["订单取消", "待付款", "待发货", "已发货", "已完成"],
       ReturnProcess: ["退货中", "处理中", "已退货"]
@@ -651,18 +475,23 @@ export default {
 
     // 根据ReturnProcess_logs数组里面是否有Role=3的项来判断是否有平台介入
     IsPlatformin:function(){
-       for (const item of this.orderInfo.ReturnProcess_logs) {
-        if (item.Role == 3) {
-          return true;
+      if(this.orderInfo.ReturnProcess_logs)
+      {
+        for (const item of this.orderInfo.ReturnProcess_logs) {
+          if (item.Role == 3) {
+            return true;
+          }
         }
       }
+       
        return false;
      },
 
     // 补运费差价：显示两位小数点
     DifferenceAmountToFixed: function() {
       // `this` 指向 vm 实例
-      if (!this.orderInfo.DifferenceAmount) return "0";
+      if (!this.orderInfo.DifferenceAmount) 
+      return "0";
       var _temp = this.orderInfo.DifferenceAmount.toFixed(2);
       return _temp;
     },
@@ -679,6 +508,8 @@ export default {
       return _temp3;
     },
     Cancelling1() {
+      if(!this.orderInfo.ReturnProcess_logs)
+        return null
       for (const item of this.orderInfo.ReturnProcess_logs) {
         if (item.Role == 1) {
           return item;
@@ -686,6 +517,8 @@ export default {
       }
     },
     Cancelling2() {
+      if(!this.orderInfo.ReturnProcess_logs)
+        return null
       for (const item of this.orderInfo.ReturnProcess_logs) {
         //if(item.Role==2&&!item.Confirm) 同意思
         if (item.Role == 2 && item.Confirm == false) {
@@ -694,6 +527,8 @@ export default {
       }
     },
     Cancelling3() {
+      if(!this.orderInfo.ReturnProcess_logs)
+        return null
       for (const item of this.orderInfo.ReturnProcess_logs) {
         if (item.Role == 2 && item.Confirm) {
           return item;
@@ -701,6 +536,8 @@ export default {
       }
     },
     IsReturnGoods1() {
+      if(!this.orderInfo.ReturnProcess_logs)
+        return null
       for (const item of this.orderInfo.ReturnProcess_logs) {
         if (item.Role == 1) {
           return item;
@@ -708,6 +545,8 @@ export default {
       }
     },
     IsReturnGoods2() {
+      if(!this.orderInfo.ReturnProcess_logs)
+        return null
       for (const item of this.orderInfo.ReturnProcess_logs) {
         //if(item.Role==2&&!item.Confirm) 同意思
         if (item.Role == 2 && item.Confirm == false) {
@@ -716,6 +555,8 @@ export default {
       }
     },
     IsReturnGoods3() {
+      if(!this.orderInfo.ReturnProcess_logs)
+        return null
       for (const item of this.orderInfo.ReturnProcess_logs) {
         if (item.Role == 2 && item.Confirm) {
           return item;
@@ -968,10 +809,8 @@ export default {
        var rep=await this.$ShoppingAPI.Order_ApplyPlatform({
           OrderId:this.orderInfo.OrderId,
       })
-      console.log(rep)
        if(rep.ret==0){
         //往一个数组里面插入一个对象 用push  //用push在数组后面插入元素
-        console.log("进来了")
         this.orderInfo.ReturnProcess_logs.push({
           Id: 1,
           OrderId: "dade587b-eb85-4954-8219-2c5e7246e285",
@@ -983,7 +822,6 @@ export default {
           Confirm: true
         
         });
-         console.log("已经插入数据")
        }
     },
 
