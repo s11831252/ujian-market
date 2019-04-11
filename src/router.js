@@ -104,6 +104,14 @@ var routes = [
           },
     },
     {
+        path: 'pages/my/entry_notice',
+        name: 'address',
+        config: {
+            navigationBarTitleText: '入驻商城申请',
+            enablePullDownRefresh: false
+          },
+    },
+    {
         path: 'pages/my/addressadd',
         name: 'addressadd',
         config: {
