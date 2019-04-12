@@ -34,6 +34,7 @@ body {
   overflow: auto;
   /* padding-top: 1.28rem; */
   position: relative;
+  font-size: 0.4rem;
 }
 
 .index .content .application {

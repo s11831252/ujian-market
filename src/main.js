@@ -7,6 +7,7 @@ import ShoppingAPI from "./api/ShoppingAPI"
 import { debug } from 'util';
 import './assets/style.css';
 import './assets/global.css';
+import './assets/iconfont.less';
 
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI

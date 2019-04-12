@@ -49,7 +49,7 @@
               <div class="selectDiv">
                 <select>
                   <option value="1">广西壮族自治区</option>
-                  <option value="1">广东</option>
+                  <option value="2">广东</option>
                 </select>
                 <div class="sjxDiv">
                   <img class="sjx" src="img/next_bottom.png" alt>
@@ -58,7 +58,7 @@
               <div class="selectDiv">
                 <select>
                   <option value="1">南宁</option>
-                  <option value="1">玉林</option>
+                  <option value="2">玉林</option>
                 </select>
                 <div class="sjxDiv">
                   <img class="sjx" src="img/next_bottom.png" alt>
@@ -132,10 +132,11 @@
       </div>
       <div class="nextBtn">下一步</div>
     </div>
-    <div class="tc_agree2">输入店铺介绍在200字内</div>
   </div>
 </template>
 <script>
+import myDrop from "@/components/myDrop";
+
 export default {};
 </script>
 <style>

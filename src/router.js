@@ -104,18 +104,58 @@ var routes = [
           },
     },
     {
+        path: 'pages/my/addressadd',
+        name: 'addressadd',
+        config: {
+            navigationBarTitleText: '新增收货地址',
+            enablePullDownRefresh: false
+          },
+    },
+    {
         path: 'pages/my/entry_notice',
-        name: 'address',
+        name: 'entry_notice',
         config: {
             navigationBarTitleText: '入驻商城申请',
             enablePullDownRefresh: false
           },
     },
     {
-        path: 'pages/my/addressadd',
-        name: 'addressadd',
+        path: 'pages/my/write_info',
+        name: 'write_info',
         config: {
-            navigationBarTitleText: '新增收货地址',
+            navigationBarTitleText: '填写基础信息',
+            enablePullDownRefresh: false
+          },
+    },
+    {
+        path: 'pages/my/write_license',
+        name: 'write_license',
+        config: {
+            navigationBarTitleText: '上传资料',
+            enablePullDownRefresh: false
+          },
+    },
+    {
+        path: 'pages/my/write_location',
+        name: 'write_location',
+        config: {
+            navigationBarTitleText: '选择位置',
+            enablePullDownRefresh: false
+          },
+    },
+    {
+        path: 'pages/my/applyresult',
+        name: 'applyresult',
+        config: {
+            navigationBarTitleText: '申请结果',
+            enablePullDownRefresh: false
+          },
+    },
+    {
+        path: 'pages/my/applyresult_detail',
+        name: 'applyresult_detail',
+        config: {
+            navigationBarTitleText: '详细资料',
             enablePullDownRefresh: false
           },
     },

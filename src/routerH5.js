@@ -18,7 +18,7 @@ import orderDetail from './pages/order/orderDetail'
 import orderreturn from './pages/order/orderreturn'
 import confirm_receipt from './pages/order/confirm_receipt'
 import write_review from './pages/order/write_review'
-import write_review from './pages/order/Comment'
+import Comment from './pages/order/Comment'
 
 
 import store from './store'
