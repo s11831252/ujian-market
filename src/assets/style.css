@@ -416,12 +416,15 @@ body {
 }
 
 .index .content .fill .fillDemo {
-  overflow: hidden;
+  /* overflow: hidden; */
+  vertical-align: top;
   padding-bottom: 0.38rem;
 }
 
 .index .content .fill .fillDemo .fill_title {
-  float: left;
+  /* float: left; */
+  vertical-align: top;
+  display:inline-block;
   color: #5f5f61;
   font-size: 0.42rem;
   margin-right: 0.5rem;
@@ -429,7 +432,8 @@ body {
 }
 
 .index .content .fill .fillDemo .fill_name {
-  float: left;
+  display:inline-block;
+  /* float: left; */
   color: #151515;
   font-size: 0.4rem;
   line-height: 0.63rem;
@@ -437,11 +441,12 @@ body {
 
 .index .content .fill .fillDemo .fill_boxDiv {
   max-width: 7.2rem;
-  float: left;
+  display:inline-block;
+  /* float: left; */
 }
 
 .index .content .fill .fillDemo .fill_boxDiv .fill_box {
-  overflow: hidden;
+  /* overflow: hidden; */
   margin-bottom: 0.15rem;
 }
 
@@ -573,7 +578,8 @@ body {
 }
 
 .index .content .fill .fillDemo .fill_editDiv {
-  float: left;
+  /* float: left; */
+  display: inline-block;
   margin-bottom: 0.45rem;
   padding-bottom: 0.6rem;
   border: solid 0.02rem #bfbfbf;

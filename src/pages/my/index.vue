@@ -29,7 +29,7 @@
                         <p class="myInfo_p">收货地址</p>
                         <img class="next" src="/static/img/next.png" alt="" />
                     </div>
-                    <div class="myInfo_demo" @click="go({path:'/pages/my/write_info'})">
+                    <div class="myInfo_demo" @click="go({path:'/pages/my/entry_notice'})">
                         <img class="shoppingCart" src="/static/img/shoppingCart.png" alt=""  />
                         <p class="myInfo_p">入驻商城</p>
                         <img class="next" src="/static/img/next.png" alt="" />

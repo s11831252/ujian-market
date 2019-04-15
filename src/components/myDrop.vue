@@ -63,14 +63,18 @@ export default {
 </script>
 <style lang="less" scoped>
 .drop{
-    margin-left:10px;
+    margin-right:2px;
     display: inline-block;
     position: relative;
     border-radius: 5px;
+    z-index: 9999;
     border: 1px solid #c1c1c1;
+    
     .drop-selected{
         .drop-label{
-        padding: 0px 15px;
+        padding: 0px 10px;
+        width: 3.15rem;
+        overflow-x: hidden;
         border-right: 1px solid #c1c1c1;
         }
         i{
@@ -81,6 +85,7 @@ export default {
     .drop-options{
         width: 100%;
         position: absolute;    
+        z-index: 9999;
         background-color: #fff;
         border: 1px solid #c1c1c1;
         border-bottom: none;

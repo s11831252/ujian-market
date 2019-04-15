@@ -17,10 +17,10 @@
           </div>
         </div>
         <div class="fillDemo">
-          <div class="fill_title">店铺LOGO:</div>
+          <div class="fill_title">店铺Logo:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <img class="fill_addimg" src="img/addImg.png" alt>
+              <img class="fill_addimg" src="/static/img/addImg.png" alt>
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -52,7 +52,7 @@
                   <option value="2">广东</option>
                 </select>
                 <div class="sjxDiv">
-                  <img class="sjx" src="img/next_bottom.png" alt>
+                  <img class="sjx" src="/static/img/next_bottom.png" alt>
                 </div>
               </div>
               <div class="selectDiv">
@@ -61,7 +61,7 @@
                   <option value="2">玉林</option>
                 </select>
                 <div class="sjxDiv">
-                  <img class="sjx" src="img/next_bottom.png" alt>
+                  <img class="sjx" src="/static/img/next_bottom.png" alt>
                 </div>
               </div>
               <div class="fillBtn">点击设置</div>
@@ -73,15 +73,16 @@
           <div class="fill_title">店铺类型:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <div class="selectDiv2">
+              <!-- <div class="selectDiv2">
                 <select>
                   <option value="1">选择类型</option>
                   <option value="2">选择类型</option>
                 </select>
                 <div class="sjxDiv">
-                  <img class="sjx" src="img/next_bottom.png" alt>
+                  <img class="sjx" src="/static/img/next_bottom.png" alt>
                 </div>
-              </div>
+              </div>-->
+              <myDrop :options="KeywordListfilter" :onSelected="KeywordSelected"></myDrop>
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -90,7 +91,9 @@
           <div class="fill_title">主营商品:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <div class="selectDiv2">
+              <myDrop :options="GoodsKeywordTypeFilter" :onSelected="GoodsKeywordSelected"></myDrop>
+              <myDrop :options="GoodsKeywordTypeFilter_Sub" :onSelected="GoodsKeywordSelected_Sub"></myDrop>
+              <!-- <div class="selectDiv2">
                 <select>
                   <option value="1">主营商品</option>
                   <option value="2">机械设备</option>
@@ -101,10 +104,10 @@
                   <option value="2">机械设备</option>
                 </select>
                 <div class="sjxDiv">
-                  <img class="sjx" src="img/next_bottom.png" alt>
+                  <img class="sjx" src="/static/img/next_bottom.png" alt>
                 </div>
-              </div>
-              <div class="selectDiv2">
+              </div>-->
+              <!-- <div class="selectDiv2">
                 <select>
                   <option value="1">主营商品</option>
                   <option value="2">机械设备</option>
@@ -115,9 +118,9 @@
                   <option value="2">机械设备</option>
                 </select>
                 <div class="sjxDiv">
-                  <img class="sjx" src="img/next_bottom.png" alt>
+                  <img class="sjx" src="/static/img/next_bottom.png" alt>
                 </div>
-              </div>
+              </div>-->
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -137,7 +140,77 @@
 <script>
 import myDrop from "@/components/myDrop";
 
-export default {};
+export default {
+  components: {
+    myDrop
+  },
+  data() {
+    return {
+      KeywordList: [],
+      GoodsKeywordType: [],
+      GoodsKeywordSelectItem: {}
+    };
+  },
+  computed: {
+    KeywordListfilter() {
+      var temp = this.KeywordList.map(item => {
+        return { text: item.KeywordName, value: item.KeywordId };
+      });
+      return temp;
+    },
+    GoodsKeywordTypeFilter() {
+      if(this.GoodsKeywordType&&this.GoodsKeywordType.length>0)
+      {
+        var temp = this.GoodsKeywordType.filter(item => {
+          return item.ParentId == 0;
+        }).map(item => {
+          return { text: item.KeywordName, value: item.KeywordId };
+        });
+        return temp;
+      }else
+      {
+        return [];
+      }
+    },
+    GoodsKeywordTypeFilter_Sub() {
+      // console.log("这里触发了",this.GoodsKeywordSelectItem)
+      var that =this;
+      if (this.GoodsKeywordSelectItem&&this.GoodsKeywordType.length>0&&this.GoodsKeywordSelectItem) {
+        var temp = this.GoodsKeywordType.filter(item => {
+          return item.ParentId !=0 && item.ParentId == that.GoodsKeywordSelectItem.value;
+        }).map(item => {
+          return { text: item.KeywordName, value: item.KeywordId };
+        });
+        return temp;
+      } else {
+        return [];
+      }
+    }
+  },
+  methods: {
+    KeywordSelected(item) {
+      // console.log(item);
+    },
+    GoodsKeywordSelected(item) {
+      // console.log(item);
+      this.GoodsKeywordSelectItem=item;
+    },
+    GoodsKeywordSelected_Sub(item) {
+      // console.log(item);
+    }
+  },
+  async mounted() {
+    var rep = await this.$ShoppingAPI.CommonInfo_GetKeywordType();
+    if (rep.ret == 0) {
+      this.KeywordList = rep.data;
+    }
+
+    var rep2 = await this.$ShoppingAPI.CommonInfo_GetGoodsKeywordType();
+    if (rep2.ret == 0) {
+      this.GoodsKeywordType = rep2.data;
+    }
+  }
+};
 </script>
 <style>
 </style>
