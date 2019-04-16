@@ -7,6 +7,7 @@
         <ul v-if="showed" class="drop-options">
             <li class="drop-option" v-for="(item,index) in options" :key="index" @click="select(index)">{{item.text}}</li>
         </ul>
+        <div class="backdrop" @click="show" v-if="showed"></div>
     </div>
 </template>
 <script>
@@ -63,23 +64,28 @@ export default {
 </script>
 <style lang="less" scoped>
 .drop{
-    margin-right:2px;
+    margin-right:0.05rem;
     display: inline-block;
     position: relative;
     border-radius: 5px;
-    z-index: 9999;
     border: 1px solid #c1c1c1;
     
     .drop-selected{
         .drop-label{
-        padding: 0px 10px;
-        width: 3.15rem;
+        padding: 2px 8px;
+        width: 2.1rem;
+        line-height: 0.6rem;
+        height: 0.6rem;
+        display: inline-block;
         overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        vertical-align: middle;
         border-right: 1px solid #c1c1c1;
         }
         i{
-            padding: 5px 0;
             display: inline-block;
+            vertical-align: middle;
         }
     }
     .drop-options{
@@ -94,6 +100,15 @@ export default {
             border-bottom: 1px solid #c1c1c1;
             padding: 5px 0 5px 5px;
         }
+    }
+    .backdrop{
+        position: fixed;
+        background: transparent;
+        z-index: 999;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
     }
 }
 </style>

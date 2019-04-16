@@ -2,7 +2,7 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = "https://market.ujianchina.net/";
+let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.119:811/":"https://market.ujianchina.net/";
 // let BaseHost = "http://192.168.0.86:811/";
 // let BaseHost = "http://192.168.0.119:811/";
 
@@ -10,6 +10,7 @@ let BaseHost = "https://market.ujianchina.net/";
 
 
 export default {
+    //百度坐标转换
     baidu_geocoder: param => {
         //location=35.658651,139.745415
         let ak = "yCCZ5HnYGnUoRQNfd0YkTHg8lluFGQRZ";
@@ -18,92 +19,120 @@ export default {
         }
         return http.get(`https://api.map.baidu.com/geocoder/v2/?ak=${ak}&output=json&coordtype=gcj02ll`, param)
     },
+    //普通登录(账号+密码)
     Account_Login: param => {
         return http.post(BaseHost + "api/Account/Login", param)
     },
+    //登录验证码
     Account_ValidationCode: (param) => {
         return http.get(BaseHost + "api/Account/ValidationCode", param)
     },
+    //微信登录(用户在微信小程序首次登录绑定账号后即可自动登录)
     Account_wxLogin: (code, param) => {
         return http.post(BaseHost + `api/Account/wxLogin?code=${code}`, param)
     },
+    //简单登录(账号+验证码)
     Account_SimpleLogin: param => {
         return http.post(BaseHost + "api/Account/SimpleLogin", param)
     },
+    //获取用户信息
     User_Get: param => {
         return http.get(BaseHost + "api/User/Get", param)
     },
+    //获取个人优惠券
     User_Coupon_Get: param => {
         //api/User_Coupon/Get?Coupon_RuleId={Coupon_RuleId}&State={State}&PageIndex={PageIndex}&PageSize={PageSize}
         return http.get(BaseHost + "api/User_Coupon/Get", param)
     },
+    //获取行业市场信息
     Market_Get: param => {
         return http.get(BaseHost + "api/Market/Get", param)
     },
+    //获取店铺
     Shop_Get: param => {
         return http.get(BaseHost + "api/Shop/Get", param)
     },
+    //获取店铺详情
     Shop_GetDetails: param => {
         return http.get(BaseHost + "api/Shop/GetDetails", param)
     },
+    //获取店铺自定义商品分类
     CustomGoodsType_Get: param => {
         return http.get(BaseHost + "api/CustomGoodsType/Get", param)
     },
+    //获取店铺商品列表
     Goods_GetByShop: param => {
         return http.get(BaseHost + "api/Goods/GetByShop", param)
     },
+    //获取商品
     Goods_Get: param => {
         return http.get(BaseHost + "api/Goods/Get", param)
     },
+    //搜索商品
     Goods_Search: param => {
         return http.get(BaseHost + "api/Goods/Search", param)
     },
+    //获取商品热门搜索关键字
     GoodsSearchHistory_GetHot: param => {
         return http.get(BaseHost + "api/GoodsSearchHistory/GetHot", param)
     },
+    //获取个人搜素商品关键字
     GoodsSearchHistory_Get: param => {
         return http.get(BaseHost + "api/GoodsSearchHistory/Get", param)
     },
+    //获取物流
     GetLogisticsMode: param => {
         return http.get(BaseHost + "api/LogisticsDistribution/GetLogisticsMode", param)
     },
+    //获取配送方式
     GetDistributionMode: param => {
         return http.get(BaseHost + "api/LogisticsDistribution/GetDistributionMode", param)
     },
+    //获取订单地址
     OrderAddress_Get: param => {
         return http.get(BaseHost + "api/OrderAddress/Get", param)
     },
+    //新增订单地址
     OrderAddress_Add: param => {
         return http.post(BaseHost + "api/OrderAddress/Add", param)
     },
+    //编辑订单地址
     OrderAddress_Edit: param => {
         return http.post(BaseHost + "api/OrderAddress/Edit", param)
     },
+    //删除订单地址
     OrderAddress_Delete: (Order_Address_Id) => {
         if (!Order_Address_Id)
             return;
         return http.post(BaseHost + `api/OrderAddress/Delete?Order_Address_Id=${Order_Address_Id}`)
     },
+    //设置默认订单地址
     OrderAddress_SetDefault: (Order_Address_Id) => {
         if (!Order_Address_Id)
             return;
         return http.post(BaseHost + `api/OrderAddress/SetDefault?Order_Address_Id=${Order_Address_Id}`)
     },
+    //查询运费
     QueryFreight: param => {
         return http.post(BaseHost + "api/LogisticsDistribution/QueryFreight", param)
     },
+    //创建订单
     Order_Create: param => {
         return http.post(BaseHost + "api/Order/Create", param)
     },
+    //获取订单
     Order_Get: param => {
         return http.get(BaseHost + "api/Order/Get", param)
     },
+    //获取支付验证码
     Order_ValidationCode: param => {
         return http.get(BaseHost + "api/Order/ValidationCode", param)
     },
+    //支付订单
     Order_Pay: param => {
         return http.post(BaseHost + "api/Order/Pay", param)
     },
+    //更新订单支付状态
     Order_UpdatePayState: param => {
         return http.post(BaseHost + "api/Order/UpdatePayState", param)
     },
@@ -134,7 +163,7 @@ export default {
     OrderComment_GetListdelete: CommentGoodsId => {
         return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
     },
-
+    //申请取消订单
     Order_ApplyCancel: (param, filePath, name) => {
         if (filePath && filePath.length > 0)
             return http.upload(BaseHost + "api/Order/ApplyCancel?t=json", param, filePath, name);
@@ -152,5 +181,12 @@ export default {
     Order_ApplyPlatform: param => {
         return http.post(BaseHost + "api/Order/ApplyPlatform?OrderId=" + param.OrderId)
     },
-
+    //获取店铺分类
+    CommonInfo_GetKeywordType: param => {
+        return http.get(BaseHost + `api/CommonInfo/GetKeywordType`,param)
+    },    
+    //获取商品分类
+    CommonInfo_GetGoodsKeywordType: param => {
+        return http.get(BaseHost + `api/CommonInfo/GetGoodsKeywordType`, param)
+    },
 }

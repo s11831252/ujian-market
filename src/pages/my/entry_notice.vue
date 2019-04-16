@@ -83,7 +83,6 @@ export default {
   },
   methods: {
     radioChange(v) {
-      console.log(v.target.value);
       this.agree = v.target.value == "true";
     },
     nextGo(){

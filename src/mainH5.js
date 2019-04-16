@@ -6,6 +6,11 @@ import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
 import fts from './utils/autorem'
 import Toast from './components/Toast';
+import './assets/style.css';
+import './assets/global.css';
+import './assets/iconfont.less';
+import './components/Toast/toast.css';
+
 Vue.use(Toast);
 
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI

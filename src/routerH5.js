@@ -19,7 +19,12 @@ import orderreturn from './pages/order/orderreturn'
 import confirm_receipt from './pages/order/confirm_receipt'
 import write_review from './pages/order/write_review'
 import Comment from './pages/order/Comment'
-
+import entry_notice from './pages/my/entry_notice'
+import write_info from './pages/my/write_info'
+import write_license from './pages/my/write_license'
+import write_location from './pages/my/write_location'
+import applyresult from './pages/my/applyresult'
+import applyresult_detail from './pages/my/applyresult_detail'
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -174,6 +179,66 @@ var routes = [
           },
           alias: '/pages/my/addressadd',
           component: addressadd
+    },
+    {
+        path: 'pages/my/entry_notice',
+        name: 'entry_notice',
+        config: {
+            navigationBarTitleText: '入驻商城申请',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/entry_notice',
+          component: entry_notice
+    },
+    {
+        path: 'pages/my/write_info',
+        name: 'write_info',
+        config: {
+            navigationBarTitleText: '填写基础信息',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/write_info',
+          component: write_info
+    },
+    {
+        path: 'pages/my/write_license',
+        name: 'write_license',
+        config: {
+            navigationBarTitleText: '上传资料',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/write_license',
+          component: write_license
+    },
+    {
+        path: 'pages/my/write_location',
+        name: 'write_location',
+        config: {
+            navigationBarTitleText: '选择位置',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/write_location',
+          component: write_location
+    },
+    {
+        path: 'pages/my/applyresult',
+        name: 'applyresult',
+        config: {
+            navigationBarTitleText: '申请结果',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/applyresult',
+          component: applyresult
+    },
+    {
+        path: 'pages/my/applyresult_detail',
+        name: 'applyresult_detail',
+        config: {
+            navigationBarTitleText: '详细资料',
+            enablePullDownRefresh: false
+          },
+          alias: '/pages/my/applyresult_detail',
+          component: applyresult_detail
     },
     {
         path: 'pages/shop/index',

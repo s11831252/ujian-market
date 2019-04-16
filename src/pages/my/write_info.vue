@@ -4,13 +4,13 @@
       <div class="fill">
         <div class="fillDemo">
           <div class="fill_title">店主姓名:</div>
-          <p class="fill_name">程方益</p>
+          <p class="fill_name">{{UserInfo.UserName}}</p>
         </div>
         <div class="fillDemo">
           <div class="fill_title">店铺名称:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <input class="fill_input" type="text">
+              <input class="fill_input" placeholder="填写店铺名称" type="text">
               <p class="fill_fuhao">※</p>
             </div>
             <p class="fill_hint">注：最多10个字</p>
@@ -29,7 +29,7 @@
           <div class="fill_title">手机号码:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <input class="fill_input" type="text">
+              <input class="fill_input" placeholder="填写手机号码" type="text">
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -38,7 +38,7 @@
           <div class="fill_title">固定电话:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <input class="fill_input" type="text">
+              <input class="fill_input" placeholder="填写固定电话" type="text">
             </div>
           </div>
         </div>
@@ -46,26 +46,10 @@
           <div class="fill_title">店铺地址:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <div class="selectDiv">
-                <select>
-                  <option value="1">广西壮族自治区</option>
-                  <option value="2">广东</option>
-                </select>
-                <div class="sjxDiv">
-                  <img class="sjx" src="/static/img/next_bottom.png" alt>
-                </div>
-              </div>
-              <div class="selectDiv">
-                <select>
-                  <option value="1">南宁</option>
-                  <option value="2">玉林</option>
-                </select>
-                <div class="sjxDiv">
-                  <img class="sjx" src="/static/img/next_bottom.png" alt>
-                </div>
-              </div>
+              <myDrop :options="AreaList_level1" :onSelected="AreaSelected"></myDrop>
+              <myDrop :options="AreaList_level2" :onSelected="Area2Selected"></myDrop>
               <div class="fillBtn">点击设置</div>
-              <input class="fill_input2" type="text">
+              <input class="fill_input2" placeholder="请填写店铺详细地址" type="text">
             </div>
           </div>
         </div>
@@ -93,34 +77,6 @@
             <div class="fill_box">
               <myDrop :options="GoodsKeywordTypeFilter" :onSelected="GoodsKeywordSelected"></myDrop>
               <myDrop :options="GoodsKeywordTypeFilter_Sub" :onSelected="GoodsKeywordSelected_Sub"></myDrop>
-              <!-- <div class="selectDiv2">
-                <select>
-                  <option value="1">主营商品</option>
-                  <option value="2">机械设备</option>
-                  <option value="2">劳保安防...</option>
-                  <option value="2">几点设备</option>
-                  <option value="2">电工电气</option>
-                  <option value="2">机械设备</option>
-                  <option value="2">机械设备</option>
-                </select>
-                <div class="sjxDiv">
-                  <img class="sjx" src="/static/img/next_bottom.png" alt>
-                </div>
-              </div>-->
-              <!-- <div class="selectDiv2">
-                <select>
-                  <option value="1">主营商品</option>
-                  <option value="2">机械设备</option>
-                  <option value="2">劳保安防...</option>
-                  <option value="2">几点设备</option>
-                  <option value="2">电工电气</option>
-                  <option value="2">机械设备</option>
-                  <option value="2">机械设备</option>
-                </select>
-                <div class="sjxDiv">
-                  <img class="sjx" src="/static/img/next_bottom.png" alt>
-                </div>
-              </div>-->
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -128,7 +84,7 @@
         <div class="fillDemo">
           <div class="fill_title">店铺介绍:</div>
           <div class="fill_editDiv">
-            <div class="fill_edit" contenteditable="true"></div>
+            <textarea class="fill_edit" placeholder="请填入店铺介绍..." contenteditable="true"></textarea>
             <div class="fill_edit_hint">0/200</div>
           </div>
         </div>
@@ -139,6 +95,7 @@
 </template>
 <script>
 import myDrop from "@/components/myDrop";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -148,10 +105,15 @@ export default {
     return {
       KeywordList: [],
       GoodsKeywordType: [],
-      GoodsKeywordSelectItem: {}
+      AreaList:[],
+      GoodsKeywordSelectItem: {},
+      AreaSelectedItem:{},
     };
   },
   computed: {
+    ...mapState({
+      UserInfo: state => state.User.UserInfo
+    }),
     KeywordListfilter() {
       var temp = this.KeywordList.map(item => {
         return { text: item.KeywordName, value: item.KeywordId };
@@ -185,11 +147,56 @@ export default {
       } else {
         return [];
       }
+    },
+    AreaList_level1(){
+      if(this.AreaList&&this.AreaList.length>0)
+      {
+        var _temp = this.AreaList.filter(item=>{
+          return item.ParentId==0;
+        }).map(item=>{
+          return { text: item.KeywordName, value: item.KeywordId, ParentId:item.ParentId};
+        })
+        return _temp;
+      }
+      else
+        return [];
+    },
+    AreaList_level2(){
+      if(this.AreaList&&this.AreaList.length>0)
+      {
+        if(this.AreaSelectedItem&&this.AreaSelectedItem.ParentId==0)
+        {
+          var _temp = this.AreaList.filter(item=>{
+            return item.ParentId==this.AreaSelectedItem.value;
+          }).map(item=>{
+            return { text: item.KeywordName, value: item.KeywordId,ParentId:item.ParentId };
+          })
+          return _temp;
+        }else{
+          // var _temp = this.AreaList.filter(item=>{
+          //   return item.ParentId==this.AreaSelectedItem.ParentId;
+          // }).map(item=>{
+          //   return { text: item.KeywordName, value: item.KeywordId,ParentId:item.ParentId };
+          // })
+          // return _temp;
+        }
+
+      }
+      else
+        return [];
     }
   },
   methods: {
     KeywordSelected(item) {
       // console.log(item);
+    },
+    AreaSelected(item){
+      // console.log(item);
+      this.AreaSelectedItem=item;
+    },
+    Area2Selected(item)
+    {
+       console.log(item);
     },
     GoodsKeywordSelected(item) {
       // console.log(item);
@@ -208,6 +215,12 @@ export default {
     var rep2 = await this.$ShoppingAPI.CommonInfo_GetGoodsKeywordType();
     if (rep2.ret == 0) {
       this.GoodsKeywordType = rep2.data;
+    }
+
+    var rep3 = await this.$UJAPI.GetKeyword({TypeId:4});
+    if(rep3.ret==0)
+    {
+      this.AreaList = rep3.data;
     }
   }
 };
