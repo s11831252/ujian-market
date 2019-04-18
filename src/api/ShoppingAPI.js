@@ -189,8 +189,15 @@ export default {
     CommonInfo_GetGoodsKeywordType: param => {
         return http.get(BaseHost + `api/CommonInfo/GetGoodsKeywordType`, param)
     },
-
+    //获取商家协议html
     Shop_AgreementHtml:(uri) =>{
         return http.get(BaseHost + `Shop_Agreement.html`)
+    },
+    //申请创建店铺
+    Shop_CreateEasy:(param, filePath, name) =>{
+        if (filePath && filePath.length > 0)
+        return http.upload(BaseHost + "api/Shop/CreateEasy?t=json", param, filePath, name);
+        else
+        return http.get(BaseHost + `api/Shop/CreateEasy`,param)
     }
 }

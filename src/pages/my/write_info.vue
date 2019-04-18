@@ -242,6 +242,14 @@ export default {
       }
     },
     next(){
+      if(!this.CreateShoppingInfo.sName)
+      {
+        this.toast("请输入店铺名称");
+        return
+      }
+
+      this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,that.sLogo,["sLogo"])
+
       console.log(this.CreateShoppingInfo);
     }
   },
