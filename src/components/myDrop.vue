@@ -64,7 +64,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .drop{
-    margin-right:0.05rem;
+    margin-right:0.2rem;
     display: inline-block;
     position: relative;
     border-radius: 5px;

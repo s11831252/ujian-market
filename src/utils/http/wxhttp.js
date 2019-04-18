@@ -111,7 +111,7 @@ const net = {
     // var  i = data.i ? data.i : 0,
     // success = data.success ? data.success : 0,
     // fail = data.fail ? data.fail : 0;
-     console.log(url,data,filePath,names);
+    //  console.log(url,data,filePath,names);
 
     //  return new Promise((resolve, reject) => {
     //   wx.uploadFile({

@@ -189,4 +189,8 @@ export default {
     CommonInfo_GetGoodsKeywordType: param => {
         return http.get(BaseHost + `api/CommonInfo/GetGoodsKeywordType`, param)
     },
+
+    Shop_AgreementHtml:(uri) =>{
+        return http.get(BaseHost + `Shop_Agreement.html`)
+    }
 }
