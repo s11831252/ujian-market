@@ -137,7 +137,9 @@ const net = {
     //   });
 
     // })
-
+    wx.showLoading({
+      title: '上传中',
+    })
     var promiseList=[];
     for (let index = 0; index < filePath.length; index++) {
       promiseList[index]=new Promise((resolve, reject) => {
@@ -153,7 +155,25 @@ const net = {
               'SingleTicket':store.state.User.SingleTicket
             }, // 设置请求的 header
             success: (resp) => {
-              resolve(JSON.parse(resp.data));
+              console.log(resp)
+              if(resp.statusCode!=200){
+                wx.showToast({
+                  title: "网络出错，稍后再试",
+                  icon: "none"
+                });
+                return false;
+              }
+              var res=JSON.parse(resp.data);
+              console.log(res)
+              if(res.ret!=0){
+                wx.showToast({
+                  title: res.msg,
+                  icon: "none"
+                });
+                return false;
+              }
+              resolve(res);
+
             },
             fail: (res) => {
             },

@@ -234,7 +234,7 @@ export default {
           //接口调用成功的回调函数
           success: function (res) {
             if(res.tempFilePaths.length>0)
-              that.sLogo.push(tempFilePaths[0]);
+              that.sLogo.push(res.tempFilePaths[0]);
           }
         })
       } else {
@@ -248,7 +248,7 @@ export default {
         return
       }
 
-      this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,that.sLogo,["sLogo"])
+      this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
 
       console.log(this.CreateShoppingInfo);
     }
