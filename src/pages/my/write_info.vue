@@ -10,7 +10,7 @@
           <div class="fill_title">店铺名称:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <input class="fill_input" v-model="CreateShoppingInfo.sName" placeholder="填写店铺名称" type="text">
+              <input class="fill_input" v-model.lazy="CreateShoppingInfo.sName" placeholder="填写店铺名称" type="text">
               <p class="fill_fuhao">※</p>
             </div>
             <p class="fill_hint">注：最多10个字</p>
@@ -30,7 +30,7 @@
           <div class="fill_title">手机号码:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <input class="fill_input" placeholder="填写手机号码" v-model="CreateShoppingInfo.Mobile" type="text">
+              <input class="fill_input" placeholder="填写手机号码" v-model.lazy="CreateShoppingInfo.Mobile" type="text">
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -39,7 +39,7 @@
           <div class="fill_title">固定电话:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <input class="fill_input" placeholder="填写固定电话" v-model="CreateShoppingInfo.Tel" type="text">
+              <input class="fill_input" placeholder="填写固定电话" v-model.lazy="CreateShoppingInfo.Tel" type="text">
             </div>
           </div>
         </div>
@@ -49,8 +49,8 @@
             <div class="fill_box">
               <myDrop :options="AreaList_level1" :onSelected="AreaSelected"></myDrop>
               <myDrop :options="AreaList_level2" :onSelected="Area2Selected"></myDrop>
-              <div class="fillBtn">点击设置</div>
-              <input class="fill_input2" placeholder="请填写店铺详细地址" v-model="CreateShoppingInfo.Address" type="text">
+              <div class="fillBtn" @click="chooseLocation">点击设置</div>
+              <input class="fill_input2" placeholder="请填写店铺详细地址" v-model.lazy="CreateShoppingInfo.Address" type="text">
             </div>
           </div>
         </div>
@@ -85,7 +85,7 @@
         <div class="fillDemo">
           <div class="fill_title">店铺介绍:</div>
           <div class="fill_editDiv">
-            <textarea class="fill_edit" placeholder="请填入店铺介绍..." v-model="CreateShoppingInfo.Brief" contenteditable="true"></textarea>
+            <textarea class="fill_edit" placeholder="请填入店铺介绍..." v-model.lazy="CreateShoppingInfo.Brief" contenteditable="true"></textarea>
             <div class="fill_edit_hint">0/200</div>
           </div>
         </div>
@@ -224,6 +224,17 @@ export default {
     },
     GoodsKeywordSelected_Sub(item) {
       this.CreateShoppingInfo.MainType=item.value;
+    },
+    chooseLocation() {
+      var that = this;
+      wx.chooseLocation({
+        success(res) {
+          console.log(res);
+          that.CreateShoppingInfo.Latitude = res.latitude;
+          that.CreateShoppingInfo.Longitude = res.longitude;
+          that.CreateShoppingInfo.Address += res.address;
+        }
+      });
     },
     //选择图片
     chooseImage(){

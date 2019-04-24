@@ -198,6 +198,6 @@ export default {
         if (filePath && filePath.length > 0)
         return http.upload(BaseHost + "api/Shop/CreateEasy?t=json", param, filePath, name);
         else
-        return http.get(BaseHost + `api/Shop/CreateEasy`,param)
+        return http.post(BaseHost + `api/Shop/CreateEasy`,param)
     }
 }
