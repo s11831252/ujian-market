@@ -258,10 +258,14 @@ export default {
         this.toast("请输入店铺名称");
         return
       }
-
-      this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
-
       console.log(this.CreateShoppingInfo);
+
+
+      var rep = this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
+      if(rep.ret==0)
+      {
+        this.go({path:"/pages/my/write_license",query:{sId:rep.ret}});
+      }
     }
   },
   async mounted() {

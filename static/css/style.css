@@ -247,6 +247,7 @@ body {
   color: #ffffff;
   font-size: 0.48rem;
   line-height: 1.2rem;
+  z-index: 999;
 }
 
 .index .content .my,
@@ -643,6 +644,7 @@ body {
   padding: 0.1rem;
   line-height: 0.6rem;
   outline: 0;
+  z-index: 0;
 }
 
 .index .content .fill .fillDemo .fill_editDiv .fill_edit:empty:before {
