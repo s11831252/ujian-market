@@ -52,6 +52,10 @@ export default {
     Shop_Get: param => {
         return http.get(BaseHost + "api/Shop/Get", param)
     },
+    //获取当前登录用户可管理的商铺列表
+    Shop_GetMy: () => {
+        return http.get(BaseHost + "api/Shop/GetMy")
+    },
     //获取店铺详情
     Shop_GetDetails: param => {
         return http.get(BaseHost + "api/Shop/GetDetails", param)

@@ -29,7 +29,7 @@
                         <p class="myInfo_p">收货地址</p>
                         <img class="next" src="/static/img/next.png" alt="" />
                     </div>
-                    <div class="myInfo_demo" @click="go({path:'/pages/my/entry_notice'})">
+                    <div class="myInfo_demo" @click="outShopping">
                         <img class="shoppingCart" src="/static/img/shoppingCart.png" alt=""  />
                         <p class="myInfo_p">入驻商城</p>
                         <img class="next" src="/static/img/next.png" alt="" />
@@ -48,21 +48,32 @@ export default {
     return {
       Balance: 0,
       Coupon:0,
+      ShoppingInfo:null
     };
   },
   computed: {
     ...mapState({
       UserInfo: state => state.User.UserInfo
-    })
+    }),
+    
   },
   methods: {
     exit() {
       this.$store.commit("Login", { Ticket: "" }); //存入Ticket
       this.$router.push("/pages/index/index"); //回到登录页
+    },
+    outShopping(){
+        if(this.ShoppingInfo&&this.ShoppingInfo.AudtiState==-1)
+        {
+            this.go({path:'/pages/my/write_license',query:{sId:this.ShoppingInfo.sId}})
+        }else{
+            this.go({path:'/pages/my/entry_notice'})
+        }
     }
   },
   components: {},
   async mounted() {
+
     if (!this.UserInfo) {
       var rep = await this.$ShoppingAPI.User_Get();
       if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
@@ -76,6 +87,11 @@ export default {
         this.Coupon = rep.total;
     });
     
+    var rep = await this.$ShoppingAPI.Shop_GetMy();
+    if(rep.ret==0)
+    {
+        this.ShoppingInfo=rep.data[0];
+    }
   }
 };
 </script>

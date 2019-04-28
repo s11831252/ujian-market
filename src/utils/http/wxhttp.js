@@ -155,7 +155,7 @@ const net = {
               'SingleTicket':store.state.User.SingleTicket
             }, // 设置请求的 header
             success: (resp) => {
-              console.log(resp)
+              // console.log(resp)
               if(resp.statusCode!=200){
                 wx.showToast({
                   title: "网络出错，稍后再试",
@@ -164,7 +164,7 @@ const net = {
                 return false;
               }
               var res=JSON.parse(resp.data);
-              console.log(res)
+              // console.log(res)
               if(res.ret!=0){
                 wx.showToast({
                   title: res.msg,
@@ -178,6 +178,7 @@ const net = {
             fail: (res) => {
             },
             complete: () => {
+              wx.hideLoading();
             }
           });
         })

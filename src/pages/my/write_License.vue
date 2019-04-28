@@ -7,7 +7,7 @@
           <div class="upload_right">
             <div class="addimgDiv">
               <div class="addImg_demo">
-                <img class="addImg" src="img/addImg.png" alt>
+                <img class="addImg" src="/static/img/addImg.png" alt>
               </div>
             </div>
             <div class="upload_text">注：1.请上传“营业执照副本”2.要求图片清晰，不能遮挡图片文字内容 3.支持JPG、PNG、GIF格式。</div>
@@ -18,7 +18,7 @@
           <div class="upload_right">
             <div class="addimgDiv">
               <div class="addImg_demo">
-                <img class="addImg" src="img/addImg.png" alt>
+                <img class="addImg" src="/static/img/addImg.png" alt>
               </div>
             </div>
 
