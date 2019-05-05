@@ -229,7 +229,7 @@ export default {
       var that = this;
       wx.chooseLocation({
         success(res) {
-          console.log(res);
+          // console.log(res);
           that.CreateShoppingInfo.Latitude = res.latitude;
           that.CreateShoppingInfo.Longitude = res.longitude;
           that.CreateShoppingInfo.Address += res.address;
@@ -258,7 +258,7 @@ export default {
         this.toast("请输入店铺名称");
         return
       }
-      console.log(this.CreateShoppingInfo);
+      // console.log(this.CreateShoppingInfo);
 
 
       var rep = this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])

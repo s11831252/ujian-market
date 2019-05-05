@@ -146,7 +146,7 @@ const net = {
           wx.uploadFile({
             url: url,
             filePath: filePath[index],
-            name:names[index],
+            name:names instanceof Array?names[index]:`${name}[${index}]`,
             formData: data,
             header: {
               'dataType-Type': 'application/json',

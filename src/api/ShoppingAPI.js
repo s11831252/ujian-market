@@ -203,5 +203,19 @@ export default {
         return http.upload(BaseHost + "api/Shop/CreateEasy?t=json", param, filePath, name);
         else
         return http.post(BaseHost + `api/Shop/CreateEasy`,param)
+    },
+    //更新店铺营业执照
+    Shop_UpdateLicense:(sId,filePath) =>{
+        if (filePath && filePath.length > 0)
+            return http.upload(BaseHost + `api/Shop/UpdateLicense?sId=${sId}?t=json`,null, filePath, "Image");
+        else
+            return http.post(BaseHost + `api/Shop/UpdateLicense`,param)
+    },
+    //更新店铺营业执照
+    Shop_UpdateLicense:(sId,param,filePath,filename) =>{
+        if (filePath && filePath.length > 0)
+            return http.upload(BaseHost + `api/Shop/UpdateImages?sId=${sId}?t=json`,null, filePath, filename);
+        else
+            return http.post(BaseHost + `api/Shop/UpdateImages`,param)
     }
 }
