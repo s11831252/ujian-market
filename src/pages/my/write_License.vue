@@ -19,7 +19,8 @@
           <div class="upload_right">
             <div class="addimgDiv">
               <div class="addImg_demo">
-                <img class="addImg" src="/static/img/addImg.png" @click="chooseShopImage" alt>
+                <img class="addImg" v-for="(item,index) in ShopImages" :key="index" :src="item">
+                <img class="addImg"  v-if="License.length<9" src="/static/img/addImg.png" @click="chooseShopImage" alt>
               </div>
             </div>
             <div class="upload_text">
@@ -30,7 +31,7 @@
           </div>
         </div>
       </div>
-      <div class="nextBtn">申请开店</div>
+      <div class="nextBtn" @click="post">申请开店</div>
     </div>
   </div>
 </template>
@@ -40,7 +41,8 @@ export default {
     return {
       sId:"",
       License:[],
-      ShopImages:[]
+      ShopImages:[],
+      ShoppingInfo:null
     };
   },
   methods:{
@@ -50,12 +52,17 @@ export default {
       if (this.License.length==0) {
         wx.chooseImage({
           sizeType: ['original', 'compressed'],//所选的图片的尺寸
+          count:1,
           //接口调用成功的回调函数
-          success: function (res) {
+           success: async function (res) {
             if(res.tempFilePaths.length>0)
             {
-              that.License.push(res.tempFilePaths[0]);
-              that.$ShoppingAPI.Shop_UpdateLicense(that.sId,that.License);
+              var rep = await that.$ShoppingAPI.Shop_UpdateLicense(that.sId,[res.tempFilePaths[0]]);
+              rep = rep[0];
+              if(rep.ret==0)
+              {
+                that.License.push(res.tempFilePaths[0]);
+              }
             }
           }
         })
@@ -69,12 +76,17 @@ export default {
       if (this.ShopImages.length<9) {
         wx.chooseImage({
           sizeType: ['original', 'compressed'],//所选的图片的尺寸
+          count:1,
           //接口调用成功的回调函数
-          success: function (res) {
+          success: async function (res) {
             if(res.tempFilePaths.length>0)
             {
-              that.ShopImages.push(res.tempFilePaths[0]);
-              that.$ShoppingAPI.Shop_UpdateLicense(that.sId,that.License,"ShopImages");
+              var rep = await that.$ShoppingAPI.Shop_UpdateImages(that.sId,null,[res.tempFilePaths[0]],"ShopImages");
+              rep = rep[0];
+              if(rep.ret==0)
+              {
+                that.ShopImages.push(res.tempFilePaths[0]);
+              }
             }
           }
         })
@@ -82,6 +94,36 @@ export default {
         that.toast('最多上传9张图片');
       }
     },
+    post(){
+      if(this.License.length>0)
+      {
+        this.go({path:"/pages/my/applyresult",query:{sId:this.sId}})
+      }else
+      {
+        this.toast('必须上传营业执照');
+      }
+    }
+  },
+  async mounted(){
+    if( this.$route.query.sId )//从外面传进来的sId店铺标识
+    {
+      this.sId=this.$route.query.sId;
+      var rep = await this.$ShoppingAPI.Shop_GetDetails({sId:this.sId});
+        if(rep.ret==0)
+        {
+            this.ShoppingInfo=rep.data;
+            var _arrtemp =  this.ShoppingInfo.ShopImages.map(item=>item.ImgUrl);
+            for (const item of _arrtemp) {
+              this.ShopImages.push(item)
+            }
+            var _arrtemp2 =  this.ShoppingInfo.License.map(item=>item.ImgUrl);
+            for (const item of _arrtemp2) {
+              this.License.push(item)
+            }
+
+            // console.log(this.ShopImages,this.License)
+        }
+    }
   }
 };
 </script>

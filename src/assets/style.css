@@ -728,7 +728,7 @@ body {
 .index .content .upload .upload_demo .upload_right .addimgDiv .addImg_demo .addImg {
   width: 2.66rem;
   height: 2.66rem;
-  display: block;
+  display: inline-block;
 }
 
 .index .content .upload .upload_demo .upload_right .addimgDiv .addImg_demo .false {
