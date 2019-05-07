@@ -66,7 +66,7 @@
             <p class="prompt_texts">{{ShoppingInfo.CreateTime}}</p>
           </div>
         </div>
-        <div class="prompt_knowBtn">查看</div>
+        <div class="prompt_knowBtn" @click="go({path:'/pages/my/applyresult_detail',query:{sId:sId}})">查看</div>
       </div>
     </div>
   </div>

@@ -689,7 +689,7 @@ body {
 }
 
 .index .content .upload {
-  margin: 0.56rem 0.3rem 2rem 0.3rem;
+  /* margin: 0.56rem 0.3rem 2rem 0.3rem; */
   background-color: #ffffff;
   padding: 0.76rem 0.2rem;
 }
