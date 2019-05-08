@@ -8,7 +8,7 @@
             <div class="addimgDiv">
               <div class="addImg_demo">
                 <img class="addImg" v-if="License.length==0" src="/static/img/addImg.png" @click="chooseImage" alt>
-                <img class="addImg" v-for="(item,index) in License" :key="index" :src="item">
+                <img class="addImg" v-for="(item,index) in License" :key="index" :src="item" @click="chooseImage">
               </div>
             </div>
             <div class="upload_text">注：1.请上传“营业执照副本”2.要求图片清晰，不能遮挡图片文字内容 3.支持JPG、PNG、GIF格式。</div>
@@ -49,7 +49,7 @@ export default {
     //选择店铺营业执照图片
     chooseImage(){
       var that = this;
-      if (this.License.length==0) {
+      if (this.License.length<2) {
         wx.chooseImage({
           sizeType: ['original', 'compressed'],//所选的图片的尺寸
           count:1,
@@ -61,7 +61,7 @@ export default {
               rep = rep[0];
               if(rep.ret==0)
               {
-                that.License.push(res.tempFilePaths[0]);
+                that.License.splice(0,1,res.tempFilePaths[0]);
               }
             }
           }

@@ -34,7 +34,7 @@
       <p class="audit_ing" v-if="ShoppingInfo.AudtiState==0">店铺审核中……</p>
       <p class="audit_ing" v-else-if="ShoppingInfo.AudtiState==2">{{ShoppingInfo.Reason}}</p>
       <!-- <p class="audit_ing" v-else-if="ShoppingInfo.AudtiState==1"></p> -->
-      <div class="nextBtn">取消申请</div>
+      <div class="nextBtn" @click="CancelAudti">取消申请</div>
     </div>
   </div>
 </template>
@@ -46,6 +46,16 @@ export default {
       ShoppingInfo: {}
     };
   },
+  methods:{
+    async CancelAudti(){
+      var rep = await this.$ShoppingAPI.Shop_CancelAudti(this.sId);
+      console.log(rep);
+      if(rep.ret==0)
+      {
+        this.go({path:"/pages/my/write_info",query:{sId:this.sId}})
+      }
+    }
+  },
   async mounted() {
     if (this.$route.query.sId) {
       //从外面传进来的sId店铺标识
@@ -54,7 +64,6 @@ export default {
       if (rep.ret == 0) {
         this.ShoppingInfo = rep.data;
       }
-      // console.log( this.ShoppingInfo)
     }
   }
 };

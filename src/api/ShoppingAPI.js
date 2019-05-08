@@ -204,9 +204,16 @@ export default {
         else
         return http.post(BaseHost + `api/Shop/CreateEasy`,param)
     },
+    //创建店铺申请失败后重试
+    Shop_CreateToo:(sId,param, filePath, name) =>{
+        if (filePath && filePath.length > 0)
+        return http.upload(BaseHost + `api/Shop/Create?sId=${sId}t=json`, param, filePath, name);
+        else
+        return http.post(BaseHost + `api/Shop/Create?sId=${sId}`,param)
+    },
+    
     //更新店铺营业执照
     Shop_UpdateLicense:(sId,filePath) =>{
-        debugger;
         if (filePath && filePath.length > 0)
             return http.upload(BaseHost + `api/Shop/UpdateLicense?sId=${sId}&t=json`,null, filePath, ["Image"]);
         else
@@ -214,10 +221,14 @@ export default {
     },
     //更新店铺照片
     Shop_UpdateImages:(sId,param,filePath,filename) =>{
-        debugger;
         if (filePath && filePath.length > 0)
             return http.upload(BaseHost + `api/Shop/UpdateImages?sId=${sId}&t=json`,param, filePath, filename);
         else
             return http.post(BaseHost + `api/Shop/UpdateImages`,param)
-    }
+    },
+    //用户自主取消店铺审核
+    Shop_CancelAudti: sId => {
+        return http.post(BaseHost + `api/Shop/CancelAudti?sId=${sId}`)
+    },
+    
 }

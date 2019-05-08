@@ -88,7 +88,6 @@ export default {
         {
             this.ShoppingInfo=rep.data;
         }
-        console.log( this.ShoppingInfo)
     }
   }
 };

@@ -104,6 +104,7 @@ export default {
   },
   data() {
     return {
+      sId:null,
       KeywordList: [],
       GoodsKeywordType: [],
       AreaList: [],
@@ -258,17 +259,32 @@ export default {
         this.toast("请输入店铺名称");
         return
       }
-      // console.log(this.CreateShoppingInfo);
-
-
-      var rep = this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
-      if(rep.ret==0)
+      if(this.sId)
       {
-        this.go({path:"/pages/my/write_license",query:{sId:rep.ret}});
+        var rep = this.$ShoppingAPI.Shop_CreateToo(this.sId,this.CreateShoppingInfo,this.sLogo,["sLogo"])
+        if(rep.ret==0)
+        {
+          this.go({path:"/pages/my/write_license",query:{sId:this.sId}});
+        }
+      }else{
+        var rep = this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
+        if(rep.ret==0)
+        {
+          this.go({path:"/pages/my/write_license",query:{sId:rep.ret}});
+        }
       }
     }
   },
   async mounted() {
+    if (this.$route.query.sId) {
+      //从外面传进来的sId店铺标识
+      this.sId = this.$route.query.sId;
+      var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
+      if (rep.ret == 0) {
+        this.CreateShoppingInfo = rep.data;
+      }
+    }
+
     var rep = await this.$ShoppingAPI.CommonInfo_GetKeywordType();
     if (rep.ret == 0) {
       this.KeywordList = rep.data;
