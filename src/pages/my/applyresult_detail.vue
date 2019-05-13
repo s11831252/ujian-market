@@ -34,7 +34,8 @@
       <p class="audit_ing" v-if="ShoppingInfo.AudtiState==0">店铺审核中……</p>
       <p class="audit_ing" v-else-if="ShoppingInfo.AudtiState==2">{{ShoppingInfo.Reason}}</p>
       <!-- <p class="audit_ing" v-else-if="ShoppingInfo.AudtiState==1"></p> -->
-      <div class="nextBtn" @click="CancelAudti">取消申请</div>
+      <div class="nextBtn" @click="CancelAudti" v-if="ShoppingInfo.AudtiState==0">取消申请</div>
+      <div class="nextBtn" @click="go({path:'/pages/my/write_info',query:{sId:ShoppingInfo.sId}})" v-if="ShoppingInfo.AudtiState==2">重新申请</div>
     </div>
   </div>
 </template>
@@ -48,11 +49,11 @@ export default {
   },
   methods:{
     async CancelAudti(){
-      var rep = await this.$ShoppingAPI.Shop_CancelAudti(this.sId);
-      console.log(rep);
+      var rep = await this.$ShoppingAPI.Shop_CancelAudti(this.ShoppingInfo.sId);
+      // console.log(rep);
       if(rep.ret==0)
       {
-        this.go({path:"/pages/my/write_info",query:{sId:this.sId}})
+        this.go({path:"/pages/my/write_info",query:{sId:this.ShoppingInfo.sId}})
       }
     }
   },

@@ -63,10 +63,33 @@ export default {
       this.$router.push("/pages/index/index"); //回到登录页
     },
     outShopping(){
-        if(this.ShoppingInfo&&this.ShoppingInfo.AudtiState==-1)
+        if(this.ShoppingInfo)
         {
-            this.go({path:'/pages/my/write_license',query:{sId:this.ShoppingInfo.sId}})
-        }else{
+            if(this.ShoppingInfo.AudtiState==-1)
+            {
+
+            }
+            switch(this.ShoppingInfo.AudtiState)
+            {
+                case -1:{
+                    this.go({path:'/pages/my/write_license',query:{sId:this.ShoppingInfo.sId}})
+                    break;
+                }
+                case 0:{
+                    this.go({path:'/pages/my/applyresult',query:{sId:this.ShoppingInfo.sId}})
+                    break;
+                }
+                case 1:{
+                    this.go({path:'/pages/my/applyresult',query:{sId:this.ShoppingInfo.sId}})
+                    break;
+                }
+                case 2:{
+                    this.go({path:'/pages/my/applyresult',query:{sId:this.ShoppingInfo.sId}})
+                    break;
+                }
+            }
+        }
+        else{
             this.go({path:'/pages/my/entry_notice'})
         }
     }

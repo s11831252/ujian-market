@@ -24,7 +24,7 @@
             <p class="prompt_url_hint">（复制以上网址前往pc端管理店铺）</p>
           </div>
         </div>
-        <div class="prompt_knowBtn">知道了</div>
+        <div class="prompt_knowBtn" @click="go({path:'/pages/my/index'})">知道了</div>
       </div>
       <div class="prompt" v-else-if="ShoppingInfo.AudtiState==0">
         <div class="prompt_storeDiv">
@@ -45,7 +45,7 @@
             <p class="prompt_texts">{{ShoppingInfo.CreateTime}}</p>
           </div>
         </div>
-        <div class="prompt_knowBtn">查看</div>
+        <div class="prompt_knowBtn" @click="go({path:'/pages/my/applyresult_detail',query:{sId:ShoppingInfo.sId}})">查看</div>
       </div>
       <div class="prompt" v-else>
         <div class="prompt_storeDiv">
@@ -66,7 +66,7 @@
             <p class="prompt_texts">{{ShoppingInfo.CreateTime}}</p>
           </div>
         </div>
-        <div class="prompt_knowBtn" @click="go({path:'/pages/my/applyresult_detail',query:{sId:sId}})">查看</div>
+        <div class="prompt_knowBtn" @click="go({path:'/pages/my/applyresult_detail',query:{sId:ShoppingInfo.sId}})">查看</div>
       </div>
     </div>
   </div>
@@ -78,6 +78,9 @@ export default {
       sId:"",
       ShoppingInfo:{},
     }
+  },
+  methods:{
+    
   },
   async mounted(){
     if( this.$route.query.sId )//从外面传进来的sId店铺标识

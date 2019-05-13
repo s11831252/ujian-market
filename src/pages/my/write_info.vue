@@ -20,7 +20,7 @@
           <div class="fill_title">店铺Logo:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <img class="fill_addimg" :src="sLogo[0]" v-if="sLogo.length>0">
+              <img class="fill_addimg" :src="sLogoPath[0]" v-if="sLogoPath.length>0"  @click="chooseImage">
               <img class="fill_addimg" v-else src="/static/img/addImg.png" @click="chooseImage" alt>
               <p class="fill_fuhao">※</p>
             </div>
@@ -123,7 +123,8 @@ export default {
         Latitude: 0,
         Longitude: 0,
       },
-      sLogo:[]
+      sLogoPath:[],
+      sLogo:[],
     };
   },
   computed: {
@@ -205,6 +206,26 @@ export default {
           // return _temp;
         }
       } else return [];
+    },
+    //如果传入sId 则查找一级城市选中的AreaId
+    AreaId1(){
+      if(this.sId)
+      {
+        var areainfo = this.AreaList.find(item=>{
+          return item.KeywordId==this.CreateShoppingInfo.AreaId;
+        })
+        if(areainfo)
+        {
+          if(areainfo.ParentId==0)
+          {
+            return areainfo.KeywordId
+          }else
+          {
+            return areainfo.ParentId;
+          }
+        }
+      }
+      return 0;
     }
   },
   methods: {
@@ -246,14 +267,17 @@ export default {
           //接口调用成功的回调函数
           success: function (res) {
             if(res.tempFilePaths.length>0)
+            {
               that.sLogo.push(res.tempFilePaths[0]);
+              that.sLogoPath.splice(0,1,res.tempFilePaths[0]);
+            }
           }
         })
       } else {
        that.toast('最多上传1张图片');
       }
     },
-    next(){
+    async next(){
       if(!this.CreateShoppingInfo.sName)
       {
         this.toast("请输入店铺名称");
@@ -261,13 +285,17 @@ export default {
       }
       if(this.sId)
       {
-        var rep = this.$ShoppingAPI.Shop_CreateToo(this.sId,this.CreateShoppingInfo,this.sLogo,["sLogo"])
+        var rep = await this.$ShoppingAPI.Shop_CreateToo(this.sId,this.CreateShoppingInfo,this.sLogo,["sLogo"])
+        if(rep instanceof Array )
+          rep = rep[0];
         if(rep.ret==0)
         {
           this.go({path:"/pages/my/write_license",query:{sId:this.sId}});
         }
       }else{
-        var rep = this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
+        if(rep instanceof Array )
+          rep = rep[0];
+        var rep = await this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
         if(rep.ret==0)
         {
           this.go({path:"/pages/my/write_license",query:{sId:rep.ret}});
@@ -282,6 +310,8 @@ export default {
       var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
       if (rep.ret == 0) {
         this.CreateShoppingInfo = rep.data;
+        if(this.CreateShoppingInfo.sLogo)
+          this.sLogoPath.push(this.CreateShoppingInfo.sLogo);
       }
     }
 

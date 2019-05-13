@@ -207,9 +207,9 @@ export default {
     //创建店铺申请失败后重试
     Shop_CreateToo:(sId,param, filePath, name) =>{
         if (filePath && filePath.length > 0)
-        return http.upload(BaseHost + `api/Shop/Create?sId=${sId}t=json`, param, filePath, name);
+        return http.upload(BaseHost + `api/Shop/CreateEasy?sId=${sId}&t=json`, param, filePath, name);
         else
-        return http.post(BaseHost + `api/Shop/Create?sId=${sId}`,param)
+        return http.post(BaseHost + `api/Shop/CreateEasy?sId=${sId}`,param)
     },
     
     //更新店铺营业执照
