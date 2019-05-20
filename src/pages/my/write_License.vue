@@ -7,7 +7,7 @@
           <div class="upload_right">
             <div class="addimgDiv">
               <div class="addImg_demo">
-                <img class="addImg" v-if="License.length==0" src="/static/img/addImg.png" @click="chooseImage" alt>
+                <img class="addImg" v-if="License.length==0" src="/static/img/Images.png" @click="chooseImage" alt>
                 <img class="addImg" v-for="(item,index) in License" :key="index" :src="item" @click="chooseImage">
               </div>
             </div>
@@ -20,7 +20,7 @@
             <div class="addimgDiv">
               <div class="addImg_demo">
                 <img class="addImg" v-for="(item,index) in ShopImages" :key="index" :src="item">
-                <img class="addImg"  v-if="License.length<9" src="/static/img/addImg.png" @click="chooseShopImage" alt>
+                <img class="addImg"  v-if="License.length<9" src="/static/img/Images.png" @click="chooseShopImage" alt>
               </div>
             </div>
             <div class="upload_text">

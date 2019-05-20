@@ -17,14 +17,14 @@
         </div>
         <p class="prompt_store_P">店铺已申请成功！</p>
         <div class="prompt_url_nr">
-          <div class="prompt_urlDiv">
-            <p class="prompt_url">https://www.duba.com/?un_4_457148</p>
+          <div class="prompt_urlDiv" @click="copyLink('https://live.ujianchina.net/')">
+            <p class="prompt_url" >https://live.ujianchina.net/</p>
           </div>
           <div class="prompt_urlDiv">
-            <p class="prompt_url_hint">（复制以上网址前往pc端管理店铺）</p>
+            <p class="prompt_url_hint">（点击复制以上网址前往pc端管理店铺）</p>
           </div>
         </div>
-        <div class="prompt_knowBtn" @click="go({path:'/pages/my/index'})">知道了</div>
+        <div class="prompt_knowBtn" @click="go({path:'/pages/my/index', isTab: true })">知道了</div>
       </div>
       <div class="prompt" v-else-if="ShoppingInfo.AudtiState==0">
         <div class="prompt_storeDiv">
@@ -80,7 +80,15 @@ export default {
     }
   },
   methods:{
-    
+    copyLink(link){
+      var that = this;
+      wx.setClipboardData({
+        data:link,
+        success(){
+          that.toast("复制成功,您可以粘贴到pc电脑上使用了。")
+        }
+      })
+    }
   },
   async mounted(){
     if( this.$route.query.sId )//从外面传进来的sId店铺标识

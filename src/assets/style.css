@@ -31,7 +31,7 @@ body {
 
 
 .index .content {
-  overflow: auto;
+  /* overflow: auto; */
   /* padding-top: 1.28rem; */
   position: relative;
   font-size: 0.4rem;
@@ -595,6 +595,8 @@ body {
   padding: 0.1rem;
   line-height: 0.6rem;
   outline: 0;
+  position: relative;
+  z-index: 0;
 }
 
 .index .content .fill .fillDemo .fill_editDiv .fill_edit:empty:before {

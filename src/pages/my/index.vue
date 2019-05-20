@@ -25,12 +25,17 @@
                 </div>
                 <div class="myInfo">
                     <div class="myInfo_demo" @click="go({path:'/pages/my/address'})">
-                        <img class="address" src="/static/img/address.png" alt="" />
+                        <i class="icon">&#xe627;</i>
                         <p class="myInfo_p">收货地址</p>
                         <img class="next" src="/static/img/next.png" alt="" />
                     </div>
-                    <div class="myInfo_demo" @click="outShopping">
-                        <img class="shoppingCart" src="/static/img/shoppingCart.png" alt=""  />
+                    <div class="myInfo_demo" @click="outShopping" v-if="ShoppingInfo&&ShoppingInfo.AudtiState==1">
+                        <i class="icon">&#xe626;</i>
+                        <p class="myInfo_p">管理店铺</p>
+                        <img class="next" src="/static/img/next.png" alt="" />
+                    </div>
+                    <div class="myInfo_demo" @click="outShopping" v-else>
+                        <i class="icon">&#xe60e;</i>
                         <p class="myInfo_p">入驻商城</p>
                         <img class="next" src="/static/img/next.png" alt="" />
                     </div>
@@ -65,10 +70,6 @@ export default {
     outShopping(){
         if(this.ShoppingInfo)
         {
-            if(this.ShoppingInfo.AudtiState==-1)
-            {
-
-            }
             switch(this.ShoppingInfo.AudtiState)
             {
                 case -1:{
@@ -121,5 +122,12 @@ export default {
 <style>
 page{
     background-color: #ecf0f1;
+}
+.myInfo_demo i{
+    color: #14b6f6;
+    float: left;
+    font-size: 0.54rem;
+    margin-right: 0.31rem;
+    margin-top: 0.38rem;
 }
 </style>

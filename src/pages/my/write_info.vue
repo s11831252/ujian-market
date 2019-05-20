@@ -20,8 +20,8 @@
           <div class="fill_title">店铺Logo:</div>
           <div class="fill_boxDiv">
             <div class="fill_box">
-              <img class="fill_addimg" :src="sLogoPath[0]" v-if="sLogoPath.length>0"  @click="chooseImage">
-              <img class="fill_addimg" v-else src="/static/img/addImg.png" @click="chooseImage" alt>
+              <img class="fill_addimg" :src="sLogoPath[0]" v-if="sLogoPath.length>0" @click="chooseImage">
+              <img class="fill_addimg" v-else src="/static/img/Images.png" @click="chooseImage" alt>
               <p class="fill_fuhao">※</p>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default {
   },
   data() {
     return {
-      sId:null,
+      sId: null,
       KeywordList: [],
       GoodsKeywordType: [],
       AreaList: [],
@@ -118,13 +118,13 @@ export default {
         Mobile: "",
         Tel: "",
         sType: 0,
-        MainType:0,
+        MainType: 0,
         AreaId: 0,
         Latitude: 0,
-        Longitude: 0,
+        Longitude: 0
       },
-      sLogoPath:[],
-      sLogo:[],
+      sLogoPath: [],
+      sLogo: []
     };
   },
   computed: {
@@ -208,19 +208,15 @@ export default {
       } else return [];
     },
     //如果传入sId 则查找一级城市选中的AreaId
-    AreaId1(){
-      if(this.sId)
-      {
-        var areainfo = this.AreaList.find(item=>{
-          return item.KeywordId==this.CreateShoppingInfo.AreaId;
-        })
-        if(areainfo)
-        {
-          if(areainfo.ParentId==0)
-          {
-            return areainfo.KeywordId
-          }else
-          {
+    AreaId1() {
+      if (this.sId) {
+        var areainfo = this.AreaList.find(item => {
+          return item.KeywordId == this.CreateShoppingInfo.AreaId;
+        });
+        if (areainfo) {
+          if (areainfo.ParentId == 0) {
+            return areainfo.KeywordId;
+          } else {
             return areainfo.ParentId;
           }
         }
@@ -230,22 +226,21 @@ export default {
   },
   methods: {
     KeywordSelected(item) {
-      this.CreateShoppingInfo.sType=item.value;
+      this.CreateShoppingInfo.sType = item.value;
     },
     AreaSelected(item) {
       this.AreaSelectedItem = item;
-      this.CreateShoppingInfo.AreaId=item.value;
+      this.CreateShoppingInfo.AreaId = item.value;
     },
     Area2Selected(item) {
-      this.CreateShoppingInfo.AreaId=item.value;
-
+      this.CreateShoppingInfo.AreaId = item.value;
     },
     GoodsKeywordSelected(item) {
       this.GoodsKeywordSelectItem = item;
-      this.CreateShoppingInfo.MainType=item.value;
+      this.CreateShoppingInfo.MainType = item.value;
     },
     GoodsKeywordSelected_Sub(item) {
-      this.CreateShoppingInfo.MainType=item.value;
+      this.CreateShoppingInfo.MainType = item.value;
     },
     chooseLocation() {
       var that = this;
@@ -259,46 +254,64 @@ export default {
       });
     },
     //选择图片
-    chooseImage(){
+    chooseImage() {
       var that = this;
-      if (this.sLogo.length==0) {
+      if (this.sLogo.length == 0) {
         wx.chooseImage({
-          sizeType: ['original', 'compressed'],//所选的图片的尺寸
+          sizeType: ["original", "compressed"], //所选的图片的尺寸
           //接口调用成功的回调函数
-          success: function (res) {
-            if(res.tempFilePaths.length>0)
-            {
+          success: function(res) {
+            if (res.tempFilePaths.length > 0) {
               that.sLogo.push(res.tempFilePaths[0]);
-              that.sLogoPath.splice(0,1,res.tempFilePaths[0]);
+              that.sLogoPath.splice(0, 1, res.tempFilePaths[0]);
             }
           }
-        })
+        });
       } else {
-       that.toast('最多上传1张图片');
+        that.toast("最多上传1张图片");
       }
     },
-    async next(){
-      if(!this.CreateShoppingInfo.sName)
-      {
+    async next() {
+      if (!this.CreateShoppingInfo.sName) {
         this.toast("请输入店铺名称");
-        return
+        return;
       }
-      if(this.sId)
-      {
-        var rep = await this.$ShoppingAPI.Shop_CreateToo(this.sId,this.CreateShoppingInfo,this.sLogo,["sLogo"])
-        if(rep instanceof Array )
-          rep = rep[0];
-        if(rep.ret==0)
-        {
-          this.go({path:"/pages/my/write_license",query:{sId:this.sId}});
+      if (this.sId) {
+        var data = {
+          sName: this.CreateShoppingInfo.sName,
+          Brief: this.CreateShoppingInfo.Brief,
+          Address: this.CreateShoppingInfo.Address,
+          BusinessHours:this.CreateShoppingInfo.BusinessHours,
+          Mobile: this.CreateShoppingInfo.Mobile,
+          Tel: this.CreateShoppingInfo.Tel,
+          sType: this.CreateShoppingInfo.sType,
+          MainType: this.CreateShoppingInfo.MainType,
+          AreaId: this.CreateShoppingInfo.AreaId,
+          Latitude: this.CreateShoppingInfo.Latitude,
+          Longitude: this.CreateShoppingInfo.Longitude,
+        };
+        var rep = await this.$ShoppingAPI.Shop_CreateToo(
+          this.sId,
+          data,
+          this.sLogo,
+          ["sLogo"]
+        );
+        if (rep instanceof Array) rep = rep[0];
+        if (rep.ret == 0) {
+          this.go({
+            path: "/pages/my/write_license",
+            query: { sId: this.sId }
+          });
         }
-      }else{
-        if(rep instanceof Array )
-          rep = rep[0];
-        var rep = await this.$ShoppingAPI.Shop_CreateEasy(this.CreateShoppingInfo,this.sLogo,["sLogo"])
-        if(rep.ret==0)
-        {
-          this.go({path:"/pages/my/write_license",query:{sId:rep.ret}});
+      } else {
+        if (rep instanceof Array) rep = rep[0];
+        var rep = await this.$ShoppingAPI.Shop_CreateEasy(
+          this.CreateShoppingInfo,
+          this.sLogo,
+          ["sLogo"]
+        );
+        if (rep.ret == 0) {
+          this.go({ path: "/pages/my/write_license", query: { sId: rep.ret } });
         }
       }
     }
@@ -310,7 +323,7 @@ export default {
       var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
       if (rep.ret == 0) {
         this.CreateShoppingInfo = rep.data;
-        if(this.CreateShoppingInfo.sLogo)
+        if (this.CreateShoppingInfo.sLogo)
           this.sLogoPath.push(this.CreateShoppingInfo.sLogo);
       }
     }

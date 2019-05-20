@@ -95,4 +95,7 @@ export default {
 </script>
 <style scoped>
 @import url("~mpvue-wxparse/src/wxParse.css");
+.index .content{
+  overflow: auto;
+}
 </style>
