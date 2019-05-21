@@ -31,7 +31,7 @@ body {
 
 
 .index .content {
-  /* overflow: auto; */
+  overflow: auto;
   /* padding-top: 1.28rem; */
   position: relative;
   font-size: 0.4rem;
@@ -413,6 +413,7 @@ body {
   margin: 0.38rem 0.3rem 2.15rem 0.3rem;
   padding: 0.79rem 0.15rem 0rem 0.3rem;
   background-color: #ffffff;
+  margin-bottom: 4rem;
 }
 
 .index .content .fill .fillDemo {
@@ -595,8 +596,8 @@ body {
   padding: 0.1rem;
   line-height: 0.6rem;
   outline: 0;
-  position: relative;
-  z-index: 0;
+  /* position: relative;
+  z-index: -1; */
 }
 
 .index .content .fill .fillDemo .fill_editDiv .fill_edit:empty:before {

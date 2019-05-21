@@ -85,8 +85,9 @@
         <div class="fillDemo">
           <div class="fill_title">店铺介绍:</div>
           <div class="fill_editDiv">
-            <textarea class="fill_edit" placeholder="请填入店铺介绍..." v-model.lazy="CreateShoppingInfo.Brief" contenteditable="true"></textarea>
-            <div class="fill_edit_hint">0/200</div>
+            <textarea class="fill_edit" v-if="showtextarea" @blur="clickshowtextarea" auto-focus="true" placeholder="请填入店铺介绍..." v-model.lazy="CreateShoppingInfo.Brief" contenteditable="true"></textarea>
+            <div class="fill_edit"  @click="clickshowtextarea" v-else >{{CreateShoppingInfo.Brief}}</div>
+            <div class="fill_edit_hint">{{CreateShoppingInfo.Brief.length}}/200</div>
           </div>
         </div>
       </div>
@@ -104,6 +105,7 @@ export default {
   },
   data() {
     return {
+      showtextarea:false,
       sId: null,
       KeywordList: [],
       GoodsKeywordType: [],
@@ -225,6 +227,10 @@ export default {
     }
   },
   methods: {
+    clickshowtextarea(){
+      // debugger;
+      this.showtextarea=!this.showtextarea;
+    },
     KeywordSelected(item) {
       this.CreateShoppingInfo.sType = item.value;
     },
@@ -249,14 +255,14 @@ export default {
           // console.log(res);
           that.CreateShoppingInfo.Latitude = res.latitude;
           that.CreateShoppingInfo.Longitude = res.longitude;
-          that.CreateShoppingInfo.Address += res.address;
+          that.CreateShoppingInfo.Address = res.address+that.CreateShoppingInfo.Address;
         }
       });
     },
     //选择图片
     chooseImage() {
       var that = this;
-      if (this.sLogo.length == 0) {
+      if (this.sLogo.length <= 1) {
         wx.chooseImage({
           sizeType: ["original", "compressed"], //所选的图片的尺寸
           //接口调用成功的回调函数
@@ -345,5 +351,8 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
+page{
+  padding-bottom: 30rem;
+}
 </style>

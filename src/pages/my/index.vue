@@ -93,29 +93,37 @@ export default {
         else{
             this.go({path:'/pages/my/entry_notice'})
         }
+    },
+    async init(){
+        if (!this.UserInfo) {
+            var rep = await this.$ShoppingAPI.User_Get();
+            if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
+        }
+
+        this.$UJAPI.Balance_Purse().then(rep => {
+            this.Balance = rep.data;
+        });
+        this.$ShoppingAPI.User_Coupon_Get({State:-1}).then(rep => {
+        if(rep.ret==0)
+            this.Coupon = rep.total;
+        });
+        
+        var rep = await this.$ShoppingAPI.Shop_GetMy();
+        if(rep.ret==0)
+        {
+            this.ShoppingInfo=rep.data[0];
+        }
     }
   },
-  components: {},
+  components: {
+
+  },
+  onPullDownRefresh(){
+    this.init();
+    wx.stopPullDownRefresh()
+  },
   async mounted() {
-
-    if (!this.UserInfo) {
-      var rep = await this.$ShoppingAPI.User_Get();
-      if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
-    }
-
-    this.$UJAPI.Balance_Purse().then(rep => {
-      this.Balance = rep.data;
-    });
-    this.$ShoppingAPI.User_Coupon_Get({State:-1}).then(rep => {
-      if(rep.ret==0)
-        this.Coupon = rep.total;
-    });
-    
-    var rep = await this.$ShoppingAPI.Shop_GetMy();
-    if(rep.ret==0)
-    {
-        this.ShoppingInfo=rep.data[0];
-    }
+     await  this.init();
   }
 };
 </script>
