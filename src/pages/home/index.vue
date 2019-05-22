@@ -399,6 +399,7 @@ export default {
   div {
     display: flex;
     align-items: center;
+    height: 30px;
     justify-content: center;
     flex: 1;
     border: solid 1px #d0f1fd;
