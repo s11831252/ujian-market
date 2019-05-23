@@ -18,13 +18,17 @@
         <img :src="item.ImageUrl" class="slide-image">
       </swiper-slide>
       <!-- Optional controls -->
-      <div class="swiper-pagination"  slot="pagination"></div>
+      <div class="swiper-pagination" slot="pagination"></div>
     </swiper>
     <div class="news box">
       <p v-text="Market.News.title"></p>
     </div>
     <ul class="box category">
-      <li v-for="(item,index) in Market.Category" :key="index" @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})">
+      <li
+        v-for="(item,index) in Market.Category"
+        :key="index"
+        @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})"
+      >
         <img :src="item.ImageUrl" :title="item.Title">
       </li>
     </ul>
@@ -57,7 +61,8 @@
       </div>
       <div class="box-body">
         <div class="nearby-location">
-          <p @click="openLocation">我的定位:
+          <p @click="openLocation">
+            我的定位:
             <span>{{CurrentLocation.LocationAddress}}</span>
           </p>
           <span class="icon">&#xe65e;</span>
@@ -82,10 +87,12 @@
                         {{item.sName}}
                         <span class="shop-item-info-distance">{{item.Distance}}米</span>
                       </p>
-                      <p class="shop-item-info-score">店铺综合评分：
+                      <p class="shop-item-info-score">
+                        店铺综合评分：
                         <span class>{{item.Score}}</span>
                       </p>
-                      <p class="shop-item-info-maintype">主营：
+                      <p class="shop-item-info-maintype">
+                        主营：
                         <span class>{{item.MainTypeName}}</span>
                       </p>
                     </div>
@@ -105,10 +112,12 @@
                         {{item.sName}}
                         <span class="shop-item-info-distance">{{item.Distance}}米</span>
                       </p>
-                      <p class="shop-item-info-score">店铺综合评分：
+                      <p class="shop-item-info-score">
+                        店铺综合评分：
                         <span class>{{item.Score}}</span>
                       </p>
-                      <p class="shop-item-info-maintype">主营：
+                      <p class="shop-item-info-maintype">
+                        主营：
                         <span class>{{item.MainTypeName}}</span>
                       </p>
                     </div>
@@ -128,10 +137,12 @@
                         {{item.sName}}
                         <span class="shop-item-info-distance">{{item.Distance}}米</span>
                       </p>
-                      <p class="shop-item-info-score">店铺综合评分：
+                      <p class="shop-item-info-score">
+                        店铺综合评分：
                         <span class>{{item.Score}}</span>
                       </p>
-                      <p class="shop-item-info-maintype">主营：
+                      <p class="shop-item-info-maintype">
+                        主营：
                         <span class>{{item.MainTypeName}}</span>
                       </p>
                     </div>
@@ -151,10 +162,12 @@
                         {{item.sName}}
                         <span class="shop-item-info-distance">{{item.Distance}}米</span>
                       </p>
-                      <p class="shop-item-info-score">店铺综合评分：
+                      <p class="shop-item-info-score">
+                        店铺综合评分：
                         <span class>{{item.Score}}</span>
                       </p>
-                      <p class="shop-item-info-maintype">主营：
+                      <p class="shop-item-info-maintype">
+                        主营：
                         <span class>{{item.MainTypeName}}</span>
                       </p>
                     </div>
@@ -170,18 +183,19 @@
 </template>
 <script>
 import { mapState, mapMutations } from "vuex";
-import 'swiper/dist/css/swiper.css'
-import { swiper, swiperSlide } from 'vue-awesome-swiper'
+import "swiper/dist/css/swiper.css";
+import { swiper, swiperSlide } from "vue-awesome-swiper";
+
 export default {
-  components:{
+  components: {
     swiper,
     swiperSlide
   },
   data() {
     return {
-      swiperOption:{
+      swiperOption: {
         pagination: {
-            el: '.swiper-pagination',
+          el: ".swiper-pagination"
         }
       },
       Market: {
@@ -254,22 +268,20 @@ export default {
     })
   },
   methods: {
-    showPosition(position){ 
-      var lat = position.coords.latitude; //纬度 
-      var lag = position.coords.longitude; //经度 
-      alert('纬度:'+lat+',经度:'+lag); 
+    showPosition(position) {
+      var lat = position.coords.latitude; //纬度
+      var lag = position.coords.longitude; //经度
+      alert("纬度:" + lat + ",经度:" + lag);
     },
     openLocation() {
       var that = this;
-      if(this.isMP)
-      {
+      if (this.isMP) {
         wx.openLocation({
           latitude: that.gcj02.latitude,
           longitude: that.gcj02.longitude,
           scale: 28
         });
       }
-
     },
     async marketGet() {
       var rep = await this.$ShoppingAPI.Market_Get();
@@ -360,11 +372,8 @@ export default {
   onReady() {
     // console.log("page index onReady", this);
   },
-  onShow() {
-
-  },
+  onShow() {},
   mounted() {
-
     var that = this;
     that.marketGet();
     // wx.authorize({scope: "scope.userLocation"});
@@ -395,24 +404,47 @@ export default {
         complete() {}
       });
     } else {
-      if (navigator.geolocation){ 
-          navigator.geolocation.getCurrentPosition(position=>{
-            console.log(position);
-            this.toast(position);
-          },error=>{
-            console.log(error);
-          }); 
-        }else{ 
-          alert("浏览器不支持地理定位。"); 
-        } 
+      var mapjs = require("../../utils/map").default;
+      mapjs.init("yCCZ5HnYGnUoRQNfd0YkTHg8lluFGQRZ").then(Bmap => {
+        // console.log(Bmap);
+        var geolocation = new Bmap.Geolocation();
+        geolocation.getCurrentPosition(function(r) {
+          if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+            if (r.accuracy == null) {
+              that.alert("您已拒绝地理位置授权");
+              //用户决绝地理位置授权
+              return;
+            } else {
+              const myGeo = new BMap.Geocoder();
+              myGeo.getLocation(
+                new BMap.Point(r.point.lng, r.point.lat),
+                data => {
+                  if (data.addressComponents) {
+                    const result = data.addressComponents;
+                    const location = {
+                      creditLongitude: r.point.lat, // 经度
+                      creditLatitude: r.point.lng, // 纬度
+                      creditProvince: result.province || "", // 省
+                      creditCity: result.city || "", // 市
+                      creditArea: result.district || "", // 区
+                      creditStreet:
+                        (result.street || "") + (result.streetNumber || "") // 街道
+                    };
+                    console.log(location);
+                  }
+                }
+              );
+            }
+          }
+        });
+      });
       that.tabClick(that.Tabs[0]);
     }
   },
   onUnload() {
     // console.log("onUnload", this);
   },
-  onHide() {
-  }
+  onHide() {}
 };
 </script>
 <style  lang="less">

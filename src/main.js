@@ -34,6 +34,13 @@ Vue.mixin({
                 icon: "none"
               });
         },
+        alert(title)
+        {
+            wx.showToast({
+                title: title,
+                icon: "none"
+              });
+        },
         modal(title,content,confirm,cancel){
             wx.showModal({
                 title: title,
