@@ -268,11 +268,6 @@ export default {
     })
   },
   methods: {
-    showPosition(position) {
-      var lat = position.coords.latitude; //纬度
-      var lag = position.coords.longitude; //经度
-      alert("纬度:" + lat + ",经度:" + lag);
-    },
     openLocation() {
       var that = this;
       if (this.isMP) {
@@ -410,11 +405,13 @@ export default {
         var geolocation = new Bmap.Geolocation();
         geolocation.getCurrentPosition(function(r) {
           if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-            if (r.accuracy == null) {
-              that.alert("您已拒绝地理位置授权");
-              //用户决绝地理位置授权
-              return;
-            } else {
+            // if (r.accuracy != null) {
+            //   that.alert("您已拒绝地理位置授权");
+            //   //用户决绝地理位置授权
+            //   return;
+            // } else 
+            // {
+            // }
               const myGeo = new BMap.Geocoder();
               myGeo.getLocation(
                 new BMap.Point(r.point.lng, r.point.lat),
@@ -430,11 +427,15 @@ export default {
                       creditStreet:
                         (result.street || "") + (result.streetNumber || "") // 街道
                     };
-                    console.log(location);
+                    // console.log(location);
+                    that.UpdateLocation({
+                      LocationAddress:location.creditProvince+location.creditCity+location.creditArea+location.creditStreet,
+                      latitude: location.lat,
+                      longitude: location.lng
+                    });
                   }
                 }
               );
-            }
           }
         });
       });
