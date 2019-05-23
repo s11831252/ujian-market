@@ -10,8 +10,10 @@ import './assets/style.css';
 import './assets/global.css';
 import './assets/iconfont.less';
 import './components/Toast/toast.css';
+import VueAwesomeSwiper from 'vue-awesome-swiper'
 
 Vue.use(Toast);
+Vue.use(VueAwesomeSwiper, /* { default global options } */)
 
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI

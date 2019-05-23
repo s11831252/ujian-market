@@ -6,12 +6,19 @@
         <span>搜索</span>
       </div>
     </div>
-    <swiper class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
+    <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <swiper-item>
           <img :src="item.ImageUrl" class="slide-image" mode="aspectFill">
         </swiper-item>
       </block>
+    </swiper>
+    <swiper v-else ref="mySwiper" :options="swiperOption">
+      <swiper-slide v-for="(item, index) in Market.Banners" :index="index" :key="index">
+        <img :src="item.ImageUrl" class="slide-image">
+      </swiper-slide>
+      <!-- Optional controls -->
+      <div class="swiper-pagination"  slot="pagination"></div>
     </swiper>
     <div class="news box">
       <p v-text="Market.News.title"></p>
@@ -163,10 +170,20 @@
 </template>
 <script>
 import { mapState, mapMutations } from "vuex";
-
+import 'swiper/dist/css/swiper.css'
+import { swiper, swiperSlide } from 'vue-awesome-swiper'
 export default {
+  components:{
+    swiper,
+    swiperSlide
+  },
   data() {
     return {
+      swiperOption:{
+        pagination: {
+            el: '.swiper-pagination',
+        }
+      },
       Market: {
         Banners: [],
         Category: [],
@@ -237,13 +254,22 @@ export default {
     })
   },
   methods: {
+    showPosition(position){ 
+      var lat = position.coords.latitude; //纬度 
+      var lag = position.coords.longitude; //经度 
+      alert('纬度:'+lat+',经度:'+lag); 
+    },
     openLocation() {
       var that = this;
-      wx.openLocation({
-        latitude: that.gcj02.latitude,
-        longitude: that.gcj02.longitude,
-        scale: 28
-      });
+      if(this.isMP)
+      {
+        wx.openLocation({
+          latitude: that.gcj02.latitude,
+          longitude: that.gcj02.longitude,
+          scale: 28
+        });
+      }
+
     },
     async marketGet() {
       var rep = await this.$ShoppingAPI.Market_Get();
@@ -369,6 +395,16 @@ export default {
         complete() {}
       });
     } else {
+      if (navigator.geolocation){ 
+          navigator.geolocation.getCurrentPosition(position=>{
+            console.log(position);
+            this.toast(position);
+          },error=>{
+            console.log(error);
+          }); 
+        }else{ 
+          alert("浏览器不支持地理定位。"); 
+        } 
       that.tabClick(that.Tabs[0]);
     }
   },

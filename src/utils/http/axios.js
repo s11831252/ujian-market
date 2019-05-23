@@ -20,6 +20,15 @@ axios.interceptors.request.use(config => {
 
 //响应拦截器即异常处理
 axios.interceptors.response.use(response => {
+  if(mpvue_Mode != 'WX')
+  {
+    let router = require('../../routerH5').default;
+    // console.log(router)
+    if(response.data.ret==10000||response.data.ret==10001||response.data.ret==10002)
+    {
+      router.push({path:"/pages/index/index"})
+    }
+  }
     return response
 }, err => {
     if (err && err.response) {
@@ -41,6 +50,7 @@ axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 
 export default {
+    axios,
   //get请求
     get (url,param) {
       return new Promise((resolve,reject) => {
