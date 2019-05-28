@@ -101,6 +101,7 @@ export default {
   border-radius: 0.5rem;
   overflow: hidden;
   float: left;
+  font-size: 0.55rem;
   /*input提示文字颜色*/
 }
 input::-webkit-input-placeholder {

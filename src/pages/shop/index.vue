@@ -276,7 +276,7 @@ export default {
     padding-top: 20px;
     .shop-detail-tab-goods {
       height: 100%;
-      min-height: 500px;
+      min-height: 400px;
       .shop-detail-tab-goods-types {
         width: 23%;
         // background-color: rgb(173, 173, 173);
@@ -351,6 +351,7 @@ export default {
   width: 100%;
   border-bottom: 1rpx solid #ccc;
   position: relative;
+  font-size: 0.41rem;
 }
 
 .navbar_item {

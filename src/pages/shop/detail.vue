@@ -51,9 +51,10 @@
                 <p class="goods-detail-title">
                     <span>商品详情</span>
                 </p>
-                <div class="goods-detail-content">
+                <div class="goods-detail-content" v-if="isMP">
                     <wxParse :content="goods_detail.gDetailed" @preview="preview" @navigate="navigate" />
                 </div>
+                <div v-else class="goods-detail-content" style="font-size:initial;" v-html="goods_detail.gDetailed"></div>
             </div>
         </div>
         <shoppingCar :sId="sId"></shoppingCar>
@@ -108,7 +109,7 @@ export default {
     },
     navigate(href, e) {
       // do something
-    }
+    },    
   },
   components: {
     swipeWeb,
@@ -116,7 +117,20 @@ export default {
     shoppingCar,
     wxParse
   },
+    onShareAppMessage(result) {
+    let title = this.goods_detail.gName;
+    let path = `/pages/shop/index?gId=${this.gId}`;
+    let imageUrl = ''
+    return {
+      title,
+      path,
+      imageUrl
+    };
+  },
    onLoad(query) {
+    // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
+    if (query.scene) this.sId = decodeURIComponent(query.scene);
+    
     wx.showShareMenu({
       withShareTicket: true
     });

@@ -183,14 +183,8 @@
 </template>
 <script>
 import { mapState, mapMutations } from "vuex";
-import "swiper/dist/css/swiper.css";
-import { swiper, swiperSlide } from "vue-awesome-swiper";
 
 export default {
-  components: {
-    swiper,
-    swiperSlide
-  },
   data() {
     return {
       swiperOption: {
@@ -448,7 +442,7 @@ export default {
   onHide() {}
 };
 </script>
-<style  lang="less">
+<style  lang="less" scoped>
 .page {
   background: #ecf0f1;
   padding-top: 42px;
@@ -551,13 +545,6 @@ export default {
 }
 
 .navbar {
-  // display: -webkit-box;
-  // display: -webkit-flex;
-  // display: flex;
-  // position: fixed;
-  // z-index: 500;
-  // top: 0;
-  // background-color: #298de5;
   height: 40px;
   line-height: 40px;
   width: 100%;
@@ -567,13 +554,6 @@ export default {
 }
 
 .navbar_item {
-  // position: relative;
-  // display: block;
-  // -webkit-box-flex: 1;
-  // -webkit-flex: 1;
-  // flex: 1;
-  // padding: 13px 0;
-  // font-size: 0;
   text-align: center;
   display: inline-block;
   width: 25%;
@@ -581,20 +561,11 @@ export default {
 
 .navbar_item_on {
   color: #12b7f5;
-  //  border-bottom: 2px solid #12b7f5;
 }
 
 .navbar_title {
   font-weight: 500;
   display: inline-block;
-  // color: white;
-  // font-size: 15px;
-  // max-width: 8em;
-  // width: auto;
-  // overflow: hidden;
-  // text-overflow: ellipsis;
-  // white-space: nowrap;
-  // word-wrap: normal;
 }
 
 .navbar_slider {

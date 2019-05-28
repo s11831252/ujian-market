@@ -30,9 +30,9 @@ export default {
 @import url('./assets/iconfont.less');
 @import url('./assets/style.less');
 @import url('./components/Toast/toast.css'); */
-#app{
+/* #app{
   margin-bottom: 45px;
-}
+} */
 .container {
   height: 100%;
   display: flex;

@@ -2,7 +2,7 @@
     <div class="swiper">
         <ul class="swiper-list">
             <li class="swiper-item">
-                <img :src="currentImg">
+                <img :src="currentImg" @click="previewImage(swiperData[currentIndex],swiperData)">
             </li>
         </ul>
         <ul class="direction">
@@ -33,6 +33,15 @@ export default {
     }
   },
   methods: {
+    previewImage(item,images) {
+      if (this.isMP) {
+        let urls = images;
+        wx.previewImage({
+          current: item.ImgUrl, // 当前显示图片的http链接
+          urls // 需要预览的图片http链接列表
+        });
+      }
+    },
     left() {
       if (this.currentIndex > 0) this.currentIndex--;
     },

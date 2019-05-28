@@ -11,6 +11,9 @@ import './assets/global.css';
 import './assets/iconfont.less';
 import './components/Toast/toast.css';
 import VueAwesomeSwiper from 'vue-awesome-swiper'
+let { swiper, swiperSlide } = VueAwesomeSwiper
+
+import "swiper/dist/css/swiper.css";
 
 Vue.use(Toast);
 Vue.use(VueAwesomeSwiper, /* { default global options } */)
@@ -18,6 +21,10 @@ Vue.use(VueAwesomeSwiper, /* { default global options } */)
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
 Vue.mixin({
+  components: {
+    swiper,
+    swiperSlide
+  },
   computed: {
     isMP(){
         return false;
