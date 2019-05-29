@@ -2,7 +2,7 @@
   <div class="shop-detail">
     <div class="shop-detail-head">
       <div class="shop-detail-logo">
-        <img :src="shopDetail.sLogo">
+        <img :src="shopDetail.sLogo" @click="previewLogo">
       </div>
       <div class="shop-simple-info">
         <p class="shop-detail-name">{{shopDetail.sName}}</p>
@@ -129,14 +129,11 @@ export default {
         scale: 18
       });
     },
-    previewImage(item,images) {
+    previewLogo() {
       if (this.isMP) {
-        let urls = images.map(item => {
-          return item.ImgUrl;
-        });
         wx.previewImage({
-          current: item.ImgUrl, // 当前显示图片的http链接
-          urls // 需要预览的图片http链接列表
+          current: this.shopDetail.sLogo, // 当前显示图片的http链接
+          urls:[this.shopDetail.sLogo] // 需要预览的图片http链接列表
         });
       }
     },

@@ -11,7 +11,7 @@
       <div>
         <p class="shop-detail-tab-goods-Price">￥{{Price_fmt}}</p>
         <span v-if="goodsInfo.Goods_Items.length>1" class="shop-detail-tab-goods-choose">选规格</span>
-        <buy v-else :goods="goodsInfo.Goods_Items[0]" :image="goodsInfo.Images[0].Thumbnail_url" :sName="sName"></buy>
+        <buy v-else-if="goodsInfo.gType!=1" :goods="goodsInfo.Goods_Items[0]" :image="goodsInfo.Images[0].Thumbnail_url" :sName="sName"></buy>
       </div>
     </div>
   </div>
