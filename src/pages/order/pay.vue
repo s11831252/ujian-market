@@ -142,7 +142,22 @@ export default {
               //   .then(rep => {
               //   });
               
-              //弹出提示框
+              //场景值scene=1037 则返回调用过来的商家小程序
+              if(that.launchOptions.scene==1037)
+              {
+                  wx.navigateBackMiniProgram({
+                    extraData: {
+                    success: true,
+                    msg:"支付成功",
+                  },
+                  success(res) {
+                    // 返回成功
+                    console.log(res)
+                  }
+                  })
+              }else
+              {
+                //弹出提示框
                 that.modal("支付成功","您已支付成功,请稍后检查订单状态。",
                 ()=>{
                   that.go({ path: "/pages/order/index", reLaunch: true });
@@ -150,14 +165,10 @@ export default {
                 ()=>{
                   that.go({ path: "/pages/order/index", reLaunch: true });
                 });
-                
-                
+              }
             },
             fail: function(res) {
-              that.toast({
-                title: res.errMsg || res.err_desc,
-                icon: "none"
-              });
+              that.toast( res.errMsg || res.err_desc||"支付失败")
             }
           };
           // console.log(payData);
@@ -189,6 +200,14 @@ export default {
     ...mapState({
       UserInfo: state => state.User.UserInfo
     })
+  },
+  async onShow(){
+    //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket, 
+    //2.订单则传递到query.OrderId
+    let options = await this.launchOptions;
+    // console.log(options)
+    if(options&&options.referrerInfo&&options.referrerInfo.extraData&&options.referrerInfo.extraData.SingleTicket)
+      this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
   },
   async mounted() {
     if (this.$route.query && this.$route.query.OrderId) {

@@ -19,6 +19,10 @@ Vue.mixin({
         },
         isMP(){
             return true;
+        },
+        async launchOptions(){
+            var options =  await wx.getLaunchOptionsSync();
+            return options;
         }
     },
     methods: {

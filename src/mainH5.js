@@ -28,6 +28,9 @@ Vue.mixin({
   computed: {
     isMP(){
         return false;
+    },
+    async launchOptions(){
+      return {};
     }
   },
   methods: {
