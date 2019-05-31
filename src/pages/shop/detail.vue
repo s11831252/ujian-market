@@ -129,7 +129,7 @@ export default {
   },
    onLoad(query) {
     // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
-    if (query.scene) this.sId = decodeURIComponent(query.scene);
+    if (query.scene) this.gId = decodeURIComponent(query.scene);
     
     wx.showShareMenu({
       withShareTicket: true
@@ -140,8 +140,13 @@ export default {
       this.sId = this.$route.query.sId;
       this.gId = this.$route.query.gId;
       // console.log(this.$route.query.sName);
-      this.sName= decodeURI(this.$route.query.sName);
+      if(this.$route.query.sName)
+        this.sName= decodeURI(this.$route.query.sName);
+    }
+
       // console.log(this.sName);
+    if(this.gId)
+    {
       var rep = await this.$ShoppingAPI.Goods_Get({
         sId: this.sId,
         gId: this.gId
