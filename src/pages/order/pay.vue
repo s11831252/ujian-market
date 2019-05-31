@@ -147,8 +147,9 @@ export default {
               {
                   wx.navigateBackMiniProgram({
                     extraData: {
-                    success: true,
-                    msg:"支付成功",
+                    OrderId:this.OrderId,
+                    success: "true",
+                    msg:"支付成功"
                   },
                   success(res) {
                     // 返回成功
