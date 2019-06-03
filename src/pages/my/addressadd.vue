@@ -39,12 +39,13 @@ export default {
     //     Latitude: 0,
     //     Longitude: 0
     //   },
+      id:null,
       Area: "点击选择位置"
     };
   },
   computed: {
     AddressInfo() {
-      if (this.$route.query && this.$route.query.id)
+      if (this.id)
         return this.$store.getters.UserAddressBysId(this.$route.query.id);
       else
         return {
@@ -120,6 +121,11 @@ export default {
     ...mapMutations([
       "AddUserAddress" //`this.$store.commit('AddUserAddress')`
     ])
+  },mounted(){
+    if(this.$route.query&& this.$route.query.id)
+    {
+      this.id=this.$route.query.id;
+    }
   }
 };
 </script>
