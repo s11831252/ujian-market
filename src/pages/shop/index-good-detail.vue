@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="shop-detail-tab-goods-logo">
-      <img :src="goodsInfo.Images[0].Thumbnail_url">
-    </div><div class="shop-detail-tab-goods-info">
+    <div class="shop-detail-tab-goods-logo" v-if="goodsInfo.Images&&goodsInfo.Images.length>0">
+      <img :src=" goodsInfo.Images[0].Thumbnail_url">
+    </div>
+    <div class="shop-detail-tab-goods-info">
       <p class="shop-detail-tab-goods-title">{{goodsInfo.gName}}</p>
       <p class="shop-detail-tab-goods-statistics">
         <span>月售{{goodsInfo.Sales}}</span>
@@ -11,7 +12,7 @@
       <div>
         <p class="shop-detail-tab-goods-Price">￥{{Price_fmt}}</p>
         <span v-if="goodsInfo.Goods_Items.length>1" class="shop-detail-tab-goods-choose">选规格</span>
-        <buy v-else-if="goodsInfo.gType!=1" :goods="goodsInfo.Goods_Items[0]" :image="goodsInfo.Images[0].Thumbnail_url" :sName="sName"></buy>
+        <buy v-else-if="goodsInfo.gType!=1" :goods="goodsInfo.Goods_Items[0]" :image="goodsInfo.Images.length>0?goodsInfo.Images[0].Thumbnail_url:''" :sName="sName"></buy>
       </div>
     </div>
   </div>

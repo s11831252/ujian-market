@@ -129,7 +129,7 @@ export default {
           var payData = JSON.parse(rep.data);
           var payData = {
             ...payData,
-            success(res) {
+            async success(res) {
               // console.log(res);
               // that.$ShoppingAPI
               //   .Order_UpdatePayState({
@@ -143,7 +143,8 @@ export default {
               //   });
               
               //场景值scene=1037 则返回调用过来的商家小程序
-              if(that.launchOptions.scene==1037)
+              let options = await that.launchOptions;
+              if(options&&options.scene==1037)
               {
                   wx.navigateBackMiniProgram({
                     extraData: {
@@ -151,9 +152,9 @@ export default {
                     success: "true",
                     msg:"支付成功"
                   },
-                  success(res) {
+                  success(res2) {
                     // 返回成功
-                    console.log(res)
+                    console.log(res2)
                   }
                   })
               }else
@@ -206,6 +207,7 @@ export default {
     //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket, 
     //2.订单则传递到query.OrderId
     let options = await this.launchOptions;
+    
     // console.log(options)
     if(options&&options.referrerInfo&&options.referrerInfo.extraData&&options.referrerInfo.extraData.SingleTicket)
       this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
