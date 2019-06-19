@@ -90,7 +90,7 @@ export default {
   z-index: 999;
   .shoppingcar-goods{
     color: #686565;
-    font-size: 20px;
+    font-size: 0.4rem;
     background-color: #fff;
     width: 100%;
     position: absolute;
@@ -109,24 +109,29 @@ export default {
         display: inline-block;
       }
       span.empty{
-        font-size: 20px;
+        font-size: 0.4rem;
         float: right;
       }
     }
     .shoppingcar-goods-list{
       padding: 10px;
       color: #686565;
-      font-size: 20px;
+      font-size: 0.4rem;
       li{
+          min-height: 24px;
+          border-bottom: #ecf0f1 1px solid;
+          margin-bottom: 4px;
         .shoppingcar-goods-name{
           width: 60%;
           display: inline-block;
+
           .shoppingcar-goods-itemname{
           color: #a2a2a2;
-          font-size: 15px;
+          font-size: 0.3rem;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+              clear:both;
           }
         }
       }

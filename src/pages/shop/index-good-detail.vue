@@ -61,7 +61,7 @@ export default {
   }
 }
 .shop-detail-tab-goods-info {
-  width: 70%;
+  width: 67%;
   margin-left: 5px;
   .shop-detail-tab-goods-title {
     font-size: 15px;
