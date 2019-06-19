@@ -137,6 +137,17 @@ export default {
         });
       }
     },
+    previewImage(item,images) {
+      if (this.isMP) {
+        let urls = images.map(item => {
+          return item.ImgUrl;
+        });
+        wx.previewImage({
+          current: item.ImgUrl, // 当前显示图片的http链接
+          urls // 需要预览的图片http链接列表
+        });
+      }
+    },
     makePhoneCall(phoneNumber){
       if(this.isMP){
         wx.makePhoneCall({
