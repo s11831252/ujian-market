@@ -1,5 +1,5 @@
 <template>
-  <div class="shop-detail">
+  <div class="shop-detail" v-if="shopDetail">
     <div class="shop-detail-head">
       <div class="shop-detail-logo">
         <img :src="shopDetail.sLogo" @click="previewLogo">
@@ -80,7 +80,7 @@ export default {
   data() {
     return {
       sId: "",
-      shopDetail: {},
+      shopDetail: null,
       goodList: [],
       GoodsType: [],
       Tabs: [],
@@ -184,45 +184,48 @@ export default {
     });
   },
   async mounted() {
-    let that = this;
-    this.activeIndex = 0;
-    this.Tabs = [
-      { name: "商品", type: "1", checked: true },
-      // { name: "评价", type: "2", checked: true },
-      { name: "商家", type: "3", checked: true }
-    ];
-    this.goodList = [];
-    if (this.sId || (this.$route.query && this.$route.query.sId.length > 0)) {
-      this.sId = this.sId || this.$route.query.sId;
-      var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId }); //获取店铺详情
 
-      if (rep.ret == 0) {
-        this.shopDetail = rep.data;
-        // this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
-        if (this.isMP)
-        {
-          wx.setNavigationBarTitle({ title: this.shopDetail.sName });
-          that.$ShoppingAPI
-          .baidu_geocoder({ location: `${that.shopDetail.Latitude},${that.shopDetail.Longitude}`,coordtype:'bd09ll',ret_coordtype:'gcj02ll' })
-          .then(rep2 => {
-            if (rep2.status == 0) {
-              that.gcj02.latitude = rep2.result.location.lat;
-              that.gcj02.longitude = rep2.result.location.lng;
-            }
-          });
+    let that = this;
+    this.wx_login(async ()=>{
+      this.activeIndex = 0;
+      this.Tabs = [
+        { name: "商品", type: "1", checked: true },
+        // { name: "评价", type: "2", checked: true },
+        { name: "商家", type: "3", checked: true }
+      ];
+      this.goodList = [];
+      if (this.sId || (this.$route.query && this.$route.query.sId.length > 0)) {
+        this.sId = this.sId || this.$route.query.sId;
+        var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId }); //获取店铺详情
+
+        if (rep.ret == 0) {
+          this.shopDetail = rep.data;
+          // this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
+          if (this.isMP)
+          {
+            wx.setNavigationBarTitle({ title: this.shopDetail.sName });
+            that.$ShoppingAPI
+            .baidu_geocoder({ location: `${that.shopDetail.Latitude},${that.shopDetail.Longitude}`,coordtype:'bd09ll',ret_coordtype:'gcj02ll' })
+            .then(rep2 => {
+              if (rep2.status == 0) {
+                that.gcj02.latitude = rep2.result.location.lat;
+                that.gcj02.longitude = rep2.result.location.lng;
+              }
+            });
+          }
+        }
+        var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
+        if (rep3.ret == 0) {
+          this.shopDetail.Goods = rep3.data;
+        }
+        var rep2 = await this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.sId }); //获取店铺商品分类
+        if (rep2.ret == 0) {
+          this.GoodsType = rep2.data;
+          this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
+          this.changeGoodsType(this.GoodsType[0].TypeId);
         }
       }
-      var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
-      if (rep3.ret == 0) {
-        this.shopDetail.Goods = rep3.data;
-      }
-      var rep2 = await this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.sId }); //获取店铺商品分类
-      if (rep2.ret == 0) {
-        this.GoodsType = rep2.data;
-        this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
-        this.changeGoodsType(this.GoodsType[0].TypeId);
-      }
-    }
+    })
   }
 };
 </script>

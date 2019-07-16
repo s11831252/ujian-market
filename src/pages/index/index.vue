@@ -3,7 +3,7 @@
     <img class="logo" :class="{logoHide:logoHide}" src="/static/img/logo108.png" mode="widthFix">
     <p>U建商城</p>
     <div class="userinfo">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />
+      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover">
       <div class="userinfo-nickname">
         <card :text="userInfo.nickName"></card>
       </div>
@@ -23,14 +23,6 @@ import login from "@/components/login";
 export default {
   data() {
     return {
-      userInfo: {
-        Account: "",
-        PassWord: "",
-        avatarUrl: "",
-        nickName: "",
-        unionid: "",
-        openid: ""
-      },
       logoHide: false
     };
   },
@@ -48,6 +40,19 @@ export default {
         this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
         this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
         this.logoHide = true;
+        wx.login({
+          success: obj => {
+            if (obj.errMsg.indexOf("login:ok") > -1) {
+              this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                if (rep.ret == 0) {
+                  // console.log(rep);
+                  this.userInfo.unionid = rep.data.result.unionid;
+                  this.userInfo.openid = rep.data.result.openid;
+                }
+              });
+            }
+          }
+        });
       } else {
         wx.showModal({
           title: "警告",
@@ -61,49 +66,6 @@ export default {
           }
         });
       }
-    },
-    wx_login() {
-      // 调用wx登录接口
-      wx.login({
-        success: obj => {
-          if (obj.errMsg.indexOf("login:ok") > -1) {
-           
-            this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
-              if (rep.ret == 0) {
-                // console.log(rep);
-                this.userInfo.unionid = rep.data.result.unionid;
-                this.userInfo.openid = rep.data.result.openid;
-                // console.log(this.userInfo);
-
-                if (rep.data.ticket) {
-                  this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
-                  this.$ShoppingAPI.User_Get().then(userinfo => {
-                    if (userinfo.ret == 0) {
-                      userinfo.data.unionid= rep.data.result.unionid;
-                      userinfo.data.openid = rep.data.result.openid;
-                      // console.log(userinfo.data);
-                      this.$store.commit("GetUserInfo", userinfo.data);
-                      if (this.$route.query.redirect)
-                        // 切换至 tabBar页面
-                        this.$router.push({
-                          path: this.$route.query.redirect,
-                          isTab: true
-                        });
-                      // 切换至 tabBar页面
-                      else
-                        this.$router.push({
-                          path: "/pages/home/index",
-                          isTab: true
-                        });
-                    }
-                  });
-                }
-              }
-            });
-          } else {
-          }
-        }
-      });
     }
   },
   mounted() {
@@ -130,10 +92,7 @@ export default {
       }
     });
   },
-  created() {
-    //1. 调用wx.login
-    this.wx_login();
-  }
+  created() {}
 };
 </script>
 

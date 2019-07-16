@@ -12,7 +12,20 @@ import './assets/iconfont.less';
 Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
 Vue.prototype.$store = store;
+let logining=false;
 Vue.mixin({
+    data(){
+        return{
+            userInfo: {
+                Account: "",
+                PassWord: "",
+                avatarUrl: "",
+                nickName: "",
+                unionid: "",
+                openid: ""
+              },
+        }
+    },
     computed: {
         $route: function () {
             return this.$router.currentRoute
@@ -59,6 +72,62 @@ Vue.mixin({
                   }
                 }
               })
+        },
+        //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
+        wx_login(callback) {
+            if(!this.$store.getters.Logined)//没有登录尝试登录 
+            {
+                logining=true;
+                // 调用wx登录接口
+                wx.login({
+                    success: obj => {
+                    if (obj.errMsg.indexOf("login:ok") > -1) {
+                    
+                        this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                        if (rep.ret == 0) {
+                            // console.log(rep);
+                            this.userInfo.unionid = rep.data.result.unionid;
+                            this.userInfo.openid = rep.data.result.openid;
+                            // console.log(this.userInfo);
+            
+                            if (rep.data.ticket) {
+                            this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
+                            logining=false;
+                            if(callback)
+                                callback();
+    
+                            this.$ShoppingAPI.User_Get().then(userinfo => {
+                                if (userinfo.ret == 0) {
+                                userinfo.data.unionid= rep.data.result.unionid;
+                                userinfo.data.openid = rep.data.result.openid;
+                                // console.log(userinfo.data);
+                                this.$store.commit("GetUserInfo", userinfo.data);
+                                // if (this.$route.query.redirect)
+                                //     // 切换至 tabBar页面
+                                //     this.$router.push({
+                                //     path: this.$route.query.redirect,
+                                //     isTab: true
+                                //     });
+                                // // 切换至 tabBar页面
+                                // else
+                                //     this.$router.push({
+                                //     path: "/pages/home/index",
+                                //     isTab: true
+                                //     });
+                                }
+                            });
+                            }
+                        }
+                        });
+                    } else {
+                    }
+                    }
+                });
+            }else
+            {
+                if(callback)
+                    callback();
+            }
         }
     },
     onLoad () {
