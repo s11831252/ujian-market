@@ -5,6 +5,7 @@ export default {
     // `this` 指向 vm 实例
     //debugger
    // console.log('this is: ' + this, 'vue触发的 created')
+   this.wx_login()
   },
   mounted(){
     //同上

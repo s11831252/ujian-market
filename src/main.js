@@ -81,46 +81,52 @@ Vue.mixin({
                 // 调用wx登录接口
                 wx.login({
                     success: obj => {
-                    if (obj.errMsg.indexOf("login:ok") > -1) {
+                        if (obj.errMsg.indexOf("login:ok") > -1) {
+                        
+                            this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                                if (rep.ret == 0) {
+                                    // console.log(rep);
+                                    this.userInfo.unionid = rep.data.result.unionid;
+                                    this.userInfo.openid = rep.data.result.openid;
+                                    // console.log(this.userInfo);
                     
-                        this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
-                        if (rep.ret == 0) {
-                            // console.log(rep);
-                            this.userInfo.unionid = rep.data.result.unionid;
-                            this.userInfo.openid = rep.data.result.openid;
-                            // console.log(this.userInfo);
+                                    if (rep.data.ticket) {
+                                    this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
+                                    logining=false;
+                                    if(callback)
+                                        callback();
             
-                            if (rep.data.ticket) {
-                            this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
-                            logining=false;
-                            if(callback)
-                                callback();
-    
-                            this.$ShoppingAPI.User_Get().then(userinfo => {
-                                if (userinfo.ret == 0) {
-                                userinfo.data.unionid= rep.data.result.unionid;
-                                userinfo.data.openid = rep.data.result.openid;
-                                // console.log(userinfo.data);
-                                this.$store.commit("GetUserInfo", userinfo.data);
-                                // if (this.$route.query.redirect)
-                                //     // 切换至 tabBar页面
-                                //     this.$router.push({
-                                //     path: this.$route.query.redirect,
-                                //     isTab: true
-                                //     });
-                                // // 切换至 tabBar页面
-                                // else
-                                //     this.$router.push({
-                                //     path: "/pages/home/index",
-                                //     isTab: true
-                                //     });
+                                    this.$ShoppingAPI.User_Get().then(userinfo => {
+                                        if (userinfo.ret == 0) {
+                                        userinfo.data.unionid= rep.data.result.unionid;
+                                        userinfo.data.openid = rep.data.result.openid;
+                                        // console.log(userinfo.data);
+                                        this.$store.commit("GetUserInfo", userinfo.data);
+                                        // if (this.$route.query.redirect)
+                                        //     // 切换至 tabBar页面
+                                        //     this.$router.push({
+                                        //     path: this.$route.query.redirect,
+                                        //     isTab: true
+                                        //     });
+                                        // // 切换至 tabBar页面
+                                        // else
+                                        //     this.$router.push({
+                                        //     path: "/pages/home/index",
+                                        //     isTab: true
+                                        //     });
+                                        }
+                                    });
+                                    }
+                                }else
+                                {
+                                    if(callback)
+                                        allback();
                                 }
                             });
-                            }
+                        } else {
+                            if(callback)
+                            callback()
                         }
-                        });
-                    } else {
-                    }
                     }
                 });
             }else
