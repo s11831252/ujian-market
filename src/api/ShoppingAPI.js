@@ -28,8 +28,8 @@ export default {
         return http.get(BaseHost + "api/Account/ValidationCode", param)
     },
     //微信登录(用户在微信小程序首次登录绑定账号后即可自动登录)
-    Account_wxLogin: (code, param) => {
-        return http.post(BaseHost + `api/Account/wxLogin?code=${code}`, param)
+    Account_wxLogin: (code, InvitaId,param) => {
+        return http.post(BaseHost + `api/Account/wxLogin?code=${code}&InvitaId=${InvitaId}`, param)
     },
     //简单登录(账号+验证码)
     Account_SimpleLogin: param => {

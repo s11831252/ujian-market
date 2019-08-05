@@ -75,7 +75,7 @@
 <script>
 import shoppingCar from "@/components/shoppingCarToolbar";
 import indexGoodDetail from "./index-good-detail";
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters,mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -117,7 +117,10 @@ export default {
         }
       });
       return list;
-    }
+    },
+    ...mapState({
+      UserInfo: state => state.User.UserInfo
+    }),
   },
   methods: {
     openLocation() {
@@ -168,7 +171,7 @@ export default {
   },
   onShareAppMessage(result) {
     let title = this.shopDetail.sName;
-    let path = `/pages/shop/index?sId=${this.sId}`;
+    let path = `/pages/shop/index?sId=${this.sId}&InvitaId=${UserInfo.UserId}`;
     let imageUrl = '/static/img/share.png'
     return {
       title,

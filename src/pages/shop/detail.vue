@@ -65,6 +65,8 @@ import swipeWeb from "@/components/swiper";
 import buy from "@/components/buy";
 import shoppingCar from "@/components/shoppingCarToolbar";
 import wxParse from 'mpvue-wxparse'
+import { mapState } from "vuex";
+
 export default {
   data() {
     return {
@@ -98,7 +100,10 @@ export default {
       if (this.goods_detail && this.goods_detail.Images) {
         return this.goods_detail.Goods_Items[this.selectItem_index];
       } else return {};
-    }
+    },
+    ...mapState({
+      UserInfo: state => state.User.UserInfo
+    }),
   },
   methods: {
     selectItem(index) {
@@ -119,7 +124,7 @@ export default {
   },
     onShareAppMessage(result) {
     let title = this.goods_detail.gName;
-    let path = `/pages/shop/index?gId=${this.gId}`;
+    let path = `/pages/shop/index?gId=${this.gId}&InvitaId=${UserInfo.UserId}`;
     let imageUrl = ''
     return {
       title,
