@@ -161,6 +161,9 @@ export default {
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
         var userinfo = await this.$ShoppingAPI.User_Get();
+        console.log(this.userInfo)
+        userinfo.data.unionid = this.userInfo.unionid;
+        userinfo.data.openid = this.userInfo.openid;
         this.$store.commit("GetUserInfo", userinfo.data);
         if (this.$route.query.redirect)
           // 切换至 tabBar页面
