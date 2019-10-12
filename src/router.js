@@ -198,6 +198,46 @@ var routes = [
             navigationBarTitleText: '订单支付',
             enablePullDownRefresh: false
         },
+    },
+    {
+        path:'pages/service/information',
+        name:'information',
+        config: {
+            navigationBarTitleText: '消息',
+            enablePullDownRefresh: false
+        },
+    },
+    {
+        path:'pages/service/consult',
+        name:'consult',
+        config: {
+            navigationBarTitleText: '商家名称',
+            enablePullDownRefresh: false
+        },
+    },
+    {
+        path:'pages/store/storePage',
+        name:'storePage',
+        config: {
+            navigationBarTitleText: '商家中心',
+            enablePullDownRefresh: false
+        },
+    },
+    {
+        path:'pages/store/service',
+        name:'service',
+        config: {
+            navigationBarTitleText: '客服管理',
+            enablePullDownRefresh: false
+        },
+    },
+    {
+        path:'pages/store/dialogBox',
+        name:'dialogBox',
+        config: {
+            navigationBarTitleText: '用户名称',
+            enablePullDownRefresh: false
+        },
     }
 ]
 module.exports =routes

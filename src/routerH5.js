@@ -25,6 +25,11 @@ import write_license from './pages/my/write_license'
 import write_location from './pages/my/write_location'
 import applyresult from './pages/my/applyresult'
 import applyresult_detail from './pages/my/applyresult_detail'
+import information from './pages/service/information'
+import consult from './pages/service/consult'
+import storePage from './pages/store/storePage'
+import service from './pages/store/service'
+import dialogBox from './pages/store/dialogBox'
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -289,6 +294,56 @@ var routes = [
         },
         alias: '/pages/order/pay',
         component: pay
+    },
+    {
+        path:'pages/service/information',
+        name:'information',
+        config: {
+            navigationBarTitleText: '消息',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/service/information',
+        component: information
+    },
+    {
+        path:'pages/service/consult',
+        name:'consult',
+        config: {
+            navigationBarTitleText: '商家名称',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/service/consult',
+        component: consult
+    },
+    {
+        path:'pages/store/storePage',
+        name:'storePage',
+        config: {
+            navigationBarTitleText: '商家中心',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/store/storePage',
+        component: storePage
+    },
+    {
+        path:'pages/store/service',
+        name:'service',
+        config: {
+            navigationBarTitleText: '客服管理',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/store/service',
+        component: service
+    },
+    {
+        path:'pages/store/dialogBox',
+        name:'dialogBox',
+        config: {
+            navigationBarTitleText: '用户名称',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/store/dialogBox',
+        component: dialogBox
     }
 ]
 

@@ -2,6 +2,7 @@
     <nav>
         <router-link to="/pages/home/index">行业市场</router-link>
         <router-link to="/pages/order/index">个人订单</router-link>
+        <router-link to="/pages/my/index">信息</router-link>
         <router-link to="/pages/my/index">我的</router-link>
     </nav>
 </template>
