@@ -6,7 +6,7 @@
     <div class="shop-detail-tab-goods-info">
       <p class="shop-detail-tab-goods-title">{{goodsInfo.gName}}</p>
       <p class="shop-detail-tab-goods-statistics">
-        <span>月售{{goodsInfo.Sales}}</span>
+          <span>月售{{goodsInfo.Sales}}</span>
         <span>评论{{goodsInfo.CommentCount}}</span>
       </p>
       <div>
@@ -88,11 +88,12 @@ export default {
   .shop-detail-tab-goods-choose {
     display: inline-block;
     float: right;
-    color: #fccb5c;
+    color: #ecf0f1;
+    background: #ff5252;
     border: 1px solid;
     border-radius: 10px;
-    padding: 0 4px;
-    font-size: 0.4rem;
+    padding: 0.1rem;
+    font-size: 0.32rem;
   }
 }
 .shop-detail-tab-goods-logo,

@@ -22,10 +22,6 @@
         "text": "个人订单"
       },
       {
-        "pagePath": "pages/service/information",
-        "text": "信息"
-      },
-      {
         "pagePath": "pages/my/index",
         "text": "我的"
       }

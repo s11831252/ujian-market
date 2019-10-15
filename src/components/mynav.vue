@@ -25,7 +25,7 @@ export default {
     }
     nav a{
         line-height: 1.41rem;
-        width: 31%;
+        width: 20%;
         font-size: 0.32rem;
         text-decoration:none;
         display: inline-block;

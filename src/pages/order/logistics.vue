@@ -41,7 +41,7 @@
                     <div class="navbar_title">
                         <i class="icon">&#xe604;</i>原有地址</div>
                 </li>
-                <li :id='1' :class="{action:activeIndex==1}" @click="tabClick">
+                <li :id='1' :class="{action:activeIndex==1}" @click="go({path:'/pages/my/address'})">
                     <div class="navbar_title">
                         <i class="icon">&#xe604;</i>新建地址</div>
                 </li>
@@ -87,14 +87,14 @@
 </template>
 <script>
 import myDrop from "@/components/myDrop";
-import { mapMutations } from "vuex";
+import {mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {
       sId: "",
       LogisticsMode: [],
       DistributionMode: [],
-      UserAddress: [],
+      // UserAddress: [],
       Order_Address_Id: "",
       LogisticsId: 0,
       DistributionId: 0,
@@ -106,6 +106,7 @@ export default {
   },
   methods: {
     ...mapMutations(["SelectLogistics"]),
+    ...mapActions(['GetUserAddressList']),
     confirm() {
       if (this.Freight) {
         var _l = this.LogisticsMode.find(
@@ -216,7 +217,13 @@ export default {
           this.Order_Address_Id = this.UserAddress[0].Order_Address_Id;
           return this.UserAddress[0];
         }
+      }else
+      {
+        return {};
       }
+    },
+    UserAddress(){
+      return this.$store.state.UserAddress.UserAddressList;
     },
     LogisticsModeMap() {
       if (this.LogisticsMode)
@@ -241,8 +248,9 @@ export default {
       this.sId = this.$route.query.sId;
       var rep = await this.$ShoppingAPI.GetLogisticsMode();
       this.LogisticsMode = rep.data;
-      var rep2 = await this.$ShoppingAPI.OrderAddress_Get();
-      this.UserAddress = rep2.data;
+
+      this.GetUserAddressList();
+
       var rep3 = await this.$ShoppingAPI.Shop_GetDetails({
         sId: this.sId
       }); //获取店铺详情

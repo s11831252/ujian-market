@@ -1,7 +1,12 @@
-<template>
+      <template>
   <div class="buy" @click.stop>
-    <div v-if="goods.Stock>0">
-      <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span><input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number"><span class="icon buy-plus" :class="{'action':getShoppingCarNumberByItemId<goods.Stock}" @click="Plus">&#xe64b;</span>
+    <div v-if="goods.Stock>0&&getShoppingCarNumberByItemId>0">
+      <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span>
+      <input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number">
+      <span class="icon buy-plus" :class="{'action':getShoppingCarNumberByItemId<goods.Stock}" @click="Plus">&#xe64b;</span>
+    </div>
+    <div class="zero" v-else-if="goods.Stock>0&&getShoppingCarNumberByItemId==0">
+      <span class="action" @click="Plus">立即抢购</span>
     </div>
     <div v-else>
         <p class="noStock">库存不足</p>
@@ -115,8 +120,17 @@ export default {
     font-size: 0.45rem;
     margin: 0;
   }
+
   .action {
-    color: #fccb5c;
+    color: #ff5252;
+  }
+  .zero{
+    background: #ff5252;
+    font-size: 0.32rem;
+    padding: 0.1rem;
+    .action{
+      color: #ecf0f1;
+    }
   }
   .noStock{
     width: 100%;
