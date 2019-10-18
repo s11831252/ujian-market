@@ -238,6 +238,14 @@ var routes = [
             navigationBarTitleText: '用户名称',
             enablePullDownRefresh: false
         },
+    },
+    {
+        path:'pages/order/distribution',
+        name:'distribution',
+        config: {
+            navigationBarTitleText: '物流选择',
+            enablePullDownRefresh: false
+        },
     }
 ]
 module.exports =routes

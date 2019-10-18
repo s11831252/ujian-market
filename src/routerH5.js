@@ -30,6 +30,8 @@ import consult from './pages/service/consult'
 import storePage from './pages/store/storePage'
 import service from './pages/store/service'
 import dialogBox from './pages/store/dialogBox'
+import distribution from 'pages/order/distribution'
+
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -344,6 +346,16 @@ var routes = [
         },
         alias: '/pages/store/dialogBox',
         component: dialogBox
+    },
+    {
+        path:'pages/order/distribution',
+        name:'distribution',
+        config: {
+            navigationBarTitleText: '物流选择',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/store/distribution',
+        component: distribution
     }
 ]
 

@@ -1,0 +1,913 @@
+<template>
+  <div>
+    <div class="top-one">
+      <span :class="{pitchOn:checkIndex==0}" @click="checktab(0)">工程U派</span>
+      <span :class="{pitchOn:checkIndex==1}" @click="checktab(1)">自行取货</span>
+    </div>
+    <div v-show="chooseUp">
+      <div class="top-two">
+        <div class="content">
+          <!-- 选中 -->
+          <img class="imgBr" v-show="Enjoy" @click="enjoy" src="/static/img/选中拷贝.png" alt />
+          <!-- 未选中 -->
+          <div class="tuoyuan" v-show="EnjoyNr" @click="enjoyNr"></div>
+          <!-- 尊享图 -->
+          <img class="imgNr" src="http://192.168.0.119:802/baseConfig/03.png" alt />
+        </div>
+        <div class="contentNr" v-show="Enjoy">
+          <!-- 活动图 http://192.168.0.119:802/baseConfig/06.png -->
+          <img src="http://192.168.0.119:802/baseConfig/06.png" alt />
+          <p>下单后，将有专属配送服务司机联系您，请您保持手机畅通</p>
+          <div class="xinxibox">
+            <div class="xinxi">
+              <span class="spanBr">姓&#12288;&#12288;名:</span>
+              <textarea placeholder="输入姓名"></textarea>
+              <span class="zhuyi">*</span>
+            </div>
+            <div class="xinxi">
+              <span class="spanBr">联系电话:</span>
+              <textarea placeholder="输入手机号码"></textarea>
+              <span class="zhuyi">*</span>
+            </div>
+            <div class="xinxi">
+              <span class="spanBr">收货地址:</span>
+              <textarea placeholder="输入收货地址"></textarea>
+              <span class="zhuyi">*</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 计费配送 -->
+      <div class="top-three">
+        <div class="charging">
+          <!-- 椭圆未选中 -->
+          <div class="aa" v-show="noBilling" @click="nobilling"></div>
+          <!--选中  -->
+          <img class="bb" v-show="Billing" @click="billing" src="/static/img/选中拷贝.png" alt />
+          <span>计费配送</span>
+        </div>
+        <div v-show="Billing">
+          <div class="car">
+            <div class="carNr">
+              <span>配送车辆</span>
+              <my-drop :options="DistributionModeMap" :onSelected="DistributionSelected"></my-drop>
+            </div>
+            <p>※工程U派推荐使用“面包车”配送该商品</p>
+          </div>
+          <!-- 详细计费 -->
+          <div class="money">
+            <!-- 展开与隐藏 -->
+            <div class="vvv icon" v-show="show" @click="Show">&#xe614;</div>
+            <div class="vvv icon" v-show="noshow" @click="NoShow">&#xe712;</div>
+            <div class="moneyBox">
+              <div class="moneyBox-one">
+                <span class="qibuNr">起步价</span>
+                <span
+                  class="shuzhi"
+                >￥{{DistributionModeSelected_Starting_Price}}/{{DistributionModeSelected.Starting_Road}}km</span>
+              </div>
+              <div class="moneyBox-one">
+                <span class="qibuNr">超里程</span>
+                <span class="shuzhi">￥{{DistributionModeSelected_Per_Kilometre}}/km</span>
+              </div>
+              <div v-show="noshow">
+                <div class="hiddenBox">
+                  <div class="moneyBox-one">
+                    <span class="qibuNr">载重</span>
+                    <span class="shuzhi">{{DistributionModeSelected.Load}}kg</span>
+                  </div>
+                  <div class="moneyBox-one">
+                    <span class="qibuNr">长宽高</span>
+                    <span
+                      class="shuzhi"
+                    >{{DistributionModeSelected.Body_Length}}m x {{DistributionModeSelected.Body_Width}}m x {{DistributionModeSelected.Body_Height}}m</span>
+                  </div>
+                  <div class="moneyBox-one">
+                    <span class="qibuNr">载货体积</span>
+                    <span class="shuzhi">{{DistributionModeSelected.Body_Volume}}㎡</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 新建地址 -->
+          <div class="newSite">
+            <span>收货地址</span>
+            <div class="site" @click="addsite">+新建地址</div>
+          </div>
+          <!-- 添加地址 -->
+            <div class="addSite" v-show="show_site">
+              <div class="xinxi">
+                <span class="spanBr">姓&#12288;&#12288;名:</span>
+                <textarea placeholder="输入姓名"></textarea>
+                <span class="zhuyi">*</span>
+              </div>
+              <div class="xinxi">
+                <span class="spanBr">联系电话:</span>
+                <textarea placeholder="输入手机号码"></textarea>
+                <span class="zhuyi">*</span>
+              </div>
+              <div class="xinxi">
+                <span class="spanBr">收货地址:</span>
+                <div class="icon dingwei">&#xe644;</div>
+                <span class="spanBr" style="color: #c9c9c9;">&#12288;自动获取</span>
+                <span class="zhuyi">*</span>
+              </div>
+              <div class="Add">确认添加</div>
+            </div>
+          <!-- 地址 -->
+          <div class="siteDetails">
+            <div class="icon tubiao">&#xe64d;</div>
+            <div class="details">
+              <span class="name">王思聪</span>
+              <span class="tel">13569852456</span>
+              <div class="xaingqing">
+                <span>广西壮族自治区南宁市西乡塘区广西建设职业技术学院工地</span>
+                <div>默认</div>
+              </div>
+            </div>
+            <div class="makeSite" @click="BeforeSite">使用以往地址</div>
+          </div>
+          <!-- 遮罩层 -->
+          <div class="popContainer" v-show="beforeSite"></div>
+          <!-- 点击以往地址 -->
+          <div class="address-select" v-show="beforeSite" @click.stop="openaddress">
+            <div class="shouhuo">
+              收货地址
+              <div class="icon tuichu" @click.stop="tuichu">&#xe613;</div>
+              <!-- 二个三角形 -->
+              <div class="t3"></div>
+              <div class="t4"></div>
+            </div>
+            <ul class="address-list" @click.stop>
+              <li
+                class="itemNr"
+                v-for="(item,index) in UserAddress"
+                :key="index"
+                :class="{checked:item.Order_Address_Id==Order_Address_Id}"
+                @click="addressChecked(item)"
+              >
+                <div class="xuanzhe">
+                  <!-- 未选中 -->
+                  <div class="weixuanzhong"></div>
+                  <!-- 选中 -->
+                  <div class="icon xuanzhong">&#xe604;</div>
+                </div>
+                <div class="address-item">
+                  <span>
+                    <i class="icon tt" style="float:left">&#xe615;</i>
+                    {{item.Name}}&#12288;
+                  </span>
+                  <span>{{item.Phone}}</span>
+                </div>
+                <div class="address-item">
+                  <i class="icon tt">&#xe627;</i>
+                  {{item.Address}}
+                </div>
+              </li>
+            </ul>
+          </div>
+          <!-- 结算 -->
+          <div class="payment">
+            <ul class="hang">
+              <li>
+                <span class="left">送货距离：</span>
+                <span class="right">16km</span>
+              </li>
+            </ul>
+            <ul class="hang">
+              <li>
+                <span class="left">当前运费：</span>
+                <span class="right">¥55.00</span>
+              </li>
+            </ul>
+            <ul class="hang">
+              <li>
+                <span class="left">配送优惠：</span>
+                <div class="icon rightNr">&#xe617; 30元优惠券</div>
+              </li>
+            </ul>
+            <ul class="hang">
+              <li>
+                <span class="left">实际支付：</span>
+                <span class="right-r">¥55.00</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 自行取货 -->
+    <div class="xinxiboxBr" v-show="chooseZq">
+      <div class="xinxi">
+        <span class="spanBr">姓&#12288;&#12288;名:</span>
+        <textarea placeholder="输入姓名"></textarea>
+        <span class="zhuyi">*</span>
+      </div>
+      <div class="xinxi">
+        <span class="spanBr">联系电话:</span>
+        <textarea placeholder="输入手机号码"></textarea>
+        <span class="zhuyi">*</span>
+      </div>
+      <div class="xinxiBr">选择自取方式后，请您在付款后与店主协商自行取货，并出示订单详情页内的取货二维码或短信接收到的取货验证码，以便确认收货</div>
+    </div>
+    <!-- 确定 -->
+    <button class="queding">确定</button>
+  </div>
+</template>
+<script>
+import myDrop from "@/components/myDrop";
+import { mapMutations } from "vuex";
+export default {
+  data() {
+    return {
+      sId: "",
+      LogisticsMode: [],
+      DistributionId: 0,
+      LogisticsId: 0,
+      DistributionMode: [],
+      UserAddress: [],
+      Order_Address_Id: "",
+      activeIndex: 0,
+      shopDetail: {},
+      openAddress: false,
+      Freight: null,
+      Enjoy: true,
+      EnjoyNr: false,
+      noBilling: true,
+      Billing: false,
+      show: true,
+      noshow: false,
+      checkIndex: 0,
+      chooseUp: true,
+      chooseZq: false,
+      beforeSite: false,
+      show_site:false,
+    };
+  },
+  methods: {
+    ...mapMutations(["SelectLogistics"]),
+    enjoy() {
+      this.Enjoy = false;
+      this.EnjoyNr = true;
+    },
+    enjoyNr() {
+      this.EnjoyNr = false;
+      this.Enjoy = true;
+      if ((this.Enjoy = true)) {
+        this.noBilling = true;
+        this.Billing = false;
+      }
+    },
+    nobilling() {
+      this.noBilling = false;
+      this.Billing = true;
+      if ((this.Billing = true)) {
+        this.Enjoy = false;
+        this.EnjoyNr = true;
+      }
+    },
+    billing() {
+      this.Billing = false;
+      this.noBilling = true;
+    },
+    Show() {
+      this.noshow = true;
+      this.show = false;
+    },
+    NoShow() {
+      this.show = true;
+      this.noshow = false;
+    },
+    // 头部切换
+    async checktab(index) {
+      this.checkIndex = index;
+      if (index == 0) {
+        this.chooseUp = true;
+        this.chooseZq = false;
+      } else if (index == 1) {
+        this.chooseUp = false;
+        this.chooseZq = true;
+      }
+    },
+    // 点击以往地址
+    BeforeSite() {
+      this.beforeSite = true;
+    },
+    tuichu() {
+      this.beforeSite = false;
+    },
+    //新建地址 
+    addsite() {
+      this.show_site= !this.show_site
+    },
+    // 确定
+    confirm() {
+      if (this.Freight) {
+        var _l = this.LogisticsMode.find(
+          item => item.LogisticsId == this.LogisticsId
+        );
+        this.SelectLogistics({
+          sId: this.sId,
+          Logistics: {
+            LogisticsId: _l.LogisticsId,
+            Order_Address_Id: this.Order_Address_Id,
+            Name: _l.Name,
+            DistributionMode: {
+              DistributionModeId: this.DistributionModeSelected
+                .DistributionModeId,
+              DistributionModeText: this.DistributionModeSelected
+                .DistributionModeText
+            },
+            FreightInfo: this.Freight
+          }
+        });
+        this.$router.back();
+      }
+    },
+    // 地址
+    tabClick(e) {
+      if (e) this.activeIndex = e.currentTarget.id;
+    },
+
+    async LogisticsSelected(selectitem) {
+      this.LogisticsId = selectitem.value;
+      if (this.LogisticsId == 0) {
+        this.DistributionMode = 0;
+        this.QueryFreight();
+      } else {
+        var rep = await this.$ShoppingAPI.GetDistributionMode({
+          LogisticsId: selectitem.value
+        });
+        if (rep.ret == 0) {
+          this.DistributionMode = rep.data;
+        }
+      }
+    },
+    DistributionSelected(selectitem) {
+      this.DistributionId = selectitem.value;
+      this.QueryFreight();
+    },
+    async QueryFreight() {
+      if (
+        this.shopDetail &&
+        this.shopDetail.Latitude &&
+        this.shopDetail.Longitude &&
+        this.OrderAddress &&
+        this.OrderAddress.Latitude &&
+        this.OrderAddress.Longitude
+      ) {
+        var rep = await this.$ShoppingAPI.QueryFreight({
+          origin: [this.shopDetail.Latitude, this.shopDetail.Longitude],
+          destinations: [
+            this.OrderAddress.Latitude,
+            this.OrderAddress.Longitude
+          ],
+          LogisticsMode: this.LogisticsId,
+          DistributionModeId: this.DistributionId
+        });
+        if (rep.ret == 0) {
+          this.Freight = rep.data;
+        }
+      }
+    }
+  },
+  computed: {
+    DistributionModeSelected() {
+      if (this.DistributionMode && this.DistributionMode.length > 0) {
+        if (this.DistributionId == 0) return this.DistributionMode[0];
+        return this.DistributionMode.find(
+          item => item.DistributionModeId == this.DistributionId
+        );
+      } else
+        return {
+          DistributionModeId: 0,
+          DistributionModeText: 0,
+          Starting_Price: 0.0,
+          Starting_Road: 0.0,
+          Per_Kilometre: 0.0,
+          Load: 0.0,
+          Body_Length: 0.0,
+          Body_Width: 0.0,
+          Body_Height: 0.0,
+          Body_Volume: 0.0
+        };
+    },
+    DistributionModeSelected_Starting_Price() {
+      return this.DistributionModeSelected.Starting_Price.toFixed(2);
+    },
+    DistributionModeSelected_Per_Kilometre() {
+      return this.DistributionModeSelected.Per_Kilometre.toFixed(2);
+    },
+    OrderAddress() {
+      if (this.UserAddress && this.UserAddress.length > 0) {
+        if (this.Order_Address_Id && this.Order_Address_Id.length > 0)
+          return this.UserAddress.find(
+            item => item.Order_Address_Id == this.Order_Address_Id
+          );
+        else {
+          this.Order_Address_Id = this.UserAddress[0].Order_Address_Id;
+          return this.UserAddress[0];
+        }
+      }
+    },
+    LogisticsModeMap() {
+      if (this.LogisticsMode)
+        return this.LogisticsMode.map(item => {
+          return { text: item.Name, value: item.LogisticsId };
+        });
+      else return [];
+    },
+
+    DistributionModeMap() {
+      if (this.DistributionMode)
+        return this.DistributionMode.map(item => {
+          return {
+            text: item.DistributionModeText,
+            value: item.DistributionModeId
+          };
+        });
+      else return [];
+    }
+  },
+  components: {
+    myDrop
+  },
+  async mounted() {
+    // 物流参数接口
+    var rep = await this.$ShoppingAPI.GetLogisticsMode();
+    this.LogisticsMode = rep.data;
+    //获取订单地址
+    var rep2 = await this.$ShoppingAPI.OrderAddress_Get();
+    this.UserAddress = rep2.data;
+
+    this.LogisticsSelected({ value: 1 });
+
+    if (this.$route.query && this.$route.query.sId.length > 0) {
+      this.sId = this.$route.query.sId;
+      var rep3 = await this.$ShoppingAPI.Shop_GetDetails({
+        sId: this.sId
+      }); //获取店铺详情
+      if (rep3.ret == 0) {
+        this.shopDetail = rep3.data;
+      }
+    }
+  }
+};
+</script>
+<style>
+.drop .drop-selected .drop-label{
+  font-size:0.36rem;
+}
+</style>
+<style scoped>
+.popContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9;
+}
+.top-one {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  background-color: #12b7f5;
+  text-align: center;
+}
+.top-one span {
+  flex: 1;
+  color: #ffffff;
+  font-size: 0.42rem;
+  margin: 0.8rem 1.3rem 1.1rem;
+  line-height: 1.2rem;
+}
+.pitchOn {
+  font-size: 0.7rem !important;
+  border-bottom: 0.1rem solid #ffffff;
+}
+.top-two {
+  width: 10.2rem;
+  background-color: #ffffff;
+  border-radius: 0.2rem;
+  margin: 0 0.3rem;
+  margin-top: -0.9rem;
+  z-index: 1;
+}
+.content {
+  padding-top: 0.73rem;
+  padding-bottom: 0.73rem;
+  margin-left: 0.77rem;
+  display: flex;
+  align-items: center;
+}
+.imgBr {
+  width: 0.4rem;
+  height: 0.4rem;
+}
+.tuoyuan {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  border: 0.01rem solid #666666;
+}
+.imgNr {
+  width: 7.96rem;
+  height: 0.54rem;
+  background-repeat: no-repeat;
+  margin-left: 0.38rem;
+}
+.contentNr img {
+  width: 8.67rem;
+  height: 0.73rem;
+  background-repeat: no-repeat;
+  margin-left: 0.25rem;
+}
+.contentNr p {
+  margin-left: 0.75rem;
+  font-size: 0.31rem;
+  color: #666666;
+  margin-top: 0.3rem;
+  /* 让内容强制不换行 */
+  white-space: nowrap;
+}
+.xinxibox {
+  margin-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+/* 自行取货样式 */
+.xinxiboxBr {
+  margin: -0.9rem 0.3rem 0.7rem;
+  background-color: #fff;
+  border-radius: 0.2rem;
+  overflow-x: hidden;
+}
+.xinxi {
+  margin-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+.xinxiBr {
+  margin: 0.38rem 0.75rem;
+  font-size: 0.31rem;
+  color: #666666;
+}
+.spanBr{
+  width: 2rem;
+  font-size: 0.42rem;
+  color: #535355;
+  /* 让内容强制不换行 */
+  white-space: nowrap;
+}
+.zhuyi {
+  font-size: 0.24rem;
+  color: #b51c1c;
+  margin-left: 0.2rem;
+}
+.xinxi textarea {
+  width: 3.5rem;
+  height: 0.5rem;
+  border-radius: 0.1rem;
+  border: solid 0.02rem #bfbfbf;
+  padding: 0.2rem;
+  font-size: 0.4rem;
+  line-height: 0.5rem;
+  text-align: left;
+}
+.top-three {
+  width: 10.2rem;
+  background-color: #ffffff;
+  border-radius: 0.2rem;
+  margin: auto;
+  margin-top: 0.5rem;
+}
+/* 计费配送样式 */
+/* .top-three {
+  position: absolute;
+  top: 4.6rem !important;
+} */
+/* 椭圆未选中 */
+.charging {
+  width: 100%;
+  height: 1.99rem;
+  line-height: 1.99rem;
+  display: flex;
+  align-items: center;
+}
+.aa {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  border: 0.01rem solid #666666;
+  margin-left: 0.77rem;
+}
+/* 选中 */
+.bb {
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-left: 0.77rem;
+}
+.charging span {
+  font-size: 0.48rem;
+  color: #1a1a1a;
+  margin-left: 0.25rem;
+}
+.car {
+  margin-left: 0.32rem;
+  margin-right: 0.32rem;
+  border-top: 0.02rem solid #ecf0f1;
+  border-bottom: 0.02rem solid #ecf0f1;
+}
+.carNr {
+  display: flex;
+  align-items: center;
+  margin-top: 0.37rem;
+  margin-left: 0.45rem;
+}
+.carNr span {
+  margin-right: 2.69rem;
+}
+.car p {
+  font-size: 0.3rem;
+  color: #b55480;
+  /* 让内容强制不换行 */
+  white-space: nowrap;
+  margin: 0.4rem auto;
+  margin-left: 0.45rem;
+}
+.money {
+  margin: 0.32rem;
+  background-color: #f9f9f9 !important;
+  position: relative;
+}
+.moneyBox {
+  margin-left: 0.61rem;
+  margin-right: 1.57rem;
+  padding-top: 0.4rem;
+}
+.moneyBox-one {
+  padding-bottom: 0.4rem;
+  font-size: 0.32rem;
+  color: #999999;
+}
+.shuzhi {
+  display: flex;
+  align-items: center;
+  float: right;
+}
+.vvv {
+  width: 0.7rem;
+  height: 0.55rem;
+  text-align: center;
+  line-height: 0.55rem;
+  font-size: 0.3rem;
+  background-color: #bdbdbd;
+  border-radius: 0.18rem;
+  opacity: 0.3;
+  position: absolute;
+  top: 0rem;
+  right: 0rem;
+}
+.newSite {
+  margin: 0.24rem 0.32rem auto;
+  display: flex;
+  align-items: center;
+  height: 1.49rem;
+  border-top: 0.02rem solid #ecf0f1;
+  border-bottom: 0.02rem solid #ecf0f1;
+}
+.newSite span {
+  font-size: 0.4rem;
+  color: #333333;
+  margin-left: 0.27rem;
+}
+.site {
+  font-size: 0.32rem;
+  color: #12b7f5;
+  padding: 0.1rem;
+  border-radius: 0.05rem;
+  border: solid 0.01rem #12b7f5;
+  margin-left: 5.7rem;
+}
+.addSite {
+  background-color:#f9f9f9;
+  border-radius: 0.2rem;
+  padding: 0.3rem
+}
+.dingwei {
+  color: #12b7f5;
+  font-size: 0.4rem;
+}
+.Add {
+  width: 2.4rem;
+  height: 0.83rem;
+  font-size: 0.36rem;
+  line-height: 0.83rem;
+  text-align: center;
+  background-color: #12b7f5;
+  border-radius: 0.16rem;
+  color: #ffffff;
+  margin-top: 0.5rem!important;
+  margin: auto;
+  
+}
+.siteDetails {
+  margin: 0.4rem 0.32rem auto;
+  overflow: hidden;
+  border-bottom: 0.02rem solid #ecf0f1;
+}
+.tubiao {
+  width: 0.76rem;
+  height: 0.76rem;
+  border-radius: 50%;
+  background-color: #12b7f5;
+  text-align: center;
+  line-height: 0.76rem;
+  color: #ffffff;
+  font-size: 0.6rem;
+  float: left;
+  margin-top: 0.37rem;
+  margin-left: 0.16rem;
+}
+.details {
+  margin-left: 1.42rem;
+  margin-right: 0.27rem;
+}
+.name {
+  font-family: MicrosoftYaHei;
+  font-size: 0.42rem;
+  color: #323232;
+}
+.tel {
+  font-family: MicrosoftYaHei;
+  font-size: 0.36rem;
+  color: #8c8c8c;
+  margin-left: 0.3rem;
+}
+.xaingqing {
+  letter-spacing: 0.03rem;
+  font-size: 0.33rem;
+  color: #333333;
+  margin-top: 0.3rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center
+  }
+.xaingqing div {
+  width: 1.06rem;
+  height: 0.47rem;
+  text-align: center;
+  line-height: 0.47rem;
+  background-color: #b1b2b4;
+  color: #8c8c8c;
+  float: right;
+}
+.makeSite {
+  width: 2.3rem;
+  height: 0.55rem;
+  background-color: #f7fff5;
+  border-radius: 0.05rem;
+  border: solid 0.01rem #59d178;
+  font-size: 0.32rem;
+  line-height: 0.55rem;
+  text-align: center;
+  color: #59d178;
+  float: right;
+  margin-right: 0.27rem;
+  margin-bottom: 0.44rem;
+  margin-top: 0.24rem;
+}
+.address-select {
+  font-size: 0.4rem;
+  color: #333333;
+  overflow: hidden;
+  margin-left: 0.7rem;
+  position: fixed;
+  top: 5rem;
+  z-index: 100;
+}
+.shouhuo {
+  font-size: 0.4rem;
+  color: #fffefe;
+  width: 8.8rem;
+  height: 1rem;
+  background-color: #12b7f5;
+  border-radius: 0.1rem 0.1rem 0rem 0rem;
+  text-align: center;
+  line-height: 1rem;
+  position: relative;
+}
+.t3 {
+  height: 0;
+  width: 0;
+  border-top: solid 0.4rem #12b7f5;
+  border-right: solid 0.4rem rgba(0, 0, 0, 0);
+  position: absolute;
+  right: 0rem;
+  bottom: -0.37rem;
+}
+.t4 {
+  margin: 0;
+  height: 0;
+  width: 0px;
+  border-top: solid 0.4rem #12b7f5;
+  border-left: solid 0.4rem rgba(0, 0, 0, 0);
+  position: absolute;
+  left: 0rem;
+  bottom: -0.37rem;
+}
+.tuichu {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  border: 0.05rem solid #fff;
+  line-height: 0.6rem;
+  color: #fff;
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+}
+.address-list {
+  height: 5rem;
+  width: 8.1rem;
+  background-color: #fff;
+  margin-left: 0.35rem;
+  margin-bottom: 0.4rem;
+  overflow: auto;
+}
+.itemNr {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  margin-left: 0.8rem;
+  margin-right: 0.8rem;
+  border-bottom: 0.02rem solid #ecf0f1;
+}
+.xuanzhe {
+  float: left;
+  height: 100%;
+  padding-top: 10%;
+}
+.weixuanzhong {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  border: solid 0.02rem #b4b4b4;
+  display: none;
+}
+.xuanzhong {
+  color: #12b7f5;
+}
+.address-item {
+  display: flex;
+  align-items: center;
+  padding-left: 0.6rem;
+  margin-top: 0.2rem;
+}
+.tt {
+  margin-right: 0.2rem;
+}
+.payment {
+  overflow: hidden;
+  margin: 0.71rem 0.59rem 0.7rem;
+}
+.hang {
+  padding-bottom: 0.9rem;
+}
+.left {
+  font-size: 0.32rem;
+  color: #333333;
+}
+.right {
+  font-size: 0.32rem;
+  color: #999999;
+  float: right;
+}
+.rightNr {
+  padding: 0.2rem;
+  font-size: 0.3rem;
+  color: #ffffff;
+  background-image: linear-gradient(270deg, 
+		#fe3c16 0%, 
+		#fe7316 100%);
+	border-radius: 0.05rem;
+  float: right;
+}
+.right-r {
+  font-size: 0.43rem;
+  color: #333333;
+  float: right;
+}
+.queding {
+  width: 5rem;
+  height: 1rem;
+  font-size: 0.5rem;
+  text-align: center;
+  line-height: 1rem;
+  background-color: #12b7f5;
+  border-radius: 0.2rem;
+  margin: 1rem auto;
+}
+</style>
