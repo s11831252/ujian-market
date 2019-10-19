@@ -62,10 +62,8 @@ export default {
       'ShoppingCarEmpty'
     ]),
    async pay(){
-     console.log(this.getShoppingCarBysId.Logistics,this.getShoppingCarGoods.length)
       if(this.getShoppingCarBysId.Logistics&&this.getShoppingCarGoods.length>0)
       {
-        console.log("进来了")
          var rep = await  this.$ShoppingAPI.Order_Create({
             LogisticsMode:this.Logistics.LogisticsId,
             DistributionModeId:this.Logistics.DistributionMode.DistributionModeId,
