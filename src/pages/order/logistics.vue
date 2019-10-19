@@ -246,7 +246,7 @@ export default {
   async mounted() {
     if (this.$route.query && this.$route.query.sId.length > 0) {
       this.sId = this.$route.query.sId;
-      var rep = await this.$ShoppingAPI.GetLogisticsMode();
+      var rep = await this.$ShoppingAPI.GetLogisticsMode({sId:this.sId});
       this.LogisticsMode = rep.data;
 
       this.GetUserAddressList();

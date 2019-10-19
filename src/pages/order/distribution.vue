@@ -1,21 +1,20 @@
 <template>
   <div>
     <div class="top-one">
-      <span v-if="LogisticsMode.length>0" :class="{pitchOn:checkIndex==0}" @click="checktab(0)">{{LogisticsMode[0].Name}}</span>
-      <span v-if="LogisticsMode.length>1" :class="{pitchOn:checkIndex==1}" @click="checktab(1)">{{LogisticsMode[1].Name}}</span>
+      <span v-if="LogisticsMode.length>0" :class="[LogisticsId==1||LogisticsId==2?'pitchOn':'']" @click="checktab(LogisticsMode[0].LogisticsId)">{{LogisticsMode[0].Name}}</span>
+      <span v-if="LogisticsMode.length>1" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
     </div>
-    <div v-show="chooseUp">
+    <div v-if="LogisticsId==1||LogisticsId==2">
       <div class="top-two">
         <div class="content">
           <!-- 选中 -->
-          <img class="imgBr" v-show="Enjoy" @click="enjoy" src="/static/img/选中拷贝.png" alt />
+          <img class="imgBr" v-if="LogisticsId==2" src="/static/img/选中拷贝.png" alt />
           <!-- 未选中 -->
-          <div class="tuoyuan" v-show="EnjoyNr" @click="enjoyNr"></div>
+          <div class="tuoyuan" v-else  @click="checktab(2)"></div>
           <!-- 尊享图 -->
           <img class="imgNr" src="http://192.168.0.119:802/baseConfig/03.png" alt />
         </div>
-        <div class="contentNr" v-show="Enjoy">
-          <!-- 活动图 http://192.168.0.119:802/baseConfig/06.png -->
+        <div class="contentNr" v-if="LogisticsId==2">
           <img src="http://192.168.0.119:802/baseConfig/06.png" alt />
           <p>下单后，将有专属配送服务司机联系您，请您保持手机畅通</p>
           <div class="xinxibox">
@@ -40,13 +39,13 @@
       <!-- 计费配送 -->
       <div class="top-three">
         <div class="charging">
-          <!-- 椭圆未选中 -->
-          <div class="aa" v-show="noBilling" @click="nobilling"></div>
           <!--选中  -->
-          <img class="bb" v-show="Billing" @click="billing" src="/static/img/选中拷贝.png" alt />
+          <img class="bb" v-if="LogisticsId==1" src="/static/img/选中拷贝.png" alt />
+          <!-- 椭圆未选中 -->
+          <div class="aa" v-else @click="checktab(1)"></div>
           <span>计费配送</span>
         </div>
-        <div v-show="Billing">
+        <div v-if="LogisticsId==1">
           <div class="car">
             <div class="carNr">
               <span>配送车辆</span>
@@ -57,8 +56,8 @@
           <!-- 详细计费 -->
           <div class="money">
             <!-- 展开与隐藏 -->
-            <div class="vvv icon" v-show="show" @click="Show">&#xe614;</div>
-            <div class="vvv icon" v-show="noshow" @click="NoShow">&#xe712;</div>
+            <div class="vvv icon" v-if="show" @click="Show">&#xe614;</div>
+            <div class="vvv icon" v-else @click="Show">&#xe712;</div>
             <div class="moneyBox">
               <div class="moneyBox-one">
                 <span class="qibuNr">起步价</span>
@@ -70,7 +69,7 @@
                 <span class="qibuNr">超里程</span>
                 <span class="shuzhi">￥{{DistributionModeSelected_Per_Kilometre}}/km</span>
               </div>
-              <div v-show="noshow">
+              <div v-show="show">
                 <div class="hiddenBox">
                   <div class="moneyBox-one">
                     <span class="qibuNr">载重</span>
@@ -95,27 +94,6 @@
             <span>收货地址</span>
             <div class="site" @click="go({path:'/pages/my/address'})">+新建地址</div>
           </div>
-          <!-- 添加地址 -->
-            <!-- <div class="addSite" v-show="show_site">
-              <div class="xinxi">
-                <span class="spanBr">姓&#12288;&#12288;名:</span>
-                <input type="text" placeholder="输入姓名" />
-                <span class="zhuyi">*</span>
-              </div>
-              <div class="xinxi">
-                <span class="spanBr">联系电话:</span>
-                <input type="text" placeholder="输入手机号码" />
-                <span class="zhuyi">*</span>
-              </div>
-              <div class="xinxi">
-                <span class="spanBr">收货地址:</span>
-                <div class="icon dingwei">&#xe644;</div>
-                <span class="spanBr" style="color: #c9c9c9;">&#12288;自动获取</span>
-                <span class="zhuyi">*</span>
-              </div>
-              <div class="Add">确认添加</div>
-            </div> -->
-          <!-- 地址 -->
           <div class="siteDetails">
             <div class="icon tubiao">&#xe64d;</div>
             <div class="details">
@@ -134,7 +112,7 @@
           <div class="address-select" v-show="beforeSite" @click.stop="openaddress">
             <div class="shouhuo">
               收货地址
-              <div class="icon tuichu" @click.stop="tuichu">&#xe613;</div>
+              <div class="icon tuichu" @click.stop="BeforeSite">&#xe613;</div>
               <!-- 二个三角形 -->
               <div class="t3"></div>
               <div class="t4"></div>
@@ -201,7 +179,7 @@
       </div>
     </div>
     <!-- 自行取货 -->
-    <div class="xinxiboxBr" v-show="chooseZq">
+    <div class="xinxiboxBr" v-if="LogisticsId==0">
       <div class="xinxi">
         <span class="spanBr">姓&#12288;&#12288;名:</span>
         <input type="text" placeholder="输入姓名" />
@@ -227,7 +205,7 @@ export default {
       sId: "",
       LogisticsMode: [],
       DistributionId: 0,
-      LogisticsId: 1,
+      LogisticsId: 2,
       DistributionMode: [],
       UserAddress: [],
       Order_Address_Id: "",
@@ -235,17 +213,8 @@ export default {
       shopDetail: {},
       openAddress: false,
       Freight: null,
-      Enjoy: true,
-      EnjoyNr: false,
-      noBilling: true,
-      Billing: false,
-      show: true,
-      noshow: false,
-      checkIndex: 0,
-      chooseUp: true,
-      chooseZq: false,
+      show: false,
       beforeSite: false,
-      show_site:false,
       // 联系人信息
       contact:{
         Name:"",
@@ -257,62 +226,21 @@ export default {
   methods: {
     ...mapMutations(["SelectLogistics"]),
     ...mapActions(['GetUserAddressList']),
-    enjoy() {
-      this.Enjoy = false;
-      this.EnjoyNr = true;
-    },
-    enjoyNr() {
-      this.EnjoyNr = false;
-      this.Enjoy = true;
-      if ((this.Enjoy = true)) {
-        this.noBilling = true;
-        this.Billing = false;
-      }
-    },
-    nobilling() {
-      this.noBilling = false;
-      this.Billing = true;
-      if ((this.Billing = true)) {
-        this.Enjoy = false;
-        this.EnjoyNr = true;
-      }
-    },
-    billing() {
-      this.Billing = false;
-      this.noBilling = true;
-    },
-    Show() {
-      this.noshow = true;
-      this.show = false;
-    },
-    NoShow() {
-      this.show = true;
-      this.noshow = false;
-    },
     // 头部切换
-    async checktab(index) {
-      this.checkIndex = index;
-      this.sId = this.$route.query.sId;
-      if (this.LogisticsId=1) {
-         if (index == 0) {
-        this.chooseUp = true;
-        this.chooseZq = false;
-      } 
+    checktab(index) {
+      this.LogisticsId=index;
+      debugger;
+      if(this.LogisticsId==1)
+      {
+        this.LogisticsSelected({value:1});
       }
-      else if (this.LogisticsId=0) {
-
-      }
-     if (index == 1) {
-        this.chooseUp = false;
-        this.chooseZq = true;
-      }
+    },
+    Show(){
+      this.show=!this.show
     },
     // 点击以往地址
     BeforeSite() {
-      this.beforeSite = true;
-    },
-    tuichu() {
-      this.beforeSite = false;
+      this.beforeSite = !this.beforeSite;
     },
     //新建地址 
     // addsite() {
@@ -466,20 +394,28 @@ export default {
     myDrop
   },
   async mounted() {
-    // 物流参数接口
-    var rep = await this.$ShoppingAPI.GetLogisticsMode();
-    this.LogisticsMode = rep.data;
-    console.log(this.LogisticsMode)
-    // 接收店铺id参数
-    this.sId = this.$route.query.sId;
-    //获取订单地址
-    var rep2 = await this.$ShoppingAPI.OrderAddress_Get();
-    this.UserAddress = rep2.data;
 
-    this.LogisticsSelected({ value: 1 });
 
     if (this.$route.query && this.$route.query.sId.length > 0) {
+      // 接收店铺id参数
       this.sId = this.$route.query.sId;
+
+      // 物流参数接口
+      var rep = await this.$ShoppingAPI.GetLogisticsMode({sId: this.sId});
+      this.LogisticsMode = rep.data;
+      
+      //获取订单地址
+      this.GetUserAddressList();
+      
+      //物流模式数组大于2说明有尊享配送，默认选择
+      if(this.LogisticsMode.length>2)
+      {
+        this.LogisticsSelected({ value:2 });
+      }else
+      {
+        this.LogisticsSelected({ value:1 });
+      }
+
       var rep3 = await this.$ShoppingAPI.Shop_GetDetails({
         sId: this.sId
       }); //获取店铺详情
