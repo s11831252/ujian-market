@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="top-one">
-      <span :class="{pitchOn:checkIndex==0}" @click="checktab(0)">工程U派</span>
-      <span :class="{pitchOn:checkIndex==1}" @click="checktab(1)">自行取货</span>
+      <span v-if="LogisticsMode.length>0" :class="{pitchOn:checkIndex==0}" @click="checktab(0)">{{LogisticsMode[0].Name}}</span>
+      <span v-if="LogisticsMode.length>1" :class="{pitchOn:checkIndex==1}" @click="checktab(1)">{{LogisticsMode[1].Name}}</span>
     </div>
     <div v-show="chooseUp">
       <div class="top-two">
@@ -21,17 +21,17 @@
           <div class="xinxibox">
             <div class="xinxi">
               <span class="spanBr">姓&#12288;&#12288;名:</span>
-              <textarea placeholder="输入姓名"></textarea>
+              <input v-model="contact.Name" type="text" placeholder="输入姓名" />
               <span class="zhuyi">*</span>
             </div>
             <div class="xinxi">
               <span class="spanBr">联系电话:</span>
-              <textarea placeholder="输入手机号码"></textarea>
+              <input v-model="contact.Phone" type="text" placeholder="输入手机号码" />
               <span class="zhuyi">*</span>
             </div>
             <div class="xinxi">
               <span class="spanBr">收货地址:</span>
-              <textarea placeholder="输入收货地址"></textarea>
+              <input v-model="contact.Address" type="text" placeholder="输入收货地址" />
               <span class="zhuyi">*</span>
             </div>
           </div>
@@ -93,18 +93,18 @@
           <!-- 新建地址 -->
           <div class="newSite">
             <span>收货地址</span>
-            <div class="site" @click="addsite">+新建地址</div>
+            <div class="site" @click="go({path:'/pages/my/address'})">+新建地址</div>
           </div>
           <!-- 添加地址 -->
-            <div class="addSite" v-show="show_site">
+            <!-- <div class="addSite" v-show="show_site">
               <div class="xinxi">
                 <span class="spanBr">姓&#12288;&#12288;名:</span>
-                <textarea placeholder="输入姓名"></textarea>
+                <input type="text" placeholder="输入姓名" />
                 <span class="zhuyi">*</span>
               </div>
               <div class="xinxi">
                 <span class="spanBr">联系电话:</span>
-                <textarea placeholder="输入手机号码"></textarea>
+                <input type="text" placeholder="输入手机号码" />
                 <span class="zhuyi">*</span>
               </div>
               <div class="xinxi">
@@ -114,15 +114,15 @@
                 <span class="zhuyi">*</span>
               </div>
               <div class="Add">确认添加</div>
-            </div>
+            </div> -->
           <!-- 地址 -->
           <div class="siteDetails">
             <div class="icon tubiao">&#xe64d;</div>
             <div class="details">
-              <span class="name">王思聪</span>
-              <span class="tel">13569852456</span>
+              <span class="name">{{OrderAddress.Name}}</span>
+              <span class="tel">{{OrderAddress.Phone}}</span>
               <div class="xaingqing">
-                <span>广西壮族自治区南宁市西乡塘区广西建设职业技术学院工地</span>
+                <span>{{OrderAddress.Address}}</span>
                 <div>默认</div>
               </div>
             </div>
@@ -144,14 +144,14 @@
                 class="itemNr"
                 v-for="(item,index) in UserAddress"
                 :key="index"
-                :class="{checked:item.Order_Address_Id==Order_Address_Id}"
-                @click="addressChecked(item)"
+                
               >
-                <div class="xuanzhe">
+                <div class="xuanzhe" :class="{xuanzhong:item.Order_Address_Id==Order_Address_Id}"
+                @click="addressChecked(item)">
                   <!-- 未选中 -->
-                  <div class="weixuanzhong"></div>
+                  <!-- <div class="weixuanzhong"></div> -->
                   <!-- 选中 -->
-                  <div class="icon xuanzhong">&#xe604;</div>
+                  <div class="icon">&#xe604;</div>
                 </div>
                 <div class="address-item">
                   <span>
@@ -169,22 +169,25 @@
           </div>
           <!-- 结算 -->
           <div class="payment">
-            <ul class="hang">
+            <ul class="hang"  v-if="Freight">
               <li>
                 <span class="left">送货距离：</span>
-                <span class="right">16km</span>
+                <span class="right">{{Freight.distance.text}}km</span>
               </li>
             </ul>
-            <ul class="hang">
+            <ul class="hang"  v-if="Freight">
               <li>
                 <span class="left">当前运费：</span>
-                <span class="right">¥55.00</span>
+                <span class="right">¥{{Freight.Freight}}</span>
               </li>
             </ul>
             <ul class="hang">
               <li>
                 <span class="left">配送优惠：</span>
-                <div class="icon rightNr">&#xe617; 30元优惠券</div>
+                <div style="float:right">
+                  <div class="icon rightNr">&#xe617; 30元优惠券</div>
+                  <b class="icon b">&#xe601;</b>
+                </div>
               </li>
             </ul>
             <ul class="hang">
@@ -201,12 +204,12 @@
     <div class="xinxiboxBr" v-show="chooseZq">
       <div class="xinxi">
         <span class="spanBr">姓&#12288;&#12288;名:</span>
-        <textarea placeholder="输入姓名"></textarea>
+        <input type="text" placeholder="输入姓名" />
         <span class="zhuyi">*</span>
       </div>
       <div class="xinxi">
         <span class="spanBr">联系电话:</span>
-        <textarea placeholder="输入手机号码"></textarea>
+        <input type="text" placeholder="输入手机号码" />
         <span class="zhuyi">*</span>
       </div>
       <div class="xinxiBr">选择自取方式后，请您在付款后与店主协商自行取货，并出示订单详情页内的取货二维码或短信接收到的取货验证码，以便确认收货</div>
@@ -217,14 +220,14 @@
 </template>
 <script>
 import myDrop from "@/components/myDrop";
-import { mapMutations } from "vuex";
+import {mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {
       sId: "",
       LogisticsMode: [],
       DistributionId: 0,
-      LogisticsId: 0,
+      LogisticsId: 1,
       DistributionMode: [],
       UserAddress: [],
       Order_Address_Id: "",
@@ -243,10 +246,17 @@ export default {
       chooseZq: false,
       beforeSite: false,
       show_site:false,
+      // 联系人信息
+      contact:{
+        Name:"",
+        Phone:"",
+        Address:""
+      },
     };
   },
   methods: {
     ...mapMutations(["SelectLogistics"]),
+    ...mapActions(['GetUserAddressList']),
     enjoy() {
       this.Enjoy = false;
       this.EnjoyNr = true;
@@ -282,10 +292,17 @@ export default {
     // 头部切换
     async checktab(index) {
       this.checkIndex = index;
-      if (index == 0) {
+      this.sId = this.$route.query.sId;
+      if (this.LogisticsId=1) {
+         if (index == 0) {
         this.chooseUp = true;
         this.chooseZq = false;
-      } else if (index == 1) {
+      } 
+      }
+      else if (this.LogisticsId=0) {
+
+      }
+     if (index == 1) {
         this.chooseUp = false;
         this.chooseZq = true;
       }
@@ -298,9 +315,9 @@ export default {
       this.beforeSite = false;
     },
     //新建地址 
-    addsite() {
-      this.show_site= !this.show_site
-    },
+    // addsite() {
+    //   this.show_site= !this.show_site
+    // },
     // 确定
     confirm() {
       if (this.Freight) {
@@ -329,6 +346,14 @@ export default {
     tabClick(e) {
       if (e) this.activeIndex = e.currentTarget.id;
     },
+    openaddress() {
+      this.openAddress = !this.openAddress;
+    },
+    addressChecked(item) {
+      this.Order_Address_Id = item.Order_Address_Id;
+      this.openaddress();
+      this.beforeSite=false;
+    },
 
     async LogisticsSelected(selectitem) {
       this.LogisticsId = selectitem.value;
@@ -337,6 +362,7 @@ export default {
         this.QueryFreight();
       } else {
         var rep = await this.$ShoppingAPI.GetDistributionMode({
+        
           LogisticsId: selectitem.value
         });
         if (rep.ret == 0) {
@@ -409,7 +435,13 @@ export default {
           this.Order_Address_Id = this.UserAddress[0].Order_Address_Id;
           return this.UserAddress[0];
         }
+      }else
+      {
+        return {};
       }
+    },
+      UserAddress(){
+      return this.$store.state.UserAddress.UserAddressList;
     },
     LogisticsModeMap() {
       if (this.LogisticsMode)
@@ -437,6 +469,9 @@ export default {
     // 物流参数接口
     var rep = await this.$ShoppingAPI.GetLogisticsMode();
     this.LogisticsMode = rep.data;
+    console.log(this.LogisticsMode)
+    // 接收店铺id参数
+    this.sId = this.$route.query.sId;
     //获取订单地址
     var rep2 = await this.$ShoppingAPI.OrderAddress_Get();
     this.UserAddress = rep2.data;
@@ -456,6 +491,9 @@ export default {
 };
 </script>
 <style>
+page {
+  background-color: #f9f9f9
+}
 .drop .drop-selected .drop-label{
   font-size:0.36rem;
 }
@@ -490,7 +528,7 @@ export default {
 }
 .top-two {
   width: 10.2rem;
-  background-color: #ffffff;
+  background-color:#fff;
   border-radius: 0.2rem;
   margin: 0 0.3rem;
   margin-top: -0.9rem;
@@ -567,15 +605,12 @@ export default {
   color: #b51c1c;
   margin-left: 0.2rem;
 }
-.xinxi textarea {
+.xinxi input {
   width: 3.5rem;
-  height: 0.5rem;
   border-radius: 0.1rem;
   border: solid 0.02rem #bfbfbf;
-  padding: 0.2rem;
+  padding-left: 0.2rem;
   font-size: 0.4rem;
-  line-height: 0.5rem;
-  text-align: left;
 }
 .top-three {
   width: 10.2rem;
@@ -692,11 +727,11 @@ export default {
   border: solid 0.01rem #12b7f5;
   margin-left: 5.7rem;
 }
-.addSite {
+/* .addSite {
   background-color:#f9f9f9;
   border-radius: 0.2rem;
   padding: 0.3rem
-}
+} */
 .dingwei {
   color: #12b7f5;
   font-size: 0.4rem;
@@ -875,6 +910,7 @@ export default {
 }
 .hang {
   padding-bottom: 0.9rem;
+  overflow: hidden;
 }
 .left {
   font-size: 0.32rem;
@@ -893,6 +929,11 @@ export default {
 		#fe3c16 0%, 
 		#fe7316 100%);
 	border-radius: 0.05rem;
+  float: left;
+}
+.b {
+  font-size: 0.6rem;
+  color: #999999;
   float: right;
 }
 .right-r {
