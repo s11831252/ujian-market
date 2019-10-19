@@ -97,8 +97,11 @@ export default {
         return http.get(BaseHost + "api/OrderAddress/Get", param)
     },
     //新增订单地址
-    OrderAddress_Add: param => {
-        return http.post(BaseHost + "api/OrderAddress/Add", param)
+    OrderAddress_Add: (param,LogisticsId) => {
+        if(LogisticsId!=undefined)
+            return http.post(BaseHost + `api/OrderAddress/Add?LogisticsId=${LogisticsId}`, param)
+        else
+            return http.post(BaseHost + "api/OrderAddress/Add", param)
     },
     //编辑订单地址
     OrderAddress_Edit: param => {

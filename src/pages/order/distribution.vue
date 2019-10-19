@@ -4,33 +4,33 @@
       <span v-if="LogisticsMode.length>0" :class="[LogisticsId==1||LogisticsId==2?'pitchOn':'']" @click="checktab(LogisticsMode[0].LogisticsId)">{{LogisticsMode[0].Name}}</span>
       <span v-if="LogisticsMode.length>1" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
     </div>
-    <div v-if="LogisticsId==1||LogisticsId==2">
+    <div v-show="LogisticsId==1||LogisticsId==2">
       <div class="top-two">
         <div class="content">
           <!-- 选中 -->
-          <img class="imgBr" v-if="LogisticsId==2" src="/static/img/选中拷贝.png" alt />
+          <img class="imgBr" v-if="LogisticsId==2" src="/static/img/选中拷贝.png" alt>
           <!-- 未选中 -->
-          <div class="tuoyuan" v-else  @click="checktab(2)"></div>
+          <div class="tuoyuan" v-else @click="checktab(2)"></div>
           <!-- 尊享图 -->
-          <img class="imgNr" src="http://192.168.0.119:802/baseConfig/03.png" alt />
+          <img class="imgNr" src="http://192.168.0.119:802/baseConfig/03.png" alt>
         </div>
         <div class="contentNr" v-if="LogisticsId==2">
-          <img src="http://192.168.0.119:802/baseConfig/06.png" alt />
+          <img src="http://192.168.0.119:802/baseConfig/06.png" alt>
           <p>下单后，将有专属配送服务司机联系您，请您保持手机畅通</p>
           <div class="xinxibox">
             <div class="xinxi">
               <span class="spanBr">姓&#12288;&#12288;名:</span>
-              <input v-model="contact.Name" type="text" placeholder="输入姓名" />
+              <input v-model="contact.Name" type="text" placeholder="输入姓名">
               <span class="zhuyi">*</span>
             </div>
             <div class="xinxi">
               <span class="spanBr">联系电话:</span>
-              <input v-model="contact.Phone" type="text" placeholder="输入手机号码" />
+              <input v-model="contact.Phone" type="text" placeholder="输入手机号码">
               <span class="zhuyi">*</span>
             </div>
             <div class="xinxi">
               <span class="spanBr">收货地址:</span>
-              <input v-model="contact.Address" type="text" placeholder="输入收货地址" />
+              <input v-model="contact.Address" type="text" placeholder="输入收货地址">
               <span class="zhuyi">*</span>
             </div>
           </div>
@@ -40,12 +40,12 @@
       <div class="top-three">
         <div class="charging">
           <!--选中  -->
-          <img class="bb" v-if="LogisticsId==1" src="/static/img/选中拷贝.png" alt />
+          <img class="bb" v-if="LogisticsId==1" src="/static/img/选中拷贝.png" alt>
           <!-- 椭圆未选中 -->
           <div class="aa" v-else @click="checktab(1)"></div>
           <span>计费配送</span>
         </div>
-        <div v-if="LogisticsId==1">
+        <div v-show="LogisticsId==1">
           <div class="car">
             <div class="carNr">
               <span>配送车辆</span>
@@ -61,9 +61,7 @@
             <div class="moneyBox">
               <div class="moneyBox-one">
                 <span class="qibuNr">起步价</span>
-                <span
-                  class="shuzhi"
-                >￥{{DistributionModeSelected_Starting_Price}}/{{DistributionModeSelected.Starting_Road}}km</span>
+                <span class="shuzhi">￥{{DistributionModeSelected_Starting_Price}}/{{DistributionModeSelected.Starting_Road}}km</span>
               </div>
               <div class="moneyBox-one">
                 <span class="qibuNr">超里程</span>
@@ -77,9 +75,7 @@
                   </div>
                   <div class="moneyBox-one">
                     <span class="qibuNr">长宽高</span>
-                    <span
-                      class="shuzhi"
-                    >{{DistributionModeSelected.Body_Length}}m x {{DistributionModeSelected.Body_Width}}m x {{DistributionModeSelected.Body_Height}}m</span>
+                    <span class="shuzhi">{{DistributionModeSelected.Body_Length}}m x {{DistributionModeSelected.Body_Width}}m x {{DistributionModeSelected.Body_Height}}m</span>
                   </div>
                   <div class="moneyBox-one">
                     <span class="qibuNr">载货体积</span>
@@ -94,7 +90,7 @@
             <span>收货地址</span>
             <div class="site" @click="go({path:'/pages/my/address'})">+新建地址</div>
           </div>
-          <div class="siteDetails">
+          <div class="siteDetails" v-if="OrderAddress!=null">
             <div class="icon tubiao">&#xe64d;</div>
             <div class="details">
               <span class="name">{{OrderAddress.Name}}</span>
@@ -118,14 +114,8 @@
               <div class="t4"></div>
             </div>
             <ul class="address-list" @click.stop>
-              <li
-                class="itemNr"
-                v-for="(item,index) in UserAddress"
-                :key="index"
-                
-              >
-                <div class="xuanzhe" :class="{xuanzhong:item.Order_Address_Id==Order_Address_Id}"
-                @click="addressChecked(item)">
+              <li class="itemNr" v-for="(item,index) in UserAddress" :key="index">
+                <div class="xuanzhe" :class="{xuanzhong:item.Order_Address_Id==Order_Address_Id}" @click="addressChecked(item)">
                   <!-- 未选中 -->
                   <!-- <div class="weixuanzhong"></div> -->
                   <!-- 选中 -->
@@ -147,13 +137,13 @@
           </div>
           <!-- 结算 -->
           <div class="payment">
-            <ul class="hang"  v-if="Freight">
+            <ul class="hang" v-if="Freight">
               <li>
                 <span class="left">送货距离：</span>
                 <span class="right">{{Freight.distance.text}}km</span>
               </li>
             </ul>
-            <ul class="hang"  v-if="Freight">
+            <ul class="hang" v-if="Freight">
               <li>
                 <span class="left">当前运费：</span>
                 <span class="right">¥{{Freight.Freight}}</span>
@@ -179,26 +169,26 @@
       </div>
     </div>
     <!-- 自行取货 -->
-    <div class="xinxiboxBr" v-if="LogisticsId==0">
+    <div class="xinxiboxBr" v-show="LogisticsId==0">
       <div class="xinxi">
         <span class="spanBr">姓&#12288;&#12288;名:</span>
-        <input type="text" placeholder="输入姓名" />
+        <input type="text" v-model="contact2.Name" placeholder="输入姓名">
         <span class="zhuyi">*</span>
       </div>
       <div class="xinxi">
         <span class="spanBr">联系电话:</span>
-        <input type="text" placeholder="输入手机号码" />
+        <input type="text" v-model="contact2.Phone" placeholder="输入手机号码">
         <span class="zhuyi">*</span>
       </div>
       <div class="xinxiBr">选择自取方式后，请您在付款后与店主协商自行取货，并出示订单详情页内的取货二维码或短信接收到的取货验证码，以便确认收货</div>
     </div>
     <!-- 确定 -->
-    <button class="queding">确定</button>
+    <button class="queding" @click="confirm">确定</button>
   </div>
 </template>
 <script>
 import myDrop from "@/components/myDrop";
-import {mapActions, mapMutations } from "vuex";
+import { mapState,mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -207,7 +197,6 @@ export default {
       DistributionId: 0,
       LogisticsId: 2,
       DistributionMode: [],
-      UserAddress: [],
       Order_Address_Id: "",
       activeIndex: 0,
       shopDetail: {},
@@ -216,59 +205,125 @@ export default {
       show: false,
       beforeSite: false,
       // 联系人信息
-      contact:{
-        Name:"",
-        Phone:"",
-        Address:""
+      contact: {
+        Order_Address_Id: "",
+        Phone: "",
+        Name: "",
+        Address: "",
+        Latitude: 0,
+        Longitude: 0,
+        IsDefault: false
       },
+      contact2:{
+        Order_Address_Id: "",
+        Phone: "",
+        Name: "",
+        Address: "自提无视",
+        Latitude: 0,
+        Longitude: 0,
+        IsDefault: false
+      }
     };
   },
   methods: {
     ...mapMutations(["SelectLogistics"]),
-    ...mapActions(['GetUserAddressList']),
+    ...mapActions(["GetUserAddressList"]),
     // 头部切换
-    checktab(index) {
-      this.LogisticsId=index;
-      debugger;
-      if(this.LogisticsId==1)
-      {
-        this.LogisticsSelected({value:1});
+    async checktab(index) {
+      this.LogisticsId = index;
+      if (this.LogisticsId != 1) {
+        this.this.DistributionId = 0;
+      } else {
+        if(this.DistributionMode==null||this.DistributionMode.length==0)
+        {
+          var rep = await this.$ShoppingAPI.GetDistributionMode({
+            LogisticsId:this.LogisticsId 
+          });
+          if (rep.ret == 0) {
+            this.DistributionMode = rep.data;
+          }
+        }
       }
     },
-    Show(){
-      this.show=!this.show
+    Show() {
+      this.show = !this.show;
     },
-    // 点击以往地址
+    // 显示以往地址
     BeforeSite() {
       this.beforeSite = !this.beforeSite;
     },
-    //新建地址 
-    // addsite() {
-    //   this.show_site= !this.show_site
-    // },
-    // 确定
-    confirm() {
-      if (this.Freight) {
+    //确认按钮事件
+    async confirm() {
         var _l = this.LogisticsMode.find(
           item => item.LogisticsId == this.LogisticsId
         );
-        this.SelectLogistics({
-          sId: this.sId,
-          Logistics: {
-            LogisticsId: _l.LogisticsId,
-            Order_Address_Id: this.Order_Address_Id,
-            Name: _l.Name,
-            DistributionMode: {
-              DistributionModeId: this.DistributionModeSelected
-                .DistributionModeId,
-              DistributionModeText: this.DistributionModeSelected
-                .DistributionModeText
-            },
-            FreightInfo: this.Freight
+        
+        if (this.LogisticsId == 0) {
+          //每次提交保存地址
+          this.contact2.Address="自提无视";//Address必填...写入占位符不然会报错
+          this.contact2.Latitude = this.CurrentLocation.latitude;
+          this.contact2.Longitude = this.CurrentLocation.longitude;
+          var rep = await this.$ShoppingAPI.OrderAddress_Add(this.contact2,this.LogisticsId);
+          if(rep.ret!=0)
+          {
+            //请求失败
+          }else{
+            //请求成功把返回的data作为Order_Address_Id值保存
+            this.SelectLogistics({
+                sId: this.sId,
+                Logistics: {
+                  LogisticsId: _l.LogisticsId,
+                  Order_Address_Id: rep.data,
+                  Name: _l.Name,
+                  DistributionMode: {
+                    DistributionModeId: 0
+                  },
+                }
+              });
           }
-        });
+        }else if(this.LogisticsId == 2)
+        {
+          this.contact.Latitude = this.CurrentLocation.latitude;
+          this.contact.Longitude = this.CurrentLocation.longitude;
+          //每次提交保存地址
+          var rep = await this.$ShoppingAPI.OrderAddress_Add(this.contact,this.LogisticsId);
+          if(rep.ret!=0)
+          {
+            //请求失败
+          }else{
+            //请求成功把返回的data作为Order_Address_Id值保存
+            this.SelectLogistics({
+                sId: this.sId,
+                Logistics: {
+                  LogisticsId: _l.LogisticsId,
+                  Order_Address_Id: rep.data,
+                  Name: _l.Name,
+                  DistributionMode: {
+                    DistributionModeId: 0
+                  },
+                }
+              });
+          }
+        }else if(this.LogisticsId == 1)
+        {
+          this.SelectLogistics({
+              sId: this.sId,
+              Logistics: {
+                LogisticsId: _l.LogisticsId,
+                Order_Address_Id: this.Order_Address_Id,
+                Name: _l.Name,
+                DistributionMode: {
+                  DistributionModeId: this.DistributionModeSelected
+                    .DistributionModeId,
+                  DistributionModeText: this.DistributionModeSelected
+                    .DistributionModeText
+                },
+                FreightInfo: this.Freight
+              }
+            });
+        }
+
         this.$router.back();
-      }
     },
     // 地址
     tabClick(e) {
@@ -280,27 +335,14 @@ export default {
     addressChecked(item) {
       this.Order_Address_Id = item.Order_Address_Id;
       this.openaddress();
-      this.beforeSite=false;
-    },
-
-    async LogisticsSelected(selectitem) {
-      this.LogisticsId = selectitem.value;
-      if (this.LogisticsId == 0) {
-        this.DistributionMode = 0;
-        this.QueryFreight();
-      } else {
-        var rep = await this.$ShoppingAPI.GetDistributionMode({
-        
-          LogisticsId: selectitem.value
-        });
-        if (rep.ret == 0) {
-          this.DistributionMode = rep.data;
-        }
-      }
+      this.beforeSite = false;
     },
     DistributionSelected(selectitem) {
-      this.DistributionId = selectitem.value;
-      this.QueryFreight();
+      if(this.DistributionId != selectitem.value)
+      {
+        this.DistributionId = selectitem.value;
+        this.QueryFreight();
+      }
     },
     async QueryFreight() {
       if (
@@ -327,6 +369,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      CurrentLocation: state => state.User.CurrentLocation
+    }),
     DistributionModeSelected() {
       if (this.DistributionMode && this.DistributionMode.length > 0) {
         if (this.DistributionId == 0) return this.DistributionMode[0];
@@ -363,22 +408,13 @@ export default {
           this.Order_Address_Id = this.UserAddress[0].Order_Address_Id;
           return this.UserAddress[0];
         }
-      }else
-      {
+      } else {
         return {};
       }
     },
-      UserAddress(){
+    UserAddress() {
       return this.$store.state.UserAddress.UserAddressList;
     },
-    LogisticsModeMap() {
-      if (this.LogisticsMode)
-        return this.LogisticsMode.map(item => {
-          return { text: item.Name, value: item.LogisticsId };
-        });
-      else return [];
-    },
-
     DistributionModeMap() {
       if (this.DistributionMode)
         return this.DistributionMode.map(item => {
@@ -394,31 +430,39 @@ export default {
     myDrop
   },
   async mounted() {
-
-
     if (this.$route.query && this.$route.query.sId.length > 0) {
       // 接收店铺id参数
       this.sId = this.$route.query.sId;
 
       // 物流参数接口
-      var rep = await this.$ShoppingAPI.GetLogisticsMode({sId: this.sId});
+      var rep = await this.$ShoppingAPI.GetLogisticsMode({ sId: this.sId });
       this.LogisticsMode = rep.data;
-      
-      //获取订单地址
+
+      //获取用户收货地址
       this.GetUserAddressList();
-      
+
+      //获取自行提取的联系方式
+      var rep = await this.$ShoppingAPI.OrderAddress_Get({ LogisticsId: 0 });
+        if(rep.data&&rep.data.length>0)
+          this.contact2 = rep.data[0];
+
       //物流模式数组大于2说明有尊享配送，默认选择
-      if(this.LogisticsMode.length>2)
-      {
-        this.LogisticsSelected({ value:2 });
-      }else
-      {
-        this.LogisticsSelected({ value:1 });
+      if (this.LogisticsMode.length > 2) {
+        //默认选中尊享配送
+        this.checktab(2);
+        //获取尊享配送的收货地址
+        var rep = await this.$ShoppingAPI.OrderAddress_Get({ LogisticsId: 2 });
+        if(rep.data&&rep.data.length>0)
+          this.contact = rep.data[0];
+      } else {
+        //默认选中自行提取
+        this.checktab(0);
       }
 
+      //获取店铺详情,用于计算运费
       var rep3 = await this.$ShoppingAPI.Shop_GetDetails({
         sId: this.sId
-      }); //获取店铺详情
+      }); 
       if (rep3.ret == 0) {
         this.shopDetail = rep3.data;
       }
@@ -428,10 +472,10 @@ export default {
 </script>
 <style>
 page {
-  background-color: #f9f9f9
+  background-color: #f9f9f9;
 }
-.drop .drop-selected .drop-label{
-  font-size:0.36rem;
+.drop .drop-selected .drop-label {
+  font-size: 0.36rem;
 }
 </style>
 <style scoped>
@@ -464,15 +508,15 @@ page {
 }
 .top-two {
   width: 10.2rem;
-  background-color:#fff;
+  background-color: #fff;
   border-radius: 0.2rem;
   margin: 0 0.3rem;
   margin-top: -0.9rem;
   z-index: 1;
 }
 .content {
-  padding-top: 0.73rem;
-  padding-bottom: 0.73rem;
+  padding-top: 0.57rem;
+  padding-bottom: 0.36rem;
   margin-left: 0.77rem;
   display: flex;
   align-items: center;
@@ -488,14 +532,14 @@ page {
   border: 0.01rem solid #666666;
 }
 .imgNr {
-  width: 7.96rem;
-  height: 0.54rem;
+  width: 8.55rem;
+  height: 0.74rem;
   background-repeat: no-repeat;
   margin-left: 0.38rem;
 }
 .contentNr img {
-  width: 8.67rem;
-  height: 0.73rem;
+  width: 100%;
+  height: 3.8rem;
   background-repeat: no-repeat;
   margin-left: 0.25rem;
 }
@@ -529,7 +573,7 @@ page {
   font-size: 0.31rem;
   color: #666666;
 }
-.spanBr{
+.spanBr {
   width: 2rem;
   font-size: 0.42rem;
   color: #535355;
@@ -545,7 +589,7 @@ page {
   width: 3.5rem;
   border-radius: 0.1rem;
   border: solid 0.02rem #bfbfbf;
-  padding-left: 0.2rem;
+  padding: 0.29rem 0 0.27rem 0.38rem;
   font-size: 0.4rem;
 }
 .top-three {
@@ -681,9 +725,8 @@ page {
   background-color: #12b7f5;
   border-radius: 0.16rem;
   color: #ffffff;
-  margin-top: 0.5rem!important;
+  margin-top: 0.5rem !important;
   margin: auto;
-  
 }
 .siteDetails {
   margin: 0.4rem 0.32rem auto;
@@ -725,8 +768,8 @@ page {
   margin-top: 0.3rem;
   overflow: hidden;
   display: flex;
-  align-items: center
-  }
+  align-items: center;
+}
 .xaingqing div {
   width: 1.06rem;
   height: 0.47rem;
@@ -861,10 +904,8 @@ page {
   padding: 0.2rem;
   font-size: 0.3rem;
   color: #ffffff;
-  background-image: linear-gradient(270deg, 
-		#fe3c16 0%, 
-		#fe7316 100%);
-	border-radius: 0.05rem;
+  background-image: linear-gradient(270deg, #fe3c16 0%, #fe7316 100%);
+  border-radius: 0.05rem;
   float: left;
 }
 .b {

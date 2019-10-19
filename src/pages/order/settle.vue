@@ -23,15 +23,15 @@
             <div class="orderinfo-item">商品金额
                 <span>￥{{getShoppingCarAmountBysId}}</span>
             </div>
-            <div class="orderinfo-item" @click="go({path:'/pages/order/logistics',query:{sId:sId}})">配送方式
+            <div class="orderinfo-item" @click="go({path:'/pages/order/distribution',query:{sId:sId}})">配送方式
                 <span v-if="!Logistics.Name" >请选择<span class="icon">&#xe601;</span></span>
-                <span v-else >{{Logistics.LogisticsId?Logistics.Name:Logistics.DistributionMode.DistributionModeText}}</span>
+                <span v-else >{{Logistics.LogisticsId==1?Logistics.Name+"："+Logistics.DistributionMode.DistributionModeText:Logistics.Name}} , 点击重选</span>
             </div>
             <div class="orderinfo-item">送货路程
-                <span>{{Logistics.FreightInfo?Logistics.FreightInfo.distance.text:''}}</span>
+                <span>{{Logistics.FreightInfo?Logistics.FreightInfo.distance.text:'0.0'}}</span>
             </div>
             <div class="orderinfo-item">运费总计
-                <span>￥{{Logistics.FreightInfo?Logistics.FreightInfo.Freight:''}}</span>
+                <span>￥{{Logistics.FreightInfo?Logistics.FreightInfo.Freight:'0.00'}}</span>
             </div>
             <div class="orderinfo-item">买家留言：<input type="text" class="left" v-model="Remarks" placeholder="对商品有什么期待，快跟商家说说吧~" /></div>
             <div class="orderinfo-item">实际支付：
@@ -62,8 +62,10 @@ export default {
       'ShoppingCarEmpty'
     ]),
    async pay(){
-      if(this.getShoppingCarBysId.Logistics.FreightInfo&&this.getShoppingCarGoods.length>0)
+     console.log(this.getShoppingCarBysId.Logistics,this.getShoppingCarGoods.length)
+      if(this.getShoppingCarBysId.Logistics&&this.getShoppingCarGoods.length>0)
       {
+        console.log("进来了")
          var rep = await  this.$ShoppingAPI.Order_Create({
             LogisticsMode:this.Logistics.LogisticsId,
             DistributionModeId:this.Logistics.DistributionMode.DistributionModeId,
