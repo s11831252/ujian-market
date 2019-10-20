@@ -150,7 +150,7 @@
               </li>
             </ul>
             <ul class="hang">
-              <li>
+              <li style="display:none">
                 <span class="left">配送优惠：</span>
                 <div style="float:right">
                   <div class="icon rightNr">&#xe617; 30元优惠券</div>
@@ -522,6 +522,7 @@ page {
   align-items: center;
 }
 .imgBr {
+
   width: 0.4rem;
   height: 0.4rem;
 }
@@ -589,7 +590,7 @@ page {
   width: 3.5rem;
   border-radius: 0.1rem;
   border: solid 0.02rem #bfbfbf;
-  padding: 0.29rem 0 0.27rem 0.38rem;
+  padding-left: 0.3rem;
   font-size: 0.4rem;
 }
 .top-three {
