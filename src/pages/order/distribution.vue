@@ -1,22 +1,21 @@
 <template>
   <div>
     <div class="top-one">
-      <span v-if="LogisticsMode.length>0" :class="[LogisticsId==1||LogisticsId==2?'pitchOn':'']" @click="checktab(LogisticsMode[0].LogisticsId)">{{LogisticsMode[0].Name}}</span>
-      <span v-if="LogisticsMode.length>1" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
+      <span v-if="LogisticsMode&&LogisticsMode.length>0" :class="[LogisticsId==1||LogisticsId==2?'pitchOn':'']" @click="checktab(LogisticsMode[0].LogisticsId)">{{LogisticsMode[0].Name}}</span>
+      <span v-if="LogisticsMode&&LogisticsMode.length>1" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
     </div>
     <div v-show="LogisticsId==1||LogisticsId==2">
       <div class="top-two">
-        <div class="content">
+        <div class="content"  @click="checktab(2)">
           <!-- 选中 -->
           <img class="imgBr" v-if="LogisticsId==2" src="/static/img/选中拷贝.png" alt>
           <!-- 未选中 -->
-          <div class="tuoyuan" v-else @click="checktab(2)"></div>
+          <div class="tuoyuan" v-else></div>
           <!-- 尊享图 -->
-          <img class="imgNr" src="http://192.168.0.119:802/baseConfig/03.png" alt>
+          <img class="imgNr" :src="DistributionMode2.length>0?DistributionMode2[0].DistributionModeText:''" alt>
         </div>
         <div class="contentNr" v-if="LogisticsId==2">
-          <img src="http://192.168.0.119:802/baseConfig/06.png" alt>
-          <p>下单后，将有专属配送服务司机联系您，请您保持手机畅通</p>
+          <img :src="DistributionMode2.length>1?DistributionMode2[1].DistributionModeText:''" alt>
           <div class="xinxibox">
             <div class="xinxi">
               <span class="spanBr">姓&#12288;&#12288;名:</span>
@@ -38,11 +37,11 @@
       </div>
       <!-- 计费配送 -->
       <div class="top-three">
-        <div class="charging">
+        <div class="charging" @click="checktab(1)">
           <!--选中  -->
           <img class="bb" v-if="LogisticsId==1" src="/static/img/选中拷贝.png" alt>
           <!-- 椭圆未选中 -->
-          <div class="aa" v-else @click="checktab(1)"></div>
+          <div class="aa" v-else></div>
           <span>计费配送</span>
         </div>
         <div v-show="LogisticsId==1">
@@ -96,8 +95,8 @@
               <span class="name">{{OrderAddress.Name}}</span>
               <span class="tel">{{OrderAddress.Phone}}</span>
               <div class="xaingqing">
-                <span>{{OrderAddress.Address}}</span>
-                <div>默认</div>
+                <span>{{OrderAddress.Address}}<div v-if="OrderAddress.IsDefault" >默认</div></span>
+                
               </div>
             </div>
             <div class="makeSite" @click="BeforeSite">使用以往地址</div>
@@ -136,20 +135,20 @@
             </ul>
           </div>
           <!-- 结算 -->
-          <div class="payment">
-            <ul class="hang" v-if="Freight">
+          <div class="payment" v-if="Freight">
+            <ul class="hang">
               <li>
                 <span class="left">送货距离：</span>
                 <span class="right">{{Freight.distance.text}}km</span>
               </li>
             </ul>
-            <ul class="hang" v-if="Freight">
+            <ul class="hang">
               <li>
                 <span class="left">当前运费：</span>
                 <span class="right">¥{{Freight.Freight}}</span>
               </li>
             </ul>
-            <ul class="hang">
+            <!-- <ul class="hang">
               <li style="display:none">
                 <span class="left">配送优惠：</span>
                 <div style="float:right">
@@ -157,11 +156,11 @@
                   <b class="icon b">&#xe601;</b>
                 </div>
               </li>
-            </ul>
+            </ul> -->
             <ul class="hang">
               <li>
                 <span class="left">实际支付：</span>
-                <span class="right-r">¥55.00</span>
+                <span class="right-r">¥{{Freight.Freight}}</span>
               </li>
             </ul>
           </div>
@@ -197,6 +196,7 @@ export default {
       DistributionId: 0,
       LogisticsId: 2,
       DistributionMode: [],
+      DistributionMode2:[],
       Order_Address_Id: "",
       activeIndex: 0,
       shopDetail: {},
@@ -450,13 +450,25 @@ export default {
       if (this.LogisticsMode.length > 2) {
         //默认选中尊享配送
         this.checktab(2);
+
+
         //获取尊享配送的收货地址
         var rep = await this.$ShoppingAPI.OrderAddress_Get({ LogisticsId: 2 });
         if(rep.data&&rep.data.length>0)
           this.contact = rep.data[0];
+
+        var rep = await this.$ShoppingAPI.GetDistributionMode({
+            LogisticsId:2,
+            sId:this.sId
+          });
+        if(rep.ret==0)
+        {
+          this.DistributionMode2=rep.data;
+          console.log(this.DistributionMode2);
+        }
       } else {
         //默认选中自行提取
-        this.checktab(0);
+        this.checktab(1);
       }
 
       //获取店铺详情,用于计算运费
@@ -473,8 +485,9 @@ export default {
 <style>
 page {
   background-color: #f9f9f9;
+  padding-bottom: 1rem;
 }
-.drop .drop-selected .drop-label {
+.drop .drop-selected .drop-label ,.drop .drop-option{
   font-size: 0.36rem;
 }
 </style>
@@ -516,13 +529,12 @@ page {
 }
 .content {
   padding-top: 0.57rem;
-  padding-bottom: 0.36rem;
+  padding-bottom: 0.61rem;
   margin-left: 0.77rem;
   display: flex;
   align-items: center;
 }
 .imgBr {
-
   width: 0.4rem;
   height: 0.4rem;
 }
@@ -530,11 +542,11 @@ page {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  border: 0.01rem solid #666666;
+  border: 0.05rem solid #666666;
 }
 .imgNr {
   width: 8.55rem;
-  height: 0.74rem;
+  height: 0.84rem;
   background-repeat: no-repeat;
   margin-left: 0.38rem;
 }
@@ -553,7 +565,7 @@ page {
   white-space: nowrap;
 }
 .xinxibox {
-  margin-top: 0.7rem;
+  margin-top: 0.68rem;
   padding-bottom: 0.7rem;
 }
 /* 自行取货样式 */
@@ -590,7 +602,7 @@ page {
   width: 3.5rem;
   border-radius: 0.1rem;
   border: solid 0.02rem #bfbfbf;
-  padding-left: 0.3rem;
+  padding: 0.28rem 0 0.28rem 0.38rem;
   font-size: 0.4rem;
 }
 .top-three {
@@ -617,7 +629,7 @@ page {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  border: 0.01rem solid #666666;
+  border: 0.05rem solid #666666;
   margin-left: 0.77rem;
 }
 /* 选中 */
@@ -705,7 +717,7 @@ page {
   color: #12b7f5;
   padding: 0.1rem;
   border-radius: 0.05rem;
-  border: solid 0.01rem #12b7f5;
+  border: solid 0.05rem #12b7f5;
   margin-left: 5.7rem;
 }
 /* .addSite {
@@ -771,14 +783,15 @@ page {
   display: flex;
   align-items: center;
 }
+.xaingqing span{
+line-height: 0.47rem;
+}
 .xaingqing div {
-  width: 1.06rem;
-  height: 0.47rem;
+  padding: 0.07rem 0.18rem;
   text-align: center;
-  line-height: 0.47rem;
-  background-color: #b1b2b4;
+  background-color: #e7e8e8;
   color: #8c8c8c;
-  float: right;
+  display: inline;
 }
 .makeSite {
   width: 2.3rem;
@@ -926,6 +939,7 @@ page {
   text-align: center;
   line-height: 1rem;
   background-color: #12b7f5;
+  color:#fff;
   border-radius: 0.2rem;
   margin: 1rem auto;
 }

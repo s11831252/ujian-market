@@ -25,7 +25,7 @@
             </div>
             <div class="orderinfo-item" @click="go({path:'/pages/order/distribution',query:{sId:sId}})">配送方式
                 <span v-if="!Logistics.Name" >请选择<span class="icon">&#xe601;</span></span>
-                <span v-else >{{Logistics.LogisticsId==1?Logistics.Name+"："+Logistics.DistributionMode.DistributionModeText:Logistics.Name}} , 点击重选</span>
+                <span v-else >{{Logistics.LogisticsId==1?Logistics.Name+"："+Logistics.DistributionMode.DistributionModeText:Logistics.Name}} <span class="icon">&#xe601;</span></span>
             </div>
             <div class="orderinfo-item">送货路程
                 <span>{{Logistics.FreightInfo?Logistics.FreightInfo.distance.text:'0.0'}}</span>
