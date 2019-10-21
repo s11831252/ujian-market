@@ -170,8 +170,9 @@ export default {
     }
   },
   onShareAppMessage(result) {
+    debugger;
     let title = this.shopDetail.sName;
-    let path = `/pages/shop/index?sId=${this.sId}&InvitaId=${UserInfo.UserId}`;
+    let path = `/pages/shop/index?sId=${this.sId}&InvitaId=${this.UserInfo.UserId}`;
     let imageUrl = '/static/img/share.png'
     return {
       title,

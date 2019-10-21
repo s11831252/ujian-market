@@ -30,7 +30,7 @@ import consult from './pages/service/consult'
 import storePage from './pages/store/storePage'
 import service from './pages/store/service'
 import dialogBox from './pages/store/dialogBox'
-import distribution from 'pages/order/distribution'
+import distribution from './pages/order/distribution'
 
 
 import store from './store'
@@ -354,7 +354,7 @@ var routes = [
             navigationBarTitleText: '物流选择',
             enablePullDownRefresh: false
         },
-        alias: '/pages/store/distribution',
+        alias: '/pages/order/distribution',
         component: distribution
     }
 ]

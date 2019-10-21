@@ -3,7 +3,7 @@
   <div class="index">
     <!--banner-->
     <div class="banner">
-      <img src="static/img/banner.png" alt>
+      <img src="/static/img/banner.png" alt>
     </div>
     <!--main-->
     <div class="main">

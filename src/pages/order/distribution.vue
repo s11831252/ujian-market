@@ -8,7 +8,7 @@
       <div class="top-two">
         <div class="content"  @click="checktab(2)">
           <!-- 选中 -->
-          <img class="imgBr" v-if="LogisticsId==2" src="/static/img/选中拷贝.png" alt>
+          <img class="imgBr" v-if="LogisticsId==2" src="/static/img/check.png" alt>
           <!-- 未选中 -->
           <div class="tuoyuan" v-else></div>
           <!-- 尊享图 -->
@@ -39,7 +39,7 @@
       <div class="top-three">
         <div class="charging" @click="checktab(1)">
           <!--选中  -->
-          <img class="bb" v-if="LogisticsId==1" src="/static/img/选中拷贝.png" alt>
+          <img class="bb" v-if="LogisticsId==1" src="/static/img/check.png" alt>
           <!-- 椭圆未选中 -->
           <div class="aa" v-else></div>
           <span>计费配送</span>
@@ -232,7 +232,7 @@ export default {
     async checktab(index) {
       this.LogisticsId = index;
       if (this.LogisticsId != 1) {
-        this.this.DistributionId = 0;
+        // this.DistributionId = 0;
       } else {
         if(this.DistributionMode==null||this.DistributionMode.length==0)
         {
@@ -438,19 +438,10 @@ export default {
       var rep = await this.$ShoppingAPI.GetLogisticsMode({ sId: this.sId });
       this.LogisticsMode = rep.data;
 
-      //获取用户收货地址
-      this.GetUserAddressList();
-
-      //获取自行提取的联系方式
-      var rep = await this.$ShoppingAPI.OrderAddress_Get({ LogisticsId: 0 });
-        if(rep.data&&rep.data.length>0)
-          this.contact2 = rep.data[0];
-
       //物流模式数组大于2说明有尊享配送，默认选择
       if (this.LogisticsMode.length > 2) {
         //默认选中尊享配送
         this.checktab(2);
-
 
         //获取尊享配送的收货地址
         var rep = await this.$ShoppingAPI.OrderAddress_Get({ LogisticsId: 2 });
@@ -464,12 +455,19 @@ export default {
         if(rep.ret==0)
         {
           this.DistributionMode2=rep.data;
-          console.log(this.DistributionMode2);
         }
       } else {
         //默认选中自行提取
         this.checktab(1);
       }
+
+      //获取自行提取的联系方式
+      var rep = await this.$ShoppingAPI.OrderAddress_Get({ LogisticsId: 0 });
+        if(rep.data&&rep.data.length>0)
+          this.contact2 = rep.data[0];
+
+      //获取用户收货地址
+       this.GetUserAddressList();
 
       //获取店铺详情,用于计算运费
       var rep3 = await this.$ShoppingAPI.Shop_GetDetails({
@@ -656,6 +654,7 @@ page {
   margin-left: 0.45rem;
 }
 .carNr span {
+  font-size:0.4rem;
   margin-right: 2.69rem;
 }
 .car p {
@@ -784,21 +783,21 @@ page {
   align-items: center;
 }
 .xaingqing span{
-line-height: 0.47rem;
+line-height: 0.49rem;
 }
 .xaingqing div {
   padding: 0.07rem 0.18rem;
   text-align: center;
   background-color: #e7e8e8;
   color: #8c8c8c;
-  display: inline;
+  display: inline-block;
 }
 .makeSite {
   width: 2.3rem;
   height: 0.55rem;
   background-color: #f7fff5;
   border-radius: 0.05rem;
-  border: solid 0.01rem #59d178;
+  border: solid 0.05rem #59d178;
   font-size: 0.32rem;
   line-height: 0.55rem;
   text-align: center;
@@ -933,6 +932,8 @@ line-height: 0.47rem;
   float: right;
 }
 .queding {
+  position: relative;
+  display: block;
   width: 5rem;
   height: 1rem;
   font-size: 0.5rem;
@@ -940,6 +941,7 @@ line-height: 0.47rem;
   line-height: 1rem;
   background-color: #12b7f5;
   color:#fff;
+  border:none;
   border-radius: 0.2rem;
   margin: 1rem auto;
 }
