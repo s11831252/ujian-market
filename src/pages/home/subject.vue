@@ -20,7 +20,7 @@
       </div>
       <!--推荐店铺-->
       <div class="tjdp">
-        <img src="static/img/tjdp_nav.png" alt>
+        <img src="/static/img/tjdp_nav.png" alt>
         <ul>
           <li v-for="(item,index) in RecommendList" :key="index" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
             <img :src="item.sLogo" alt>
@@ -34,7 +34,7 @@
       </div>
       <!--附近商家-->
       <div class="fjsj">
-        <img src="static/img/fjsj.png" alt>
+        <img src="/static/img/fjsj.png" alt>
         <div v-for="(item,index) in NearbyList" :key="index" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
           <div class="nr">
             <div class="f1">
@@ -57,7 +57,7 @@
           <div class="bor">
             <ul>
               <li v-for="(item2,index2) in item.Goods_list" :key="index2" v-if="index2<3" @click.stop="go({path:'/pages/shop/detail',query:{sId:item.sId,gId:item2.gId}})">
-                  <img v-if="item2.Images.length>0" :src="item2.Images[0].Thumbnail_url" alt>
+                  <img v-if="item2.Images&&item2.Images.length>0" :src="item2.Images[0].Thumbnail_url" alt>
                   <img v-else src="">
                   <p>{{item2.gName}}</p>
                   <p>
