@@ -85,7 +85,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -110,7 +110,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -135,7 +135,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -160,7 +160,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}米</span>
+                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -445,12 +445,12 @@ export default {
 <style  lang="less" scoped>
 .page {
   background: #ecf0f1;
-  padding-top: 42px;
+  padding-top: 1.27rem;
 }
 .search {
   background-color: #12b7f5;
   width: 100%;
-  height: 42px;
+  height: 1.27rem;
   display: flex;
   align-items: center;
   position: fixed;
@@ -462,16 +462,16 @@ export default {
   div {
     display: flex;
     align-items: center;
-    height: 30px;
+    height: 0.8rem;
     justify-content: center;
     flex: 1;
-    border: solid 1px #d0f1fd;
+    border: solid 0.02rem #d0f1fd;
     border-radius: 0.5rem;
     color: #d0f1fd;
     margin: 0 10%;
     i,
     span {
-      font-size: 14px;
+      font-size: 0.4rem;
     }
   }
 }
@@ -481,15 +481,16 @@ export default {
 }
 .box {
   background: #fff;
-  margin-bottom: 10px;
+  margin-bottom: 0.27rem;
   .box-head {
-    padding: 10px;
-    border-bottom: 1px solid @borderColor;
+    background-color: #ffffff;
+    padding: 0.35rem 0.35rem 0;
+    // border-bottom: 0.01rem solid @borderColor;
     p {
       color: #12b7f5;
       font-size: 0.4rem;
       span {
-        padding-left: 10px;
+        padding-left: 0.26rem;
         color: #7f8699;
         font-size: 0.35rem;
       }
@@ -497,15 +498,17 @@ export default {
   }
 }
 .news {
-  padding: 10px;
+  padding: 0.37rem;
+  margin-top: 0.27rem
 }
 .news p {
-  border-left: 2px solid #12b7f5;
-  padding-left: 5px;
+  border-left: 0.09rem solid #12b7f5;
+  padding-left: 0.26rem;
   font-size: 0.4rem;
+  border-radius: 0.04rem;
 }
 .category {
-  margin: 10px;
+  margin: 0.3rem;
 }
 .category li {
   display: inline-block;
@@ -513,24 +516,24 @@ export default {
   width: 25%;
 }
 .category li img {
-  width: 80px;
-  height: 80px;
+  width: 2.47rem;
+  height: 2.47rem;
 }
 @borderColor: #ecf0f1;
 .service {
   .Primary {
-    border-bottom: 1px solid @borderColor;
+    border-bottom: 0.01rem solid @borderColor;
     li {
       display: inline-block;
       text-align: center;
       width: 49.5%;
       img {
         width: 100%;
-        height: 118px;
+        height: 3.35rem;
       }
     }
     li:nth-of-type(odd) {
-      border-right: 1px solid @borderColor;
+      border-right: 0.01rem solid @borderColor;
     }
   }
   .Secondary li {
@@ -539,16 +542,16 @@ export default {
     width: 25%;
     img {
       width: 100%;
-      height: 120px;
+      height: 3.24rem
     }
   }
 }
 
 .navbar {
-  height: 40px;
-  line-height: 40px;
+  height: 1.09rem;
+  line-height: 1.09rem;
   width: 100%;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 0.01rem solid #ccc;
   position: relative;
   font-size: 0.41rem;
 }
@@ -574,7 +577,7 @@ export default {
   left: 0;
   // bottom: 0;
   width: 25%;
-  height: 2px;
+  height: 0.02rem;
   background-color: #12b7f5;
   -webkit-transition: -webkit-transform 0.1s;
   transition: -webkit-transform 0.1s;
@@ -599,8 +602,8 @@ export default {
   .nearby-location {
     font-size: 0.4rem;
     color: #6b6b6b;
-    border-bottom: 1px solid @borderColor;
-    padding: 10px;
+    border-bottom: 0.01rem solid @borderColor;
+    padding: 0.35rem;
     .icon,
     p {
       display: inline;
@@ -608,11 +611,10 @@ export default {
   }
   .nearby-merchants {
     .nearby-merchants-list {
-      margin-top: 10px;
-      margin: 10px;
+      margin: 0.4rem;
       .shop-item {
         position: relative;
-        margin-top: 10px;
+        margin-top: 0.4rem;
         .shop-item-logo {
           // width: 25%;
           img {
@@ -621,7 +623,7 @@ export default {
             width: 2.3rem;
             height: 2.3rem;
             border-radius: 10%;
-            border: 1px solid #d7d7d7;
+            border: 0.01rem solid #d7d7d7;
           }
         }
         .shop-item-info-distance {
@@ -634,9 +636,9 @@ export default {
           width: 66%;
 
           .shop-item-info-name {
-            font-size: 16px;
+            font-size: 0.44rem;
             color: #021218;
-            margin-bottom: 10px;
+            margin-bottom: 0.4rem;
             width: 80%;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -645,7 +647,7 @@ export default {
 
           .shop-item-info-score {
             color: #5c5c5c;
-            margin-bottom: 10px;
+            margin-bottom: 0.4rem;
             span {
               color: #ff5252;
             }
@@ -655,7 +657,7 @@ export default {
           }
           .shop-item-info-score,
           .shop-item-info-maintype {
-            font-size: 14px;
+            font-size: 0.38rem;
           }
         }
         .shop-item-logo,
