@@ -6,16 +6,23 @@
         <span>搜索</span>
       </div>
     </div>
-    <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
+    <swiper
+      v-if="isMP"
+      class="swiper"
+      indicator-dots="true"
+      autoplay="true"
+      interval="5000"
+      duration="1000"
+    >
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <swiper-item>
-          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill">
+          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill" />
         </swiper-item>
       </block>
     </swiper>
     <swiper v-else ref="mySwiper" :options="swiperOption">
       <swiper-slide v-for="(item, index) in Market.Banners" :index="index" :key="index">
-        <img :src="item.ImageUrl" class="slide-image">
+        <img :src="item.ImageUrl" class="slide-image" />
       </swiper-slide>
       <!-- Optional controls -->
       <div class="swiper-pagination" slot="pagination"></div>
@@ -29,7 +36,7 @@
         :key="index"
         @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})"
       >
-        <img :src="item.ImageUrl" :title="item.Title">
+        <img :src="item.ImageUrl" :title="item.Title" />
       </li>
     </ul>
     <div class="box service" v-if="false">
@@ -42,12 +49,12 @@
       <div class="box-body">
         <ul class="Primary">
           <li v-for="(item,index) in Market.Service.Primary" :key="index">
-            <img :src="item.ImageUrl" :title="item.Title">
+            <img :src="item.ImageUrl" :title="item.Title" />
           </li>
         </ul>
         <ul class="Secondary">
           <li v-for="(item,index) in Market.Service.Secondary" :key="index">
-            <img :src="item.ImageUrl" :title="item.Title">
+            <img :src="item.ImageUrl" :title="item.Title" />
           </li>
         </ul>
       </div>
@@ -69,7 +76,14 @@
         </div>
         <div class="nearby-merchants">
           <ul class="navbar">
-            <li v-for="(item,index) in Tabs" :key="index" :id="index" :class="{'navbar_item_on':activeIndex == index}" class="navbar_item" @click="tabClick(item,$event)">
+            <li
+              v-for="(item,index) in Tabs"
+              :key="index"
+              :id="index"
+              :class="{'navbar_item_on':activeIndex == index}"
+              class="navbar_item"
+              @click="tabClick(item,$event)"
+            >
               <div class="navbar_title">{{item.name}}</div>
             </li>
           </ul>
@@ -78,14 +92,18 @@
             <div :hidden="activeIndex != 0">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
+                  <div
+                    class="shop-item"
+                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
+                  >
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo">
+                      <img :src="item.sLogo" />
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -103,14 +121,18 @@
             <div :hidden="activeIndex != 1">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
+                  <div
+                    class="shop-item"
+                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
+                  >
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo">
+                      <img :src="item.sLogo" />
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -128,14 +150,18 @@
             <div :hidden="activeIndex != 2">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
+                  <div
+                    class="shop-item"
+                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
+                  >
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo">
+                      <img :src="item.sLogo" />
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -153,14 +179,18 @@
             <div :hidden="activeIndex != 3">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
+                  <div
+                    class="shop-item"
+                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
+                  >
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo">
+                      <img :src="item.sLogo" />
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span class="shop-item-info-distance">{{item.Distance}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -209,6 +239,7 @@ export default {
       longitude: 0,
       LocationAddress: "",
       ShopList: [],
+      aa: [],
       Tabs: [
         {
           name: "综合",
@@ -307,6 +338,14 @@ export default {
       var rep = await this.$ShoppingAPI.Shop_Get(param);
       if (rep.ret == 0) {
         this.ShopList = rep.data;
+        if (rep.data && rep.data.length) {
+          for (let index = 0; index < rep.data.length; index++) {
+            if (rep.data[index].Distance >= 1000) {
+              rep.data[index].Distance =
+                (rep.data[index].Distance / 1000).toFixed(1) * 1000;
+            }
+          }
+        }
       }
     },
     ...mapMutations([
@@ -343,6 +382,10 @@ export default {
         if (rep.data && rep.data.length) {
           for (let index = 0; index < rep.data.length; index++) {
             const element = rep.data[index];
+            if (rep.data[index].Distance >= 1000) {
+              rep.data[index].Distance =
+                (rep.data[index].Distance / 1000).toFixed(1) * 1000;
+            }
 
             that.ShopList.push(element);
           }
@@ -403,33 +446,37 @@ export default {
             //   that.alert("您已拒绝地理位置授权");
             //   //用户决绝地理位置授权
             //   return;
-            // } else 
+            // } else
             // {
             // }
-              const myGeo = new BMap.Geocoder();
-              myGeo.getLocation(
-                new BMap.Point(r.point.lng, r.point.lat),
-                data => {
-                  if (data.addressComponents) {
-                    const result = data.addressComponents;
-                    const location = {
-                      creditLongitude: r.point.lat, // 经度
-                      creditLatitude: r.point.lng, // 纬度
-                      creditProvince: result.province || "", // 省
-                      creditCity: result.city || "", // 市
-                      creditArea: result.district || "", // 区
-                      creditStreet:
-                        (result.street || "") + (result.streetNumber || "") // 街道
-                    };
-                    // console.log(location);
-                    that.UpdateLocation({
-                      LocationAddress:location.creditProvince+location.creditCity+location.creditArea+location.creditStreet,
-                      latitude: location.lat,
-                      longitude: location.lng
-                    });
-                  }
+            const myGeo = new BMap.Geocoder();
+            myGeo.getLocation(
+              new BMap.Point(r.point.lng, r.point.lat),
+              data => {
+                if (data.addressComponents) {
+                  const result = data.addressComponents;
+                  const location = {
+                    creditLongitude: r.point.lat, // 经度
+                    creditLatitude: r.point.lng, // 纬度
+                    creditProvince: result.province || "", // 省
+                    creditCity: result.city || "", // 市
+                    creditArea: result.district || "", // 区
+                    creditStreet:
+                      (result.street || "") + (result.streetNumber || "") // 街道
+                  };
+                  // console.log(location);
+                  that.UpdateLocation({
+                    LocationAddress:
+                      location.creditProvince +
+                      location.creditCity +
+                      location.creditArea +
+                      location.creditStreet,
+                    latitude: location.lat,
+                    longitude: location.lng
+                  });
                 }
-              );
+              }
+            );
           }
         });
       });
@@ -499,7 +546,7 @@ export default {
 }
 .news {
   padding: 0.37rem;
-  margin-top: 0.27rem
+  margin-top: 0.27rem;
 }
 .news p {
   border-left: 0.09rem solid #12b7f5;
@@ -542,7 +589,7 @@ export default {
     width: 25%;
     img {
       width: 100%;
-      height: 3.24rem
+      height: 3.24rem;
     }
   }
 }
