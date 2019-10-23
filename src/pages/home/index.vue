@@ -492,8 +492,8 @@ export default {
                       location.creditCity +
                       location.creditArea +
                       location.creditStreet,
-                    latitude: location.lat,
-                    longitude: location.lng
+                      latitude: location.creditLongitude,
+                      longitude: location.creditLatitude
                   });
                 }
               }
