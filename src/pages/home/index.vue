@@ -73,6 +73,7 @@
             <span>{{CurrentLocation.LocationAddress}}</span>
           </p>
           <span class="icon">&#xe65e;</span>
+          <span class="icon Right">&#xe601;</span>
         </div>
         <div class="nearby-merchants">
           <ul class="navbar">
@@ -102,8 +103,14 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
-                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
+                        <span
+                          v-if="item.Distance<1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance}}m</span>
+                        <span
+                          v-if="item.Distance>=1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -131,8 +138,14 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
-                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
+                        <span
+                          v-if="item.Distance<1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance}}m</span>
+                        <span
+                          v-if="item.Distance>=1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -160,8 +173,14 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
-                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
+                        <span
+                          v-if="item.Distance<1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance}}m</span>
+                        <span
+                          v-if="item.Distance>=1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -189,8 +208,14 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
-                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
+                        <span
+                          v-if="item.Distance<1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance}}m</span>
+                        <span
+                          v-if="item.Distance>=1000"
+                          class="shop-item-info-distance"
+                        >{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -206,6 +231,7 @@
               </ul>
             </div>
           </div>
+          <!-- <div class="box_bottom">DUANG~已经到底了哦</div> -->
         </div>
       </div>
     </div>
@@ -293,6 +319,23 @@ export default {
     })
   },
   methods: {
+    async unit(param) {
+      var rep = await this.$ShoppingAPI.Shop_Get(param);
+      if (rep.ret == 0) {
+        if (rep.data && rep.data.length) {
+          for (let index = 0; index < rep.data.length; index++) {
+            const element = rep.data[index];
+            // debugger;
+            if (element.Distance >= 1000) {
+              element.Distance = (element.Distance / 1000).toFixed(1) * 1000;
+            }
+            this.ShopList.push(element);
+          }
+        }
+      }
+      return rep;
+    },
+
     openLocation() {
       var that = this;
       if (this.isMP) {
@@ -333,20 +376,10 @@ export default {
         param.Lon = this.CurrentLocation.longitude;
         param.Lat = this.CurrentLocation.latitude;
       }
-
+      //this.ShopList = rep.data;
+      this.ShopList = [];
       //获取满足条件的店铺
-      var rep = await this.$ShoppingAPI.Shop_Get(param);
-      if (rep.ret == 0) {
-        this.ShopList = rep.data;
-        if (rep.data && rep.data.length) {
-          for (let index = 0; index < rep.data.length; index++) {
-            if (rep.data[index].Distance >= 1000) {
-              rep.data[index].Distance =
-                (rep.data[index].Distance / 1000).toFixed(1) * 1000;
-            }
-          }
-        }
-      }
+      var rep = this.unit(param);
     },
     ...mapMutations([
       "UpdateLocation" //`this.$store.commit('UpdateLocation')`
@@ -377,21 +410,9 @@ export default {
         (param.Lon = this.CurrentLocation.longitude),
           (param.Lat = this.CurrentLocation.latitude);
       }
-      var rep = await this.$ShoppingAPI.Shop_Get(param);
-      if (rep.ret == 0) {
-        if (rep.data && rep.data.length) {
-          for (let index = 0; index < rep.data.length; index++) {
-            const element = rep.data[index];
-            if (rep.data[index].Distance >= 1000) {
-              rep.data[index].Distance =
-                (rep.data[index].Distance / 1000).toFixed(1) * 1000;
-            }
-
-            that.ShopList.push(element);
-          }
-        } else {
-          tab.parm.hasPage = false;
-        }
+      var rep = this.unit(param);
+      if (!rep.data || rep.data.length <= 0) {
+        tab.parm.hasPage = false;
       }
     }
   },
@@ -531,7 +552,7 @@ export default {
   margin-bottom: 0.27rem;
   .box-head {
     background-color: #ffffff;
-    padding: 0.35rem 0.35rem 0;
+    padding: 0.35rem 0 0 0.27rem;
     // border-bottom: 0.01rem solid @borderColor;
     p {
       color: #12b7f5;
@@ -647,21 +668,30 @@ export default {
 }
 .nearby {
   .nearby-location {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
     font-size: 0.4rem;
     color: #6b6b6b;
     border-bottom: 0.01rem solid @borderColor;
-    padding: 0.35rem;
+    padding: 0.32rem 0.33rem 0.34rem 0.28rem;
     .icon,
     p {
       display: inline;
     }
+    .Right {
+      font-size: 0.4rem;
+      padding-left: 0.16rem;
+    }
   }
   .nearby-merchants {
     .nearby-merchants-list {
-      margin: 0.4rem;
+      margin: 0rem 0.35rem 0rem 0.27rem;
       .shop-item {
         position: relative;
-        margin-top: 0.4rem;
+        padding-top: 0.46rem;
+        padding-bottom: 0.46rem;
+        border-bottom: 0.01rem solid #ecf0f1;
         .shop-item-logo {
           // width: 25%;
           img {
@@ -674,12 +704,13 @@ export default {
           }
         }
         .shop-item-info-distance {
+          font-size: 0.36rem;
           position: absolute;
           right: 0;
           color: #5c5c5c;
         }
         .shop-item-info {
-          padding-left: 8px;
+          padding-left: 0.33rem;
           width: 66%;
 
           .shop-item-info-name {
@@ -695,14 +726,15 @@ export default {
           .shop-item-info-score {
             color: #5c5c5c;
             margin-bottom: 0.4rem;
+            font-size: 0.36rem;
             span {
               color: #ff5252;
+              font-size: 0.4rem;
             }
           }
           .shop-item-info-maintype {
             color: #a2a2a2;
           }
-          .shop-item-info-score,
           .shop-item-info-maintype {
             font-size: 0.38rem;
           }
@@ -715,6 +747,13 @@ export default {
         }
       }
     }
+  }
+  .box_bottom {
+    height: 0.87rem;
+    background-color: rgba(18, 183, 245, 0.03);
+    font-size: 0.32rem;
+    text-align: center;
+    line-height: 0.87rem;
   }
 }
 </style>
