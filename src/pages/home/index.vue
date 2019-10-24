@@ -6,23 +6,16 @@
         <span>搜索</span>
       </div>
     </div>
-    <swiper
-      v-if="isMP"
-      class="swiper"
-      indicator-dots="true"
-      autoplay="true"
-      interval="5000"
-      duration="1000"
-    >
+    <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <swiper-item>
-          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill" />
+          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill">
         </swiper-item>
       </block>
     </swiper>
     <swiper v-else ref="mySwiper" :options="swiperOption">
       <swiper-slide v-for="(item, index) in Market.Banners" :index="index" :key="index">
-        <img :src="item.ImageUrl" class="slide-image" />
+        <img :src="item.ImageUrl" class="slide-image">
       </swiper-slide>
       <!-- Optional controls -->
       <div class="swiper-pagination" slot="pagination"></div>
@@ -36,7 +29,7 @@
         :key="index"
         @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})"
       >
-        <img :src="item.ImageUrl" :title="item.Title" />
+        <img :src="item.ImageUrl" :title="item.Title">
       </li>
     </ul>
     <div class="box service" v-if="false">
@@ -49,12 +42,12 @@
       <div class="box-body">
         <ul class="Primary">
           <li v-for="(item,index) in Market.Service.Primary" :key="index">
-            <img :src="item.ImageUrl" :title="item.Title" />
+            <img :src="item.ImageUrl" :title="item.Title">
           </li>
         </ul>
         <ul class="Secondary">
           <li v-for="(item,index) in Market.Service.Secondary" :key="index">
-            <img :src="item.ImageUrl" :title="item.Title" />
+            <img :src="item.ImageUrl" :title="item.Title">
           </li>
         </ul>
       </div>
@@ -77,40 +70,23 @@
         </div>
         <div class="nearby-merchants">
           <ul class="navbar">
-            <li
-              v-for="(item,index) in Tabs"
-              :key="index"
-              :id="index"
-              :class="{'navbar_item_on':activeIndex == index}"
-              class="navbar_item"
-              @click="tabClick(item,$event)"
-            >
+            <li v-for="(item,index) in Tabs" :key="index" :id="index" :class="{'navbar_item_on':activeIndex == index}" class="navbar_item" @click="tabClick(item,$event)">
               <div class="navbar_title">{{item.name}}</div>
             </li>
           </ul>
           <div class="navbar_slider" :class="navbarSliderClass"></div>
           <div class="nearby-merchants-list">
-            <div :hidden="activeIndex != 0">
+            <div>
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div
-                    class="shop-item"
-                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
-                  >
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo" />
+                      <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span
-                          v-if="item.Distance<1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance}}m</span>
-                        <span
-                          v-if="item.Distance>=1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance/1000}}km</span>
+                        <span class="shop-item-info-distance">{{item.Distance}}</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -125,27 +101,18 @@
                 </li>
               </ul>
             </div>
-            <div :hidden="activeIndex != 1">
+            <!-- <div :hidden="activeIndex != 1">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div
-                    class="shop-item"
-                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
-                  >
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo" />
+                      <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span
-                          v-if="item.Distance<1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance}}m</span>
-                        <span
-                          v-if="item.Distance>=1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance/1000}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -163,24 +130,15 @@
             <div :hidden="activeIndex != 2">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div
-                    class="shop-item"
-                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
-                  >
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo" />
+                      <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span
-                          v-if="item.Distance<1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance}}m</span>
-                        <span
-                          v-if="item.Distance>=1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance/1000}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -198,24 +156,15 @@
             <div :hidden="activeIndex != 3">
               <ul>
                 <li v-for="(item,index) in ShopList" :key="index">
-                  <div
-                    class="shop-item"
-                    @click="go({path:'/pages/shop/index',query:{sId:item.sId}})"
-                  >
+                  <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo" />
+                      <img :src="item.sLogo">
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         {{item.sName}}
-                        <span
-                          v-if="item.Distance<1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance}}m</span>
-                        <span
-                          v-if="item.Distance>=1000"
-                          class="shop-item-info-distance"
-                        >{{item.Distance/1000}}km</span>
+                        <span v-if="item.Distance<1000" class="shop-item-info-distance">{{item.Distance}}m</span>
+                        <span v-if="item.Distance>=1000" class="shop-item-info-distance">{{item.Distance/1000}}km</span>
                       </p>
                       <p class="shop-item-info-score">
                         店铺综合评分：
@@ -229,7 +178,7 @@
                   </div>
                 </li>
               </ul>
-            </div>
+            </div> -->
           </div>
           <!-- <div class="box_bottom">DUANG~已经到底了哦</div> -->
         </div>
@@ -239,7 +188,6 @@
 </template>
 <script>
 import { mapState, mapMutations } from "vuex";
-
 export default {
   data() {
     return {
@@ -327,9 +275,11 @@ export default {
             const element = rep.data[index];
             // debugger;
             if (element.Distance >= 1000) {
-              element.Distance = (element.Distance / 1000).toFixed(1) * 1000;
+              element.Distance = (element.Distance / 1000).toFixed(1) + "km";
+            } else {
+              element.Distance = element.Distance + "m";
             }
-            this.ShopList.push(element);
+            rep.data[index] = element;
           }
         }
       }
@@ -377,9 +327,10 @@ export default {
         param.Lat = this.CurrentLocation.latitude;
       }
       //this.ShopList = rep.data;
-      this.ShopList = [];
       //获取满足条件的店铺
-      var rep = this.unit(param);
+      var rep = await this.unit(param);
+
+      this.ShopList = rep.data;
     },
     ...mapMutations([
       "UpdateLocation" //`this.$store.commit('UpdateLocation')`
@@ -410,8 +361,10 @@ export default {
         (param.Lon = this.CurrentLocation.longitude),
           (param.Lat = this.CurrentLocation.latitude);
       }
-      var rep = this.unit(param);
-      if (!rep.data || rep.data.length <= 0) {
+      var rep = await this.unit(param);
+      if (rep.data || rep.data.length) {
+        this.ShopList.push.apply(this.ShopList, rep.data);
+      } else {
         tab.parm.hasPage = false;
       }
     }
@@ -492,8 +445,8 @@ export default {
                       location.creditCity +
                       location.creditArea +
                       location.creditStreet,
-                      latitude: location.creditLongitude,
-                      longitude: location.creditLatitude
+                    latitude: location.creditLongitude,
+                    longitude: location.creditLatitude
                   });
                 }
               }
@@ -692,6 +645,7 @@ export default {
         padding-top: 0.46rem;
         padding-bottom: 0.46rem;
         border-bottom: 0.01rem solid #ecf0f1;
+        font-size: 0;
         .shop-item-logo {
           // width: 25%;
           img {
@@ -716,7 +670,7 @@ export default {
           .shop-item-info-name {
             font-size: 0.44rem;
             color: #021218;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.35rem;
             width: 80%;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -725,7 +679,7 @@ export default {
 
           .shop-item-info-score {
             color: #5c5c5c;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.35rem;
             font-size: 0.36rem;
             span {
               color: #ff5252;
