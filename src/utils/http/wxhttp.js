@@ -37,7 +37,10 @@ const net = {
             if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
             {
               store.state.User.SingleTicket="";
-              wx.redirectTo({url:"/pages/index/index"});
+              var pages = getCurrentPages()    //获取加载的页面
+              var currentPage = pages[pages.length-1]    //获取当前页面的对象
+              var url = currentPage.route    //当前页面url
+              wx.redirectTo({url:`/pages/index/index?redirect=/${url}`});
             }else if(res.data.ret!=0)
             {
               wx.showToast({

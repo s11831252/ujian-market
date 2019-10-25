@@ -5,7 +5,7 @@
       <span v-if="LogisticsMode&&LogisticsMode.length>1" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
     </div>
     <div v-show="LogisticsId==1||LogisticsId==2">
-      <div class="top-two">
+      <div class="top-two" v-if="DistributionMode2.length>0">
         <div class="content"  @click="checktab(2)">
           <!-- 选中 -->
           <img class="imgBr" v-if="LogisticsId==2" src="/static/img/check.png" alt>

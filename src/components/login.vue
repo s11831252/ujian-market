@@ -132,11 +132,16 @@ export default {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
         var userinfo = await this.$ShoppingAPI.User_Get();
         this.$store.commit("GetUserInfo", userinfo.data);
+        
+
         if (this.$route.query.redirect)
-          // 切换至 tabBar页面
+        {
+          // 切换至redirect页面
           this.$router.push({ path: this.$route.query.redirect, isTab: true });
-        // 切换至 tabBar页面
-        else this.$router.push({ path: "/pages/home/index", isTab: true });
+        }
+        // 切换至首页
+        else 
+          this.$router.push({ path: "/pages/home/index", isTab: true });
       } else {
         this.toast("登录失败");
       }
@@ -150,6 +155,7 @@ export default {
         this.toast("请输入验证码");
         return;
       }
+      console.log(this.userInfo);
       var req = await this.$ShoppingAPI.Account_SimpleLogin({
         Phone: this.userInfo.Account,
         unionid: this.userInfo.unionid,
@@ -161,14 +167,22 @@ export default {
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
         var userinfo = await this.$ShoppingAPI.User_Get();
-        console.log(this.userInfo)
         userinfo.data.unionid = this.userInfo.unionid;
         userinfo.data.openid = this.userInfo.openid;
         this.$store.commit("GetUserInfo", userinfo.data);
         if (this.$route.query.redirect)
-          // 切换至 tabBar页面
-          this.$router.push({ path: this.$route.query.redirect, isTab: true });
-        // 切换至 tabBar页面
+          // 切换至redirect页面
+          this.$router.push(
+            {path: this.$route.query.redirect, isTab: true },
+            //执行完毕回调
+            (msg)=>{
+            },
+            //跳转失败回调,失败了可以认为不是tabBar页面
+            (msg)=>{
+                this.$router.push({path: this.$route.query.redirect})
+            }
+          );
+        // 切换至首页页面
         else this.$router.push({ path: "/pages/home/index", isTab: true });
       } else {
         this.toast("登录失败");
