@@ -155,12 +155,11 @@ export default {
         this.toast("请输入验证码");
         return;
       }
-      console.log(this.userInfo);
       var req = await this.$ShoppingAPI.Account_SimpleLogin({
         Phone: this.userInfo.Account,
         unionid: this.userInfo.unionid,
         openid: this.userInfo.openid,
-        UserName: this.userInfo.nickName,
+        UserName: this.userInfo.nickName&&this.userInfo.nickName.slice(0,16),
         VerificationCode: this.VerificationCode
       });
 
