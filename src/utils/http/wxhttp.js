@@ -37,10 +37,24 @@ const net = {
             if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
             {
               store.state.User.SingleTicket="";
-              var pages = getCurrentPages()    //获取加载的页面
-              var currentPage = pages[pages.length-1]    //获取当前页面的对象
-              var url = currentPage.route    //当前页面url
-              wx.redirectTo({url:`/pages/index/index?redirect=/${url}`});
+              var pages = getCurrentPages();    //获取加载的页面
+              var currentPage = pages[pages.length-1];    //获取当前页面的对象
+              var url = `/pages/index/index?redirect=/${currentPage.route}`;    //当前页面url
+
+              //拼接页面参数
+              var parms="";
+              for(var key in currentPage.options)
+              {
+                parms+=`${key}=${currentPage.options[key]}`;
+              }
+              if(parms.length>0)
+              {
+                //url转码
+                let encodeparms = encodeURIComponent(`?${parms}`);
+                url=url+encodeparms;
+              }
+
+              wx.redirectTo({url:url});
             }else if(res.data.ret!=0)
             {
               wx.showToast({
