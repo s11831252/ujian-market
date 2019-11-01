@@ -62,8 +62,12 @@ export default {
       'ShoppingCarEmpty'
     ]),
    async pay(){
-      if(this.getShoppingCarBysId.Logistics&&this.getShoppingCarGoods.length>0)
-      {
+      if(!this.getShoppingCarBysId.Logistics)
+        this.alert("请选择配送方式")
+
+      if(this.getShoppingCarGoods.length<=0)
+        this.alert("请选择下单商品")
+
          var rep = await  this.$ShoppingAPI.Order_Create({
             LogisticsMode:this.Logistics.LogisticsId,
             DistributionModeId:this.Logistics.DistributionMode.DistributionModeId,
@@ -83,7 +87,6 @@ export default {
               }
             });
         }
-      }
     }
   },
   computed: {

@@ -400,7 +400,7 @@
       <div class="ReturnGoods" v-if="Over" @click.stop>
         <button class="ReturnGoods-cap">
           您可以选择
-          <img src="/static/img/close.png">
+          <img  src="/static/img/close.png">
         </button>
         <div class="ReturnGoods-box">
           <button class="scan btr" @click="scanOver">扫码签收</button>
@@ -411,7 +411,7 @@
       <div class="dialog" v-if="scan" @click.stop>
         <div class="OrderCancel-box">
           <div class="QR-content">
-            <img src="/static/img/QR.png">
+            <img :src="qrcodeURL">
             <p>请骑手扫描二维码确认收货</p>
           </div>
         </div>
@@ -635,7 +635,18 @@ export default {
       if (ReturnProcess == 1) {
         return "退货中";
       }
+    },
+    qrcodeURL(){
+      const QR = require('../../utils/weapp-qrcode.js')
+      var imgData = QR.drawImg(`${this.$route.query.OrderId}*shop`, {
+        typeNumber: 4,
+        errorCorrectLevel: 'M',
+        size: 500
+      })
+      // 返回输出base64编码imgData
+      return imgData;
     }
+
   },
 
   components: {},
@@ -694,9 +705,9 @@ export default {
         success(res) {
           if (res.confirm) {
             that.orderInfo.State = 4;
-            console.log("已确认收货");
+            // console.log("已确认收货");
           } else if (res.cancel) {
-            console.log("没确认收货");
+            // console.log("没确认收货");
           }
         }
       });
@@ -749,7 +760,7 @@ export default {
         //	申请取消原因,0其他原因
         CancelType: this.cancellationreason
       });
-      console.log(rep);
+      // console.log(rep);
       if (rep.ret == 0) {
         this.Cancel = true;
       }
@@ -760,7 +771,7 @@ export default {
       var rep = await this.$ShoppingAPI.Order_OrderOver({
         OrderId: this.orderInfo.OrderId
       });
-      console.log(rep);
+      // console.log(rep);
       if (rep.ret == 0) {
         this.hint = true;
         this.consignee = false;
@@ -836,7 +847,6 @@ export default {
     // },
     //bindchange事件，每次勾选时，只能使一个选项呈现为选中状态，同时会将相应的值存在detail里。
     bindchange(e) {
-      console.log("radio发生change事件，携带value的值", e.target.value);
       this.cancellationreason = e.target.value;
     }
   },
