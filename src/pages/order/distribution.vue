@@ -261,8 +261,8 @@ export default {
         if (this.LogisticsId == 0) {
           //每次提交保存地址
           this.contact2.Address="自提无视";//Address必填...写入占位符不然会报错
-          this.contact2.Latitude = this.CurrentLocation.latitude;
-          this.contact2.Longitude = this.CurrentLocation.longitude;
+          this.contact2.Latitude = this.CurrentLocation.latitude?this.CurrentLocation.latitude:0;
+          this.contact2.Longitude = this.CurrentLocation.longitude?this.CurrentLocation.longitude:0;
           var rep = await this.$ShoppingAPI.OrderAddress_Add(this.contact2,this.LogisticsId);
           if(rep.ret!=0)
           {
@@ -281,10 +281,12 @@ export default {
                 }
               });
           }
-        }else if(this.LogisticsId == 2)
+        }
+        else if(this.LogisticsId == 2)
         {
-          this.contact.Latitude = this.CurrentLocation.latitude;
-          this.contact.Longitude = this.CurrentLocation.longitude;
+          this.contact.Latitude = this.CurrentLocation.latitude?this.CurrentLocation.latitude:0;
+          this.contact.Longitude = this.CurrentLocation.longitude?this.CurrentLocation.longitude:0;
+
           //每次提交保存地址
           var rep = await this.$ShoppingAPI.OrderAddress_Add(this.contact,this.LogisticsId);
           if(rep.ret!=0)

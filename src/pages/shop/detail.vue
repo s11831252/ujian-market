@@ -158,6 +158,7 @@ export default {
       });
       if (rep.ret == 0) {
         this.goods_detail = rep.data;
+        this.sId=this.goods_detail.sId;
         //  console.log(this.goods_detail);
       }
     }
