@@ -124,7 +124,7 @@ export default {
   },
     onShareAppMessage(result) {
     let title = this.goods_detail.gName;
-    let path = `/pages/shop/index?gId=${this.gId}&InvitaId=${this.UserInfo.UserId}`;
+    let path = `/pages/shop/detail?gId=${this.gId}&InvitaId=${this.UserInfo.UserId}`;
     let imageUrl = ''
     return {
       title,

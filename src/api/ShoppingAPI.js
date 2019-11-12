@@ -2,7 +2,7 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.119:811/":"https://market.ujianchina.net/";
+let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.85:811/":"https://market.ujianchina.net/";
 // let BaseHost = "http://192.168.0.86:811/";
 // let BaseHost = "http://192.168.0.119:811/";
 
@@ -161,13 +161,13 @@ export default {
     },
     //添加订单评论
     OrderComment_GetListAdd: (param, paramfilePath, names) => {
-        if (paramfilePath&&paramfilePath.length > 0)
-            return http.upload(BaseHost + "api/OrderComment/Add?t=json", param, paramfilePath, names)
-        else
+        // if (paramfilePath&&paramfilePath.length > 0)
+        //     return http.upload(BaseHost + "api/OrderComment/Add?t=json", param, paramfilePath, names)
+        // else
             return http.post(BaseHost + "api/OrderComment/Add", param)
     },
     //删除订单评论
-    OrderComment_GetListdelete: CommentGoodsId => {
+    OrderComment_DeleteGoodsComment: CommentGoodsId => {
         return http.post(BaseHost + `api/OrderComment/DeleteGoodsComment?CommentGoodsId=${CommentGoodsId}`)
     },
     //申请取消订单

@@ -24,7 +24,12 @@
                     </div>
                 </div>
                 <div class="myInfo">
-                    <div class="myInfo_demo" @click="go({path:'/pages/my/address'})">
+                    <div class="myInfo_demo" @click="go({path:'/pages/order/index'})" v-if="Config.showBuy">
+                        <i class="icon">&#xe653;</i>
+                        <p class="myInfo_p">查看全部订单</p>
+                        <img class="next" src="/static/img/next.png" alt="" />
+                    </div>
+                    <div class="myInfo_demo" @click="go({path:'/pages/my/address'})" v-if="Config.showBuy">
                         <i class="icon">&#xe627;</i>
                         <p class="myInfo_p">收货地址</p>
                         <img class="next" src="/static/img/next.png" alt="" />
@@ -58,7 +63,8 @@ export default {
   },
   computed: {
     ...mapState({
-      UserInfo: state => state.User.UserInfo
+      UserInfo: state => state.User.UserInfo,
+      Config: state => state.Global.Config     
     }),
     
   },

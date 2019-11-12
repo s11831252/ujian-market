@@ -2,6 +2,8 @@ import Vue from 'vue';
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import ShoppingAPI from "./api/ShoppingAPI"
+import WeixinOpenAPI from "./api/WeixinOpenAPI"
+
 import { debug } from 'util';
 
 Vue.use(Vuex);
@@ -211,6 +213,23 @@ export default new Vuex.Store({//store对象
           var rep = await ShoppingAPI.OrderAddress_Get();
           if(rep.ret==0)
             context.commit('GetUserAddressList',rep.data);
+        }
+      }
+    },
+    Global:{
+      state:{
+        Config:{}
+      },
+      mutations:{
+        setConfig(state,Config){
+          state.Config=Config;
+        }
+      },
+      actions:{
+        async GetConfig (context) {
+          var rep = await WeixinOpenAPI.WXMP_Config();
+          if(rep.ret==0)
+            context.commit('setConfig',rep.data);
         }
       }
     }

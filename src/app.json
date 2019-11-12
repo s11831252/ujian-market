@@ -18,10 +18,6 @@
         "text": "行业市场"
       },
       {
-        "pagePath": "pages/order/index",
-        "text": "个人订单"
-      },
-      {
         "pagePath": "pages/my/index",
         "text": "我的"
       }

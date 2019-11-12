@@ -14,12 +14,12 @@
       <div class="order" v-if="orderInfo.IsReturnGoods==false || orderInfo.IsCancelling==false">
         <div class="information">订单信息</div>
           <ul class="ordernumber">
-            <li>订单号:</li>
-            <li>下单时间</li>
+            <li>订单号:<span class="right">{{ orderInfo.OrderNo}}</span></li>
+            <li>下单时间<span class="right">{{ orderInfo.OrderTime}}</span></li>
           </ul>
           <ul class="ordertime">
-            <li>{{ orderInfo.OrderNo}}</li>
-            <li>{{ orderInfo.OrderTime}}</li>
+            <li></li>
+            <li></li>
           </ul>
       </div>
     </div>
@@ -60,10 +60,8 @@ export default {
   }
 };
 </script>
-
-
-
 <style scoped>
+
 .content {
   height: 17.33rem;
   background-color: #ecf0f1;
@@ -92,13 +90,13 @@ export default {
 .OrderInfo {
   background-color: #ffffff;
   padding-top: 0.81rem;
-  height: 2.58rem;
+  /* height: 2.58rem; */
 }
 .order {
   width: 10.24rem;
   border-top: solid #12b7f5 0.03rem;
   margin-bottom: 0.32rem;
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.3rem;
   margin-left: 0.31rem;
 }
 .information {
@@ -112,7 +110,10 @@ export default {
   margin-top: 0.2rem;
   color: #a2a2a2;
   font-size: 0.36rem;
-  float: left;
+  /* float: left; */
+}
+.ordernumber .right{
+  float: right;
 }
 .ordertime {
   margin-top: 0.2rem;
@@ -125,5 +126,11 @@ export default {
   color: #a2a2a2;
   text-align: center;
   padding-top: 8.03rem;
+}
+</style>
+<style>
+body{
+    background-color: #ecf0f1;
+    height: 100%;
 }
 </style>

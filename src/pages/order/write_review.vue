@@ -15,11 +15,7 @@
             </span>
             <span class="goods-info">
               <p class="goods-name">{{item.gName}}</p>
-              <p class="goods-price">
-                单价：
-                <span>¥{{item.Price}}</span>/件
-              </p>
-              <p class="goods-iteminfo">规格：{{item.ItemName}}</p>
+              <p class="goods-price">单价：<span class="goods-price-num">¥{{item.Price}}</span>/件 <span> (规格：{{item.ItemName?item.ItemName:"默认"}})</span></p>
             </span>
           </li>
         </ul>
@@ -138,9 +134,10 @@ export default {
           }
         });
       } else {
-        var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData,this.imgArray,this.uploadfilenames);
-        var rep = rep[rep.length-1];
-        console.log(rep);
+        // var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData,this.imgArray,this.uploadfilenames);
+        // var rep = rep[rep.length-1];
+        console.log(this.postData);
+        var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData);
         if (rep.ret == 0) {
           this.replace({
             path: "/pages/order/Comment",
@@ -267,9 +264,15 @@ export default {
   font-size: 0.36rem;
   float: left;
 }
+.goods-price .goods-price-num{
+color:#ff5252;
+}
 .goods-iteminfo {
   color: #5c5c5c;
   font-size: 0.36rem;
+}
+.goods-iteminfo span{
+
 }
 /* 评价的商品 */
 .comment {
@@ -323,7 +326,10 @@ export default {
   height: 1.2rem;
   background-color: #12b7f5;
   border-radius: 0.16rem;
+  margin: 0 auto;
   margin-top: 0.5rem;
+  display: block;
   color: #ffffff;
+  border: 0;
 }
 </style>

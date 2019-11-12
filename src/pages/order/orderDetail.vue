@@ -23,21 +23,14 @@
         </div>
         <!-- 订单信息在退款退货页面不显示v-if="(orderInfo.State==2 && orderInfo.IsCancelling==false)|| (orderInfo.State==4&& orderInfo.IsReturnGoods==false )"-->
         <div class="OrderInfo1">
+        </div>
           <div class="OrderInfoltft">
             <ul>
-              <li class="orleft">商品金额：</li>
-              <li>运费：</li>
-              <li>实际支付：</li>
+              <li class="orleft">商品金额：<span class="right">￥{{orderInfo.GoodsAmount}}</span></li>
+              <li>运费：<span class="right" v-if="orderInfo.LogisticsInfo">￥{{orderInfo.LogisticsInfo.Amount}}</span></li>
+              <li>实际支付：<span class="right pay">￥{{orderInfo.TotalAmount}}</span></li>
             </ul>
           </div>
-          <div class="OrderInforight">
-            <ul class="rightfloat">
-              <li class="ordecolor">￥{{orderInfo.GoodsAmount}}</li>
-              <li v-if="orderInfo.LogisticsInfo">￥{{orderInfo.LogisticsInfo.Amount}}</li>
-              <li class="pay">￥{{orderInfo.TotalAmount}}</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -135,41 +128,36 @@
       <div class="border_top">
         <div class="comments">买家评论</div>
       </div>
-      <!-- 2 -->
-      <div class="Buyers_information" v-for="(item, index) in getCommentModel.goodsCommentList" v-bind:key="index">
-        <div class="user_ID">
-          <div class="user_iocn">
-            <img :src="item.Portrait ">
-          </div>
-          <div class="userinfo">
-            <div class="useid">{{ item.UserName }}</div>
-            <div class="credit">
-              <li class="quality">质量:</li>
-              <li class="qualitynumber">{{getCommentModel.QualityVal}}</li>
-              <li class="speed">速度：</li>
-              <li class="speednumber">{{getCommentModel.SpeedVal}}</li>
-              <li class="serve">服务：</li>
-              <li class="servenumber">{{getCommentModel.ServiceVal}}</li>
-            </div>
+      <div class="goods_comments" v-for="(item, index) in getCommentModel.goodsCommentList" v-bind:key="index">
+        <div class="title">
+          <i class="icon">&#xe620;</i>
+          商品评分:
+          <span class="user_comments" v-if="item.State==1">好评<i class="icon">&#xe643;</i></span>
+          <span class="user_comments" v-else-if="item.State==3">中评<i class="icon">&#xe63e;</i></span>
+          <span class="user_comments" v-if="item.State==6">差评<i class="icon">&#xe63f;</i></span>
+          <span class="del" @click="delComments(item,index)"><i class="icon">&#xe612;</i>删除</span>
+        </div>
+        <div class="body">
+          <img class="body_left" :src="orderInfo.Order_Goods_items[index].Image_url"/>
+          <div class="body_right">
+            <p>{{item.gName}}</p>
+            <p class="goods-price">单价：<span class="goods-price-num">¥{{orderInfo.Order_Goods_items[index].Price}}</span>/件 <span> (规格：{{orderInfo.Order_Goods_items[index].ItemName?orderInfo.Order_Goods_items[index].ItemName:"默认"}})</span></p>
           </div>
         </div>
-        <div class="comment_content">
-          <div class="content2">
-            <div class="content3">{{ item.Content }}</div>
-            <div class="content_time">{{ item.AddTime }}</div>
-          </div>
-          <div class="evaluate_img">
-            <!-- <img src="/static/img/img1.png"> -->
-            <img v-for="(item2,inde2) in item.imageInfoList" v-bind:key="inde2" :src="item2.url">
-          </div>
+        <div class="comments_content">
+          {{item.Content}}
+          <p class="datetime">{{item.AddTime}}</p>
         </div>
-        <!-- <div class="Business_reply">商家回复：非常感谢您的评价，欢迎下次再来购买。</div> -->
-        <div class="Business_reply" v-for="(item2, reply) in item.replyInfoList" v-bind:key="reply">商家回复:{{item2.Content}}</div>
+        <div class="Order_Comment_border"></div>
+      </div>
+      <div class="grade">
+        <i class="icon">&#xe626;</i>
+        <span>店铺评分：</span> 质量：<span class="grade_num">{{getCommentModel.QualityVal}}</span>速度：<span class="grade_num">{{getCommentModel.SpeedVal}}</span>服务：<span class="grade_num">{{getCommentModel.ServiceVal}}</span>
       </div>
     </div>
 
     <!-- 骑手信息在待发货和待收货-->
-    <div class="horseman" v-if="(orderInfo.State==2 && orderInfo.IsCancelling==false) || (orderInfo.State==3)">
+    <div class="horseman" v-if="((orderInfo.State==2 && !orderInfo.IsCancelling) || (orderInfo.State==3))&&orderInfo.LogisticsInfo.LogisticsMode==1">
       <div class="border">
         <div class="logisticsaddress">骑手信息</div>
       </div>
@@ -206,37 +194,29 @@
     <div class="address" v-if="orderInfo.State>0||orderInfo.IsCancelling||orderInfo.IsReturnGoods">
       <div class="logistics">
         <div class="border">
-          <div class="logisticsaddress">物流地址</div>
+          <div class="logisticsaddress">物流信息</div>
         </div>
         <div class="Gaininformation">
-          <div class="adrrleft">
-            <img src="/static/img/address.png">
-          </div>
+          <div class="adrrleft icon">&#xe64f;</div>
           <div class="shippingaddress">取货地址：</div>
-          <div class="shippingaddress2">{{ orderInfo.Contact_Address}}</div>
-          <div class="adrrbuttom"></div>
+          <div class="shippingaddress2">{{ orderInfo.LogisticsInfo.Shipper_Address}}</div>
+          <!-- <div class="adrrbuttom"></div> -->
         </div>
       </div>
 
       <div class="Gaininformation1">
         <!-- 收货人信息 顶部 -->
         <div class="infotop">
-          <div class="Consignee-icon">
-            <img src="/static/img/man.png">
-          </div>
+          <div class="Consignee-icon icon">&#xe615;</div>
           <div class="recipients">收货人：{{ orderInfo.Contact_Name}}</div>
-          <div class="phone-icon">
-            <img src="/static/img/phone2.png">
-          </div>
+          <div class="phone-icon icon">&#xe608;</div>
           <div class="phone">{{ orderInfo.Contact_Phone}}</div>
         </div>
         <!--地址  中间 -->
         <div class="centre">
-          <div class="Delivery-icon">
-            <img src="/static/img/site.png">
-          </div>
+          <div class="Delivery-icon icon">&#xe64f;</div>
           <div class="deliveryaddress">送货地址：</div>
-          <div class="location">{{ orderInfo.LogisticsInfo.Shipper_Address}}</div>
+          <div class="location">{{orderInfo.Contact_Address}}</div>
         </div>
         <!-- 距离 底部 运输距离在代付款页面显示 1-->
         <div class="bottom" v-if="orderInfo.State==1">
@@ -271,7 +251,7 @@
     </div>
 
     <!-- 配送信息  只有代付款页面显示  ==1时候 -->
-    <div class="Shippinginformation" v-if="orderInfo.State==1">
+    <div class="Shippinginformation" v-if="orderInfo.State==1&&orderInfo.LogisticsInfo.LogisticsMode==1">
       <!-- 车辆信息 -->
       <div class="motorcycletype">
         <div class="border">
@@ -300,7 +280,7 @@
     </div>
 
     <!-- 留言 在代付款页面不显示留言  其他页面都显示 !=1-->
-    <div class="leave-world" v-if="orderInfo.State!=1">留言：越快送到越好，急着要！</div>
+    <div class="leave-world" v-if="orderInfo.State!=1">留言：{{orderInfo.Remarks}}</div>
 
     <!-- 订单信息 在退货/退款中不显示-->
     <div class="OrderInfo">
@@ -464,7 +444,7 @@ export default {
       orderInfo: {
       },
       StateNames: ["订单取消", "待付款", "待发货", "已发货", "已完成"],
-      ReturnProcess: ["退货中", "处理中", "已退货"]
+      // ReturnProcess: ["退货中", "处理中", "已退货"]
     };
   },
   computed: {
@@ -630,12 +610,12 @@ export default {
       return this.StateNames[this.orderInfo.State];
     },
 
-    // 判断处理进度
-    ReturnProcess: function() {
-      if (ReturnProcess == 1) {
-        return "退货中";
-      }
-    },
+    // // 判断处理进度
+    // ReturnProcess: function() {
+    //   if (ReturnProcess == 1) {
+    //     return "退货中";
+    //   }
+    // },
     qrcodeURL(){
       const QR = require('../../utils/weapp-qrcode.js')
       var imgData = QR.drawImg(`${this.$route.query.OrderId}*shop`, {
@@ -835,23 +815,29 @@ export default {
         });
        }
     },
-
-    // //删除评论
-    // async Deletecomment(){
-    //   var rep=await this.$ShoppingAPI.OrderComment_GetListdelete({
-    //     OrderId: this.orderInfo.OrderId  
-    //   });
-    //   if(rep.ret==0){
-        
-    //   }
-    // },
     //bindchange事件，每次勾选时，只能使一个选项呈现为选中状态，同时会将相应的值存在detail里。
     bindchange(e) {
       this.cancellationreason = e.target.value;
+    },
+    delComments(item,index)
+    {
+      this.modal("提示","是否删除该评论",async ()=> {
+            var rep=await this.$ShoppingAPI.OrderComment_DeleteGoodsComment(item.CommentGoodsId);
+            if(rep.ret==0){
+              this.getCommentModel.goodsCommentList.splice(index, 1); 
+            }else
+            {
+              this.alert("删除评论失败")
+            }
+      });
     }
   },
    async onShow(){
-  //打印外面传进来的参数
+
+  },
+  //异步
+  async mounted() {
+    //打印外面传进来的参数
     // console.log(this.$route.query);
     //把vue this 指向that，方便在其他回调函数里面使用this
     var that = this;
@@ -883,11 +869,7 @@ export default {
     });
     if (rec.ret == 0) {
       this.getCommentModel = rec.data;
-      // console.log(this.getCommentModel);
     }
-  },
-  //异步
-  async mounted() {
   },
   created() {
     // console.log(this.orderInfo.Contact_Name);
@@ -895,11 +877,7 @@ export default {
 };
 </script>
 
-
-
-
-
-<style scoped>
+<style lang="less"  scoped>
 .content {
   padding-top: 0.2rem;
   background-color: #ecf0f1;
@@ -1092,18 +1070,20 @@ export default {
 }
 .content .top .long {
   color: #ff5252;
+  padding: 0.32rem 0;
   padding-left: 0.2rem;
   font-size: 0.36rem;
-  border-bottom: solid #ecf0f1;
+  border-bottom: 0.01rem solid #ecf0f1;
 }
 .orderinfo {
   margin-left: 0.21rem;
-  margin-right: 0.21rem;
-  margin-top: 0.21rem;
+  margin-right: 0.3rem;
+  margin-top: 0.32rem;
 }
 .orderinfo .orderinfo-top {
-  float: left;
-  border-bottom: solid #ecf0f1;
+  display: inline-block;
+  font-size:0;
+  padding-bottom: 0.36rem;
 }
 .orderinfo .orderinfo-top .left {
   float: left;
@@ -1116,7 +1096,7 @@ export default {
 }
 .orderinfo .orderinfo-top .right {
   float: left;
-  width: 7.42rem;
+  width: 7.62rem;;
   overflow: hidden;
 }
 .orderinfo .orderinfo-top .right .right-botton {
@@ -1144,34 +1124,34 @@ export default {
 }
 
 .orderinfo .orderinfo-top .right .quantity {
-  padding-left: 7rem;
+  /* padding-left: 7rem; */
+  float: right;
   color: #5c5c5c;
   padding-top: 0.42rem;
   font-size: 0.36rem;
 }
-.OrderInfo1 {
-  padding-bottom: 0.3rem;
-  padding-top: 0.3rem;
-}
-.OrderInfo1 .OrderInfoltft {
-  float: left;
+.OrderInfoltft {
+  /* float: left; */
   color: #5c5c5c;
   font-size: 0.36rem;
+  padding-bottom: 0.3rem;
+  border-top:0.01rem solid #d6d6d6;
   padding-top: 0.2rem;
+  
 }
-.OrderInforight {
-  margin-top: 0.3rem;
+.OrderInfoltft .right {
+  float: right;
 }
-.OrderInfo1 .OrderInforight .rightfloat .ordecolor {
+/* .OrderInfo1 .OrderInforight .rightfloat .ordecolor {
   margin-top: 1.7rem;
-}
-.OrderInforight .rightfloat {
+} */
+/* .OrderInforight .rightfloat {
   padding-left: 8.7rem;
   padding-top: 0.4rem;
   color: #5c5c5c;
   font-size: 0.36rem;
-}
-.OrderInfo1 .OrderInforight .rightfloat .pay {
+} */
+.OrderInfoltft .pay {
   color: #ff5252;
   font-size: 0.36rem;
 }
@@ -1242,13 +1222,18 @@ export default {
 .Order_Comment {
   background-color: #ffffff;
   margin-top: 0.3rem;
+  .Order_Comment_border{
+    height: 0.15rem;
+    width: 100%;
+    background-color: #ecf0f1;
+  }
 }
 .border_top {
-  border-bottom: 0.04rem solid #12b7f5;
+  border-bottom: 0.01rem solid #12b7f5;
   margin-left: 0.2rem;
   padding-top: 0.21rem;
+  margin-right: 0.32rem;
   padding-bottom: 0.32rem;
-  width: 10rem;
   font-size: 0.38rem;
   color: #636363;
 }
@@ -1259,93 +1244,79 @@ export default {
   border-radius: 0.1rem;
   overflow: hidden;
 }
-.Buyers_information {
-  padding-left: 0.31rem;
-}
-.user_ID {
-  padding-top: 0.32rem;
-  border-bottom: solid #d6d6d6 0.02rem;
-  width: 10rem;
-}
-.user_ID .user_iocn img {
-  width: 1.05rem;
-  height: 0.96rem;
-  float: left;
-}
-.user_ID .userinfo {
-  margin-bottom: 0.62rem;
-}
-.user_ID .useid {
-  font-size: 0.38rem;
-  color: #191919;
-  padding-left: 0.36rem;
-  float: left;
-}
+.goods_comments{
+  .title{
+    font-size: 0.36rem;
+    padding: 0.28rem 0;
+    margin: 0 0.32rem;
+    color: #666666;
+    border-bottom: 0.01rem solid #d6d6d6;
+    .icon{
+      color: #636363;
+      display:inline-block;
+    }
+    .user_comments{
+      margin-left: 0.19rem;
+      color: #ff5252;
+      .icon{
+        margin-left: 0.19rem;
+        display:inline-block;
+        color: #ff5252;
+      }
+    }
+    .del{
+      float: right;
+    }
+  }
+  .body{
+    padding: 0.20rem 0;
+    margin: 0 0.32rem;
+    font-size: 0.2rem;
+    color: #999999;
+    border-bottom: 0.01rem solid #d6d6d6;
+    .body_left{
+      display: inline-block;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+    .body_right{
+      font-size: 0.3rem;
+      margin-left: 0.12rem;
+      display: inline-flex;
+      flex-direction: column;
+      height: 1.2rem;
+      vertical-align: top;
+      justify-content: space-between;
 
-.user_ID .quality {
-  font-size: 0.3rem;
-  color: #666666;
-  float: left;
-  padding-left: 1.25rem;
+      .goods-price-num{
+        color: #ff5252;
+      }
+    }
+  }
+  .comments_content{
+    padding: 0.20rem 0;
+    margin: 0 0.32rem;
+    font-size: 0.34rem;
+    color: #333333;
+    position: relative;
+    .datetime{
+      font-size: 0.26rem;
+      color: #9d9d9d;
+      text-align: right;
+    }
+  }
 }
-.user_ID .qualitynumber {
-  color: #ff8533;
-  font-size: 0.3rem;
-  float: left;
-}
-
-.user_ID .speed {
-  font-size: 0.3rem;
-  color: #666666;
-  overflow: hidden;
-  padding-left: 0.5rem;
-  float: left;
-}
-.user_ID .speednumber {
-  color: #63c230;
-  font-size: 0.3rem;
-  float: left;
-}
-
-.user_ID .serve {
-  font-size: 0.3rem;
-  color: #666666;
-  float: left;
-  padding-left: 0.5rem;
-}
-.user_ID .servenumber {
-  font-size: 0.3rem;
-  color: #f96268;
-}
-
-.comment_content {
-  padding-top: 0.41rem;
-}
-.comment_content .content2 {
+.grade{
+  padding: 0.24rem;
   font-size: 0.36rem;
-  width: 10.19rem;
-  padding-bottom: 0.26rem;
-}
-.comment_content .content3 {
-  color: #191919;
-  /* float: left; */
-}
-.comment_content .content_time {
-  /* float: right; */
-  color: #9d9d9d;
-}
-.comment_content .evaluate_img img {
-  width: 1.97rem;
-  height: 1.81rem;
-  margin-right: 0.2rem;
-  overflow: hidden;
-  padding-bottom: 0.4rem;
-}
-
-.Business_reply {
-  color: #f57c2a;
-  font-size: 0.32rem;
-  padding-bottom: 0.41rem;
+  color: #666666;
+  .icon{
+    display: inline-block;
+  }
+  .grade_num{
+    color: #12b7f5;
+    margin-right: 0.17rem;
+  }
 }
 
 /* 骑手信息 */
@@ -1407,7 +1378,7 @@ export default {
   border-bottom: solid #ecf0f1;
 }
 .border {
-  border-bottom: 0.04rem solid #12b7f5;
+  border-bottom: 0.02rem solid #12b7f5;
   margin-left: 0.2rem;
   padding-top: 0.01rem;
   padding-bottom: 0.2rem;
@@ -1426,95 +1397,110 @@ export default {
 .Gaininformation {
   /* height: 3rem; */
   padding-top: 0.44rem;
+  padding-bottom: 0.41rem;
   overflow: hidden;
   clear: both;
 }
 .Gaininformation .adrrleft {
   float: left;
+  color:#f76b1b;
   margin-left: 0.29rem;
+  font-size: 0.46rem;
+  line-height: 0.46rem;
 }
-.Gaininformation .adrrleft img {
+/* .Gaininformation .adrrleft i {
   height: 0.6rem;
   width: 0.6rem;
-}
+} */
 .Gaininformation .shippingaddress {
   margin-left: 0.22rem;
   color: #5c5c5c;
   float: left;
-  padding-bottom: 0.41rem;
+  line-height: 0.46rem;
+  /* padding-bottom: 0.41rem; */
   font-size: 0.36rem;
 }
 .Gaininformation .shippingaddress2 {
   margin-left: 0.22rem;
   color: #5c5c5c;
-  padding-bottom: 0.41rem;
   max-width: 6rem;
   float: left;
   font-size: 0.36rem;
+  line-height: 0.46rem;
 }
-.recipients {
-  color: #5c5c5c;
-  float: left;
-  padding-top: 0.44rem;
-  padding-left: 0.2rem;
-  font-size: 0.36rem;
-}
+
 .infotop {
+  margin-top: 0.4rem;
   overflow: hidden;
 }
 .infotop .Consignee-icon {
   float: left;
   margin-left: 0.3rem;
-  margin-top: 0.4rem;
+  font-size: 0.46rem;
+  line-height: 0.46rem;
+  color: #12b7f5;
 }
-.infotop .Consignee-icon img {
+.recipients {
+  color: #5c5c5c;
+  float: left;
+  padding-left: 0.2rem;
+  font-size: 0.36rem;
+  line-height: 0.46rem;
+}
+/* .infotop .Consignee-icon img {
   height: 0.6rem;
   width: 0.5rem;
-}
+} */
 .infotop .phone-icon {
   float: left;
-  margin-top: 0.44rem;
+  color: #12b7f5;
   margin-left: 0.46rem;
-  overflow: hidden;
+  font-size: 0.46rem;
+  line-height: 0.46rem;
 }
-.infotop .phone-icon img {
+/* .infotop .phone-icon img {
   height: 0.6rem;
   width: 0.4rem;
   padding-left: 2rem;
-}
+} */
 .infotop .phone {
   color: #5c5c5c;
   float: left;
   padding-left: 0.2rem;
-  padding-top: 0.44rem;
   font-size: 0.36rem;
+  line-height: 0.46rem;
 }
 .centre {
   padding-bottom: 0.5rem;
   color: #5c5c5c;
   padding-top: 0.44rem;
   overflow: hidden;
-  /* border-bottom: solid #ecf0f1; */
+  border-bottom: solid #ecf0f1;
 }
 .centre .Delivery-icon {
-  height: 0.6rem;
-  width: 0.6rem;
+  /* height: 0.6rem;
+  width: 0.6rem; */
   float: left;
   margin-left: 0.3rem;
+  color: #12b7f5;
+  font-size: 0.46rem;
+  line-height: 0.46rem;
 }
-.centre .Delivery-icon img {
+/* .centre .Delivery-icon img {
   height: 0.6rem;
   width: 0.6rem;
-}
+} */
 .centre .deliveryaddress {
   padding-left: 0.2rem;
   float: left;
   font-size: 0.36rem;
+  line-height: 0.46rem;
 }
 .centre .location {
   max-width: 6.5rem;
   float: left;
   font-size: 0.36rem;
+  line-height: 0.46rem;
 }
 .buttom {
   width: 10rem;

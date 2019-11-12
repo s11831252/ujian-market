@@ -1,5 +1,5 @@
 <template>
-    <div class="shoppingcar" :style="{height:showed?'100%':'50px'}">
+    <div class="shoppingcar" :style="{height:showed?'100%':'50px'}" v-if="Config.showBuy">
         <div class="shoppingcar-goods" v-if="showed">
             <span class="icon close" @click="taggle">&#xe603;</span>
             <div class="bar">
@@ -29,7 +29,7 @@
     </div>
 </template>
 <script>
-import { mapMutations } from "vuex";
+import {mapState, mapMutations } from "vuex";
 import buy from "@/components/buy";
 export default {
     props:{
@@ -41,7 +41,7 @@ export default {
         sName:"",
       };
     },
-    computed: {
+  computed: {
     getShoppingCarBysId(){
       var shopCar =this.$store.getters.getShoppingCarBysId(this.sId);
       if(shopCar)
@@ -61,7 +61,10 @@ export default {
     },
     getShoppingCarCountBysId() {
       return this.$store.getters.getShoppingCarCountBysId(this.sId);
-    }
+    },
+    ...mapState({
+      Config: state => state.Global.Config      
+    })
   },
   components:{
     buy,

@@ -4,6 +4,8 @@ import store from './store'
 import router from './routerH5'
 import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
+import WeixinOpenAPI from "./api/WeixinOpenAPI"
+
 import fts from './utils/autorem'
 import Toast from './components/Toast';
 import './assets/style.css';
@@ -18,8 +20,10 @@ import "swiper/dist/css/swiper.css";
 Vue.use(Toast);
 Vue.use(VueAwesomeSwiper, /* { default global options } */)
 
-Vue.prototype.$UJAPI = UJAPI; //在实例中用$UJAPI调用UJAPI封装好的RestAPI
-Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
+Vue.prototype.$UJAPI = UJAPI; //在实例中用this.$UJAPI调用UJAPI封装好的RestAPI
+Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用this.$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
+Vue.prototype.$WeiXinOpenAPI = WeixinOpenAPI; //在实例中用this.$WeiXinOpenAPI调用WeiXinOpenAPI.js封装好的RestAPI
+
 Vue.mixin({
   components: {
     swiper,
@@ -36,6 +40,9 @@ Vue.mixin({
   methods: {
       go: function(path) {
         this.$router.push(path);
+      },
+      replace: function (path) {
+        this.$router.replace(path);
       },
       toast(title){
         this.$toast.center(title);

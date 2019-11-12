@@ -1,5 +1,5 @@
-      <template>
-  <div class="buy" @click.stop>
+<template>
+  <div class="buy" @click.stop v-if="Config.showBuy">
     <div v-if="goods.Stock>0&&getShoppingCarNumberByItemId>0">
       <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span>
       <input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number">
@@ -14,7 +14,8 @@
   </div>
 </template>
 <script>
-import {mapGetters ,mapMutations } from 'vuex'
+import {mapState,mapGetters ,mapMutations } from 'vuex'
+
 export default {
   props: {
     goods: Object,
@@ -59,27 +60,30 @@ export default {
         return this.$store.getters.getShoppingCarNumberByItemId(this.goods.sId,this.goods.ItemId);
       },
       set(newval){
-      if(!isNaN(newval))
-      {
-        var n= parseInt(newval);
-        if(n>=0&&n <=this.goods.Stock)
+        if(!isNaN(newval))
         {
-          this.ShoppingCarPush({
-            sId:this.goods.sId,
-            sName:this.sName,
-            gId:this.goods.gId,
-            gName:this.goods.gName,
-            ItemId:this.goods.ItemId,
-            ItemName:this.goods.ItemName,
-            Image:this.image,
-            Number:newval,
-            Price:this.goods.Price,
-            Stock:this.goods.Stock,
-            });
+          var n= parseInt(newval);
+          if(n>=0&&n <=this.goods.Stock)
+          {
+            this.ShoppingCarPush({
+              sId:this.goods.sId,
+              sName:this.sName,
+              gId:this.goods.gId,
+              gName:this.goods.gName,
+              ItemId:this.goods.ItemId,
+              ItemName:this.goods.ItemName,
+              Image:this.image,
+              Number:newval,
+              Price:this.goods.Price,
+              Stock:this.goods.Stock,
+              });
+          }
         }
       }
-      }
     },
+    ...mapState({
+      Config: state => state.Global.Config      
+    })
   },
   methods: {
     ...mapMutations([
@@ -101,8 +105,6 @@ export default {
         this.getShoppingCarNumberByItemId=n;
     }
   },
-  mounted(){
-  }
 };
 </script>
 <style lang="less" scoped>
