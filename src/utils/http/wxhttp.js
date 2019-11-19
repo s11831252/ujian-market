@@ -34,6 +34,7 @@ const net = {
             return false;
           }
           if(res.data&&res.data.ret)
+          {
             if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
             {
               store.state.User.SingleTicket="";
@@ -53,7 +54,6 @@ const net = {
                 let encodeparms = encodeURIComponent(`?${parms}`);
                 url=url+encodeparms;
               }
-
               wx.redirectTo({url:url});
             }else if(res.data.ret!=0)
             {
@@ -63,6 +63,7 @@ const net = {
               });
               return false;
             }
+          }
           resolve(res.data);
         },
         fail: function (error) {
