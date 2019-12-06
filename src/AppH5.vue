@@ -9,6 +9,7 @@
 
 <script>
 import mynav from '@/components/mynav.vue'
+import { mapActions  } from "vuex";
 
 export default {
   computed:{
@@ -23,6 +24,12 @@ export default {
   components: {
     mynav,
   },
+  methods:{
+      ...mapActions(["GetConfig"])
+  },
+  created(){
+    this.GetConfig();
+  }
 };
 </script>
 <style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="shoppingcar" :style="{height:showed?'100%':'50px'}" v-if="Config.showBuy">
+    <div class="shoppingcar" :class="{showed:showed}" v-if="Config.showBuy">
         <div class="shoppingcar-goods" v-if="showed">
             <span class="icon close" @click="taggle">&#xe603;</span>
             <div class="bar">
@@ -17,8 +17,14 @@
             </ul>
         </div>
         <div class="shoppingcar-toolbar">
-            <i class="icon car-icon">&#xe600;</i>
-            <span class="shoppingcar-count">{{getShoppingCarCountBysId}}件商品</span>
+            <span class="service" @click="go({path:'/pages/service/consult'})">
+              <i class="icon service-icon">&#xe734;</i>
+              <p>联系客服</p>
+            </span>
+            <i class="icon car-icon" :class="{has:getShoppingCarCountBysId>0}">
+              &#xe600;
+               <span v-if="getShoppingCarCountBysId>0" class="shoppingcar-count">{{getShoppingCarCountBysId}}</span>
+              </i>
             <span class="shoppingcar-amount">￥{{getShoppingCarAmountBysId}}</span>
             <button v-if="getShoppingCarAmountBysId>0" class="btn-buy" @click="go({path:'/pages/order/settle',query:{sId:sId}})">去结算</button>
             <button v-else class="btn-buy Invalid">去结算</button>
@@ -90,6 +96,7 @@ export default {
   // opacity: 0.8;
   bottom: 0;
   width: 100%;
+  height: 1.45rem;
   z-index: 999;
   .shoppingcar-goods{
     color: #686565;
@@ -97,7 +104,7 @@ export default {
     background-color: #fff;
     width: 100%;
     position: absolute;
-    bottom: 50px;
+    bottom: 1.45rem;
     .close{
       font-size: 28px;
       position: absolute;
@@ -141,18 +148,50 @@ export default {
     }
   }
   .shoppingcar-toolbar {
-    padding: 0px 10px 5px 10px;
-    position: absolute;
-    width: 96%;
-    bottom: 0;
     color: #ffffff;
-    .car-icon {
-      color: #bfbfbf;
-      font-size: 28px;
+    display: flex;
+    align-items: center;
+    height: 1.45rem;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    .service{
       display: inline-block;
+      font-size: 0.27rem;
+      text-align: center;
+      .service-icon{
+        font-size: 0.64rem;
+      }
+      margin-left: 0.42rem;
+      margin-right: 0.72rem;
     }
-    .shoppingcar-count,
+    .car-icon, {
+      color: #bfbfbf;
+      font-size: 0.8rem;
+      position: relative;
+      display: inline-block;
+      padding-left: 0.5rem;
+      border-left: 0.02rem solid #bfbfbf;
+      .shoppingcar-count{
+        position: absolute;
+        top: -0.1rem;
+        right: -0.2rem;
+        font-size:0.26rem;
+        background: #ff5252;
+        border-radius: 50%;
+        text-align: center;
+        color: #ffffff;
+        min-width: 0.46rem;
+        width: auto;
+        height: 0.46rem;
+        line-height: 0.46rem;
+      }
+    }
+    .car-icon.has{
+      color: #fccb5c;
+    }
     .shoppingcar-amount {
+      margin-left: 0.5rem;
       line-height: 30px;
       font-size: 15px;
     }
@@ -164,12 +203,12 @@ export default {
       font-weight: bold;
       padding: 4px 6px;
       border: 0;
-      float: right;
+      // float: right;
       color: #ffffff;
       border-radius: 10px;
       position: absolute;
       right: 2%;
-      bottom: 20%;
+      // bottom: 20%;
     }
     .Invalid {
        background-color:#bfbfbf
@@ -180,5 +219,8 @@ export default {
       right: 16%;
     }
   }
+}
+.shoppingcar.showed{
+  height: 100%;
 }
 </style>
