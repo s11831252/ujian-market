@@ -1,9 +1,7 @@
 <template>
     <div id="app">
-      <div>
         <router-view></router-view>
         <mynav v-if="Enable"></mynav>
-      </div>
     </div>
 </template>
 
@@ -60,6 +58,11 @@ body{
   height: 100%;
   padding: 0;
   margin: auto 0;
-  
 }
+#app,html{
+  height: 100%;
+}
+</style>
+}
+
 </style>

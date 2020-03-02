@@ -1,0 +1,168 @@
+<template>
+      <div class="chat-item">
+        <p class="time">{{fmtChattime}}</p>
+          <!-- 用户对话框 -->
+        <div class="chat-my"  v-if="chatdata.from==UserInfo.UserId">
+          <div class="chat-content">
+            <div class="dialog_box">
+              <p class="username">用户名称</p>
+              <!-- <span class="read">已读</span> -->
+              {{chatdata.msg}}
+              <img :src="UserInfo.Portrait" alt
+              />
+            </div>
+          </div>
+        </div>
+        <div class="chat-other" v-else>
+          <!-- 管理员对话框 -->
+          <div class="chat-content">
+            <div class="dialog_box">
+              <p class="username">管理员名称</p>
+              <!-- <span class="read">已读</span> -->
+              南宁
+              <img
+                src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1570536053455&di=e7deaf157fc09c2547ac84bfadd77de5&imgtype=0&src=http%3A%2F%2Fp2.so.qhimgs1.com%2Ft015b444b7249801792.jpg"
+                alt
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+</template>
+<script>
+import { mapState } from "vuex";
+import utils from "@/utils"
+export default {
+    props:{
+        chatdata:Object
+    },
+    computed:{
+        ...mapState({
+            UserInfo:state => state.User.UserInfo
+        }),
+        fmtChattime(){
+            let _date = new Date(this.chatdata.chattime*1000); 
+            console.log(utils.formatTime);
+            return _date.toLocaleString();
+        }
+    },
+}
+</script>
+<style scoped>
+.chat-item{
+  margin-top:0.56rem;
+  text-align: center
+}
+.chat-my{
+  display: flex;justify-content: flex-end;
+}
+.chat-other{
+  display:flex;justify-content:flex-start;
+}
+.chat-content {
+  /* margin: 0.4rem auto; */
+  /* float: right; */
+  word-break:break-all;
+}
+.time {
+  font-size: 0.3rem;
+  color: #5c5c5c;
+  /* 让内容强制不换行 */
+  white-space: nowrap;
+  margin-bottom: 0.47rem;
+}
+.chat-my .chat-content .username {
+  font-size: 0.3rem;
+  color: #5c5c5c;
+  /* 让内容强制不换行 */
+  white-space: nowrap;
+  position: absolute;
+  right: 0.15rem;
+  top: -0.5rem;
+}
+.chat-my .chat-content .read {
+  font-size: 0.3rem;
+  color: #a2a2a2;
+  position: absolute;
+  left: -0.74rem;
+  top: 50%;
+}
+.chat-my .chat-content .dialog_box {
+  max-width: 6.5rem;
+  /* css3属性，fit-content既是让宽度随内容大小变化 */
+  width: fit-content;
+  font-size: 0.4rem;
+  color: #5c5c5c;
+  background-color: #d2e0e1;
+  border-radius: 0.1rem;
+  padding: 0.5rem;
+  position: relative;
+  margin-right: 1.5rem;
+}
+/* 右侧小三角形 */
+.chat-my .chat-content .dialog_box:after {
+  border: 0.1rem solid transparent;
+  border-left: 0.25rem solid #d2e0e1;
+  position: absolute;
+  content: "";
+  top: 50%;
+  margin-top: -0.2rem;
+  left: 100%;
+}
+.chat-my .chat-content img {
+  width: 1.08rem;
+  height: 1.09rem;
+  border-radius: 50%;
+  background-color: #5c5c5c;
+  position: absolute;
+  right: -1.4rem;
+  top: 0.2rem;
+}
+.chat-other .chat-content .username {
+  font-size: 0.3rem;
+  color: #5c5c5c;
+  /* 让内容强制不换行 */
+  white-space: nowrap;
+  position: absolute;
+  left: 0.15rem;
+  top: -0.5rem;
+}
+.chat-other .chat-content .read {
+  font-size: 0.3rem;
+  color: #a2a2a2;
+  position: absolute;
+  right: -0.74rem;
+  top: 40%;
+}
+.chat-other .chat-content .dialog_box {
+  max-width: 6.5rem;
+  /* css3属性，fit-content既是让宽度随内容大小变化 */
+  width: fit-content;
+  font-size: 0.4rem;
+  color: #5c5c5c;
+  background-color: #fdfdfd;
+  border-radius: 0.1rem;
+  padding: 0.5rem;
+  position: relative;
+  margin-left: 1.5rem;
+}
+/* 左侧小三角形 */
+.chat-other .chat-content .dialog_box:after {
+  border: 0.1rem solid transparent;
+  border-right: 0.25rem solid #fdfdfd;
+  position: absolute;
+  content: "";
+  top: 50%;
+  margin-top: -0.2rem;
+  right: 100%;
+}
+.chat-other .chat-content img {
+  width: 1.08rem;
+  height: 1.09rem;
+  border-radius: 50%;
+  background-color: #5c5c5c;
+  position: absolute;
+  left: -1.4rem;
+  top: 0.2rem;
+}
+</style>

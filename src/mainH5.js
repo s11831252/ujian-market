@@ -41,9 +41,6 @@ Vue.mixin({
       go: function(path) {
         this.$router.push(path);
       },
-      replace: function (path) {
-        this.$router.replace(path);
-      },
       toast(title){
         this.$toast.center(title);
       },

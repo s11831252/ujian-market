@@ -155,7 +155,7 @@ export default {
         console.log(rep);
 
         if (rep.ret == 0) {
-          // this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
+          // this.$router.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
           this.$router.back();
         }
       } 
@@ -171,7 +171,7 @@ export default {
         console.log(rep);
         if (rep.ret == 0) {
           this.$router.back();
-          //  this.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
+          //  this.$router.replace({path:'/pages/order/orderDetail',query:{OrderId:this.orderInfo.OrderId},reLaunch: true})
         }
       }
     }

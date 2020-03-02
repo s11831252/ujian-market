@@ -57,7 +57,7 @@
                 <div v-else class="goods-detail-content" style="font-size:initial;" v-html="goods_detail.gDetailed"></div>
             </div>
         </div>
-        <shoppingCar :sId="sId"></shoppingCar>
+        <shoppingCar :sId="sId" :sName="sName"></shoppingCar>
     </div>
 </template>
 <script>

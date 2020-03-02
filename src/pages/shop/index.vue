@@ -69,7 +69,7 @@
         </div>
       </div>
     </div>
-    <shoppingCar :sId="sId"></shoppingCar>
+    <shoppingCar :sId="sId" :sName="shopDetail.sName"></shoppingCar>
   </div>
 </template>
 <script>
@@ -170,7 +170,6 @@ export default {
     }
   },
   onShareAppMessage(result) {
-    debugger;
     let title = this.shopDetail.sName;
     let path = `/pages/shop/index?sId=${this.sId}&InvitaId=${this.UserInfo.UserId}`;
     let imageUrl = '/static/img/share.png'

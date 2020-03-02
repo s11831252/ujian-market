@@ -74,6 +74,7 @@ export default {
       this.$router.push("/pages/index/index"); //回到登录页
     },
     outShopping(){
+        console.log(this.ShoppingInfo);
         if(this.ShoppingInfo)
         {
             switch(this.ShoppingInfo.AudtiState)
@@ -87,7 +88,7 @@ export default {
                     break;
                 }
                 case 1:{
-                    this.go({path:'/pages/my/applyresult',query:{sId:this.ShoppingInfo.sId}})
+                    this.go({path:'/pages/store/storepage',query:{sId:this.ShoppingInfo.sId}})
                     break;
                 }
                 case 2:{

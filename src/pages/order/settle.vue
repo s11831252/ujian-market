@@ -61,7 +61,7 @@ export default {
     ...mapMutations([
       'ShoppingCarEmpty'
     ]),
-   async pay(){
+    async pay(){
       if(!this.getShoppingCarBysId.Logistics)
         this.alert("请选择配送方式")
 

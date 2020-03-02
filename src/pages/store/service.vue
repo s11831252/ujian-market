@@ -8,14 +8,17 @@
                 <p class="hint">显示最后一条信息,该消息已被阅读...</p>
                 <div v-if="shuzi" class="unread" >1</div>
             </div>
-            <div class="dingdan">
-                <span>交易订单：</span>
-                <span class="bianhao">123456987521456325</span>
+            <span class="dingdan">
+                <div>
+                    <span>交易订单：</span>
+                    <span class="bianhao">123456987521456325</span>
+                </div>
+                <div>
                 <span>已经签收</span>
                 <span>&gt;</span>
-            </div>
+                </div>
+            </span>
         </div> 
-       
     </div>
 </template>
 <script>
@@ -47,10 +50,11 @@ export default {
     
 }
 .right {
-    border-bottom: 0.02rem solid #dedde3;
+    border-bottom: 0.01rem solid #dedde3;
     position: absolute;
-    right: 0.36rem;
+    right: 0;
     top: 0.51rem;
+    padding-right: 0.34rem;
     left: 2.15rem;
 }
 .name {
@@ -89,6 +93,7 @@ export default {
     font-size: 0.36rem;
     color: #a2a2a2;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-left: 2.15rem;
     margin-top: 0.51rem;

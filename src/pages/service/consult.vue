@@ -1,48 +1,144 @@
 <template>
-  <div>
-    <div class="wai">
-      <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-      <!-- 用户对话框 -->
-      <div class="yonghu">
-        <p class="time">下午03:07</p>
-        <div class="dialog_box">
-          <p class="username">用户名称</p>
-          <span class="read">已读</span>
-          请传参传参错错错错错错错错错错错错错错错错错错错错错错错错错错错
-          <img
-            src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1570536053455&di=e7deaf157fc09c2547ac84bfadd77de5&imgtype=0&src=http%3A%2F%2Fp2.so.qhimgs1.com%2Ft015b444b7249801792.jpg"
-            alt
-          />
-        </div>
-      </div>
-      <!-- 管理员对话框 -->
-      <div class="Administrator">
-        <div class="dialog_boxNr">
-          <p class="timeNr">下午03:07</p>
-          <p class="usernameNr">管理员名称</p>
-          <span class="readNr">已读</span>
-          南宁
-          <img
-            src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1570536053455&di=e7deaf157fc09c2547ac84bfadd77de5&imgtype=0&src=http%3A%2F%2Fp2.so.qhimgs1.com%2Ft015b444b7249801792.jpg"
-            alt
-          />
-        </div>
-      </div>
-
-      
-      
-    </div>
+  <div class="wai">
+    <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
+    <!-- <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" ></chatItem> -->
     <!-- 输入框 -->
     <div class="input">
       <!-- 引用图标，需要引用其样式 -->
       <div class="icon">&#xe664;</div>
-      <textarea maxlength="1000" auto-focus="’true’" placeholder="输入新消息"></textarea>
+      <textarea maxlength="1000" auto-focus="’true’" v-model="msg" placeholder="输入新消息"></textarea>
       <div class="icon">&#xe652;</div>
-      <div class="icon">&#xe726;</div>
+      <div class="icon" @click="SendMsg">&#xe726;</div>
     </div>
   </div>
 </template>
+<script>
+import { mapState } from "vuex";
+import utils from "@/utils/index.js";
+import chatItem from "@/pages/service/chat-item";
+import WebIM from "@/utils/hx/WebIM";
+import md5 from "@/utils/md5";
+
+export default {
+  data() {
+    return {
+      msg: "",
+      to:"",
+      sId: null,
+      webSocket: null,
+      ChatHistory: [],
+      chatInfo:null
+    };
+  },
+  components: {
+    chatItem
+  },
+  computed: {
+    ...mapState({
+      Ticket: state => state.User.SingleTicket,
+      UserInfo: state => state.User.UserInfo
+    })
+  },
+  methods: {
+    SendMsg(){
+      var that = this;
+			let id = WebIM.conn.getUniqueId();
+			let msg = new WebIM.message("txt", id);
+			msg.set({
+				msg: this.msg,
+				from: WebIM.conn.context.userId,
+				to:this.to,
+				roomType: false,
+				chatType: "chat",
+				success(id, serverMsgId){
+					console.log('成功了',id,serverMsgId)
+          // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
+          that.msg="";
+				},
+				fail(id, serverMsgId){
+					console.log('失败了')
+				}
+      });
+			msg.setGroup("groupchat");
+			console.log('发送消息', msg)
+			WebIM.conn.send(msg.body);
+    }
+  },
+  mounted() {
+    this.sId = this.$route.query.sId;
+    this.sName= decodeURI(this.$route.query.sName);
+    wx.setNavigationBarTitle({ title: this.sName });
+    var listGroup = utils.getItem("listGroup")
+    if(listGroup)
+    {
+      this.chatInfo = listGroup.find(item=>{
+        return item.name==this.UserInfo.Phone+"_"+this.sName
+      })
+      console.log(this.chatInfo);
+      if(this.chatInfo)
+      this.to = this.chatInfo.roomId
+    }
+  },
+  created() {
+    console.log(WebIM);
+    var _WebIM=WebIM
+    WebIM.conn.listen({
+      onOpened: function(message) {
+        //连接成功回调
+        // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
+        // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
+        // 则无需调用conn.setPresence();
+        console.log(message)
+        _WebIM.conn.setPresence();
+            _WebIM.conn.listRooms({
+                success: function(resp) {
+                    console.log("Response: ", resp);
+                    // cursor = resp.cursor;
+                    utils.setItem("listGroup",resp)
+                },
+                error: function(e) {
+                    console.log("error:", e);
+                }
+            });
+      },
+      onClosed: function(message) {}, //连接关闭回调
+      onTextMessage: function(message) {}, //收到文本消息
+      onEmojiMessage: function(message) {}, //收到表情消息
+      onPictureMessage: function(message) {}, //收到图片消息
+      onRoster: function(message) {}, //处理好友申请
+      onInviteMessage: function(message) {}, //处理群组邀请
+      onOnline: function() {}, //本机网络连接成功
+      onOffline: function() {}, //本机网络掉线
+      onError: function(message) {}, //失败回调
+      onReceivedMessage: function(message) {}, //收到消息送达服务器回执
+      onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
+      onReadMessage: function(message) {} //收到消息已读回执
+      // ......
+    });
+    if (this.UserInfo && this.UserInfo.UserId) {
+      var hx_username = this.UserInfo.UserId.replace(/-/g, "");
+      var hx_psw = md5.hex_md5(hx_username);
+      console.log(hx_username, hx_psw);
+
+      let options = {
+        grant_type: "password",
+        apiUrl: WebIM.config.apiURL,
+        user: hx_username,
+        pwd: hx_psw,
+        appKey: WebIM.config.appkey
+      };
+      WebIM.conn.open(options);
+    }
+  }
+};
+</script>
+
 <style scoped>
+.wai {
+  background-color: #ecf0f1;
+  height: 100%;
+  padding-top: 0.49rem;
+}
 .top {
   width: 6.38rem;
   height: 0.68rem;
@@ -52,139 +148,10 @@
   color: #ffffff;
   text-align: center;
   line-height: 0.68rem;
-  margin-top: 0.49rem;
+  /* margin-top: 0.49rem; */
   margin-left: 2.21rem;
 }
-.yonghu {
-  margin: 0.4rem auto;
-  float: right;
-  word-break:break-all;
-}
-.time {
-  font-size: 0.3rem;
-  color: #5c5c5c;
-  /* 让内容强制不换行 */
-  white-space: nowrap;
-  margin-left: 0.1rem;
-  margin-bottom: 0.47rem;
-}
-.username {
-  font-size: 0.3rem;
-  color: #5c5c5c;
-  /* 让内容强制不换行 */
-  white-space: nowrap;
-  position: absolute;
-  right: 0.15rem;
-  top: -0.4rem;
-}
-.read {
-  font-size: 0.3rem;
-  color: #a2a2a2;
-  position: absolute;
-  left: -0.74rem;
-  top: 50%;
-}
-.dialog_box {
-  max-width: 6.5rem;
-  /* css3属性，fit-content既是让宽度随内容大小变化 */
-  width: fit-content;
-  font-size: 0.4rem;
-  color: #5c5c5c;
-  background-color: #d2e0e1;
-  border-radius: 0.1rem;
-  padding: 0.5rem;
-  position: relative;
-  margin-right: 1.5rem;
-}
-/* 右侧小三角形 */
-.dialog_box:after {
-  border: 0.1rem solid transparent;
-  border-left: 0.25rem solid #d2e0e1;
-  position: absolute;
-  content: "";
-  top: 50%;
-  margin-top: -0.2rem;
-  left: 100%;
-}
-.yonghu img {
-  width: 1.08rem;
-  height: 1.09rem;
-  border-radius: 50%;
-  background-color: #5c5c5c;
-  position: absolute;
-  right: -1.4rem;
-  top: 0.2rem;
-}
-.Administrator {
-  width: 100%;
-  margin: 0.8rem auto 0rem;
-  float: left;
-  word-break:break-all;
-}
-/* 让最后一个元素距离输入框有一个距离 */
-.yonghu:last-child {
-  margin-bottom: 2rem !important;
-}
-.Administrator:last-child {
-  margin-bottom: 2rem !important;
-}
 
-.timeNr {
-  font-size: 0.3rem;
-  color: #5c5c5c;
-  /* 让内容强制不换行 */
-  white-space: nowrap;
-  position: absolute;
-  right: 0.2rem;
-  top: -0.8rem;
-}
-.usernameNr {
-  font-size: 0.3rem;
-  color: #5c5c5c;
-  /* 让内容强制不换行 */
-  white-space: nowrap;
-  position: absolute;
-  left: 0.15rem;
-  top: -0.4rem;
-}
-.readNr {
-  font-size: 0.3rem;
-  color: #a2a2a2;
-  position: absolute;
-  right: -0.74rem;
-  top: 40%;
-}
-.dialog_boxNr {
-  max-width: 6.5rem;
-  /* css3属性，fit-content既是让宽度随内容大小变化 */
-  width: fit-content;
-  font-size: 0.4rem;
-  color: #5c5c5c;
-  background-color: #fdfdfd;
-  border-radius: 0.1rem;
-  padding: 0.35rem;
-  position: relative;
-  margin-left: 1.5rem;
-}
-/* 左侧小三角形 */
-.dialog_boxNr:after {
-  border: 0.1rem solid transparent;
-  border-right: 0.25rem solid #fdfdfd;
-  position: absolute;
-  content: "";
-  top: 50%;
-  margin-top: -0.2rem;
-  right: 100%;
-}
-.Administrator img {
-  width: 1.08rem;
-  height: 1.09rem;
-  border-radius: 50%;
-  background-color: #5c5c5c;
-  position: absolute;
-  left: -1.4rem;
-  top: 0.2rem;
-}
 .input {
   width: 100%;
   border-top: 0.02rem solid #898989;

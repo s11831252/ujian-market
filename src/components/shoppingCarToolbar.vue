@@ -17,7 +17,7 @@
             </ul>
         </div>
         <div class="shoppingcar-toolbar">
-            <span class="service" @click="go({path:'/pages/service/consult'})">
+            <span class="service" @click="go({path:'/pages/service/consult',query:{sId:sId,sName:sName}})">
               <i class="icon service-icon">&#xe734;</i>
               <p>联系客服</p>
             </span>
@@ -40,11 +40,11 @@ import buy from "@/components/buy";
 export default {
     props:{
         sId:String,
+        sName:String
     },
     data(){
       return {
         showed:false,
-        sName:"",
       };
     },
   computed: {

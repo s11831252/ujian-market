@@ -27,7 +27,7 @@ function formatNumber (n) {
   return str[1] ? str : `0${str}`
 }
 
-export function formatTime (date) {
+function formatTime (date) {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
   const day = date.getDate()
@@ -42,10 +42,55 @@ export function formatTime (date) {
   return `${t1} ${t2}`
 }
 
+/**
+ * 设置缓存项
+ *
+ * @param {*} key 缓存键名
+ * @param {*} value 缓存值
+ */
+function setItem(key,value){
+  // 存储
+  if(mpvue_Mode === 'WX')
+     wx.setStorageSync(key, value)
+  else
+    localStorage.setItem(key, value);
+}
+
+
+/**
+ *获取缓存值
+ *
+ * @param {*} key 缓存键名
+ * @returns 返回缓存值
+ */
+function getItem(key)
+{
+    if(mpvue_Mode === 'WX')
+      return wx.getStorageSync(key)
+    else
+      return localStorage.getItem(key);
+}
+
+/**
+ *移除缓存键
+ *
+ * @param {*} key 缓存键名
+ */
+function removeItem(key)
+{
+  if(mpvue_Mode === 'WX')
+     wx.removeStorageSync(key)
+  else
+    localStorage.removeItem(key);
+}
+
 export default {
   formatNumber,
   formatTime,
   setCookie,
   getCookie,
-  delCookie
+  delCookie,
+  setItem,
+  getItem,
+
 }

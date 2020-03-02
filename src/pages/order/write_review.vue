@@ -139,7 +139,7 @@ export default {
         console.log(this.postData);
         var rep = await this.$ShoppingAPI.OrderComment_GetListAdd(this.postData);
         if (rep.ret == 0) {
-          this.replace({
+          this.$router.replace({
             path: "/pages/order/Comment",
             query: { OrderId: this.orderInfo.OrderId },
             reLaunch: true

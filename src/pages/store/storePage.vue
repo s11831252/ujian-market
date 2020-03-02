@@ -53,10 +53,14 @@
     <!--数据评分 -->
     <div class="middle">
       <div class="middleNr">
-        <span class="dianpu">店铺综合评分:</span>
-        <span class="shuzi" style="color:#46b7ff;">4.5</span>
-        <span class="particulars">查看详情</span>
-        <span class="particulars">&gt;</span>
+        <div>
+          <span class="dianpu">店铺综合评分:</span>
+          <span class="shuzi" style="color:#46b7ff;">4.5</span>
+        </div>
+        <div>
+          <span class="particulars">查看详情</span>
+          <span class="particulars">&gt;</span>
+        </div>
       </div>
       <div class="quality">
         <div class="grade">
@@ -133,8 +137,9 @@
 }
 .tubiao div {
   color: #ffffff;
-  width: 0.58rem;
-  height: 0.58rem;
+  /* width: 0.58rem;
+  height: 0.58rem; */
+  font-size: 0.6rem;
   margin-right: 0.43rem;
   margin-top: 0.36rem;
 }
@@ -197,18 +202,23 @@
   padding-bottom: 0.52rem;
 }
 .middleNr {
-  height: 1.34rem;
-  line-height: 1.34rem;
+  /* height: 1.34rem;
+  line-height: 1.34rem; */
   border-bottom: 0.03rem solid #e8e8e8;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0;
+  padding: 0.44rem 0.33rem;
 }
 .dianpu {
   font-size: 0.4rem;
-  padding-left: 0.34rem;
-  padding-right: 0.25rem;
+  /* padding-left: 0.34rem;
+  padding-right: 0.25rem; */
 }
 .shuzi {
-  font-size: 0.4rem;
-  padding-right: 5.2rem;
+  padding-left: 0.16rem;
+  font-size: 0.5rem;
+  /* padding-right: 5.2rem; */
 }
 .particulars {
   font-size: 0.35rem;

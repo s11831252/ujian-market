@@ -756,7 +756,7 @@ export default {
         this.hint = true;
         this.consignee = false;
       // 页面跳转  跳转去确认收货页面
-        this.replace({
+        this.$router.replace({
         path: "/pages/order/confirm_receipt",
         query: { OrderId: this.orderInfo.OrderId },
         reLaunch: true
