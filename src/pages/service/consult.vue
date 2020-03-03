@@ -18,6 +18,8 @@ import utils from "@/utils/index.js";
 import chatItem from "@/pages/service/chat-item";
 import WebIM from "@/utils/hx/WebIM";
 import md5 from "@/utils/md5";
+import msgStorage from "./msgstorage";
+import msgType from "./msytype";
 
 export default {
   data() {
@@ -53,6 +55,7 @@ export default {
 				success(id, serverMsgId){
 					console.log('成功了',id,serverMsgId)
           // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
+          msgStorage.saveMsg(msg,msgType.TEXT)
           that.msg="";
 				},
 				fail(id, serverMsgId){
@@ -61,7 +64,8 @@ export default {
       });
 			msg.setGroup("groupchat");
 			console.log('发送消息', msg)
-			WebIM.conn.send(msg.body);
+      WebIM.conn.send(msg.body);
+      
     }
   },
   mounted() {
@@ -80,6 +84,7 @@ export default {
     }
   },
   created() {
+    var that = this;
     console.log(WebIM);
     var _WebIM=WebIM
     WebIM.conn.listen({
@@ -90,6 +95,8 @@ export default {
         // 则无需调用conn.setPresence();
         console.log(message)
         _WebIM.conn.setPresence();
+        utils.setItem("myUsername",_WebIM.conn.context.userId)
+        
             _WebIM.conn.listRooms({
                 success: function(resp) {
                     console.log("Response: ", resp);
@@ -102,12 +109,15 @@ export default {
             });
       },
       onClosed: function(message) {}, //连接关闭回调
-      onTextMessage: function(message) {}, //收到文本消息
+      onTextMessage: function(message) {
+
+        
+      }, //收到文本消息
       onEmojiMessage: function(message) {}, //收到表情消息
       onPictureMessage: function(message) {}, //收到图片消息
       onRoster: function(message) {}, //处理好友申请
       onInviteMessage: function(message) {}, //处理群组邀请
-      onOnline: function() {}, //本机网络连接成功
+      onOnline: function() {}, //本机网络连f接成功
       onOffline: function() {}, //本机网络掉线
       onError: function(message) {}, //失败回调
       onReceivedMessage: function(message) {}, //收到消息送达服务器回执
