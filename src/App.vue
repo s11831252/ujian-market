@@ -82,8 +82,8 @@ export default {
   -webkit-transition: width 2s;
   -o-transition: width 2s;
 }
-page{
-  /* background: #ecf0f1; */
-  /* margin-bottom: 45px; */
-}
+/* page{
+  background: #ecf0f1;
+  margin-bottom: 45px;
+} */
 </style>

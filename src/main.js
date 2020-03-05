@@ -5,15 +5,18 @@ import store from './store'
 import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
-
+import API2 from "./api/API2"
 import { debug } from 'util';
 import './assets/style.css';
 import './assets/global.css';
 import './assets/iconfont.less';
+import WebIM from "@/utils/hx/WebIM";
+import md5 from "@/utils/md5";
 
 Vue.prototype.$UJAPI = UJAPI; //在实例中用this.$UJAPI调用UJAPI封装好的RestAPI
 Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用this.$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
 Vue.prototype.$WeixinOpenAPI = WeixinOpenAPI; //在实例中用this.$WeiXinOpenAPI调用WeiXinOpenAPI.js封装好的RestAPI
+Vue.prototype.$API2=API2;//在实例中用this.$API2调用API2.js封装好的RestAPI
 
 Vue.prototype.$store = store;
 Vue.mixin({
@@ -126,6 +129,23 @@ Vue.mixin({
                 if(callback)
                     callback();
             }
+        },
+        hx_login(){
+            // console.log(this.$store.state,this.$store.state.UserInfo)
+            if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
+                var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
+                var hx_psw = md5.hex_md5(hx_username);
+                console.log(hx_username, hx_psw);
+          
+                let options = {
+                  grant_type: "password",
+                  apiUrl: WebIM.config.apiURL,
+                  user: hx_username,
+                  pwd: hx_psw,
+                  appKey: WebIM.config.appkey
+                };
+                WebIM.conn.open(options);
+              }
         }
     },
     onLoad () {

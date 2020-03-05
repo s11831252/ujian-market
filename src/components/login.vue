@@ -169,6 +169,8 @@ export default {
         userinfo.data.unionid = this.userInfo.unionid;
         userinfo.data.openid = this.userInfo.openid;
         this.$store.commit("GetUserInfo", userinfo.data);
+        this.hx_login();
+        
         if (this.$route.query.redirect)
         {
           let url = decodeURIComponent(this.$route.query.redirect); 

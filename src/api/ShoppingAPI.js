@@ -238,4 +238,7 @@ export default {
         return http.post(BaseHost + `api/Shop/CancelAudti?sId=${sId}`)
     },
     
+    ShopEmployee_Get:(sId)=>{
+        return http.get(BaseHost + `api/ShopEmployee/Get?sId=${sId}`)
+    }
 }

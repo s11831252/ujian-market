@@ -2,7 +2,7 @@
 //  let disp = require("../../utils/hx/broadcast");
 import Disp from "../../utils/hx/Dispatcher";
 import disp from "../../utils/hx/broadcast";
-import msgpackager from "./msgpackager";
+import msgPackager from "./msgpackager";
 import msgType from "./msgtype";
 let msgStorage = new Disp();
 msgStorage.saveReceiveMsg = function(receiveMsg, type){

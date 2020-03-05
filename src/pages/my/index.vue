@@ -53,6 +53,8 @@
 </template>
 <script>
 import { mapState } from "vuex";
+import WebIM from "@/utils/hx/WebIM";
+
 export default {
   data() {
     return {
@@ -71,6 +73,8 @@ export default {
   methods: {
     exit() {
       this.$store.commit("Login", { Ticket: "" }); //存入Ticket
+      this.$store.commit("GetUserInfo", {});
+      WebIM.conn.close();
       this.$router.push("/pages/index/index"); //回到登录页
     },
     outShopping(){
