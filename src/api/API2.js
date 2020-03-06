@@ -6,6 +6,10 @@ let BaseHost = process.env.NODE_ENV != 'development'?"http://localhost:49814/":"
 
 export default {
     groupChat_Create:(groupname,owner,members,desc="",isPublic=false,approval=true)=>{
-        http_wx.get(BaseHost+`groupChat/Create?groupname=${groupname}&members=${members}&owner=${owner}&desc=${desc}&isPublic=${isPublic}&approval=${approval}`)
+       return  http_wx.get(BaseHost+`groupChat/Create?groupname=${groupname}&members=${members}&owner=${owner}&desc=${desc}&isPublic=${isPublic}&approval=${approval}`)
+    },
+    groupChat_ModifyDescription:(groupid,description)=>
+    {
+        return http_wx.get(BaseHost+`groupChat/ModifyDescription?groupid=${groupid}&description=${description}`)
     }
 }
