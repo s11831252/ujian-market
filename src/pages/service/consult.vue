@@ -167,11 +167,11 @@ export default {
           });
           _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
           members = _menberArr.join();
-          console.log(groupname, owner, members, desc);
+          // console.log(groupname, owner, members, desc);
           this.$API2
             .groupChat_Create(groupname, owner, members, desc)
             .then(rep2 => {
-              console.log(rep2);
+              // console.log(rep2);
               if (rep2.ret == 0) {
                 this.chatRoomInfo = {
                   jid: `888yuezhi-88#ubuild_${
@@ -191,7 +191,10 @@ export default {
         roomId: this.chatRoomInfo.roomId,
         success: function(settings, members, fields) {
           console.log("queryRoomInfo成功",fields);
+
           var desc_obj = JSON.parse(fields.description);
+          console.log(desc_obj);
+
           desc_obj.lastTime = Math.round(new Date().getTime()/1000);
           var json_obj = JSON.stringify(desc_obj)
           console.log(json_obj);
