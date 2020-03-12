@@ -1,16 +1,18 @@
 <template>
-  <div class="wai">
+  <scroll-view class="wai" :scroll-into-view="toView" scroll-y="true">
     <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-    <!-- <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" ></chatItem> -->
+    <!-- <div class="msgbox"> -->
+    <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
+    <!-- </div> -->
     <!-- 输入框 -->
     <div class="input">
       <!-- 引用图标，需要引用其样式 -->
       <div class="icon">&#xe664;</div>
       <textarea maxlength="1000" auto-focus="’true’" v-model="msg" placeholder="输入新消息"></textarea>
       <div class="icon">&#xe652;</div>
-      <div class="icon" @click="SendMsg">&#xe726;</div>
+      <div class="icon" @click="sendMsg">&#xe726;</div>
     </div>
-  </div>
+  </scroll-view>
 </template>
 <script>
 import { mapState } from "vuex";
@@ -62,8 +64,9 @@ export default {
       sId: null,
       webSocket: null,
       ChatHistory: [],
-      chatRoomInfo: null,
-      shopInfo: null
+      chatRoomInfo: {},
+      shopInfo: null,
+      toView:"",
     };
   },
   components: {
@@ -80,7 +83,7 @@ export default {
     }
   },
   methods: {
-    SendMsg() {
+    sendMsg() {
       var that = this;
       if (!this.to) {
       } else {
@@ -108,6 +111,13 @@ export default {
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
       }
+    },
+    readMsg(renderableMsg,type,currentChatMsg,sessionKey,isNew){
+      this.ChatHistory=currentChatMsg;
+      if(this.ChatHistory.length)
+      {
+        this.toView=this.ChatHistory[this.ChatHistory.length-1].mid
+      }
     }
   },
   async mounted() {
@@ -130,30 +140,27 @@ export default {
     }
 
     //没有则创建聊天室
-    if (!this.chatRoomInfo) {
-     
-      var groupname,
-        owner,
-        members,desc
+    if (!this.chatRoomInfo.roomId) {
+      var groupname, owner, members, desc;
       var desc_obj = {
-          store: {
-            sId: this.sId,
-            sNm: this.sName,
-            sLogo:this.shopInfo.sLogo.replace(/\//g, "#")
-          },
-          order: {
-            // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
-            // orderNo: "201906181030089564",
-            // state: "交易完成"
-          },
-          buyer: {
-            bId: this.UserInfo.UserId,
-            bPhone: this.UserInfo.Phone,
-            bLogo: this.UserInfo.Portrait.replace(/\//g, "#"),
-            bNm: this.UserInfo.UserName,
-            auth: this.IsCertification?"true":"false"
-          },
-          lastTime: Math.round(new Date().getTime()/1000) 
+        store: {
+          sId: this.sId,
+          sNm: this.sName,
+          sLogo: this.shopInfo.sLogo.replace(/\//g, "#")
+        },
+        order: {
+          // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
+          // orderNo: "201906181030089564",
+          // state: "交易完成"
+        },
+        buyer: {
+          bId: this.UserInfo.UserId,
+          bPhone: this.UserInfo.Phone,
+          bLogo: this.UserInfo.Portrait.replace(/\//g, "#"),
+          bNm: this.UserInfo.UserName,
+          auth: this.IsCertification ? "true" : "false"
+        },
+        lastTime: Math.round(new Date().getTime() / 1000)
       };
       desc = JSON.stringify(desc_obj);
       groupname = `${this.UserInfo.Phone}_${this.sName}`;
@@ -186,27 +193,52 @@ export default {
             });
         }
       });
-    } else {
+    } 
+
+    
+      // //更新聊天室备注
       WebIM.conn.queryRoomInfo({
         roomId: this.chatRoomInfo.roomId,
         success: function(settings, members, fields) {
           console.log("queryRoomInfo成功",fields);
 
           var desc_obj = JSON.parse(fields.description);
-          console.log(desc_obj);
-
+          // console.log(desc_obj);
           desc_obj.lastTime = Math.round(new Date().getTime()/1000);
           var json_obj = JSON.stringify(desc_obj)
-          console.log(json_obj);
           that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId,json_obj)
+          desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
+          desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
+          that.chatRoomInfo.desc=desc_obj;
+          // console.log(that.chatRoomInfo);
         },
         error: function(msg) {
           console.log(msg);
         }
       });
-    }
+    var sessionKey = this.chatRoomInfo.roomId + WebIM.conn.context.userId;
+      
+    var chatMsg = utils.getItem(sessionKey);
+    this.readMsg(null,null,chatMsg,sessionKey)
+    
 
-    console.log(this.chatRoomInfo);
+    msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey){
+      console.log("newChatMsg:",renderableMsg, curChatMsg)
+      // 判断是否属于当前会话
+      if(that.chatRoomInfo.roomId&&sesskey==sessionKey)
+      {
+        if(renderableMsg.info.from==that.chatRoomInfo.roomId||renderableMsg.info.to == that.chatRoomInfo.roomId)//群消息或者群成员发出的消息
+        {
+          that.readMsg(renderableMsg,type,curChatMsg,sesskey,true)
+        }else if(renderableMsg.info.from == WebIM.conn.context.userId||renderableMsg.info.to == WebIM.conn.context.userId) //我发的消息或者别人发给我的消息
+        {
+          that.readMsg(renderableMsg,type,curChatMsg,sesskey)
+        }
+      }
+
+		});
+
+    // console.log(this.chatRoomInfo);
   },
   created() {
     var that = this;
@@ -269,12 +301,21 @@ export default {
   }
 };
 </script>
-
+<style>
+body{
+  height: 100%;
+}
+</style>
 <style scoped>
+
 .wai {
   background-color: #ecf0f1;
   height: 100%;
+  max-height: 100%;
+  overflow:scroll;
   padding-top: 0.49rem;
+  padding-bottom: 0.4rem;
+  margin-bottom: 1.4rem;
 }
 .top {
   width: 6.38rem;

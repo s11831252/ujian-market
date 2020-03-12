@@ -1,68 +1,72 @@
 <template>
-      <div class="chat-item">
-        <p class="time">{{fmtChattime}}</p>
-          <!-- 用户对话框 -->
-        <div class="chat-my"  v-if="chatdata.from==UserInfo.UserId">
-          <div class="chat-content">
-            <div class="dialog_box">
-              <p class="username">用户名称</p>
-              <!-- <span class="read">已读</span> -->
-              {{chatdata.msg}}
-              <img :src="UserInfo.Portrait" alt
-              />
-            </div>
-          </div>
-        </div>
-        <div class="chat-other" v-else>
-          <!-- 管理员对话框 -->
-          <div class="chat-content">
-            <div class="dialog_box">
-              <p class="username">管理员名称</p>
-              <!-- <span class="read">已读</span> -->
-              南宁
-              <img
-                src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1570536053455&di=e7deaf157fc09c2547ac84bfadd77de5&imgtype=0&src=http%3A%2F%2Fp2.so.qhimgs1.com%2Ft015b444b7249801792.jpg"
-                alt
-              />
-            </div>
-          </div>
+  <div class="chat-item" :id="chatdata.mid">
+    <p class="time">{{fmtChattime}}</p>
+    <!-- 用户对话框 -->
+    <div class="chat-my" v-if="chatdata.info.from==myUsername">
+      <div class="chat-content">
+        <div class="dialog_box">
+          <p class="username">{{UserInfo.UserName}}</p>
+          <!-- <span class="read">已读</span> -->
+          <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          <img :src="UserInfo.Portrait" alt />
         </div>
       </div>
+    </div>
+    <div class="chat-other" v-else>
+      <!-- 管理员对话框 -->
+      <div class="chat-content">
+        <div class="dialog_box">
+          <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
+          <!-- <span class="read">已读</span> -->
+          <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import { mapState } from "vuex";
-import utils from "@/utils"
+import utils from "@/utils";
 export default {
-    props:{
-        chatdata:Object
+  props: {
+    chatdata: Object,
+    chatRoomInfo: Object
+  },
+  computed: {
+    ...mapState({
+      UserInfo: state => state.User.UserInfo
+    }),
+    fmtChattime() {   
+      return this.chatdata.time;
     },
-    computed:{
-        ...mapState({
-            UserInfo:state => state.User.UserInfo
-        }),
-        fmtChattime(){
-            let _date = new Date(this.chatdata.chattime*1000); 
-            console.log(utils.formatTime);
-            return _date.toLocaleString();
-        }
+    myUsername(){
+      var _myUsername = utils.getItem("myUsername");
+      return _myUsername;
     },
-}
+  },
+  mounted() {
+
+  }
+};
 </script>
 <style scoped>
-.chat-item{
-  margin-top:0.56rem;
-  text-align: center
+.chat-item {
+  margin-top: 0.56rem;
+  text-align: center;
 }
-.chat-my{
-  display: flex;justify-content: flex-end;
+.chat-my {
+  display: flex;
+  justify-content: flex-end;
 }
-.chat-other{
-  display:flex;justify-content:flex-start;
+.chat-other {
+  display: flex;
+  justify-content: flex-start;
 }
 .chat-content {
   /* margin: 0.4rem auto; */
   /* float: right; */
-  word-break:break-all;
+  word-break: break-all;
 }
 .time {
   font-size: 0.3rem;

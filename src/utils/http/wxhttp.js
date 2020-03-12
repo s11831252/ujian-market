@@ -57,10 +57,11 @@ const net = {
               wx.redirectTo({url:url});
             }else if(res.data.ret!=0)
             {
-              wx.showToast({
-                title: res.data.msg,
-                icon: "none"
-              });
+              if(res.data.msg)
+                wx.showToast({
+                  title: res.data.msg,
+                  icon: "none"
+                });
               return false;
             }
           }
@@ -104,6 +105,7 @@ const net = {
             return false;
           }
           if(res.data.ret!=0){
+            if(res.data.msg)
             wx.showToast({
               title: res.data.msg,
               icon: "none"
@@ -184,10 +186,11 @@ const net = {
               var res=JSON.parse(resp.data);
               // console.log(res)
               if(res.ret!=0){
-                wx.showToast({
-                  title: res.msg,
-                  icon: "none"
-                });
+                if(res.msg)
+                  wx.showToast({
+                    title: res.msg,
+                    icon: "none"
+                  });
                 return false;
               }
               resolve(res);
