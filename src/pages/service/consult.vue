@@ -3,6 +3,7 @@
     <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
     <!-- <div class="msgbox"> -->
     <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
+    <div id="end"></div>
     <!-- </div> -->
     <!-- 输入框 -->
     <div class="input">
@@ -114,9 +115,17 @@ export default {
     },
     readMsg(renderableMsg,type,currentChatMsg,sessionKey,isNew){
       this.ChatHistory=currentChatMsg;
+      
+
       if(this.ChatHistory.length)
       {
-        this.toView=this.ChatHistory[this.ChatHistory.length-1].mid
+        if(isNew)
+        {
+          this.toView = currentChatMsg[this.ChatHistory.length-1].mid
+        }else
+        {
+          this.toView = currentChatMsg[this.ChatHistory.length-1].mid
+        }
       }
     }
   },
@@ -158,7 +167,7 @@ export default {
           bPhone: this.UserInfo.Phone,
           bLogo: this.UserInfo.Portrait.replace(/\//g, "#"),
           bNm: this.UserInfo.UserName,
-          auth: this.IsCertification ? "true" : "false"
+          auth: this.IsCertification
         },
         lastTime: Math.round(new Date().getTime() / 1000)
       };
@@ -205,10 +214,15 @@ export default {
           var desc_obj = JSON.parse(fields.description);
           // console.log(desc_obj);
           desc_obj.lastTime = Math.round(new Date().getTime()/1000);
+          if(desc_obj.buyer)
+          {
+            desc_obj.buyer.auth=true;
+          }
           var json_obj = JSON.stringify(desc_obj)
           that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId,json_obj)
           desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
           desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
+          
           that.chatRoomInfo.desc=desc_obj;
           // console.log(that.chatRoomInfo);
         },
@@ -310,7 +324,7 @@ body{
 
 .wai {
   background-color: #ecf0f1;
-  height: 100%;
+  height: 87%;
   max-height: 100%;
   overflow:scroll;
   padding-top: 0.49rem;

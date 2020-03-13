@@ -52,7 +52,7 @@ export default {
 </script>
 <style scoped>
 .chat-item {
-  margin-top: 0.56rem;
+  margin: 0.28rem 0;
   text-align: center;
 }
 .chat-my {
