@@ -6,13 +6,13 @@
     <div id="end"></div>
     <!-- </div> -->
     <!-- 输入框 -->
-    <div class="input">
+    <cover-view class="input">
       <!-- 引用图标，需要引用其样式 -->
-      <div class="icon">&#xe664;</div>
-      <textarea maxlength="1000" auto-focus="’true’" v-model="msg" placeholder="输入新消息"></textarea>
-      <div class="icon">&#xe652;</div>
-      <div class="icon" @click="sendMsg">&#xe726;</div>
-    </div>
+      <cover-view class="icon">&#xe664;</cover-view>
+      <textarea fixed="true" maxlength="1000" auto-focus focus="true" @confirm="sendMsg" confirm-type="发送" v-model="msg" placeholder="输入新消息"></textarea>
+      <cover-view class="icon">&#xe652;</cover-view>
+      <cover-view class="icon">&#xe726;</cover-view>
+    </cover-view>
   </scroll-view>
 </template>
 <script>

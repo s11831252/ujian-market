@@ -172,7 +172,7 @@ export default {
   onShareAppMessage(result) {
     let title = this.shopDetail.sName;
     let path = `/pages/shop/index?sId=${this.sId}&InvitaId=${this.UserInfo.UserId}`;
-    let imageUrl = '/static/img/share.png'
+    let imageUrl = 'https://image.ujianchina.net/MiniProgram/share.png'
     return {
       title,
       path,
