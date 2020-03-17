@@ -7,7 +7,10 @@
         <div class="dialog_box">
           <p class="username">{{UserInfo.UserName}}</p>
           <!-- <span class="read">已读</span> -->
-          <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          <div v-if="chatdata.msg.data&&chatdata.msg.data.length">
+            <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          </div>
+          <span v-else>&nbsp;</span>
           <img :src="UserInfo.Portrait" alt />
         </div>
       </div>
@@ -18,7 +21,10 @@
         <div class="dialog_box">
           <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
           <!-- <span class="read">已读</span> -->
-          <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          <div v-if="chatdata.msg.data&&chatdata.msg.data.length">
+            <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          </div>
+          <span v-else>&nbsp;</span>
           <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
         </div>
       </div>

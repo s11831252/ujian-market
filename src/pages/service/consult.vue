@@ -1,19 +1,21 @@
 <template>
-  <scroll-view class="wai" :scroll-into-view="toView" scroll-y="true">
+  <div class="wai">
+    <scroll-view :scroll-into-view="toView" scroll-y="true" class="chatbox">
     <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
     <!-- <div class="msgbox"> -->
     <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
     <div id="end"></div>
+    </scroll-view>
     <!-- </div> -->
     <!-- 输入框 -->
-    <cover-view class="input">
+    <div class="input">
       <!-- 引用图标，需要引用其样式 -->
-      <cover-view class="icon">&#xe664;</cover-view>
-      <textarea fixed="true" maxlength="1000" auto-focus focus="true" @confirm="sendMsg" confirm-type="发送" v-model="msg" placeholder="输入新消息"></textarea>
-      <cover-view class="icon">&#xe652;</cover-view>
-      <cover-view class="icon">&#xe726;</cover-view>
-    </cover-view>
-  </scroll-view>
+      <div class="icon">&#xe664;</div>
+      <input type="text" maxlength="1000" @confirm="sendMsg" confirm-type="发送" v-model="msg" placeholder="输入新消息">
+      <div class="icon">&#xe652;</div>
+      <div class="icon">&#xe726;</div>
+    </div>
+  </div>
 </template>
 <script>
 import { mapState } from "vuex";
@@ -324,12 +326,17 @@ body{
 
 .wai {
   background-color: #ecf0f1;
-  height: 87%;
-  max-height: 100%;
-  overflow:scroll;
+  height: 100%;
   padding-top: 0.49rem;
-  padding-bottom: 0.4rem;
-  margin-bottom: 1.4rem;
+  overflow: hidden;
+  width: 100%;
+  overflow: hidden;
+  /* overflow:scroll; */
+  /* padding-bottom: 0.4rem;
+  margin-bottom: 1.4rem; */
+}
+.chatbox{
+  height: 87%;
 }
 .top {
   width: 6.38rem;
@@ -357,7 +364,7 @@ body{
   bottom: 0rem;
   z-index: 99;
 }
-.input textarea {
+.input input {
   padding: 0.1rem;
   height: fit-content;
   min-height: 1rem;
