@@ -17,7 +17,7 @@
             </ul>
         </div>
         <div class="shoppingcar-toolbar">
-            <span class="service" @click="go({path:'/pages/service/consult',query:{sId:sId,sName:sName}})">
+            <span class="service" @click="goService">
               <i class="icon service-icon">&#xe734;</i>
               <p>联系客服</p>
             </span>
@@ -82,6 +82,20 @@ export default {
     taggle(){
       this.showed=!this.showed;
     },
+    goService(){
+      var that = this;
+      if(this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId)
+      {
+        this.go({path:'/pages/service/consult',query:{sId:this.sId,sName:this.sName}})
+      }else
+      {
+        console.log(this.$route,this.$router)
+        this.modal("未登录","请您登录后使用客服功能",()=>{
+          that.$router.push({path:`/pages/index/index`,query:{redirect:encodeURIComponent(that.$route.fullPath)}})
+          // that.$router.push("/pages/index/index"); //回到登录页
+        },null,"去登录")
+      }
+    }
   }
 };
 </script>

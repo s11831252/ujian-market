@@ -70,8 +70,8 @@ export default {
   },
   mounted() {
     if (
-      this.$store.state.User.SingleTicket == null ||
-      this.$store.state.User.SingleTicket.length > 0
+      this.$store.state.User.UserInfo&&
+      this.$store.state.User.UserInfo.UserId
     ) {
       // 切换至 tabBar 页面
       this.$router.push({ path: "/pages/home/index", isTab: true });

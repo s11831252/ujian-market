@@ -11,7 +11,7 @@
           <input
             type="tel"
             placeholder="请输入手机号码"
-            v-model.lazy="userInfo.Account"
+            v-model="userInfo.Account"
           >
         </div>
         <!-- 输入验证码 -->
@@ -21,7 +21,7 @@
             <input
               type="number"
               placeholder="请输入验证码"
-              v-model.lazy="VerificationCode"
+              v-model="VerificationCode"
             >
           </div>
           <p
@@ -52,7 +52,7 @@
           <input
             type="tel"
             placeholder="请输入手机号码"
-            v-model.lazy="userInfo.Account"
+            v-model="userInfo.Account"
           >
         </div>
         <!-- 输入密码 -->
@@ -61,7 +61,7 @@
           <input
             type="password"
             placeholder="请输入密码"
-            v-model.lazy="userInfo.PassWord"
+            v-model="userInfo.PassWord"
           >
         </div>
         <!-- 登录按钮 -->
@@ -170,7 +170,7 @@ export default {
         userinfo.data.openid = this.userInfo.openid;
         this.$store.commit("GetUserInfo", userinfo.data);
         this.hx_login();
-        
+        debugger
         if (this.$route.query.redirect)
         {
           let url = decodeURIComponent(this.$route.query.redirect); 

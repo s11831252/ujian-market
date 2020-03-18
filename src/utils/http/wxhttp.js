@@ -9,6 +9,7 @@ const net = {
   get(url, data) {
     wx.showLoading({
       title: '加载中',//数据请求前loading，提高用户体验
+      mask:true
     })
     return new Promise((resolve, reject) => {
       wx.request({
@@ -43,15 +44,16 @@ const net = {
               var url = `/pages/index/index?redirect=/${currentPage.route}`;    //当前页面url
 
               //拼接页面参数
-              var parms="";
+              var parms=[];
               for(var key in currentPage.options)
               {
-                parms+=`${key}=${currentPage.options[key]}`;
+                parms.push(`${key}=${currentPage.options[key]}`);
               }
               if(parms.length>0)
               {
                 //url转码
-                let encodeparms = encodeURIComponent(`?${parms}`);
+                var parmsStr = parms.join("&")
+                let encodeparms = encodeURIComponent(`?${parmsStr}`);
                 url=url+encodeparms;
               }
               wx.redirectTo({url:url});

@@ -64,10 +64,12 @@ Vue.mixin({
                 icon: "none"
               });
         },
-        modal(title,content,confirm,cancel){
+        modal(title,content,confirm,cancel,confirmText){
+            
             wx.showModal({
-                title: title,
-                content: content,
+                confirmText,
+                title,
+                content,
                 success (res) {
                   if (res.confirm) {
                     if(confirm)

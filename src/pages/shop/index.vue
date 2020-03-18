@@ -82,6 +82,7 @@ export default {
       sId: "",
       shopDetail: null,
       goodList: [],
+      shopGoods:[],
       GoodsType: [],
       Tabs: [],
       activeIndex: 0,
@@ -103,14 +104,15 @@ export default {
     $GoodsType(){
       var that = this;
       var list =  that.GoodsType.filter(item=>{
-        if(item.TypeId>0)
+        if(item.TypeId>0&&that.shopGoods)
         {
-          var goods = that.shopDetail.Goods.find(v=>{
+          debugger;
+          var goods = that.shopGoods.find(v=>{
              return v.TypeId.indexOf(item.TypeId)>=0;
           })
           return goods!=null;
         }else{
-          var goods = that.shopDetail.Goods.find(v=>{
+          var goods = that.shopGoods.find(v=>{
              return v.TypeId.length==0
           })
           return goods!=null;
@@ -163,10 +165,11 @@ export default {
     },
     changeGoodsType(typeid) {
       this.activeType = typeid;
-      this.goodList = this.shopDetail.Goods.filter(item => {
-        if (typeid > 1) return item.TypeId.indexOf(typeid) > -1;
-        else return item.TypeId.length == 0;
-      });
+      if(this.shopGoods)
+        this.goodList = this.shopGoods.filter(item => {
+          if (typeid > 1) return item.TypeId.indexOf(typeid) > -1;
+          else return item.TypeId.length == 0;
+        });
     }
   },
   onShareAppMessage(result) {
@@ -219,7 +222,7 @@ export default {
         }
         var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
         if (rep3.ret == 0) {
-          this.shopDetail.Goods = rep3.data;
+          this.shopGoods = rep3.data;
         }
         var rep2 = await this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.sId }); //获取店铺商品分类
         if (rep2.ret == 0) {

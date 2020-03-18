@@ -10,10 +10,10 @@
     <!-- 输入框 -->
     <div class="input">
       <!-- 引用图标，需要引用其样式 -->
-      <div class="icon">&#xe664;</div>
-      <input type="text" maxlength="1000" @confirm="sendMsg" confirm-type="发送" v-model="msg" placeholder="输入新消息">
-      <div class="icon">&#xe652;</div>
-      <div class="icon">&#xe726;</div>
+      <div class="icon" @click="pending('语音')">&#xe664;</div>
+      <input type="text" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
+      <div class="icon" @click="pending('表情')">&#xe652;</div>
+      <div class="icon" @click="pending('多媒体功能')">&#xe726;</div>
     </div>
   </div>
 </template>
@@ -116,13 +116,7 @@ export default {
     },
     readMsg(renderableMsg,type,currentChatMsg,sessionKey,isNew){
       // console.log(renderableMsg,currentChatMsg)
-      if(renderableMsg)
-      {
-        this.ChatHistory.push(renderableMsg)
-      }else
-      {
-        this.ChatHistory=currentChatMsg;
-      }
+      this.ChatHistory=currentChatMsg;
       
       if(this.ChatHistory.length)
       {
@@ -134,6 +128,9 @@ export default {
           this.toView = currentChatMsg[this.ChatHistory.length-1].mid
         }
       }
+    },
+    pending(title){
+      this.toast(`${title}功能正在开发中`)
     }
   },
   async mounted() {
@@ -263,13 +260,20 @@ export default {
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
         // 则无需调用conn.setPresence();
-        console.log(message);
+        console.log("onOpened",message);
         WebIM.conn.setPresence();
         utils.setItem("myUsername", WebIM.conn.context.userId);
-
+        if(that.isMP)
+        {
+          wx.showLoading({
+            title:"正在同步聊天记录",
+            mask:true
+          })
+        }
         WebIM.conn.listRooms({
           success: function(resp) {
             utils.setItem("listGroup", resp);
+            wx.hideLoading();
           },
           error: function(e) {
             console.log("error:", e);

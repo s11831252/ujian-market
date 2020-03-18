@@ -3,7 +3,7 @@
         <div class="top">
             <div class="sousuo">
                 <i  class="icon ss" alt="" >&#xe6e3;</i>
-                <input class="shuru" v-model.lazy="keyword" auto-focus focus="true" placeholder="输入商品关键词" placeholder-style="color:#d0f1fd;" />
+                <input class="shuru" v-model="keyword" auto-focus focus="true" placeholder="输入商品关键词" placeholder-style="color:#d0f1fd;" />
                 <i class="icon false" alt="" @click="clearKeyword" >&#xe603;</i>
             </div>
             <span class="more" @click="gosearch">搜索</span>
