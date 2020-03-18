@@ -65,7 +65,6 @@ export default {
     return {
       msg: "",
       sId: null,
-      webSocket: null,
       ChatHistory: [],
       chatRoomInfo: {},
       shopInfo: null,
@@ -97,15 +96,13 @@ export default {
           from: WebIM.conn.context.userId,
           to: this.to,
           roomType: false,
-          chatType: "chat",
+          chatType: "groupchat",
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
-            msgStorage.saveMsg(msg, "txt");
             console.log(
               `发送消息(id=${id},serverMsgId=${serverMsgId})成功为`,
               msg
             );
-            that.msg = "";
           },
           fail(id, serverMsgId) {
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
@@ -113,12 +110,20 @@ export default {
         });
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
+        msgStorage.saveMsg(msg, "txt");
+        that.msg = "";
       }
     },
     readMsg(renderableMsg,type,currentChatMsg,sessionKey,isNew){
-      this.ChatHistory=currentChatMsg;
+      // console.log(renderableMsg,currentChatMsg)
+      if(renderableMsg)
+      {
+        this.ChatHistory.push(renderableMsg)
+      }else
+      {
+        this.ChatHistory=currentChatMsg;
+      }
       
-
       if(this.ChatHistory.length)
       {
         if(isNew)
@@ -149,15 +154,11 @@ export default {
         return item.name == this.UserInfo.Phone + "_" + this.sName;
       });
     }
-
-    //没有则创建聊天室
-    if (!this.chatRoomInfo.roomId) {
-      var groupname, owner, members, desc;
       var desc_obj = {
         store: {
           sId: this.sId,
           sNm: this.sName,
-          sLogo: this.shopInfo.sLogo.replace(/\//g, "#")
+          sLogo: this.shopInfo.sLogo
         },
         order: {
           // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
@@ -167,13 +168,17 @@ export default {
         buyer: {
           bId: this.UserInfo.UserId,
           bPhone: this.UserInfo.Phone,
-          bLogo: this.UserInfo.Portrait.replace(/\//g, "#"),
+          bLogo: this.UserInfo.Portrait,
           bNm: this.UserInfo.UserName,
           auth: this.IsCertification
         },
         lastTime: Math.round(new Date().getTime() / 1000)
       };
+    //没有则创建聊天室
+    if (!this.chatRoomInfo||!this.chatRoomInfo.roomId) {
+      var groupname, owner, members, desc;
       desc = JSON.stringify(desc_obj);
+      desc = desc.replace(/\//g, "#") //格式化url
       groupname = `${this.UserInfo.Phone}_${this.sName}`;
       //店铺Id为创建人
       owner = this.sId.replace(/-/g, "") + "_";
@@ -196,7 +201,8 @@ export default {
                     rep2.data
                   }@conference.easemob.com`,
                   name: groupname,
-                  roomId: rep2.data.groupid
+                  roomId: rep2.data.groupid,
+                  desc:desc_obj
                 };
                 listGroup.push(this.chatRoomInfo);
                 utils.setItem("listGroup", listGroup);
@@ -204,34 +210,29 @@ export default {
             });
         }
       });
-    } 
-
-    
+    } else
+    {
       // //更新聊天室备注
       WebIM.conn.queryRoomInfo({
         roomId: this.chatRoomInfo.roomId,
         success: function(settings, members, fields) {
           console.log("queryRoomInfo成功",fields);
-
           var desc_obj = JSON.parse(fields.description);
           // console.log(desc_obj);
           desc_obj.lastTime = Math.round(new Date().getTime()/1000);
-          if(desc_obj.buyer)
-          {
-            desc_obj.buyer.auth=true;
-          }
           var json_obj = JSON.stringify(desc_obj)
           that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId,json_obj)
-          desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
-          desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
-          
-          that.chatRoomInfo.desc=desc_obj;
+          // desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
+          // desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
+          // that.chatRoomInfo.desc=desc_obj;
           // console.log(that.chatRoomInfo);
         },
         error: function(msg) {
           console.log(msg);
         }
       });
+    }
+    that.chatRoomInfo.desc=desc_obj;
     var sessionKey = this.chatRoomInfo.roomId + WebIM.conn.context.userId;
       
     var chatMsg = utils.getItem(sessionKey);
@@ -253,8 +254,6 @@ export default {
       }
 
 		});
-
-    // console.log(this.chatRoomInfo);
   },
   created() {
     var that = this;

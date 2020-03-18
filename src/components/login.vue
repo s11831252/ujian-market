@@ -11,7 +11,7 @@
           <input
             type="tel"
             placeholder="请输入手机号码"
-            v-model="userInfo.Account"
+            v-model.lazy="userInfo.Account"
           >
         </div>
         <!-- 输入验证码 -->
@@ -21,7 +21,7 @@
             <input
               type="number"
               placeholder="请输入验证码"
-              v-model="VerificationCode"
+              v-model.lazy="VerificationCode"
             >
           </div>
           <p
@@ -52,7 +52,7 @@
           <input
             type="tel"
             placeholder="请输入手机号码"
-            v-model="userInfo.Account"
+            v-model.lazy="userInfo.Account"
           >
         </div>
         <!-- 输入密码 -->
@@ -61,7 +61,7 @@
           <input
             type="password"
             placeholder="请输入密码"
-            v-model="userInfo.PassWord"
+            v-model.lazy="userInfo.PassWord"
           >
         </div>
         <!-- 登录按钮 -->
