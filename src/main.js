@@ -101,7 +101,7 @@ Vue.mixin({
                     
                                     if (rep.data.ticket) {
                                         this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
-                                        if(rep.data.result.errcode==0)
+                                        if(rep.data.result.errcode==0)//0表示系统用户 -1游客
                                         {
                                             this.$ShoppingAPI.User_Get().then(userinfo => {
                                                 if (userinfo.ret == 0) {

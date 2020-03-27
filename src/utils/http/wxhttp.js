@@ -39,6 +39,7 @@ const net = {
             if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
             {
               store.state.User.SingleTicket="";
+              store.state.User.UserInfo={};
               var pages = getCurrentPages();    //获取加载的页面
               var currentPage = pages[pages.length-1];    //获取当前页面的对象
               var url = `/pages/index/index?redirect=/${currentPage.route}`;    //当前页面url

@@ -89,7 +89,6 @@ export default {
         this.go({path:'/pages/service/consult',query:{sId:this.sId,sName:this.sName}})
       }else
       {
-        console.log(this.$route,this.$router)
         this.modal("未登录","请您登录后使用客服功能",()=>{
           that.$router.push({path:`/pages/index/index`,query:{redirect:encodeURIComponent(that.$route.fullPath)}})
           // that.$router.push("/pages/index/index"); //回到登录页

@@ -72,9 +72,9 @@ export default {
   },
   methods: {
     exit() {
-      this.$store.commit("Login", { Ticket: "" }); //存入Ticket
-      this.$store.commit("GetUserInfo", {});
-      WebIM.conn.close();
+      this.$store.commit("Login", { Ticket: "" }); //清空Ticket
+      this.$store.commit("GetUserInfo", {});//清空userinfo
+      WebIM.conn.close();//环信IM关闭
       this.$router.push("/pages/index/index"); //回到登录页
     },
     outShopping(){
@@ -107,23 +107,27 @@ export default {
     },
     async init(){
         if (!this.UserInfo) {
-            var rep = await this.$ShoppingAPI.User_Get();
-            if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
+                var rep = await this.$ShoppingAPI.User_Get();
+                if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
         }
 
-        this.$UJAPI.Balance_Purse().then(rep => {
-            this.Balance = rep.data;
-        });
-        this.$ShoppingAPI.User_Coupon_Get({State:-1}).then(rep => {
-        if(rep.ret==0)
-            this.Coupon = rep.total;
-        });
-        
-        var rep = await this.$ShoppingAPI.Shop_GetMy();
-        if(rep.ret==0)
+        if(this.UserInfo)
         {
-            this.ShoppingInfo=rep.data[0];
+            this.$UJAPI.Balance_Purse().then(rep => {
+                this.Balance = rep.data;
+            });
+            this.$ShoppingAPI.User_Coupon_Get({State:-1}).then(rep => {
+            if(rep.ret==0)
+                this.Coupon = rep.total;
+            });
+            
+            var rep = await this.$ShoppingAPI.Shop_GetMy();
+            if(rep.ret==0)
+            {
+                this.ShoppingInfo=rep.data[0];
+            }
         }
+
     }
   },
   components: {
@@ -133,8 +137,11 @@ export default {
     this.init();
     wx.stopPullDownRefresh()
   },
-  async mounted() {
-     await  this.init();
+   mounted() {
+      this.wx_login(async ()=>{
+          await  this.init();
+
+      })
   }
 };
 </script>

@@ -1,19 +1,24 @@
 <template>
   <div class="wai">
-    <scroll-view :scroll-into-view="toView" scroll-y="true" class="chatbox">
-    <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-    <!-- <div class="msgbox"> -->
-    <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
-    <div id="end"></div>
+    <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox">
+      <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
+      <!-- <div class="msgbox"> -->
+      <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <div id="end"></div>
     </scroll-view>
     <!-- </div> -->
     <!-- 输入框 -->
-    <div class="input">
-      <!-- 引用图标，需要引用其样式 -->
-      <div class="icon" @click="pending('语音')">&#xe664;</div>
-      <input type="text" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
-      <div class="icon" @click="pending('表情')">&#xe652;</div>
-      <div class="icon" @click="pending('多媒体功能')">&#xe726;</div>
+    <div class="input-chat-box">
+      <div class="input">
+        <!-- 引用图标，需要引用其样式 -->
+        <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio','语音')">&#xe664;</div>
+        <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
+        <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji','表情')">&#xe652;</div>
+        <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more','多媒体功能')">&#xe726;</div>
+      </div>
+      <div v-if="chattype=='emoji'" class="emojibox">
+
+      </div>
     </div>
   </div>
 </template>
@@ -69,6 +74,7 @@ export default {
       chatRoomInfo: {},
       shopInfo: null,
       toView:"",
+      chattype:"chat"
     };
   },
   components: {
@@ -129,8 +135,15 @@ export default {
         }
       }
     },
-    pending(title){
-      this.toast(`${title}功能正在开发中`)
+    pending(type,title){
+      if(this.chattype==type)
+         this.chattype="chat";
+      else
+      {     
+        if(title)
+          this.toast(`${title}功能正在开发中`)
+        this.chattype=type; 
+      }
     }
   },
   async mounted() {
@@ -218,6 +231,7 @@ export default {
           // console.log(desc_obj);
           desc_obj.lastTime = Math.round(new Date().getTime()/1000);
           var json_obj = JSON.stringify(desc_obj)
+          // json_obj = json_obj.replace(/\//g, "#") //格式化url
           that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId,json_obj)
           // desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
           // desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
@@ -234,10 +248,10 @@ export default {
       
     var chatMsg = utils.getItem(sessionKey);
     this.readMsg(null,null,chatMsg,sessionKey)
-    
+    console.log(WebIM);
 
     msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey){
-      console.log("newChatMsg:",renderableMsg, curChatMsg)
+      // console.log("newChatMsg:",renderableMsg, curChatMsg)
       // 判断是否属于当前会话
       if(that.chatRoomInfo.roomId&&sesskey==sessionKey)
       {
@@ -304,15 +318,56 @@ export default {
           // }
         }
       }, //收到文本消息
-      onEmojiMessage: function(message) {}, //收到表情消息
-      onPictureMessage: function(message) {}, //收到图片消息
+      onEmojiMessage: function(message) {
+        console.log("onEmojiMessage", message);
+
+      }, //收到表情消息
+      onPictureMessage: function(message) {
+        console.log("onPictureMessage", message);
+      }, //收到图片消息
+      onVideoMessage(message){
+				console.log("onVideoMessage: ", message);
+				if(message){
+					msgStorage.saveReceiveMsg(message, msgType.VIDEO);
+				}
+				calcUnReadSpot(message);
+				ack(message);
+			},//收到视频消息
+			onAudioMessage(message){
+				console.log("onAudioMessage", message);
+				if(message){
+					if(onMessageError(message)){
+						msgStorage.saveReceiveMsg(message, msgType.AUDIO);
+					}
+					calcUnReadSpot(message);
+					ack(message);
+				}
+      },//收到音频消息
+			onCmdMessage(message){
+				console.log("onCmdMessage", message);
+				if(message){
+					if(onMessageError(message)){
+						msgStorage.saveReceiveMsg(message, msgType.CMD);
+					}
+					calcUnReadSpot(message);
+					ack(message);
+				}
+      },//收到命令消息
+       onFileMessage: function ( message ) {},    //收到文件消息
+      onLocationMessage: function ( message ) {},//收到位置消息
       onRoster: function(message) {}, //处理好友申请
       onInviteMessage: function(message) {}, //处理群组邀请
-      onOnline: function() {}, //本机网络连f接成功
+      onOnline: function() {}, //本机网络连接成功
       onOffline: function() {}, //本机网络掉线
-      onError: function(message) {}, //失败回调
-      onReceivedMessage: function(message) {}, //收到消息送达服务器回执
-      onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
+      onError: function(message) {
+
+      }, //失败回调
+      onReceivedMessage: function(message) {
+
+      }, //收到消息送达服务器回执
+      onDeliveredMessage: function(message) {
+
+      }, //收到消息送达客户端回执
       onReadMessage: function(message) {} //收到消息已读回执
       // ......
     });
@@ -323,6 +378,7 @@ export default {
 <style>
 body{
   height: 100%;
+  overflow: hidden;
 }
 </style>
 <style scoped>
@@ -330,22 +386,26 @@ body{
 .wai {
   background-color: #ecf0f1;
   height: 100%;
-  padding-top: 0.49rem;
-  overflow: hidden;
   width: 100%;
-  overflow: hidden;
   /* overflow:scroll; */
   /* padding-bottom: 0.4rem;
   margin-bottom: 1.4rem; */
+  /* display: flex;
+  flex-direction: column; */
+  overflow: hidden;
 }
 .chatbox{
-  height: 87%;
+  height: 90%;
+  /* flex-grow:2; */
+  overflow: hidden;
 }
+
 .top {
   width: 6.38rem;
   height: 0.68rem;
   background-color: #c9c9c9;
   border-radius: 0.1rem;
+  margin-top: 0.49rem;
   font-size: 0.34rem;
   color: #ffffff;
   text-align: center;
@@ -353,19 +413,21 @@ body{
   /* margin-top: 0.49rem; */
   margin-left: 2.21rem;
 }
-
-.input {
+.input-chat-box{
   width: 100%;
   border-top: 0.02rem solid #898989;
+  padding: 0.2rem;
+  background-color: #fdfdfd;
+  /* flex-grow:1; */
+}
+.input {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.2rem;
-  background-color: #fdfdfd;
-  opacity: 1;
-  position: fixed;
+  /* opacity: 1;
   bottom: 0rem;
-  z-index: 99;
+  z-index: 99; */
+  /* position: fixed; */
 }
 .input input {
   padding: 0.1rem;
@@ -386,5 +448,12 @@ body{
 .icon {
   font-size: 0.7rem;
   margin-right: 0.2rem;
+}
+.icon.focus{
+  color:#12b7f5;
+}
+.emojibox{
+  height: 2rem;
+  width: 100%;
 }
 </style>
