@@ -17,7 +17,11 @@
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more','多媒体功能')">&#xe726;</div>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
-
+        <swiper class="swiper">
+          <swiper-item v-for="(item,index) in EmojiObj2.map" :key="index">
+            <img v-for="(item2,index2) in item" :key="index2" :src="EmojiObj2.path+item2">
+          </swiper-item>
+        </swiper>
       </div>
     </div>
   </div>
@@ -74,7 +78,8 @@ export default {
       chatRoomInfo: {},
       shopInfo: null,
       toView:"",
-      chattype:"chat"
+      chattype:"chat",
+      EmojiObj2:{}
     };
   },
   components: {
@@ -157,7 +162,7 @@ export default {
     //设置标题
     wx.setNavigationBarTitle({ title: this.sName });
 
-    //查询聊天室列表,并仓尝试获取与该店铺的聊天室
+    //查询聊天室列表,并尝试获取与该店铺的聊天室
     var listGroup = utils.getItem("listGroup");
     if (listGroup) {
       this.chatRoomInfo = listGroup.find(item => {
@@ -248,7 +253,8 @@ export default {
       
     var chatMsg = utils.getItem(sessionKey);
     this.readMsg(null,null,chatMsg,sessionKey)
-    console.log(WebIM);
+    this.EmojiObj2 = WebIM.EmojiObj2;
+    console.log(this.EmojiObj2);
 
     msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey){
       // console.log("newChatMsg:",renderableMsg, curChatMsg)
@@ -320,6 +326,13 @@ export default {
       }, //收到文本消息
       onEmojiMessage: function(message) {
         console.log("onEmojiMessage", message);
+        if (message) {
+          if (onMessageError(message)) {
+            msgStorage.saveReceiveMsg(message, msgType.EMOJI);
+          }
+          // calcUnReadSpot(message);
+          ack(message);
+        }
 
       }, //收到表情消息
       onPictureMessage: function(message) {
@@ -330,7 +343,7 @@ export default {
 				if(message){
 					msgStorage.saveReceiveMsg(message, msgType.VIDEO);
 				}
-				calcUnReadSpot(message);
+				// calcUnReadSpot(message);
 				ack(message);
 			},//收到视频消息
 			onAudioMessage(message){
@@ -339,7 +352,7 @@ export default {
 					if(onMessageError(message)){
 						msgStorage.saveReceiveMsg(message, msgType.AUDIO);
 					}
-					calcUnReadSpot(message);
+					// calcUnReadSpot(message);
 					ack(message);
 				}
       },//收到音频消息
@@ -349,7 +362,7 @@ export default {
 					if(onMessageError(message)){
 						msgStorage.saveReceiveMsg(message, msgType.CMD);
 					}
-					calcUnReadSpot(message);
+					// calcUnReadSpot(message);
 					ack(message);
 				}
       },//收到命令消息
@@ -381,7 +394,7 @@ body{
   overflow: hidden;
 }
 </style>
-<style scoped>
+<style scoped lang="less">
 
 .wai {
   background-color: #ecf0f1;
@@ -390,13 +403,14 @@ body{
   /* overflow:scroll; */
   /* padding-bottom: 0.4rem;
   margin-bottom: 1.4rem; */
-  /* display: flex;
-  flex-direction: column; */
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 .chatbox{
   height: 90%;
-  /* flex-grow:2; */
+  flex-grow:2;
+  padding-bottom: 2%;
   overflow: hidden;
 }
 
@@ -416,14 +430,15 @@ body{
 .input-chat-box{
   width: 100%;
   border-top: 0.02rem solid #898989;
-  padding: 0.2rem;
+  padding-top: 0.2rem;
   background-color: #fdfdfd;
-  /* flex-grow:1; */
+  flex-grow:1;
 }
 .input {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 0.2rem;
   /* opacity: 1;
   bottom: 0rem;
   z-index: 99; */
@@ -453,7 +468,23 @@ body{
   color:#12b7f5;
 }
 .emojibox{
-  height: 2rem;
-  width: 100%;
+  height: 2.5rem;
+  width: auto;
+  margin-bottom:0.2rem;
+  padding-bottom:0.2rem;
+  .swiper{
+    background-color: #c9c9c9;
+  }
+  img{
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-top:0.15rem ;
+  }
+  img:not(:first-child){
+    padding-left:0.7rem;
+  }
+  img:nth-child(7n+1),img:first-child{
+    padding-left:0.5rem;
+  }
 }
 </style>

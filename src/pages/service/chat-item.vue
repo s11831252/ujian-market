@@ -7,8 +7,9 @@
         <div class="dialog_box">
           <p class="username">{{UserInfo.UserName}}</p>
           <!-- <span class="read">已读</span> -->
-          <div v-if="chatdata.msg.data&&chatdata.msg.data.length">
-            <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
+            <!-- <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span> -->
+            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
           </div>
           <span v-else>&nbsp;</span>
           <img :src="UserInfo.Portrait" alt />
@@ -21,8 +22,9 @@
         <div class="dialog_box">
           <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
           <!-- <span class="read">已读</span> -->
-          <div v-if="chatdata.msg.data&&chatdata.msg.data.length">
-            <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span>
+          <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
+            <!-- <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span> -->
+            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
           </div>
           <span v-else>&nbsp;</span>
           <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
@@ -34,6 +36,7 @@
 <script>
 import { mapState } from "vuex";
 import utils from "@/utils";
+import chatMsg from '@/pages/service/chat-msg'
 export default {
   props: {
     chatdata: Object,
@@ -51,9 +54,9 @@ export default {
       return _myUsername;
     },
   },
-  mounted() {
-
-  }
+  components:{
+    chatMsg
+  },
 };
 </script>
 <style scoped>
@@ -97,6 +100,7 @@ export default {
   left: -0.74rem;
   top: 50%;
 }
+
 .chat-my .chat-content .dialog_box {
   max-width: 6.5rem;
   /* css3属性，fit-content既是让宽度随内容大小变化 */
@@ -108,6 +112,11 @@ export default {
   padding: 0.5rem;
   position: relative;
   margin-right: 1.5rem;
+}
+.chatdata{
+  display: flex;
+  flex-wrap:wrap;
+  align-items:center;
 }
 /* 右侧小三角形 */
 .chat-my .chat-content .dialog_box:after {
