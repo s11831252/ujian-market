@@ -75,7 +75,6 @@ WebIM.parseEmoji = function(msg){
 	if(typeof WebIM.Emoji === "undefined" || typeof WebIM.Emoji.map === "undefined"){
 		return msg;
 	}
-	debugger;
 	var emoji = WebIM.Emoji,
 		reg = null;
 	var msgList = [];

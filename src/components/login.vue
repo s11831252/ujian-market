@@ -170,7 +170,6 @@ export default {
         userinfo.data.openid = this.userInfo.openid;
         this.$store.commit("GetUserInfo", userinfo.data);
         this.hx_login();
-        debugger
         if (this.$route.query.redirect)
         {
           let url = decodeURIComponent(this.$route.query.redirect); 

@@ -8,8 +8,11 @@
           <p class="username">{{UserInfo.UserName}}</p>
           <!-- <span class="read">已读</span> -->
           <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-            <!-- <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span> -->
-            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
+            <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix">
+            <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
+            <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
+                <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
+            </div>
           </div>
           <span v-else>&nbsp;</span>
           <img :src="UserInfo.Portrait" alt />
@@ -23,8 +26,11 @@
           <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
           <!-- <span class="read">已读</span> -->
           <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-            <!-- <span v-for="(item,index) in chatdata.msg.data" :key="index">{{item.data}}</span> -->
-            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
+            <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix">
+            <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
+            <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
+                <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
+            </div>
           </div>
           <span v-else>&nbsp;</span>
           <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
@@ -57,6 +63,15 @@ export default {
   components:{
     chatMsg
   },
+  methods:{
+    previewImage(url){
+      if (this.isMP) {
+        wx.previewImage({
+          urls: [url]		// 需要预览的图片 http 链接列表
+        });
+      }
+    }
+  }
 };
 </script>
 <style scoped>
@@ -128,7 +143,7 @@ export default {
   margin-top: -0.2rem;
   left: 100%;
 }
-.chat-my .chat-content img {
+.chat-my .chat-content .dialog_box>img {
   width: 1.08rem;
   height: 1.09rem;
   border-radius: 50%;
@@ -175,7 +190,7 @@ export default {
   margin-top: -0.2rem;
   right: 100%;
 }
-.chat-other .chat-content img {
+.chat-other .chat-content .dialog_box>img {
   width: 1.08rem;
   height: 1.09rem;
   border-radius: 50%;
@@ -183,5 +198,8 @@ export default {
   position: absolute;
   left: -1.4rem;
   top: 0.2rem;
+}
+.avatar{
+  width: 1.5rem;
 }
 </style>

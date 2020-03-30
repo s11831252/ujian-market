@@ -54,7 +54,8 @@ Vue.mixin({
         toast(title){
             wx.showToast({
                 title: title,
-                icon: "none"
+                icon: "none",
+                mask:true
               });
         },
         alert(title)
@@ -147,6 +148,7 @@ Vue.mixin({
                   appKey: WebIM.config.appkey
                 };
                 WebIM.conn.open(options);
+                this.toast("正在连接聊天服务器")
               }
         }
     },

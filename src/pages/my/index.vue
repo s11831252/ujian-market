@@ -2,11 +2,16 @@
     <div class="index">
         <div class="content">
             <div class="my">
-                <div class="myTop">
+                <div class="myTop" v-if="Logined">
                     <img class="my_headimg" :src="UserInfo.Portrait" v-if="UserInfo.Portrait" alt="" />
                     <div class="myTop_textDiv">
                         <p class="myTop_name">{{UserInfo.UserName}}</p>
                         <p class="myTop_phone">手机号码：{{UserInfo.Phone}}</p>
+                    </div>
+                </div>
+                <div class="myTop" v-else>
+                    <div class="myTop_textDiv">
+                        <p class="myTop_name" @click="go({path:'/pages/index/index'})">去登录/注册</p>
                     </div>
                 </div>
                 <div class="mystate">
@@ -23,7 +28,7 @@
                         <p class="mystate_p">我的积分</p>
                     </div>
                 </div>
-                <div class="myInfo">
+                <div class="myInfo" v-if="Logined">
                     <div class="myInfo_demo" @click="go({path:'/pages/order/index'})" v-if="Config.showBuy">
                         <i class="icon">&#xe653;</i>
                         <p class="myInfo_p">查看全部订单</p>
@@ -45,14 +50,14 @@
                         <img class="next" src="/static/img/next.png" alt="" />
                     </div>
                 </div>
-                <div class="myesc" @click="exit">退出登录</div>
+                <div v-if="Logined" class="myesc" @click="exit">退出登录</div>
             </div>
         </div>
      
     </div>    
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState,mapGetters } from "vuex";
 import WebIM from "@/utils/hx/WebIM";
 
 export default {
@@ -68,7 +73,10 @@ export default {
       UserInfo: state => state.User.UserInfo,
       Config: state => state.Global.Config     
     }),
-    
+    Logined()
+    {
+        return this.$store.getters.Logined;
+    }
   },
   methods: {
     exit() {
@@ -106,13 +114,12 @@ export default {
         }
     },
     async init(){
-        if (!this.UserInfo) {
-                var rep = await this.$ShoppingAPI.User_Get();
-                if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
-        }
-
-        if(this.UserInfo)
+        if(this.Logined)
         {
+            if (!this.UserInfo.UserId) {
+                    var rep = await this.$ShoppingAPI.User_Get();
+                    if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
+            }
             this.$UJAPI.Balance_Purse().then(rep => {
                 this.Balance = rep.data;
             });
@@ -140,7 +147,6 @@ export default {
    mounted() {
       this.wx_login(async ()=>{
           await  this.init();
-
       })
   }
 };

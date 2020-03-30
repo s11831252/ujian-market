@@ -13,7 +13,7 @@
         <!-- 引用图标，需要引用其样式 -->
         <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio','语音')">&#xe664;</div>
         <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
-        <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji','表情')">&#xe652;</div>
+        <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emojitest','表情')">&#xe652;</div>
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more','多媒体功能')">&#xe726;</div>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
@@ -276,19 +276,18 @@ export default {
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
+        console.log("onOpened",message);
+
         //连接成功回调
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
         // 则无需调用conn.setPresence();
-        console.log("onOpened",message);
+        wx.hideLoading();
         WebIM.conn.setPresence();
         utils.setItem("myUsername", WebIM.conn.context.userId);
         if(that.isMP)
         {
-          wx.showLoading({
-            title:"正在同步聊天记录",
-            mask:true
-          })
+          that.toast("正在同步聊天记录")
         }
         WebIM.conn.listRooms({
           success: function(resp) {
@@ -337,14 +336,21 @@ export default {
       }, //收到表情消息
       onPictureMessage: function(message) {
         console.log("onPictureMessage", message);
+					if(onMessageError(message)){
+						msgStorage.saveReceiveMsg(message, msgType.IMAGE);
+					}
+					// calcUnReadSpot(message);
+					ack(message);
       }, //收到图片消息
       onVideoMessage(message){
 				console.log("onVideoMessage: ", message);
 				if(message){
-					msgStorage.saveReceiveMsg(message, msgType.VIDEO);
+					if(onMessageError(message)){
+						msgStorage.saveReceiveMsg(message, msgType.VIDEO);
+					}
+					// calcUnReadSpot(message);
+					ack(message);
 				}
-				// calcUnReadSpot(message);
-				ack(message);
 			},//收到视频消息
 			onAudioMessage(message){
 				console.log("onAudioMessage", message);
@@ -366,7 +372,7 @@ export default {
 					ack(message);
 				}
       },//收到命令消息
-       onFileMessage: function ( message ) {},    //收到文件消息
+      onFileMessage: function ( message ) {},    //收到文件消息
       onLocationMessage: function ( message ) {},//收到位置消息
       onRoster: function(message) {}, //处理好友申请
       onInviteMessage: function(message) {}, //处理群组邀请

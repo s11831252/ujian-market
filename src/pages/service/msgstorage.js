@@ -75,7 +75,7 @@ msgStorage.saveReceiveMsg = function(receiveMsg, type){
 			value: receiveMsg.data
 		};
 	}
-	else if(type == msgType.AUDIO){
+	else if(type == msgType.AUDIO||type ==msgType.VIDEO){
 		sendableMsg = {
 			id: receiveMsg.id,
 			type: type,

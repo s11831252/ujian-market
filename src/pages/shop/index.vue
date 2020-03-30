@@ -106,7 +106,6 @@ export default {
       var list =  that.GoodsType.filter(item=>{
         if(item.TypeId>0&&that.shopGoods)
         {
-          debugger;
           var goods = that.shopGoods.find(v=>{
              return v.TypeId.indexOf(item.TypeId)>=0;
           })
