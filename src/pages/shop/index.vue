@@ -234,7 +234,7 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .shop-detail {
   padding-bottom: 65px;
   .shop-detail-head {

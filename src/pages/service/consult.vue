@@ -13,15 +13,18 @@
         <!-- 引用图标，需要引用其样式 -->
         <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio','语音')">&#xe664;</div>
         <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
-        <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emojitest','表情')">&#xe652;</div>
+        <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more','多媒体功能')">&#xe726;</div>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper">
           <swiper-item v-for="(item,index) in EmojiObj2.map" :key="index">
-            <img v-for="(item2,index2) in item" :key="index2" :src="EmojiObj2.path+item2">
+            <img v-for="(value,key) in item" :key="key" :src="EmojiObj2.path+value" @click="emojiInput(key)">
           </swiper-item>
         </swiper>
+        <div class="toolbox">
+          <span class="btn_send">发送</span>
+        </div>
       </div>
     </div>
   </div>
@@ -52,7 +55,7 @@ function onMessageError(err) {
   }
   return true;
 }
-// function calcUnReadSpot(message){
+function calcUnReadSpot(message){
 // 	let myName = wx.getStorageSync("myUsername");
 // 	let members = wx.getStorageSync("member") || []; //好友
 // 	var listGroups = wx.getStorageSync('listGroup')|| []; //群组
@@ -68,7 +71,7 @@ function onMessageError(err) {
 // 	}, 0);
 // 	getApp().globalData.unReadMessageNum = count;
 // 	disp.fire("em.xmpp.unreadspot", message);
-// }
+}
 export default {
   data() {
     return {
@@ -76,7 +79,6 @@ export default {
       sId: null,
       ChatHistory: [],
       chatRoomInfo: {},
-      shopInfo: null,
       toView:"",
       chattype:"chat",
       EmojiObj2:{}
@@ -149,14 +151,19 @@ export default {
           this.toast(`${title}功能正在开发中`)
         this.chattype=type; 
       }
+    },
+    emojiInput(emoji){
+      // console.log(item,item2)
+      this.msg+=emoji
     }
   },
   async mounted() {
     var that = this;
     this.sId = this.$route.query.sId;
+    let shopInfo ={}
     var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
     if (rep.ret == 0) {
-      this.shopInfo = rep.data;
+      shopInfo = rep.data;
     }
     this.sName = decodeURI(this.$route.query.sName);
     //设置标题
@@ -173,7 +180,7 @@ export default {
         store: {
           sId: this.sId,
           sNm: this.sName,
-          sLogo: this.shopInfo.sLogo
+          sLogo: shopInfo.sLogo
         },
         order: {
           // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
@@ -254,7 +261,6 @@ export default {
     var chatMsg = utils.getItem(sessionKey);
     this.readMsg(null,null,chatMsg,sessionKey)
     this.EmojiObj2 = WebIM.EmojiObj2;
-    console.log(this.EmojiObj2);
 
     msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey){
       // console.log("newChatMsg:",renderableMsg, curChatMsg)
@@ -400,8 +406,7 @@ body{
   overflow: hidden;
 }
 </style>
-<style scoped lang="less">
-
+<style lang="scss" scoped>
 .wai {
   background-color: #ecf0f1;
   height: 100%;
@@ -474,12 +479,13 @@ body{
   color:#12b7f5;
 }
 .emojibox{
-  height: 2.5rem;
+  height: auto;
   width: auto;
-  margin-bottom:0.2rem;
-  padding-bottom:0.2rem;
+  // margin-bottom:0.2rem;
+  // padding-bottom:0.2rem;
   .swiper{
-    background-color: #c9c9c9;
+    background-color: #ecf0f1;
+    height: 3rem;
   }
   img{
     width: 0.8rem;
@@ -491,6 +497,15 @@ body{
   }
   img:nth-child(7n+1),img:first-child{
     padding-left:0.5rem;
+  }
+  .toolbox{
+    display: flex;
+    justify-content: flex-end;
+    .btn_send{
+      padding: 0.5rem;
+      background-color: #12b7f5;
+      color: #ecf0f1;
+    }
   }
 }
 </style>

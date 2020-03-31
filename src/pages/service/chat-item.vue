@@ -1,40 +1,36 @@
 <template>
-  <div class="chat-item" :id="chatdata.mid">
+  <div class="chat-item" :id="chatdata.mid" :class="chatdata.info.from==myUsername?'chat-my':'chat-other'">
     <p class="time">{{fmtChattime}}</p>
     <!-- 用户对话框 -->
-    <div class="chat-my" v-if="chatdata.info.from==myUsername">
-      <div class="chat-content">
-        <div class="dialog_box">
-          <p class="username">{{UserInfo.UserName}}</p>
-          <!-- <span class="read">已读</span> -->
-          <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-            <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix">
-            <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
-            <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
-                <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
-            </div>
+    <div class="chat-content" v-if="chatdata.info.from==myUsername">
+      <div class="dialog_box">
+        <p class="username">{{UserInfo.UserName}}</p>
+        <!-- <span class="read">已读</span> -->
+        <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
+          <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
+          <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
+          <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
+            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
           </div>
-          <span v-else>&nbsp;</span>
-          <img :src="UserInfo.Portrait" alt />
         </div>
+        <span v-else>&nbsp;</span>
+        <img :src="UserInfo.Portrait" alt />
       </div>
     </div>
-    <div class="chat-other" v-else>
-      <!-- 管理员对话框 -->
-      <div class="chat-content">
-        <div class="dialog_box">
-          <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
-          <!-- <span class="read">已读</span> -->
-          <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-            <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix">
-            <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
-            <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
-                <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
-            </div>
+    <!-- 管理员对话框 -->
+    <div class="chat-content" v-else>
+      <div class="dialog_box">
+        <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
+        <!-- <span class="read">已读</span> -->
+        <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
+          <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
+          <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
+          <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
+            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
           </div>
-          <span v-else>&nbsp;</span>
-          <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
         </div>
+        <span v-else>&nbsp;</span>
+        <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
       </div>
     </div>
   </div>
@@ -42,7 +38,7 @@
 <script>
 import { mapState } from "vuex";
 import utils from "@/utils";
-import chatMsg from '@/pages/service/chat-msg'
+import chatMsg from "@/pages/service/chat-msg";
 export default {
   props: {
     chatdata: Object,
@@ -52,22 +48,22 @@ export default {
     ...mapState({
       UserInfo: state => state.User.UserInfo
     }),
-    fmtChattime() {   
+    fmtChattime() {
       return this.chatdata.time;
     },
-    myUsername(){
+    myUsername() {
       var _myUsername = utils.getItem("myUsername");
       return _myUsername;
-    },
+    }
   },
-  components:{
+  components: {
     chatMsg
   },
-  methods:{
-    previewImage(url){
+  methods: {
+    previewImage(url) {
       if (this.isMP) {
         wx.previewImage({
-          urls: [url]		// 需要预览的图片 http 链接列表
+          urls: [url] // 需要预览的图片 http 链接列表
         });
       }
     }
@@ -79,18 +75,17 @@ export default {
   margin: 0.28rem 0;
   text-align: center;
 }
-.chat-my {
-  display: flex;
-  justify-content: flex-end;
-}
-.chat-other {
-  display: flex;
-  justify-content: flex-start;
-}
-.chat-content {
+
+.chat-my .chat-content {
   /* margin: 0.4rem auto; */
   /* float: right; */
   word-break: break-all;
+  display: flex;
+  justify-content: flex-end;
+}
+.chat-other .chat-content {
+  display: flex;
+  justify-content: flex-start;
 }
 .time {
   font-size: 0.3rem;
@@ -128,10 +123,10 @@ export default {
   position: relative;
   margin-right: 1.5rem;
 }
-.chatdata{
+.chatdata {
   display: flex;
-  flex-wrap:wrap;
-  align-items:center;
+  flex-wrap: wrap;
+  align-items: center;
 }
 /* 右侧小三角形 */
 .chat-my .chat-content .dialog_box:after {
@@ -143,7 +138,7 @@ export default {
   margin-top: -0.2rem;
   left: 100%;
 }
-.chat-my .chat-content .dialog_box>img {
+.chat-my .chat-content .dialog_box > img {
   width: 1.08rem;
   height: 1.09rem;
   border-radius: 50%;
@@ -190,7 +185,7 @@ export default {
   margin-top: -0.2rem;
   right: 100%;
 }
-.chat-other .chat-content .dialog_box>img {
+.chat-other .chat-content .dialog_box > img {
   width: 1.08rem;
   height: 1.09rem;
   border-radius: 50%;
@@ -199,7 +194,7 @@ export default {
   left: -1.4rem;
   top: 0.2rem;
 }
-.avatar{
+.avatar {
   width: 1.5rem;
 }
 </style>
