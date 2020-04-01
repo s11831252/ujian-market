@@ -17,14 +17,32 @@
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more','多媒体功能')">&#xe726;</div>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
-        <swiper class="swiper">
+        <swiper class="swiper" indicator-dots="true">
           <swiper-item v-for="(item,index) in EmojiObj2.map" :key="index">
             <img v-for="(value,key) in item" :key="key" :src="EmojiObj2.path+value" @click="emojiInput(key)">
           </swiper-item>
         </swiper>
         <div class="toolbox">
-          <span class="btn_send">发送</span>
+          <span class="btn_send" @click="sendMsg">发送</span>
         </div>
+      </div>
+      <div v-if="chattype=='more'" class="moremsg">
+        <span class="iconbox" @click="openImage">
+          <i class="icon">&#xe89c;</i>
+          <p>图片</p>
+        </span>
+        <span class="iconbox">
+          <i class="icon">&#xe634;</i>
+          <p>拍照</p>
+        </span>
+        <span class="iconbox" @click="openVideo">
+          <i class="icon">&#xe6c5;</i>
+          <p>视频</p>
+        </span>
+        <span class="iconbox">
+          <i class="icon">&#xe65e;</i>
+          <p>位置</p>
+        </span>
       </div>
     </div>
   </div>
@@ -125,6 +143,7 @@ export default {
         WebIM.conn.send(msg.body);
         msgStorage.saveMsg(msg, "txt");
         that.msg = "";
+        that.chattype="chat";
       }
     },
     readMsg(renderableMsg,type,currentChatMsg,sessionKey,isNew){
@@ -155,6 +174,107 @@ export default {
     emojiInput(emoji){
       // console.log(item,item2)
       this.msg+=emoji
+    },
+		upLoadImage(res,_msgType="img"){
+			var me = this;
+			var tempFilePaths = res.tempFilePaths;
+      var token = WebIM.conn.context.accessToken;
+      for (let index = 0; index < tempFilePaths.length; index++) {
+        const path = tempFilePaths[index];
+        wx.getImageInfo({
+          src: path,
+          success(res){
+            var allowType = {
+              jpg: true,
+              gif: true,
+              png: true,
+              bmp: true,
+              mp4:true
+            };
+            var str = WebIM.config.appkey.split("#");
+            var width = res.width;
+            var height = res.height;
+            var index = res.path.lastIndexOf(".");
+            var filetype = (~index && res.path.slice(index + 1)) || "";
+            if(filetype.toLowerCase() in allowType){
+              me.$HXAPI.chatfiles(str[0],
+              str[1],
+              [path],
+              ['file'],
+              {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
+              .then((dataArr)=>{
+                  var dataObj = dataArr[0];
+                  var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
+                  var msg = new WebIM.message(_msgType, id);
+                  var body;
+                  if(_msgType==msgType.IMAGE)
+                  {
+                    body = {
+                      type: _msgType,
+                      size: {
+                        width: width,
+                        height: height
+                      },
+                      url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                      filetype: filetype,
+                      filename: path
+                    };
+                  }else if(_msgType==msgType.VIDEO){
+                    body ={
+                      type: _msgType,
+                      url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                      filetype: filetype||"mp4",
+                      filename: tempFilePaths
+                    }
+                  }
+
+                  msg.set({
+                    body: body,
+                    from: WebIM.conn.context.userId,
+                    to: me.to,
+                    roomType: false,
+                    chatType: "groupchat",
+                    success: function (argument) {
+                      // disp.fire('em.chat.sendSuccess', id);
+                      console.log("files send ok",argument)
+                      msgStorage.saveMsg(msg, _msgType);
+                    },
+                    fail(id, serverMsgId) {
+                      console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
+                    }
+                  });
+                  msg.setGroup("groupchat");
+                  WebIM.conn.send(msg.body);
+              })
+            }
+          }
+        });
+      }
+		},
+    openImage(){
+      let that = this;
+      wx.chooseImage({
+          sizeType: ['original', 'compressed'],//所选的图片的尺寸
+          sourceType:['album'],//
+          count:1,
+          //接口调用成功的回调函数
+          success: function (res) {
+            console.log(res.tempFilePaths);//数组临时路径
+            that.upLoadImage(res);
+          }
+        })
+    },
+    openVideo(){
+      var that = this
+      wx.chooseVideo({
+        sourceType: ['album','camera'],
+        maxDuration: 10,
+        camera: 'back',
+        success(res) {
+          console.log(res.tempFilePath)
+          that.upLoadImage([res.tempFilePath],msgType.VIDEO)//临时路径
+        }
+      })
     }
   },
   async mounted() {
@@ -454,8 +574,7 @@ body{
   bottom: 0rem;
   z-index: 99; */
   /* position: fixed; */
-}
-.input input {
+input {
   padding: 0.1rem;
   height: fit-content;
   min-height: 1rem;
@@ -471,13 +590,15 @@ body{
   margin-right: 0.2rem;
   background-color: #ffffff;
 }
-.icon {
+  .icon {
   font-size: 0.7rem;
   margin-right: 0.2rem;
+  }
+  .icon.focus{
+    color:#12b7f5;
+  }
 }
-.icon.focus{
-  color:#12b7f5;
-}
+
 .emojibox{
   height: auto;
   width: auto;
@@ -485,7 +606,7 @@ body{
   // padding-bottom:0.2rem;
   .swiper{
     background-color: #ecf0f1;
-    height: 3rem;
+    height: 3.3rem;
   }
   img{
     width: 0.8rem;
@@ -502,9 +623,30 @@ body{
     display: flex;
     justify-content: flex-end;
     .btn_send{
-      padding: 0.5rem;
+      padding: 0.3rem;
       background-color: #12b7f5;
       color: #ecf0f1;
+    }
+  }
+}
+.moremsg{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #ecf0f1;
+  padding: 0.3rem 0;
+  span.iconbox{
+    text-align: center;
+    .icon{
+      background-color: #fff;
+      padding: 0.3rem 0.4rem;
+      border: 0.02rem solid #fff;
+      border-radius: 0.3rem;
+      font-size: 0.7rem;
+    }
+    p{
+      color:#898989;
+      font-size: 0.4rem;
     }
   }
 }

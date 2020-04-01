@@ -2,35 +2,20 @@
   <div class="chat-item" :id="chatdata.mid" :class="chatdata.info.from==myUsername?'chat-my':'chat-other'">
     <p class="time">{{fmtChattime}}</p>
     <!-- 用户对话框 -->
-    <div class="chat-content" v-if="chatdata.info.from==myUsername">
+    <div class="chat-content" >
       <div class="dialog_box">
         <p class="username">{{UserInfo.UserName}}</p>
         <!-- <span class="read">已读</span> -->
         <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
           <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
           <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
-          <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
+          <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" class="chatmsgarr">
             <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
           </div>
         </div>
         <span v-else>&nbsp;</span>
-        <img :src="UserInfo.Portrait" alt />
-      </div>
-    </div>
-    <!-- 管理员对话框 -->
-    <div class="chat-content" v-else>
-      <div class="dialog_box">
-        <p class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
-        <!-- <span class="read">已读</span> -->
-        <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-          <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
-          <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
-          <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'">
-            <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
-          </div>
-        </div>
-        <span v-else>&nbsp;</span>
-        <img :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
+        <img v-if="chatdata.info.from==myUsername" :src="UserInfo.Portrait" alt />
+        <img v-else :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
       </div>
     </div>
   </div>
@@ -123,7 +108,8 @@ export default {
   position: relative;
   margin-right: 1.5rem;
 }
-.chatdata {
+
+.chatmsgarr{
   display: flex;
   flex-wrap: wrap;
   align-items: center;

@@ -6,6 +6,8 @@ import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
 import API2 from "./api/API2"
+import HXAPI from "./api/HXAPI"
+
 import { debug } from 'util';
 import './assets/style.css';
 import './assets/global.css';
@@ -13,10 +15,12 @@ import './assets/iconfont.less';
 import WebIM from "@/utils/hx/WebIM";
 import md5 from "@/utils/md5";
 
-Vue.prototype.$UJAPI = UJAPI; //在实例中用this.$UJAPI调用UJAPI封装好的RestAPI
-Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用this.$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
-Vue.prototype.$WeixinOpenAPI = WeixinOpenAPI; //在实例中用this.$WeiXinOpenAPI调用WeiXinOpenAPI.js封装好的RestAPI
-Vue.prototype.$API2=API2;//在实例中用this.$API2调用API2.js封装好的RestAPI
+//在实例中用this.$xxx调用封装好的RestAPI
+Vue.prototype.$UJAPI = UJAPI; 
+Vue.prototype.$ShoppingAPI = ShoppingAPI; 
+Vue.prototype.$WeixinOpenAPI = WeixinOpenAPI;
+Vue.prototype.$API2=API2;
+Vue.prototype.$HXAPI=HXAPI;
 
 Vue.prototype.$store = store;
 Vue.mixin({

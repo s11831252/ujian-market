@@ -129,7 +129,7 @@ const net = {
       })
     })
   },
-  upload (url,data,filePath,names){
+  upload (url,data,filePath,names,header){
     var that = this;
     // var  i = data.i ? data.i : 0,
     // success = data.success ? data.success : 0,
@@ -164,6 +164,14 @@ const net = {
       title: '上传中',
     })
     var promiseList=[];
+    var _header={
+      'dataType-Type': 'application/json',
+      'Device':"WebApp",
+      'DisplayVersion':"2.0.11",
+      'SingleTicket':store.state.User.SingleTicket,
+      ...header
+    };
+    console.log(url,data,filePath,names,_header)
     for (let index = 0; index < filePath.length; index++) {
       promiseList[index]=new Promise((resolve, reject) => {
           wx.uploadFile({
@@ -171,12 +179,7 @@ const net = {
             filePath: filePath[index],
             name:names instanceof Array?names[index]:`${names}[${index}]`,
             formData: data,
-            header: {
-              'dataType-Type': 'application/json',
-              'Device':"WebApp",
-              'DisplayVersion':"2.0.11",
-              'SingleTicket':store.state.User.SingleTicket
-            }, // 设置请求的 header
+            header: _header, // 设置请求的 header
             success: (resp) => {
               // console.log(resp)
               if(resp.statusCode!=200){
@@ -194,7 +197,6 @@ const net = {
                     title: res.msg,
                     icon: "none"
                   });
-                return false;
               }
               resolve(res);
 

@@ -23,8 +23,8 @@ export default {
     line-height: 0.4rem;
     font-size: 0.4rem;
     img{
-        width: 0.45rem;
-        height: 0.45rem;
+        width: 0.48rem;
+        height: 0.48rem;
     }
 }
 </style>
