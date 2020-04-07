@@ -171,7 +171,6 @@ const net = {
       'SingleTicket':store.state.User.SingleTicket,
       ...header
     };
-    console.log(url,data,filePath,names,_header)
     for (let index = 0; index < filePath.length; index++) {
       promiseList[index]=new Promise((resolve, reject) => {
           wx.uploadFile({

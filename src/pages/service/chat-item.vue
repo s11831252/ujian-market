@@ -7,7 +7,7 @@
         <p class="username">{{UserInfo.UserName}}</p>
         <!-- <span class="read">已读</span> -->
         <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-          <img v-if="chatdata.msg.type=='img'" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
+          <img v-if="chatdata.msg.type=='img'" lazy-load="true" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
           <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
           <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" class="chatmsgarr">
             <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>

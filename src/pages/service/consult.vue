@@ -14,7 +14,7 @@
         <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio','语音')">&#xe664;</div>
         <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
-        <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more','多媒体功能')">&#xe726;</div>
+        <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper" indicator-dots="true">
@@ -32,7 +32,7 @@
           <p>图片</p>
         </span>
         <span class="iconbox">
-          <i class="icon">&#xe634;</i>
+          <i class="icon" @click="openCamera">&#xe634;</i>
           <p>拍照</p>
         </span>
         <span class="iconbox" @click="openVideo">
@@ -121,12 +121,12 @@ export default {
       if (!this.to) {
       } else {
         let id = WebIM.conn.getUniqueId();
-        let msg = new WebIM.message("txt", id);
+        let msg = new WebIM.message(msgType.TEXT, id);
         msg.set({
           msg: this.msg,
           from: WebIM.conn.context.userId,
           to: this.to,
-          roomType: false,
+          roomType: true,
           chatType: "groupchat",
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
@@ -175,80 +175,132 @@ export default {
       // console.log(item,item2)
       this.msg+=emoji
     },
-		upLoadImage(res,_msgType="img"){
+		upLoadImage(tempFilePaths,_msgType="img"){
 			var me = this;
-			var tempFilePaths = res.tempFilePaths;
       var token = WebIM.conn.context.accessToken;
+      var str = WebIM.config.appkey.split("#");
       for (let index = 0; index < tempFilePaths.length; index++) {
         const path = tempFilePaths[index];
-        wx.getImageInfo({
-          src: path,
-          success(res){
-            var allowType = {
-              jpg: true,
-              gif: true,
-              png: true,
-              bmp: true,
-              mp4:true
-            };
-            var str = WebIM.config.appkey.split("#");
-            var width = res.width;
-            var height = res.height;
-            var index = res.path.lastIndexOf(".");
-            var filetype = (~index && res.path.slice(index + 1)) || "";
-            if(filetype.toLowerCase() in allowType){
-              me.$HXAPI.chatfiles(str[0],
-              str[1],
-              [path],
-              ['file'],
-              {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
-              .then((dataArr)=>{
-                  var dataObj = dataArr[0];
-                  var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
-                  var msg = new WebIM.message(_msgType, id);
-                  var body;
-                  if(_msgType==msgType.IMAGE)
-                  {
-                    body = {
-                      type: _msgType,
-                      size: {
-                        width: width,
-                        height: height
-                      },
-                      url: dataObj.uri + "/" + dataObj.entities[0].uuid,
-                      filetype: filetype,
-                      filename: path
-                    };
-                  }else if(_msgType==msgType.VIDEO){
-                    body ={
-                      type: _msgType,
-                      url: dataObj.uri + "/" + dataObj.entities[0].uuid,
-                      filetype: filetype||"mp4",
-                      filename: tempFilePaths
-                    }
-                  }
+        if(_msgType==msgType.IMAGE)
+        {
+          wx.getImageInfo({
+            src: path,
+            success(res){
+              var allowType = {
+                jpg: true,
+                gif: true,
+                png: true,
+                bmp: true,
+              };
+              var width = res.width;
+              var height = res.height;
+              var index = res.path.lastIndexOf(".");
+              var filetype = (~index && res.path.slice(index + 1)) || "";
+              if(filetype.toLowerCase() in allowType){
+                me.$HXAPI.chatfiles(str[0],
+                str[1],
+                [path],
+                ['file'],
+                {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
+                .then((dataArr)=>{
+                    var dataObj = dataArr[0];
+                    var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
+                    var msg = new WebIM.message(_msgType, id);
+                    var body = {
+                        type: _msgType,
+                        size: {
+                          width: width,
+                          height: height
+                        },
+                        url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                        filetype: filetype,
+                        filename: path
+                      };
 
-                  msg.set({
-                    body: body,
-                    from: WebIM.conn.context.userId,
-                    to: me.to,
-                    roomType: false,
-                    chatType: "groupchat",
-                    success: function (argument) {
-                      // disp.fire('em.chat.sendSuccess', id);
-                      console.log("files send ok",argument)
-                      msgStorage.saveMsg(msg, _msgType);
-                    },
-                    fail(id, serverMsgId) {
-                      console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
-                    }
-                  });
-                  msg.setGroup("groupchat");
-                  WebIM.conn.send(msg.body);
-              })
+                    msg.set({
+                      body: body,
+                      from: WebIM.conn.context.userId,
+                      to: me.to,
+                      roomType: true,
+                      chatType: "groupchat",
+                      success: function (argument) {
+                        // disp.fire('em.chat.sendSuccess', id);
+                        console.log("files send ok",argument)
+                        msgStorage.saveMsg(msg, _msgType);
+                      },
+                      fail(id, serverMsgId) {
+                        console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
+                      }
+                    });
+                    msg.setGroup("groupchat");
+                    WebIM.conn.send(msg.body);
+                })
+              }else{
+                me.toast(`不支持的文件格式:${filetype}`)
+              }
+            },
+            fail(msg){
+              console.log(msg)
+            },
+            complete(){
+              console.log("getImageInfo complete")
             }
-          }
-        });
+          });
+        }else{
+             var allowType = {
+                mp4:true
+              };
+              var width = path.width;
+              var height = path.height;
+              var index = path.tempFilePath.lastIndexOf(".");
+              var filetype = (~index && path.tempFilePath.slice(index + 1)) || "";
+              if(filetype.toLowerCase() in allowType){
+                me.$HXAPI.chatfiles(str[0],
+                str[1],
+                [path.tempFilePath],
+                ['file'],
+                {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
+                .then((dataArr)=>{
+                    var dataObj = dataArr[0];
+                    var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
+                    var msg = new WebIM.message(_msgType, id);
+                    console.log(msg);
+                    var body = {
+                        type: _msgType,
+                        url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                        filetype: filetype||"mp4",
+                        filename: path.tempFilePath,
+                        length:path.size,
+                        size: {
+                          width: width,
+                          height: height
+                        },
+                      }                    
+                    msg.set({
+                      body: body,
+                      from: WebIM.conn.context.userId,
+                      to: me.to,
+                      roomType: true,
+                      chatType: "groupchat",
+                      success: function (argument) {
+                        // disp.fire('em.chat.sendSuccess', id);
+                        console.log("files send ok",argument)
+                        msgStorage.saveMsg(msg, _msgType);
+                        
+                      },
+                      fail(id, serverMsgId) {
+                        console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
+                      }
+                    });
+                    msg.setGroup("groupchat");
+                    WebIM.conn.send(msg.body);
+                })
+              }else
+              {
+                me.toast("目前仅支持.mp4文件")
+              }
+        }
+
       }
 		},
     openImage(){
@@ -259,20 +311,42 @@ export default {
           count:1,
           //接口调用成功的回调函数
           success: function (res) {
-            console.log(res.tempFilePaths);//数组临时路径
-            that.upLoadImage(res);
+            that.upLoadImage(res.tempFilePaths);//数组临时路径
           }
         })
+    },
+    openCamera(){
+      var that = this
+      wx.chooseMedia({
+        count: 1,
+        mediaType: ['image','video'],
+        sourceType: ['camera'],
+        maxDuration: 10,
+        camera: 'back',
+        sizeType:'original',
+        success(res) {
+          console.log(res)
+          if(res.type=='video')
+          {
+            that.upLoadImage(res.tempFiles,msgType.VIDEO)
+          }else
+          {
+            var paths =  res.tempFiles.map(item=>{
+              return item.tempFilePath
+            })
+            that.upLoadImage(paths,msgType.IMAGE)//临时路径
+          }
+        }
+      })
     },
     openVideo(){
       var that = this
       wx.chooseVideo({
-        sourceType: ['album','camera'],
+        sourceType: ['album'],
         maxDuration: 10,
         camera: 'back',
         success(res) {
-          console.log(res.tempFilePath)
-          that.upLoadImage([res.tempFilePath],msgType.VIDEO)//临时路径
+          that.upLoadImage([res],msgType.VIDEO)//临时路径
         }
       })
     }

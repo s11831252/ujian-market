@@ -30,8 +30,15 @@ export default function(sendableMsg, type, myName){
 			width: sendableMsg.body.body.size.width,
 			height: sendableMsg.body.body.size.height,
 		};
-	}else if (type == msgType.AUDIO||type ==msgType.VIDEO) {
+	}else if(type ==msgType.VIDEO){
+		renderableMsg.msg.size = {
+			width: sendableMsg.body.body.size.width,
+			height: sendableMsg.body.body.size.height,
+		};
 		renderableMsg.msg.length = sendableMsg.body.length;
+	}else if (type == msgType.AUDIO) {
+		renderableMsg.msg.length = sendableMsg.body.length;
+
 	}else if (type == msgType.FILE){
 		renderableMsg.msg.data = [{data: "[当前不支持此格式消息展示]", type: "txt"}];
 		renderableMsg.msg.type = 'txt';

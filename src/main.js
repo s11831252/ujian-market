@@ -66,7 +66,8 @@ Vue.mixin({
         {
             wx.showToast({
                 title: title,
-                icon: "none"
+                icon: "none",
+                mask:true
               });
         },
         modal(title,content,confirm,cancel,confirmText){

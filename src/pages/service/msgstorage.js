@@ -128,8 +128,8 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 	}
 	curChatMsg.push(renderableMsg);
 	//console.log('renderableMsgrenderableMsg', renderableMsg)
-	if(type == msgType.AUDIO){
-		renderableMsg.msg.token = sendableMsg.accessToken;
+	// if(type == msgType.AUDIO){
+	// 	renderableMsg.msg.token = sendableMsg.accessToken;
 		//如果是音频则请求服务器转码
 		// wx.downloadFile({
 		// 	url: sendableMsg.body.body.url,
@@ -150,7 +150,7 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 		// 		console.log("downloadFile failed", e);
 		// 	}
 		// });
-	}
+	// }
 	// else{
 	// 	save();
 	// }
