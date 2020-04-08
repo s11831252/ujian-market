@@ -3,7 +3,6 @@ class Html_Font_Size {
         let self = this;
         window.onresize = function () {
             self.getRem(1080,100);
-            //alert(document.getElementsByTagName('html').item(0).style.fontSize);              
         }
         self.getRem(1080,100);
     }

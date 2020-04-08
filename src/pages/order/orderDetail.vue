@@ -693,7 +693,7 @@ export default {
       });
     },
     say: function(message) {
-      alert(message);
+      this.toast(message);
     },
     checktanchuceng() {
       if ((this.showed = true)) {
@@ -827,7 +827,7 @@ export default {
               this.getCommentModel.goodsCommentList.splice(index, 1); 
             }else
             {
-              this.alert("删除评论失败")
+              this.toast("删除评论失败")
             }
       });
     }

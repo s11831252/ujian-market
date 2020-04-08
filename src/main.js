@@ -62,13 +62,13 @@ Vue.mixin({
                 mask:true
               });
         },
-        alert(title)
-        {
-            wx.showToast({
-                title: title,
-                icon: "none",
+        showLoading(){
+            wx.showLoading({
                 mask:true
-              });
+            });
+        },
+        hideLoading(){
+            wx.hideLoading();
         },
         modal(title,content,confirm,cancel,confirmText){
             
@@ -141,6 +141,7 @@ Vue.mixin({
         hx_login(){
             // console.log(this.$store.state,this.$store.state.UserInfo)
             if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
+                this.toast("正在连接聊天服务器")
                 var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
                 var hx_psw = md5.hex_md5(hx_username);
                 console.log(hx_username, hx_psw);
@@ -153,7 +154,7 @@ Vue.mixin({
                   appKey: WebIM.config.appkey
                 };
                 WebIM.conn.open(options);
-                this.toast("正在连接聊天服务器")
+                this.showLoading();
               }
         }
     },

@@ -30,12 +30,6 @@ export default function(sendableMsg, type, myName){
 			width: sendableMsg.body.body.size.width,
 			height: sendableMsg.body.body.size.height,
 		};
-	}else if(type ==msgType.VIDEO){
-		renderableMsg.msg.size = {
-			width: sendableMsg.body.body.size.width,
-			height: sendableMsg.body.body.size.height,
-		};
-		renderableMsg.msg.length = sendableMsg.body.length;
 	}else if (type == msgType.AUDIO) {
 		renderableMsg.msg.length = sendableMsg.body.length;
 

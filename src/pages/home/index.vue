@@ -418,7 +418,7 @@ export default {
         geolocation.getCurrentPosition(function(r) {
           if (this.getStatus() == BMAP_STATUS_SUCCESS) {
             // if (r.accuracy != null) {
-            //   that.alert("您已拒绝地理位置授权");
+            //   that.toast("您已拒绝地理位置授权");
             //   //用户决绝地理位置授权
             //   return;
             // } else

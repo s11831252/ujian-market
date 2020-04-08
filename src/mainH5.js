@@ -44,10 +44,6 @@ Vue.mixin({
       toast(title){
         this.$toast.center(title);
       },
-      alert(title)
-      {
-        this.$toast.center(title);
-      },
       modal(title,content,confirm,cancel){
         if(window.confirm(content)){
           if(confirm)

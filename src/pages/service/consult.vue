@@ -264,8 +264,8 @@ export default {
                     var dataObj = dataArr[0];
                     var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
                     var msg = new WebIM.message(_msgType, id);
-                    console.log(msg);
-                    var body = {
+                    msg.set({
+                      body: {
                         type: _msgType,
                         url: dataObj.uri + "/" + dataObj.entities[0].uuid,
                         filetype: filetype||"mp4",
@@ -275,9 +275,10 @@ export default {
                           width: width,
                           height: height
                         },
-                      }                    
-                    msg.set({
-                      body: body,
+                        file:{
+                          filename:path.tempFilePath
+                        }
+                      },
                       from: WebIM.conn.context.userId,
                       to: me.to,
                       roomType: true,
@@ -292,6 +293,7 @@ export default {
                         console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
                       }
                     });
+                    console.log(msg.body);
                     msg.setGroup("groupchat");
                     WebIM.conn.send(msg.body);
                 })
@@ -482,17 +484,17 @@ export default {
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
         // 则无需调用conn.setPresence();
-        wx.hideLoading();
         WebIM.conn.setPresence();
         utils.setItem("myUsername", WebIM.conn.context.userId);
         if(that.isMP)
         {
-          that.toast("正在同步聊天记录")
+          that.toast("正在同步聊天记录");
+          that.showLoading();
         }
         WebIM.conn.listRooms({
           success: function(resp) {
             utils.setItem("listGroup", resp);
-            wx.hideLoading();
+            that.hideLoading();
           },
           error: function(e) {
             console.log("error:", e);
@@ -545,6 +547,7 @@ export default {
       onVideoMessage(message){
 				console.log("onVideoMessage: ", message);
 				if(message){
+            debugger;
 					if(onMessageError(message)){
 						msgStorage.saveReceiveMsg(message, msgType.VIDEO);
 					}
