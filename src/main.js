@@ -62,10 +62,9 @@ Vue.mixin({
                 mask:true
               });
         },
-        showLoading(){
-            wx.showLoading({
-                mask:true
-            });
+        showLoading(opt){
+            var obj ={mask:true, ...opt};
+            wx.showLoading(obj);
         },
         hideLoading(){
             wx.hideLoading();
@@ -141,11 +140,9 @@ Vue.mixin({
         hx_login(){
             // console.log(this.$store.state,this.$store.state.UserInfo)
             if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
-                this.toast("正在连接聊天服务器")
                 var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
                 var hx_psw = md5.hex_md5(hx_username);
                 console.log(hx_username, hx_psw);
-          
                 let options = {
                   grant_type: "password",
                   apiUrl: WebIM.config.apiURL,
@@ -153,9 +150,9 @@ Vue.mixin({
                   pwd: hx_psw,
                   appKey: WebIM.config.appkey
                 };
+                this.showLoading({title:"正在连接聊天服务器"})
                 WebIM.conn.open(options);
-                this.showLoading();
-              }
+            }
         }
     },
     onLoad () {

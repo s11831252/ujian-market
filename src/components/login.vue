@@ -184,9 +184,10 @@ export default {
                 this.$router.replace({path: url})
             }
           );
+        }else if(this.$route.query.back){//后退
+          this.$router.back()
         }
-        // 切换至首页页面
-        else
+        else// 切换至首页页面
         {
           this.$router.push({ path: "/pages/home/index", isTab: true });
         } 

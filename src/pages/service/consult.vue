@@ -1,6 +1,6 @@
 <template>
   <div class="wai">
-    <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox">
+    <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)">
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
       <!-- <div class="msgbox"> -->
       <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
@@ -39,7 +39,7 @@
           <i class="icon">&#xe6c5;</i>
           <p>视频</p>
         </span>
-        <span class="iconbox">
+        <span class="iconbox"  @click="pending('location','定位')">
           <i class="icon">&#xe65e;</i>
           <p>位置</p>
         </span>
@@ -175,7 +175,7 @@ export default {
       // console.log(item,item2)
       this.msg+=emoji
     },
-		upLoadImage(tempFilePaths,_msgType="img"){
+	  upLoadImage(tempFilePaths,_msgType="img"){
 			var me = this;
       var token = WebIM.conn.context.accessToken;
       var str = WebIM.config.appkey.split("#");
@@ -255,48 +255,64 @@ export default {
               var index = path.tempFilePath.lastIndexOf(".");
               var filetype = (~index && path.tempFilePath.slice(index + 1)) || "";
               if(filetype.toLowerCase() in allowType){
+               me.$HXAPI.chatfiles(str[0],str[1],[path.thumbTempFilePath],['file'],{"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
+               .then((thumbResponseArr)=>{
+                var thumbRes = thumbResponseArr[0];
+                var _thumbUrl= thumbRes.uri + "/" + thumbRes.entities[0].uuid;
+                var _thumb_secret = thumbRes.entities[0].uuid
+                console.log(thumbResponseArr,thumbRes);
                 me.$HXAPI.chatfiles(str[0],
-                str[1],
-                [path.tempFilePath],
-                ['file'],
-                {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
-                .then((dataArr)=>{
-                    var dataObj = dataArr[0];
-                    var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
-                    var msg = new WebIM.message(_msgType, id);
-                    msg.set({
-                      body: {
-                        type: _msgType,
-                        url: dataObj.uri + "/" + dataObj.entities[0].uuid,
-                        filetype: filetype||"mp4",
-                        filename: path.tempFilePath,
-                        length:path.size,
-                        size: {
-                          width: width,
-                          height: height
+                  str[1],
+                  [path.tempFilePath],
+                  ['file'],
+                  {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
+                  .then((dataArr)=>{
+                      var dataObj = dataArr[0];
+                      var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
+                      var msg = new WebIM.message(_msgType, id);
+                      msg.set({
+                        body: {
+                          type: _msgType,
+                          url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                          filetype: filetype||"mp4",
+                          filename: path.tempFilePath,
+                          file_length:path.size,
+                          length:path.duration,
+                          duration:path.duration,
+                          thumb:_thumbUrl||"https://a1.easemob.com/888yuezhi-88/ubuild/chatfiles/7d6a5be0-7a0c-11ea-ad22-7d667b9412a9",
+                          thumb_secret:_thumb_secret||"fWpb6noMEeqx5Fff_gzv8arOKcwjnyRlagS9fpPps0mSONG_",
+                          size: {
+                            width: width,
+                            height: height
+                          }
                         },
                         file:{
-                          filename:path.tempFilePath
+                            filename:path.tempFilePath,
+                            file_length:path.size,
+                            length:path.duration,
+                            duration:path.duration,
+                            thumb:_thumbUrl||"https://a1.easemob.com/888yuezhi-88/ubuild/chatfiles/7d6a5be0-7a0c-11ea-ad22-7d667b9412a9",
+                            thumb_secret:_thumb_secret||"fWpb6noMEeqx5Fff_gzv8arOKcwjnyRlagS9fpPps0mSONG_",
+                        },
+                        from: WebIM.conn.context.userId,
+                        to: me.to,
+                        roomType: true,
+                        chatType: "groupchat",
+                        success: function (argument) {
+                          // disp.fire('em.chat.sendSuccess', id);
+                          console.log("files send ok",argument)
+                          msgStorage.saveMsg(msg, _msgType);
+                          
+                        },
+                        fail(id, serverMsgId) {
+                          console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
                         }
-                      },
-                      from: WebIM.conn.context.userId,
-                      to: me.to,
-                      roomType: true,
-                      chatType: "groupchat",
-                      success: function (argument) {
-                        // disp.fire('em.chat.sendSuccess', id);
-                        console.log("files send ok",argument)
-                        msgStorage.saveMsg(msg, _msgType);
-                        
-                      },
-                      fail(id, serverMsgId) {
-                        console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
-                      }
-                    });
-                    console.log(msg.body);
-                    msg.setGroup("groupchat");
-                    WebIM.conn.send(msg.body);
-                })
+                      });
+                      console.log(msg.body);
+                      msg.setGroup("groupchat");
+                      WebIM.conn.send(msg.body);
+                  })
+               })
               }else
               {
                 me.toast("目前仅支持.mp4文件")
@@ -343,12 +359,33 @@ export default {
     },
     openVideo(){
       var that = this
-      wx.chooseVideo({
+      // wx.chooseVideo({
+      //   sourceType: ['album'],
+      //   maxDuration: 10,
+      //   camera: 'back',
+      //   success(res) {
+      //     console.log(res)
+      //     that.upLoadImage([res],msgType.VIDEO)//临时路径
+      //   }
+      // })
+      wx.chooseMedia({
+        count: 1,
+        mediaType: ['video'],
         sourceType: ['album'],
         maxDuration: 10,
-        camera: 'back',
+        sizeType:'original',
         success(res) {
-          that.upLoadImage([res],msgType.VIDEO)//临时路径
+          console.log(res)
+          if(res.type=='video')
+          {
+            that.upLoadImage(res.tempFiles,msgType.VIDEO)
+          }else
+          {
+            var paths =  res.tempFiles.map(item=>{
+              return item.tempFilePath
+            })
+            that.upLoadImage(paths,msgType.IMAGE)//临时路径
+          }
         }
       })
     }
@@ -478,22 +515,17 @@ export default {
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
+        that.showLoading({title:"正在同步聊天记录"});
         console.log("onOpened",message);
-
         //连接成功回调
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
         // 则无需调用conn.setPresence();
-        WebIM.conn.setPresence();
-        utils.setItem("myUsername", WebIM.conn.context.userId);
-        if(that.isMP)
-        {
-          that.toast("正在同步聊天记录");
-          that.showLoading();
-        }
+        // WebIM.conn.setPresence();
         WebIM.conn.listRooms({
           success: function(resp) {
             utils.setItem("listGroup", resp);
+            utils.setItem("myUsername", WebIM.conn.context.userId);
             that.hideLoading();
           },
           error: function(e) {
@@ -547,7 +579,6 @@ export default {
       onVideoMessage(message){
 				console.log("onVideoMessage: ", message);
 				if(message){
-            debugger;
 					if(onMessageError(message)){
 						msgStorage.saveReceiveMsg(message, msgType.VIDEO);
 					}

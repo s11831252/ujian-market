@@ -59,7 +59,7 @@
 <script>
 import { mapState,mapGetters } from "vuex";
 import WebIM from "@/utils/hx/WebIM";
-
+import utils from "@/utils/index.js";
 export default {
   data() {
     return {
@@ -82,6 +82,7 @@ export default {
     exit() {
       this.$store.commit("Login", { Ticket: "" }); //清空Ticket
       this.$store.commit("GetUserInfo", {});//清空userinfo
+      utils.removeItem("myUsername");
       WebIM.conn.close();//环信IM关闭
       this.$router.push("/pages/index/index"); //回到登录页
     },

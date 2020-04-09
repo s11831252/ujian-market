@@ -85,6 +85,7 @@ const net = {
   post(url, data) {
     wx.showLoading({
       title: '加载中',
+      mask:true
     })
     return new Promise((resolve, reject) => {
       wx.request({
@@ -162,6 +163,7 @@ const net = {
     // })
     wx.showLoading({
       title: '上传中',
+      mask:true
     })
     var promiseList=[];
     var _header={

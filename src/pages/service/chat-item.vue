@@ -4,7 +4,8 @@
     <!-- 用户对话框 -->
     <div class="chat-content" >
       <div class="dialog_box">
-        <p class="username">{{UserInfo.UserName}}</p>
+        <p v-if="chatdata.info.from==myUsername" class="username">{{UserInfo.UserName}}</p>
+        <p v-else class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
         <!-- <span class="read">已读</span> -->
         <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
           <img v-if="chatdata.msg.type=='img'" lazy-load="true" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
@@ -181,6 +182,11 @@ export default {
   top: 0.2rem;
 }
 .avatar {
-  width: 1.5rem;
+  max-width: 1.5rem;
+  max-height: 2.5rem;
+}
+video{
+  width: 2.5rem;
+  height: 2.5rem;
 }
 </style>
