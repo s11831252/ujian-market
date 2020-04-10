@@ -277,8 +277,8 @@ export default {
                           filetype: filetype||"mp4",
                           filename: path.tempFilePath,
                           file_length:path.size,
-                          length:path.duration,
-                          duration:path.duration,
+                          length:path.duration*1000,
+                          // duration:path.duration,
                           thumb:_thumbUrl||"https://a1.easemob.com/888yuezhi-88/ubuild/chatfiles/7d6a5be0-7a0c-11ea-ad22-7d667b9412a9",
                           thumb_secret:_thumb_secret||"fWpb6noMEeqx5Fff_gzv8arOKcwjnyRlagS9fpPps0mSONG_",
                           size: {
@@ -289,8 +289,8 @@ export default {
                         file:{
                             filename:path.tempFilePath,
                             file_length:path.size,
-                            length:path.duration,
-                            duration:path.duration,
+                            length:path.duration*1000,
+                            // duration:path.duration,
                             thumb:_thumbUrl||"https://a1.easemob.com/888yuezhi-88/ubuild/chatfiles/7d6a5be0-7a0c-11ea-ad22-7d667b9412a9",
                             thumb_secret:_thumb_secret||"fWpb6noMEeqx5Fff_gzv8arOKcwjnyRlagS9fpPps0mSONG_",
                         },
