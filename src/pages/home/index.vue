@@ -1,5 +1,11 @@
 <template>
   <div class="page">
+    <div class="viewhistory">
+      <p class="title">最近浏览</p>
+      <ul class="list">
+        <li></li>
+      </ul>
+    </div>
     <div class="search">
       <div @click="go({path:'/pages/home/search'})">
         <i class="icon">&#xe6e3;</i>&nbsp;
@@ -464,10 +470,18 @@ export default {
   onHide() {}
 };
 </script>
-<style  lang="less" scoped>
+<style  lang="scss" scoped>
 .page {
   background: #ecf0f1;
   padding-top: 1.27rem;
+}
+.viewhistory{
+  width: 100%;
+  .title{
+    font-size: 0.27rem;
+    width: 0.26rem;
+    line-height: 0.27rem;
+  }
 }
 .search {
   background-color: #12b7f5;
@@ -507,7 +521,7 @@ export default {
   .box-head {
     background-color: #ffffff;
     padding: 0.35rem 0 0 0.27rem;
-    // border-bottom: 0.01rem solid @borderColor;
+    // border-bottom: 0.01rem solid $borderColor;
     p {
       color: #12b7f5;
       font-size: 0.4rem;
@@ -541,10 +555,10 @@ export default {
   width: 2.47rem;
   height: 2.47rem;
 }
-@borderColor: #ecf0f1;
+$borderColor: #ecf0f1;
 .service {
   .Primary {
-    border-bottom: 0.01rem solid @borderColor;
+    border-bottom: 0.01rem solid $borderColor;
     li {
       display: inline-block;
       text-align: center;
@@ -555,7 +569,7 @@ export default {
       }
     }
     li:nth-of-type(odd) {
-      border-right: 0.01rem solid @borderColor;
+      border-right: 0.01rem solid $borderColor;
     }
   }
   .Secondary li {
@@ -627,7 +641,7 @@ export default {
     overflow: hidden;
     font-size: 0.4rem;
     color: #6b6b6b;
-    border-bottom: 0.01rem solid @borderColor;
+    border-bottom: 0.01rem solid $borderColor;
     padding: 0.32rem 0.33rem 0.34rem 0.28rem;
     .icon,
     p {
