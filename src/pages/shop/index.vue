@@ -75,7 +75,7 @@
 <script>
 import shoppingCar from "@/components/shoppingCarToolbar";
 import indexGoodDetail from "./index-good-detail";
-import { mapGetters,mapState, mapMutations } from "vuex";
+import {mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -169,7 +169,8 @@ export default {
           if (typeid > 1) return item.TypeId.indexOf(typeid) > -1;
           else return item.TypeId.length == 0;
         });
-    }
+    },
+    ...mapMutations(['viewHistory_push'])
   },
   onShareAppMessage(result) {
     let title = this.shopDetail.sName;
@@ -218,7 +219,9 @@ export default {
               }
             });
           }
+          this.viewHistory_push({sId:this.shopDetail.sId,sLogo:this.shopDetail.sLogo,sName:this.shopDetail.sName})
         }
+        
         var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
         if (rep3.ret == 0) {
           this.shopGoods = rep3.data;

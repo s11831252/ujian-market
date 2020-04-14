@@ -4,8 +4,6 @@ import createPersistedState from 'vuex-persistedstate'
 import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
 
-import { debug } from 'util';
-
 Vue.use(Vuex);
 export default new Vuex.Store({//store对象
   modules: {
@@ -13,12 +11,14 @@ export default new Vuex.Store({//store对象
       state: {
         UserInfo: {},
         SingleTicket: "",
-        CurrentLocation:{}
+        CurrentLocation:{},
+        viewHistory:[],//店铺浏览记录
+        showHistory:true,
       },
       getters:{
         Logined: state =>{
           return state.SingleTicket&&state.SingleTicket.length>0&&state.UserInfo&&state.UserInfo.UserId;
-        }
+        },
       },
       mutations: {
         Login(state, payload) {
@@ -30,6 +30,44 @@ export default new Vuex.Store({//store对象
         },
         UpdateLocation(state,payload){
           state.CurrentLocation = payload;
+        },
+        
+        viewHistory_push(state,viewlog){
+          if(viewlog!=null)
+          {
+            // var obj =  state.viewHistory.find(item=>item.sId==viewlog.sId)//查找店铺是否浏览过
+            // if(obj)
+            // {
+            //   if(state.viewHistory.length>1)
+            //   {
+            //     var _index =state.viewHistory.indexOf(obj)//找下标
+            //     state.viewHistory.splice(_index,1);//先移除
+            //     state.viewHistory.unshift(viewlog);//再插入首位
+            //   }
+
+            // }eles
+            // {
+            //   state.viewHistory.unshift(viewlog)
+            // }
+            var obj =  state.viewHistory.find(function(item){
+              return item.sId==viewlog.sId;
+            })//查找店铺是否浏览过
+            if(obj!=null)
+            {
+              var _index =state.viewHistory.indexOf(obj);//找下标
+               state.viewHistory.splice(_index,1);//先移除
+            }
+            
+            state.viewHistory.unshift(viewlog);
+            if(state.viewHistory.length>50)
+              state.viewHistory.pop();
+            state.showHistory=true;
+          }
+
+        },
+        setshowHistory(state,isshow)
+        {
+          state.showHistory=isshow;
         }
       }
     },

@@ -1,10 +1,17 @@
 <template>
   <div class="page">
-    <div class="viewhistory">
-      <p class="title">最近浏览</p>
-      <ul class="list">
-        <li></li>
-      </ul>
+    <div class="viewhistory" :class="[showHistory?'show':'hide',]" :style="hideStyle" v-if="viewHistory&&viewHistory.length">
+      <span class="title">最近浏览</span>
+      <div class="body">
+        <ul class="list">
+          <li v-for="(item,index) in viewHistory" :key="index" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})" >
+            <img :src="item.sLogo">
+            <p>{{item.sName}}</p>
+          </li>
+        </ul>
+      <i class="icon" @click="hidehistory">&#xe613;</i>
+      </div>
+
     </div>
     <div class="search">
       <div @click="go({path:'/pages/home/search'})">
@@ -202,6 +209,7 @@ export default {
           el: ".swiper-pagination"
         }
       },
+      hideStyle:"animation-play-state:paused;animation-direction:reverse",
       Market: {
         Banners: [],
         Category: [],
@@ -268,9 +276,16 @@ export default {
     navbarSliderClass() {
       return "navbar_slider_" + this.activeIndex;
     },
+    viewHistory(){
+      var _arr = this.$store.state.User.viewHistory.slice(0,4)//只显示4个店铺
+      return _arr;
+    },
     ...mapState({
       CurrentLocation: state => state.User.CurrentLocation,
-      Config: state => state.Global.Config     
+      Config: state => state.Global.Config,
+      showHistory(state){
+        return state.User.showHistory;
+      }
     })
   },
   methods: {
@@ -292,7 +307,11 @@ export default {
       }
       return rep;
     },
-
+    hidehistory(){
+      //启动隐藏浏览记录动画
+      this.hideStyle="animation-play-state:running;animation-direction:normal";
+      this.setshowHistory(false)
+    },
     openLocation() {
       var that = this;
       if (this.isMP) {
@@ -340,7 +359,8 @@ export default {
       this.ShopList = rep.data;
     },
     ...mapMutations([
-      "UpdateLocation" //`this.$store.commit('UpdateLocation')`
+      "UpdateLocation", //`this.$store.commit('UpdateLocation')`
+      "setshowHistory"
     ])
   },
   onPullDownRefresh() {
@@ -475,13 +495,89 @@ export default {
   background: #ecf0f1;
   padding-top: 1.27rem;
 }
+
+
 .viewhistory{
+  
   width: 100%;
+  display: flex;
+  align-items: center;
+
   .title{
     font-size: 0.27rem;
     width: 0.26rem;
     line-height: 0.27rem;
+    padding: 0.12rem 0.19rem;
+    background-color: #dadada;
+    color: #197fa5;
+    line-height: 0.4rem;
   }
+  .body{
+      display: flex;
+      align-items: center;
+      justify-content:space-between;
+      width: 100%;
+    .list{
+      display: flex;
+      li{
+        display: flex;
+        align-items:center;
+        margin-left: 0.23rem;
+        overflow: hidden;
+        img{
+          width: 0.66rem;
+          height: 0.66rem;
+        }
+        p{
+          margin-left: 0.1rem;
+          width: 1.3rem;
+          letter-spacing: -0.01rem;
+          font-size: 0.27rem;
+          line-height: 0.4rem;
+          color: #333333;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          word-break: break-all;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2; 
+        }
+      }
+    }
+    i.icon{
+          font-size: 0.35rem;
+          color: #4d4d4d;
+          padding: 0 0.4rem;
+      }
+  }
+
+  
+}
+// .hide2{
+//     animation: hidehistory 1s;
+//     animation-play-state:paused;
+//     animation-direction:reverse;
+//     animation-fill-mod:forwards;
+//     -webkit-animation-fill-mode:forwards;
+// }
+.hide{
+    animation: hidehistory 1s;
+    animation-fill-mod:forwards;
+    -webkit-animation-fill-mode:forwards;
+}
+
+@keyframes hidehistory
+{
+0% {	
+   opacity: 1;
+    transform: translateX(0);
+    height: auto;
+    }
+100% {		
+    opacity: 0;
+    transform: translateX(-10.8rem);
+    height: 0;
+    }
 }
 .search {
   background-color: #12b7f5;
