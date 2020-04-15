@@ -51,6 +51,15 @@ export default function(sendableMsg, type, myName){
 		} else if (type == msgType.FILE) {
 			return sendableMsg.body.body.msg
 		}
+		else if(type==msgType.LOCATION)
+		{
+			return {
+				lat: sendableMsg.body.body.lat,
+				lng: sendableMsg.body.body.lng,
+				addr:sendableMsg.body.body.addr
+			};
+
+		}
 		return "";
 	}
 };

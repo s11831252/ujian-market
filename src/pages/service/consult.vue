@@ -607,7 +607,14 @@ export default {
 				}
       },//收到命令消息
       onFileMessage: function ( message ) {},    //收到文件消息
-      onLocationMessage: function ( message ) {},//收到位置消息
+      onLocationMessage: function ( message ) {
+        console.log("onLocationMessage", message);
+        					if(onMessageError(message)){
+						msgStorage.saveReceiveMsg(message, msgType.LOCATION);
+					}
+					// calcUnReadSpot(message);
+					ack(message);
+      },//收到位置消息
       onRoster: function(message) {}, //处理好友申请
       onInviteMessage: function(message) {}, //处理群组邀请
       onOnline: function() {}, //本机网络连接成功

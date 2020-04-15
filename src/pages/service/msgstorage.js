@@ -99,6 +99,26 @@ msgStorage.saveReceiveMsg = function(receiveMsg, type){
 				},
 			},
 		};
+	}else if(type == msgType.LOCATION){
+		sendableMsg = {
+			id: receiveMsg.id,
+			type: type,
+			body: {
+				id: receiveMsg.id,
+				from: receiveMsg.from,
+				to: receiveMsg.to,
+				type: receiveMsg.type,
+				ext: receiveMsg.ext,
+				chatType: receiveMsg.type,
+				toJid: "",
+				body: {
+					type: type,
+					lat: receiveMsg.lat,
+					lng: receiveMsg.lng,
+					addr:receiveMsg.addr,
+				},
+			},
+		};
 	}
 	else{
 		return;
