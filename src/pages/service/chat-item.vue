@@ -7,11 +7,16 @@
         <p v-if="chatdata.info.from==myUsername" class="username">{{UserInfo.UserName}}</p>
         <p v-else class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
         <!-- <span class="read">已读</span> -->
-        <div v-if="chatdata.msg.data&&chatdata.msg.data.length" class="chatdata">
-          <img v-if="chatdata.msg.type=='img'" lazy-load="true" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
-          <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
-          <div v-else-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" class="chatmsgarr">
+        <div v-if="chatdata.msg.data" class="chatdata">
+          <div v-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" class="chatmsgarr">
             <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
+          </div>
+          <img v-else-if="chatdata.msg.type=='img'" lazy-load="true" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
+          <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
+          <!-- <map v-else-if="chatdata.msg.type == 'location'" id="map" :longitude="chatdata.msg.data.lng" :latitude="chatdata.msg.data.lat" enable-scroll="false" enable-zoom="false" :markers="markers" scale="16" style="width: 200px; height: 150px;"></map> -->
+          <div v-else-if="chatdata.msg.type == 'location'" class="loc" @click="mapclick" >
+            <img src="../../../static/img/maps.png">
+            <p class="addr">{{chatdata.msg.data.addr}}</p>
           </div>
         </div>
         <span v-else>&nbsp;</span>
@@ -28,7 +33,17 @@ import chatMsg from "@/pages/service/chat-msg";
 export default {
   props: {
     chatdata: Object,
-    chatRoomInfo: Object
+    chatRoomInfo: Object,
+  },
+  data(){
+    return {
+      markers:[{
+        id: 0,
+        latitude: this.chatdata.msg.data.lat,
+        longitude: this.chatdata.msg.data.lng,
+        title:this.chatdata.msg.data.addr
+      }]
+    }
   },
   computed: {
     ...mapState({
@@ -46,6 +61,15 @@ export default {
     chatMsg
   },
   methods: {
+    mapclick(){
+      if (this.isMP) {
+        wx.openLocation({
+          latitude:this.chatdata.msg.data.lat,
+          longitude: this.chatdata.msg.data.lng,
+          scale: 28
+        });
+      }
+    },
     previewImage(url) {
       if (this.isMP) {
         wx.previewImage({
@@ -53,10 +77,11 @@ export default {
         });
       }
     }
-  }
+  },
+  
 };
 </script>
-<style scoped>
+<style scoped  lang="scss">
 .chat-item {
   margin: 0.28rem 0;
   text-align: center;
@@ -105,9 +130,11 @@ export default {
   color: #5c5c5c;
   background-color: #d2e0e1;
   border-radius: 0.1rem;
-  padding: 0.5rem;
   position: relative;
   margin-right: 1.5rem;
+  .chatdata{
+    padding: 0.5rem;
+  }
 }
 
 .chatmsgarr{
@@ -121,7 +148,7 @@ export default {
   border-left: 0.25rem solid #d2e0e1;
   position: absolute;
   content: "";
-  top: 50%;
+  top: 0.8rem;
   margin-top: -0.2rem;
   left: 100%;
 }
@@ -158,9 +185,11 @@ export default {
   color: #5c5c5c;
   background-color: #fdfdfd;
   border-radius: 0.1rem;
-  padding: 0.5rem;
   position: relative;
   margin-left: 1.5rem;
+  .chatdata{
+    padding: 0.5rem;
+  }
 }
 /* 左侧小三角形 */
 .chat-other .chat-content .dialog_box:after {
@@ -168,7 +197,7 @@ export default {
   border-right: 0.25rem solid #fdfdfd;
   position: absolute;
   content: "";
-  top: 50%;
+  top: 0.8rem;
   margin-top: -0.2rem;
   right: 100%;
 }
@@ -188,5 +217,24 @@ export default {
 video{
   width: 2.5rem;
   height: 2.5rem;
+}
+.loc{
+  position: relative;
+  img{
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  p.addr{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    font-size: 0.3rem;
+    text-align: left;
+    padding-left: 0.1rem;
+    opacity:0.7;
+    filter:alpha(opacity=70); /* 针对 IE8 以及更早的版本 */
+  }
 }
 </style>
