@@ -3,7 +3,7 @@
     <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)">
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
       <!-- <div class="msgbox"> -->
-      <chatItem  v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scroll-view>
     <!-- </div> -->
@@ -12,14 +12,14 @@
       <div class="input">
         <!-- 引用图标，需要引用其样式 -->
         <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio','语音')">&#xe664;</div>
-        <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息">
+        <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper" indicator-dots="true">
           <swiper-item v-for="(item,index) in EmojiObj2.map" :key="index">
-            <img v-for="(value,key) in item" :key="key" :src="EmojiObj2.path+value" @click="emojiInput(key)">
+            <img v-for="(value,key) in item" :key="key" :src="EmojiObj2.path+value" @click="emojiInput(key)" />
           </swiper-item>
         </swiper>
         <div class="toolbox">
@@ -39,7 +39,7 @@
           <i class="icon">&#xe6c5;</i>
           <p>视频</p>
         </span>
-        <span class="iconbox"  @click="pending('location','定位')">
+        <span class="iconbox" @click="chooseLocation">
           <i class="icon">&#xe65e;</i>
           <p>位置</p>
         </span>
@@ -73,22 +73,22 @@ function onMessageError(err) {
   }
   return true;
 }
-function calcUnReadSpot(message){
-// 	let myName = wx.getStorageSync("myUsername");
-// 	let members = wx.getStorageSync("member") || []; //好友
-// 	var listGroups = wx.getStorageSync('listGroup')|| []; //群组
-// 	let allMembers = members.concat(listGroups)
-// 	let count = allMembers.reduce(function(result, curMember, idx){
-// 		let chatMsgs;
-// 		if (curMember.roomId) {
-// 			chatMsgs = wx.getStorageSync(curMember.roomId + myName.toLowerCase()) || [];
-// 		}else{
-// 			chatMsgs = wx.getStorageSync(curMember.name.toLowerCase() + myName.toLowerCase()) || [];
-// 		}
-// 		return result + chatMsgs.length;
-// 	}, 0);
-// 	getApp().globalData.unReadMessageNum = count;
-// 	disp.fire("em.xmpp.unreadspot", message);
+function calcUnReadSpot(message) {
+  // 	let myName = wx.getStorageSync("myUsername");
+  // 	let members = wx.getStorageSync("member") || []; //好友
+  // 	var listGroups = wx.getStorageSync('listGroup')|| []; //群组
+  // 	let allMembers = members.concat(listGroups)
+  // 	let count = allMembers.reduce(function(result, curMember, idx){
+  // 		let chatMsgs;
+  // 		if (curMember.roomId) {
+  // 			chatMsgs = wx.getStorageSync(curMember.roomId + myName.toLowerCase()) || [];
+  // 		}else{
+  // 			chatMsgs = wx.getStorageSync(curMember.name.toLowerCase() + myName.toLowerCase()) || [];
+  // 		}
+  // 		return result + chatMsgs.length;
+  // 	}, 0);
+  // 	getApp().globalData.unReadMessageNum = count;
+  // 	disp.fire("em.xmpp.unreadspot", message);
 }
 export default {
   data() {
@@ -97,13 +97,13 @@ export default {
       sId: null,
       ChatHistory: [],
       chatRoomInfo: {},
-      toView:"",
-      chattype:"chat",
-      EmojiObj2:{}
+      toView: "",
+      chattype: "chat",
+      EmojiObj2: {}
     };
   },
   components: {
-    chatItem
+    chatItem,
   },
   computed: {
     ...mapState({
@@ -143,79 +143,72 @@ export default {
         WebIM.conn.send(msg.body);
         msgStorage.saveMsg(msg, "txt");
         that.msg = "";
-        that.chattype="chat";
+        that.chattype = "chat";
       }
     },
-    readMsg(renderableMsg,type,currentChatMsg,sessionKey,isNew){
+    readMsg(renderableMsg, type, currentChatMsg, sessionKey, isNew) {
       // console.log(renderableMsg,currentChatMsg)
-      this.ChatHistory=currentChatMsg;
-      
-      if(this.ChatHistory.length)
-      {
-        if(isNew)
-        {
-          this.toView = currentChatMsg[this.ChatHistory.length-1].mid
-        }else
-        {
-          this.toView = currentChatMsg[this.ChatHistory.length-1].mid
+      this.ChatHistory = currentChatMsg;
+
+      if (this.ChatHistory.length) {
+        if (isNew) {
+          this.toView = currentChatMsg[this.ChatHistory.length - 1].mid;
+        } else {
+          this.toView = currentChatMsg[this.ChatHistory.length - 1].mid;
         }
       }
     },
-    pending(type,title){
-      if(this.chattype==type)
-         this.chattype="chat";
-      else
-      {     
-        if(title)
-          this.toast(`${title}功能正在开发中`)
-        this.chattype=type; 
+    pending(type, title) {
+      if (this.chattype == type) this.chattype = "chat";
+      else {
+        if (title) this.toast(`${title}功能正在开发中`);
+        this.chattype = type;
       }
     },
-    emojiInput(emoji){
+    emojiInput(emoji) {
       // console.log(item,item2)
-      this.msg+=emoji
+      this.msg += emoji;
     },
-	  upLoadImage(tempFilePaths,_msgType="img"){
-			var me = this;
+    upLoadImage(tempFilePaths, _msgType = "img") {
+      var me = this;
       var token = WebIM.conn.context.accessToken;
       var str = WebIM.config.appkey.split("#");
       for (let index = 0; index < tempFilePaths.length; index++) {
         const path = tempFilePaths[index];
-        if(_msgType==msgType.IMAGE)
-        {
+        if (_msgType == msgType.IMAGE) {
           wx.getImageInfo({
             src: path,
-            success(res){
+            success(res) {
               var allowType = {
                 jpg: true,
                 gif: true,
                 png: true,
-                bmp: true,
+                bmp: true
               };
               var width = res.width;
               var height = res.height;
               var index = res.path.lastIndexOf(".");
               var filetype = (~index && res.path.slice(index + 1)) || "";
-              if(filetype.toLowerCase() in allowType){
-                me.$HXAPI.chatfiles(str[0],
-                str[1],
-                [path],
-                ['file'],
-                {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
-                .then((dataArr)=>{
+              if (filetype.toLowerCase() in allowType) {
+                me.$HXAPI
+                  .chatfiles(str[0], str[1], [path], ["file"], {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + token
+                  })
+                  .then(dataArr => {
                     var dataObj = dataArr[0];
-                    var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
+                    var id = WebIM.conn.getUniqueId(); // 生成本地消息 id
                     var msg = new WebIM.message(_msgType, id);
                     var body = {
-                        type: _msgType,
-                        size: {
-                          width: width,
-                          height: height
-                        },
-                        url: dataObj.uri + "/" + dataObj.entities[0].uuid,
-                        filetype: filetype,
-                        filename: path
-                      };
+                      type: _msgType,
+                      size: {
+                        width: width,
+                        height: height
+                      },
+                      url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                      filetype: filetype,
+                      filename: path
+                    };
 
                     msg.set({
                       body: body,
@@ -223,177 +216,199 @@ export default {
                       to: me.to,
                       roomType: true,
                       chatType: "groupchat",
-                      success: function (argument) {
+                      success: function(argument) {
                         // disp.fire('em.chat.sendSuccess', id);
-                        console.log("files send ok",argument)
+                        console.log("files send ok", argument);
                         msgStorage.saveMsg(msg, _msgType);
                       },
                       fail(id, serverMsgId) {
-                        console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
+                        console.log(
+                          `发送文件(id=${id},serverMsgId=${serverMsgId})失败`
+                        );
                       }
                     });
                     msg.setGroup("groupchat");
                     WebIM.conn.send(msg.body);
-                })
-              }else{
-                me.toast(`不支持的文件格式:${filetype}`)
+                  });
+              } else {
+                me.toast(`不支持的文件格式:${filetype}`);
               }
             },
-            fail(msg){
-              console.log(msg)
+            fail(msg) {
+              console.log(msg);
             },
-            complete(){
-              console.log("getImageInfo complete")
+            complete() {
+              console.log("getImageInfo complete");
             }
           });
-        }else{
-             var allowType = {
-                mp4:true
-              };
-              var width = path.width;
-              var height = path.height;
-              var index = path.tempFilePath.lastIndexOf(".");
-              var filetype = (~index && path.tempFilePath.slice(index + 1)) || "";
-              if(filetype.toLowerCase() in allowType){
-               me.$HXAPI.chatfiles(str[0],str[1],[path.thumbTempFilePath],['file'],{"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
-               .then((thumbResponseArr)=>{
+        } else {
+          var allowType = {
+            mp4: true
+          };
+          var width = path.width;
+          var height = path.height;
+          var index = path.tempFilePath.lastIndexOf(".");
+          var filetype = (~index && path.tempFilePath.slice(index + 1)) || "";
+          if (filetype.toLowerCase() in allowType) {
+            me.$HXAPI
+              .chatfiles(str[0], str[1], [path.thumbTempFilePath], ["file"], {
+                "Content-Type": "multipart/form-data",
+                Authorization: "Bearer " + token
+              })
+              .then(thumbResponseArr => {
                 var thumbRes = thumbResponseArr[0];
-                var _thumbUrl= thumbRes.uri + "/" + thumbRes.entities[0].uuid;
-                var _thumb_secret = thumbRes.entities[0].uuid
-                console.log(thumbResponseArr,thumbRes);
-                me.$HXAPI.chatfiles(str[0],
-                  str[1],
-                  [path.tempFilePath],
-                  ['file'],
-                  {"Content-Type": "multipart/form-data",Authorization: "Bearer " + token})
-                  .then((dataArr)=>{
-                      var dataObj = dataArr[0];
-                      var id = WebIM.conn.getUniqueId();		// 生成本地消息 id
-                      var msg = new WebIM.message(_msgType, id);
-                      msg.set({
-                        body: {
-                          type: _msgType,
-                          url: dataObj.uri + "/" + dataObj.entities[0].uuid,
-                          filetype: filetype||"mp4",
-                          filename: path.tempFilePath,
-                          file_length:path.size,
-                          length:path.duration*1000,
-                          // duration:path.duration,
-                          thumb:_thumbUrl||"https://a1.easemob.com/888yuezhi-88/ubuild/chatfiles/7d6a5be0-7a0c-11ea-ad22-7d667b9412a9",
-                          thumb_secret:_thumb_secret||"fWpb6noMEeqx5Fff_gzv8arOKcwjnyRlagS9fpPps0mSONG_",
-                          size: {
-                            width: width,
-                            height: height
-                          }
-                        },
-                        file:{
-                            filename:path.tempFilePath,
-                            file_length:path.size,
-                            length:path.duration*1000,
-                            // duration:path.duration,
-                            thumb:_thumbUrl||"https://a1.easemob.com/888yuezhi-88/ubuild/chatfiles/7d6a5be0-7a0c-11ea-ad22-7d667b9412a9",
-                            thumb_secret:_thumb_secret||"fWpb6noMEeqx5Fff_gzv8arOKcwjnyRlagS9fpPps0mSONG_",
-                        },
-                        from: WebIM.conn.context.userId,
-                        to: me.to,
-                        roomType: true,
-                        chatType: "groupchat",
-                        success: function (argument) {
-                          // disp.fire('em.chat.sendSuccess', id);
-                          console.log("files send ok",argument)
-                          msgStorage.saveMsg(msg, _msgType);
-                          
-                        },
-                        fail(id, serverMsgId) {
-                          console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
-                        }
-                      });
-                      console.log(msg.body);
-                      msg.setGroup("groupchat");
-                      WebIM.conn.send(msg.body);
+                var _thumbUrl = thumbRes.uri + "/" + thumbRes.entities[0].uuid;
+                var _thumb_secret = thumbRes.entities[0].uuid;
+                console.log(thumbResponseArr, thumbRes);
+                me.$HXAPI
+                  .chatfiles(str[0], str[1], [path.tempFilePath], ["file"], {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + token
                   })
-               })
-              }else
-              {
-                me.toast("目前仅支持.mp4文件")
-              }
+                  .then(dataArr => {
+                    var dataObj = dataArr[0];
+                    var id = WebIM.conn.getUniqueId(); // 生成本地消息 id
+                    var msg = new WebIM.message(_msgType, id);
+                    msg.set({
+                      body: {
+                        type: _msgType,
+                        url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                        filetype: filetype || "mp4",
+                        filename: path.tempFilePath,
+                        file_length: path.size,
+                        length: path.duration * 1000,
+                        thumb: _thumbUrl,
+                        thumb_secret: _thumb_secret,
+                        size: {
+                          width: width,
+                          height: height
+                        }
+                      },
+                      file: {
+                        filename: path.tempFilePath,
+                        file_length: path.size,
+                        length: path.duration * 1000,
+                        thumb: _thumbUrl,
+                        thumb_secret: _thumb_secret
+                      },
+                      from: WebIM.conn.context.userId,
+                      to: me.to,
+                      roomType: true,
+                      chatType: "groupchat",
+                      success: function(argument) {
+                        // disp.fire('em.chat.sendSuccess', id);
+                        console.log("files send ok", argument);
+                        msgStorage.saveMsg(msg, _msgType);
+                      },
+                      fail(id, serverMsgId) {
+                        console.log(
+                          `发送文件(id=${id},serverMsgId=${serverMsgId})失败`
+                        );
+                      }
+                    });
+                    console.log(msg.body);
+                    msg.setGroup("groupchat");
+                    WebIM.conn.send(msg.body);
+                  });
+              });
+          } else {
+            me.toast("目前仅支持.mp4文件");
+          }
         }
-
       }
-		},
-    openImage(){
+    },
+    openImage() {
       let that = this;
       wx.chooseImage({
-          sizeType: ['original', 'compressed'],//所选的图片的尺寸
-          sourceType:['album'],//
-          count:1,
-          //接口调用成功的回调函数
-          success: function (res) {
-            that.upLoadImage(res.tempFilePaths);//数组临时路径
-          }
-        })
+        sizeType: ["original", "compressed"], //所选的图片的尺寸
+        sourceType: ["album"], //
+        count: 1,
+        //接口调用成功的回调函数
+        success: function(res) {
+          that.upLoadImage(res.tempFilePaths); //数组临时路径
+        }
+      });
     },
-    openCamera(){
-      var that = this
+    openCamera() {
+      var that = this;
       wx.chooseMedia({
         count: 1,
-        mediaType: ['image','video'],
-        sourceType: ['camera'],
+        mediaType: ["image", "video"],
+        sourceType: ["camera"],
         maxDuration: 10,
-        camera: 'back',
-        sizeType:'original',
+        camera: "back",
+        sizeType: "original",
         success(res) {
-          console.log(res)
-          if(res.type=='video')
-          {
-            that.upLoadImage(res.tempFiles,msgType.VIDEO)
-          }else
-          {
-            var paths =  res.tempFiles.map(item=>{
-              return item.tempFilePath
-            })
-            that.upLoadImage(paths,msgType.IMAGE)//临时路径
+          console.log(res);
+          if (res.type == "video") {
+            that.upLoadImage(res.tempFiles, msgType.VIDEO);
+          } else {
+            var paths = res.tempFiles.map(item => {
+              return item.tempFilePath;
+            });
+            that.upLoadImage(paths, msgType.IMAGE); //临时路径
           }
         }
-      })
+      });
     },
-    openVideo(){
-      var that = this
-      // wx.chooseVideo({
-      //   sourceType: ['album'],
-      //   maxDuration: 10,
-      //   camera: 'back',
-      //   success(res) {
-      //     console.log(res)
-      //     that.upLoadImage([res],msgType.VIDEO)//临时路径
-      //   }
-      // })
+    openVideo() {
+      var that = this;
       wx.chooseMedia({
         count: 1,
-        mediaType: ['video'],
-        sourceType: ['album'],
+        mediaType: ["video"],
+        sourceType: ["album"],
         maxDuration: 10,
-        sizeType:'original',
+        sizeType: "original",
         success(res) {
-          console.log(res)
-          if(res.type=='video')
-          {
-            that.upLoadImage(res.tempFiles,msgType.VIDEO)
-          }else
-          {
-            var paths =  res.tempFiles.map(item=>{
-              return item.tempFilePath
-            })
-            that.upLoadImage(paths,msgType.IMAGE)//临时路径
+          console.log(res);
+          if (res.type == "video") {
+            that.upLoadImage(res.tempFiles, msgType.VIDEO);
+          } else {
+            var paths = res.tempFiles.map(item => {
+              return item.tempFilePath;
+            });
+            that.upLoadImage(paths, msgType.IMAGE); //临时路径
           }
         }
-      })
+      });
+    },
+    chooseLocation() {
+      var that = this;
+      wx.chooseLocation({
+        success(res) {
+          var id = WebIM.conn.getUniqueId();
+          var msg = new WebIM.message(msgType.LOCATION, id);
+          msg.set({
+            msg: "",
+            from: WebIM.conn.context.userId,
+            to: that.to,
+            roomType: false,
+            lng: res.longitude,
+            lat: res.latitude,
+            addr:res.name,
+            // addr: res.address,
+            ext:{
+              name:res.name,
+              address:res.address
+            },
+            roomType: true,
+            chatType: "groupchat",
+            success(argument) {
+              // disp.fire('em.chat.sendSuccess', id);
+              console.log("location send ok", argument);
+              msgStorage.saveMsg(msg, msgType.LOCATION);
+            }
+          });
+          msg.setGroup("groupchat");
+          WebIM.conn.send(msg.body);
+        }
+      });
     }
   },
   async mounted() {
     var that = this;
     this.sId = this.$route.query.sId;
-    let shopInfo ={}
+    let shopInfo = {};
     var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
     if (rep.ret == 0) {
       shopInfo = rep.data;
@@ -409,31 +424,31 @@ export default {
         return item.name == this.UserInfo.Phone + "_" + this.sName;
       });
     }
-      var desc_obj = {
-        store: {
-          sId: this.sId,
-          sNm: this.sName,
-          sLogo: shopInfo.sLogo
-        },
-        order: {
-          // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
-          // orderNo: "201906181030089564",
-          // state: "交易完成"
-        },
-        buyer: {
-          bId: this.UserInfo.UserId,
-          bPhone: this.UserInfo.Phone,
-          bLogo: this.UserInfo.Portrait,
-          bNm: this.UserInfo.UserName,
-          auth: this.IsCertification
-        },
-        lastTime: Math.round(new Date().getTime() / 1000)
-      };
+    var desc_obj = {
+      store: {
+        sId: this.sId,
+        sNm: this.sName,
+        sLogo: shopInfo.sLogo
+      },
+      order: {
+        // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
+        // orderNo: "201906181030089564",
+        // state: "交易完成"
+      },
+      buyer: {
+        bId: this.UserInfo.UserId,
+        bPhone: this.UserInfo.Phone,
+        bLogo: this.UserInfo.Portrait,
+        bNm: this.UserInfo.UserName,
+        auth: this.IsCertification
+      },
+      lastTime: Math.round(new Date().getTime() / 1000)
+    };
     //没有则创建聊天室
-    if (!this.chatRoomInfo||!this.chatRoomInfo.roomId) {
+    if (!this.chatRoomInfo || !this.chatRoomInfo.roomId) {
       var groupname, owner, members, desc;
       desc = JSON.stringify(desc_obj);
-      desc = desc.replace(/\//g, "#") //格式化url
+      desc = desc.replace(/\//g, "#"); //格式化url
       groupname = `${this.UserInfo.Phone}_${this.sName}`;
       //店铺Id为创建人
       owner = this.sId.replace(/-/g, "") + "_";
@@ -457,7 +472,7 @@ export default {
                   }@conference.easemob.com`,
                   name: groupname,
                   roomId: rep2.data.groupid,
-                  desc:desc_obj
+                  desc: desc_obj
                 };
                 listGroup.push(this.chatRoomInfo);
                 utils.setItem("listGroup", listGroup);
@@ -465,19 +480,21 @@ export default {
             });
         }
       });
-    } else
-    {
+    } else {
       // //更新聊天室备注
       WebIM.conn.queryRoomInfo({
         roomId: this.chatRoomInfo.roomId,
         success: function(settings, members, fields) {
-          console.log("queryRoomInfo成功",fields);
+          console.log("queryRoomInfo成功", fields);
           var desc_obj = JSON.parse(fields.description);
           // console.log(desc_obj);
-          desc_obj.lastTime = Math.round(new Date().getTime()/1000);
-          var json_obj = JSON.stringify(desc_obj)
+          desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
+          var json_obj = JSON.stringify(desc_obj);
           // json_obj = json_obj.replace(/\//g, "#") //格式化url
-          that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId,json_obj)
+          that.$API2.groupChat_ModifyDescription(
+            that.chatRoomInfo.roomId,
+            json_obj
+          );
           // desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
           // desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
           // that.chatRoomInfo.desc=desc_obj;
@@ -488,35 +505,44 @@ export default {
         }
       });
     }
-    that.chatRoomInfo.desc=desc_obj;
+    that.chatRoomInfo.desc = desc_obj;
     var sessionKey = this.chatRoomInfo.roomId + WebIM.conn.context.userId;
-      
+
     var chatMsg = utils.getItem(sessionKey);
-    this.readMsg(null,null,chatMsg,sessionKey)
+    this.readMsg(null, null, chatMsg, sessionKey);
     this.EmojiObj2 = WebIM.EmojiObj2;
 
-    msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey){
+    msgStorage.on("newChatMsg", function(
+      renderableMsg,
+      type,
+      curChatMsg,
+      sesskey
+    ) {
       // console.log("newChatMsg:",renderableMsg, curChatMsg)
       // 判断是否属于当前会话
-      if(that.chatRoomInfo.roomId&&sesskey==sessionKey)
-      {
-        if(renderableMsg.info.from==that.chatRoomInfo.roomId||renderableMsg.info.to == that.chatRoomInfo.roomId)//群消息或者群成员发出的消息
-        {
-          that.readMsg(renderableMsg,type,curChatMsg,sesskey,true)
-        }else if(renderableMsg.info.from == WebIM.conn.context.userId||renderableMsg.info.to == WebIM.conn.context.userId) //我发的消息或者别人发给我的消息
-        {
-          that.readMsg(renderableMsg,type,curChatMsg,sesskey)
+      if (that.chatRoomInfo.roomId && sesskey == sessionKey) {
+        if (
+          renderableMsg.info.from == that.chatRoomInfo.roomId ||
+          renderableMsg.info.to == that.chatRoomInfo.roomId
+        ) {
+          //群消息或者群成员发出的消息
+          that.readMsg(renderableMsg, type, curChatMsg, sesskey, true);
+        } else if (
+          renderableMsg.info.from == WebIM.conn.context.userId ||
+          renderableMsg.info.to == WebIM.conn.context.userId
+        ) {
+          //我发的消息或者别人发给我的消息
+          that.readMsg(renderableMsg, type, curChatMsg, sesskey);
         }
       }
-
-		});
+    });
   },
   created() {
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
-        that.showLoading({title:"正在同步聊天记录"});
-        console.log("onOpened",message);
+        that.showLoading({ title: "正在同步聊天记录" });
+        console.log("onOpened", message);
         //连接成功回调
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
@@ -566,68 +592,61 @@ export default {
           // calcUnReadSpot(message);
           ack(message);
         }
-
       }, //收到表情消息
       onPictureMessage: function(message) {
         console.log("onPictureMessage", message);
-					if(onMessageError(message)){
-						msgStorage.saveReceiveMsg(message, msgType.IMAGE);
-					}
-					// calcUnReadSpot(message);
-					ack(message);
+        if (onMessageError(message)) {
+          msgStorage.saveReceiveMsg(message, msgType.IMAGE);
+        }
+        // calcUnReadSpot(message);
+        ack(message);
       }, //收到图片消息
-      onVideoMessage(message){
-				console.log("onVideoMessage: ", message);
-				if(message){
-					if(onMessageError(message)){
-						msgStorage.saveReceiveMsg(message, msgType.VIDEO);
-					}
-					// calcUnReadSpot(message);
-					ack(message);
-				}
-			},//收到视频消息
-			onAudioMessage(message){
-				console.log("onAudioMessage", message);
-				if(message){
-					if(onMessageError(message)){
-						msgStorage.saveReceiveMsg(message, msgType.AUDIO);
-					}
-					// calcUnReadSpot(message);
-					ack(message);
-				}
-      },//收到音频消息
-			onCmdMessage(message){
-				console.log("onCmdMessage", message);
-				if(message){
-					if(onMessageError(message)){
-						msgStorage.saveReceiveMsg(message, msgType.CMD);
-					}
-					// calcUnReadSpot(message);
-					ack(message);
-				}
-      },//收到命令消息
-      onFileMessage: function ( message ) {},    //收到文件消息
-      onLocationMessage: function ( message ) {
+      onVideoMessage(message) {
+        console.log("onVideoMessage: ", message);
+        if (message) {
+          if (onMessageError(message)) {
+            msgStorage.saveReceiveMsg(message, msgType.VIDEO);
+          }
+          // calcUnReadSpot(message);
+          ack(message);
+        }
+      }, //收到视频消息
+      onAudioMessage(message) {
+        console.log("onAudioMessage", message);
+        if (message) {
+          if (onMessageError(message)) {
+            msgStorage.saveReceiveMsg(message, msgType.AUDIO);
+          }
+          // calcUnReadSpot(message);
+          ack(message);
+        }
+      }, //收到音频消息
+      onCmdMessage(message) {
+        console.log("onCmdMessage", message);
+        if (message) {
+          if (onMessageError(message)) {
+            msgStorage.saveReceiveMsg(message, msgType.CMD);
+          }
+          // calcUnReadSpot(message);
+          ack(message);
+        }
+      }, //收到命令消息
+      onFileMessage: function(message) {}, //收到文件消息
+      onLocationMessage: function(message) {
         console.log("onLocationMessage", message);
-        					if(onMessageError(message)){
-						msgStorage.saveReceiveMsg(message, msgType.LOCATION);
-					}
-					// calcUnReadSpot(message);
-					ack(message);
-      },//收到位置消息
+        if (onMessageError(message)) {
+          msgStorage.saveReceiveMsg(message, msgType.LOCATION);
+        }
+        // calcUnReadSpot(message);
+        ack(message);
+      }, //收到位置消息
       onRoster: function(message) {}, //处理好友申请
       onInviteMessage: function(message) {}, //处理群组邀请
       onOnline: function() {}, //本机网络连接成功
       onOffline: function() {}, //本机网络掉线
-      onError: function(message) {
-
-      }, //失败回调
-      onReceivedMessage: function(message) {
-
-      }, //收到消息送达服务器回执
-      onDeliveredMessage: function(message) {
-
-      }, //收到消息送达客户端回执
+      onError: function(message) {}, //失败回调
+      onReceivedMessage: function(message) {}, //收到消息送达服务器回执
+      onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
       onReadMessage: function(message) {} //收到消息已读回执
       // ......
     });
@@ -636,7 +655,7 @@ export default {
 };
 </script>
 <style>
-body{
+body {
   height: 100%;
   overflow: hidden;
 }
@@ -653,9 +672,9 @@ body{
   flex-direction: column;
   overflow: hidden;
 }
-.chatbox{
+.chatbox {
   height: 90%;
-  flex-grow:2;
+  flex-grow: 2;
   padding-bottom: 2%;
   overflow: hidden;
 }
@@ -673,12 +692,12 @@ body{
   /* margin-top: 0.49rem; */
   margin-left: 2.21rem;
 }
-.input-chat-box{
+.input-chat-box {
   width: 100%;
   border-top: 0.02rem solid #898989;
   padding-top: 0.2rem;
   background-color: #fdfdfd;
-  flex-grow:1;
+  flex-grow: 1;
 }
 .input {
   display: flex;
@@ -689,78 +708,79 @@ body{
   bottom: 0rem;
   z-index: 99; */
   /* position: fixed; */
-input {
-  padding: 0.1rem;
-  height: fit-content;
-  min-height: 1rem;
-  max-height: 2rem;
-  width: 8rem;
-  font-size: 0.4rem;
-  /* 允许长单词换行到下一行 */
-  word-wrap: break-word;
-  word-break: break-all;
-  overflow-y: visible;
-  border-radius: 0.15rem;
-  border: 0.02rem solid #898989;
-  margin-right: 0.2rem;
-  background-color: #ffffff;
-}
-  .icon {
-  font-size: 0.7rem;
-  margin-right: 0.2rem;
+  input {
+    padding: 0.1rem;
+    height: fit-content;
+    min-height: 1rem;
+    max-height: 2rem;
+    width: 8rem;
+    font-size: 0.4rem;
+    /* 允许长单词换行到下一行 */
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-y: visible;
+    border-radius: 0.15rem;
+    border: 0.02rem solid #898989;
+    margin-right: 0.2rem;
+    background-color: #ffffff;
   }
-  .icon.focus{
-    color:#12b7f5;
+  .icon {
+    font-size: 0.7rem;
+    margin-right: 0.2rem;
+  }
+  .icon.focus {
+    color: #12b7f5;
   }
 }
 
-.emojibox{
+.emojibox {
   height: auto;
   width: auto;
   // margin-bottom:0.2rem;
   // padding-bottom:0.2rem;
-  .swiper{
+  .swiper {
     background-color: #ecf0f1;
     height: 3.3rem;
   }
-  img{
+  img {
     width: 0.8rem;
     height: 0.8rem;
-    margin-top:0.15rem ;
+    margin-top: 0.15rem;
   }
-  img:not(:first-child){
-    padding-left:0.7rem;
+  img:not(:first-child) {
+    padding-left: 0.7rem;
   }
-  img:nth-child(7n+1),img:first-child{
-    padding-left:0.5rem;
+  img:nth-child(7n + 1),
+  img:first-child {
+    padding-left: 0.5rem;
   }
-  .toolbox{
+  .toolbox {
     display: flex;
     justify-content: flex-end;
-    .btn_send{
+    .btn_send {
       padding: 0.3rem;
       background-color: #12b7f5;
       color: #ecf0f1;
     }
   }
 }
-.moremsg{
+.moremsg {
   display: flex;
   justify-content: space-around;
   align-items: center;
   background-color: #ecf0f1;
   padding: 0.3rem 0;
-  span.iconbox{
+  span.iconbox {
     text-align: center;
-    .icon{
+    .icon {
       background-color: #fff;
       padding: 0.3rem 0.4rem;
       border: 0.02rem solid #fff;
       border-radius: 0.3rem;
       font-size: 0.7rem;
     }
-    p{
-      color:#898989;
+    p {
+      color: #898989;
       font-size: 0.4rem;
     }
   }
