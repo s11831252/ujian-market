@@ -11,10 +11,14 @@
     <div class="input-chat-box">
       <div class="input">
         <!-- 引用图标，需要引用其样式 -->
-        <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio','语音')">&#xe664;</div>
+        <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio')">&#xe664;</div>
         <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
+      </div>
+      <div v-if="chattype=='audio'" class="recorderbox" @touchstart="openRecorder" @touchend="closeRecorder">
+        <i class="icon">&#xe648;</i>
+        <p>点击开始录音</p>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper" indicator-dots="true">
@@ -113,7 +117,10 @@ export default {
     to() {
       if (this.chatRoomInfo) return this.chatRoomInfo.roomId;
       else return null;
-    }
+    },
+    recorderManager(){
+      return  wx.getRecorderManager()
+    } 
   },
   methods: {
     sendMsg() {
@@ -164,6 +171,37 @@ export default {
         if (title) this.toast(`${title}功能正在开发中`);
         this.chattype = type;
       }
+    },
+    openRecorder(){
+         this.recorderManager.onStart(() => {
+          console.log('recorder start')
+        })
+         this.recorderManager.onPause(() => {
+          console.log('recorder pause')
+        })
+         this.recorderManager.onStop((res) => {
+          console.log('recorder stop', res)
+          const { tempFilePath } = res
+        })
+         this.recorderManager.onFrameRecorded((res) => {
+          const { frameBuffer } = res
+          console.log('frameBuffer.byteLength', frameBuffer.byteLength)
+        })
+
+        const options = {
+          duration: 10000,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          encodeBitRate: 192000,
+          format: 'mp3',
+          frameSize: 50
+        }
+
+         this.recorderManager.start(options)
+     
+    },
+    closeRecorder(){
+      this.recorderManager.stop()
     },
     emojiInput(emoji) {
       // console.log(item,item2)
@@ -467,9 +505,7 @@ export default {
               // console.log(rep2);
               if (rep2.ret == 0) {
                 this.chatRoomInfo = {
-                  jid: `888yuezhi-88#ubuild_${
-                    rep2.data
-                  }@conference.easemob.com`,
+                  jid: `888yuezhi-88#ubuild_${rep2.data}@conference.easemob.com`,
                   name: groupname,
                   roomId: rep2.data.groupid,
                   desc: desc_obj
@@ -730,6 +766,20 @@ body {
   }
   .icon.focus {
     color: #12b7f5;
+  }
+}
+
+.recorderbox{
+  margin: 0 auto;
+  text-align: center;
+  padding: 1rem;
+  i,p{
+    margin:0 auto;
+    width: auto;
+  }
+  i{
+    font-size: 2rem;
+    font-weight: bold;
   }
 }
 

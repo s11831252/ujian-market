@@ -13,8 +13,7 @@
           </div>
           <img v-else-if="chatdata.msg.type=='img'" lazy-load="true" class="avatar" @click="previewImage(chatdata.msg.data)" :src="chatdata.msg.data" mode="widthFix" />
           <video v-else-if="chatdata.msg.type == 'video'" :src="chatdata.msg.data" controls autoplay></video>
-          <!-- <map v-else-if="chatdata.msg.type == 'location'" id="map" :longitude="chatdata.msg.data.lng" :latitude="chatdata.msg.data.lat" enable-scroll="false" enable-zoom="false" :markers="markers" scale="16" style="width: 200px; height: 150px;"></map> -->
-          <audioMsg v-else-if="chatdata.msg.type == 'audio'"></audioMsg>
+          <audioMsg v-else-if="chatdata.msg.type == 'audio'" :msgdata="chatdata.msg" :position="chatdata.info.from==myUsername?'right':'left'"></audioMsg>
           <div v-else-if="chatdata.msg.type == 'location'" class="loc" @click="mapclick" >
             <img src="../../../static/img/maps.png">
             <p class="addr">{{chatdata.msg.data.addr}}</p>
@@ -37,16 +36,6 @@ export default {
   props: {
     chatdata: Object,
     chatRoomInfo: Object,
-  },
-  data(){
-    return {
-      markers:[{
-        id: 0,
-        latitude: this.chatdata.msg.data.lat,
-        longitude: this.chatdata.msg.data.lng,
-        title:this.chatdata.msg.data.addr
-      }]
-    }
   },
   computed: {
     ...mapState({
