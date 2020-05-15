@@ -131,7 +131,7 @@ export default {
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
         var userinfo = await this.$ShoppingAPI.User_Get();
-        this.$store.commit("GetUserInfo", userinfo.data);
+        this.$store.commit("SetUserInfo", userinfo.data);
         
 
         if (this.$route.query.redirect)
@@ -168,7 +168,7 @@ export default {
         var userinfo = await this.$ShoppingAPI.User_Get();
         userinfo.data.unionid = this.userInfo.unionid;
         userinfo.data.openid = this.userInfo.openid;
-        this.$store.commit("GetUserInfo", userinfo.data);
+        this.$store.commit("SetUserInfo", userinfo.data);
         this.hx_login();
         if (this.$route.query.redirect)
         {

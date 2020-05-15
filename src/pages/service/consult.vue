@@ -3,7 +3,7 @@
     <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)">
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
       <!-- <div class="msgbox"> -->
-      <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scroll-view>
     <!-- </div> -->
@@ -11,14 +11,14 @@
     <div class="input-chat-box">
       <div class="input">
         <!-- 引用图标，需要引用其样式 -->
-        <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio')">&#xe664;</div>
+        <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
         <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
       </div>
-      <div v-if="chattype=='audio'" class="recorderbox" @touchstart="openRecorder" @touchend="closeRecorder">
+      <div v-if="chattype=='audio'" class="recorderbox" :class="{'action':recording}" @touchstart="openRecorder" @touchend="closeRecorder">
         <i class="icon">&#xe648;</i>
-        <p>点击开始录音</p>
+        <p>{{recording?'录音中':'长按开始录音'}}</p>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper" indicator-dots="true">
@@ -103,11 +103,13 @@ export default {
       chatRoomInfo: {},
       toView: "",
       chattype: "chat",
-      EmojiObj2: {}
+      EmojiObj2: {},
+      recording: false,
+      desc_obj:{}
     };
   },
   components: {
-    chatItem,
+    chatItem
   },
   computed: {
     ...mapState({
@@ -118,9 +120,15 @@ export default {
       if (this.chatRoomInfo) return this.chatRoomInfo.roomId;
       else return null;
     },
-    recorderManager(){
-      return  wx.getRecorderManager()
-    } 
+    recorderManager() {
+      return wx.getRecorderManager();
+    },
+    sessionKey(){
+      if(this.chatRoomInfo&&this.chatRoomInfo.roomId)
+        return this.chatRoomInfo.roomId + WebIM.conn.context.userId;
+      else
+        return "";
+    }
   },
   methods: {
     sendMsg() {
@@ -137,10 +145,7 @@ export default {
           chatType: "groupchat",
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
-            console.log(
-              `发送消息(id=${id},serverMsgId=${serverMsgId})成功为`,
-              msg
-            );
+            console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`,msg);
           },
           fail(id, serverMsgId) {
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
@@ -172,42 +177,94 @@ export default {
         this.chattype = type;
       }
     },
-    openRecorder(){
-         this.recorderManager.onStart(() => {
-          console.log('recorder start')
-        })
-         this.recorderManager.onPause(() => {
-          console.log('recorder pause')
-        })
-         this.recorderManager.onStop((res) => {
-          console.log('recorder stop', res)
-          const { tempFilePath } = res
-        })
-         this.recorderManager.onFrameRecorded((res) => {
-          const { frameBuffer } = res
-          console.log('frameBuffer.byteLength', frameBuffer.byteLength)
-        })
-
-        const options = {
-          duration: 10000,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          encodeBitRate: 192000,
-          format: 'mp3',
-          frameSize: 50
+    openRecorder() {
+      var that = this;
+      this.recorderManager.onStart(() => {
+        console.log("recorder start");
+        this.recording = true;
+      });
+      this.recorderManager.onPause(() => {
+        console.log("recorder pause");
+      });
+      this.recorderManager.onStop(res => {
+        console.log("recorder stop", res);
+        const { tempFilePath } = res;
+        if (res.duration < 1000) 
+        {
+          this.toast("录音时间太短");
+        }else
+        {
+          this.upLoadFile([res], msgType.AUDIO);
         }
+      });
+      this.recorderManager.onFrameRecorded(res => {
+        const { frameBuffer } = res;
+        console.log("frameBuffer.byteLength", frameBuffer.byteLength);
+      });
 
-         this.recorderManager.start(options)
-     
+      executeRecord();
+      function executeRecord() {
+        wx.getSetting({
+          success: res => {
+            let recordAuth = res.authSetting["scope.record"];
+            if (recordAuth == false) {
+              //已申请过授权，但是用户拒绝
+              wx.openSetting({
+                success: function(res) {
+                  let recordAuth = res.authSetting["scope.record"];
+                  if (recordAuth == true) {
+                    that.toast({
+                      title: "授权成功",
+                      icon: "success"
+                    });
+                  } else {
+                    that.toast({
+                      title: "请授权录音",
+                      icon: "none"
+                    });
+                  }
+                }
+              });
+            } else if (recordAuth == true) {
+              // 用户已经同意授权
+              const options = {
+                duration: 10000,
+                sampleRate: 44100,
+                numberOfChannels: 2,
+                encodeBitRate: 192000,
+                format: "wav",
+                frameSize: 50
+              };
+              that.recorderManager.start(options);
+            } else {
+              // 第一次进来，未发起授权
+              wx.authorize({
+                scope: "scope.record",
+                success: () => {
+                  //授权成功
+                  that.toast({
+                    title: "授权成功",
+                    icon: "success"
+                  });
+                }
+              });
+            }
+          },
+          fail: function() {
+            that.toast("鉴权失败，请重试");
+          }
+        });
+      }
     },
-    closeRecorder(){
-      this.recorderManager.stop()
+    closeRecorder() {
+      this.recording = false;
+      this.recorderManager.stop();
     },
     emojiInput(emoji) {
       // console.log(item,item2)
       this.msg += emoji;
     },
-    upLoadImage(tempFilePaths, _msgType = "img") {
+    upLoadFile(tempFilePaths, _msgType = "img") {
       var me = this;
       var token = WebIM.conn.context.accessToken;
       var str = WebIM.config.appkey.split("#");
@@ -279,12 +336,12 @@ export default {
               console.log("getImageInfo complete");
             }
           });
-        } else {
+        } else if (_msgType == msgType.VIDEO) {
           var allowType = {
             mp4: true
           };
-          var width = path.width;
-          var height = path.height;
+          // var width = path.width;
+          // var height = path.height;
           var index = path.tempFilePath.lastIndexOf(".");
           var filetype = (~index && path.tempFilePath.slice(index + 1)) || "";
           if (filetype.toLowerCase() in allowType) {
@@ -316,11 +373,11 @@ export default {
                         file_length: path.size,
                         length: path.duration * 1000,
                         thumb: _thumbUrl,
-                        thumb_secret: _thumb_secret,
-                        size: {
-                          width: width,
-                          height: height
-                        }
+                        thumb_secret: _thumb_secret
+                        // size: {
+                        //   width: width,
+                        //   height: height
+                        // }
                       },
                       file: {
                         filename: path.tempFilePath,
@@ -344,13 +401,63 @@ export default {
                         );
                       }
                     });
-                    console.log(msg.body);
+                    // console.log(msg.body);
                     msg.setGroup("groupchat");
                     WebIM.conn.send(msg.body);
                   });
               });
           } else {
             me.toast("目前仅支持.mp4文件");
+          }
+        } else if (_msgType == msgType.AUDIO) {
+          var allowType = ["mp3", "wav"];
+          var index = path.tempFilePath.lastIndexOf(".");
+          var filetype = (~index && path.tempFilePath.slice(index + 1)) || "";
+          if (allowType.indexOf(filetype.toLowerCase()) >= 0) {
+            me.$HXAPI
+              .chatfiles(str[0], str[1], [path.tempFilePath], ["file"], {
+                "Content-Type": "multipart/form-data",
+                Authorization: "Bearer " + token,
+                "restrict-access": "true"
+              })
+              .then(res => {
+                // 发送 xmpp 消息
+                var id = WebIM.conn.getUniqueId();
+                var msg = new WebIM.message(msgType.AUDIO, id);
+                var dataObj = res[0];
+                // 接收消息对象
+                msg.set({
+                  apiUrl: WebIM.config.apiURL,
+                  accessToken: token,
+                  body: {
+                    type: msgType.AUDIO,
+                    url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+                    filetype: filetype,
+                    filename: `${id}audio.${filetype}`,
+                    secret: dataObj.entities[0]["share-secret"],
+                    length: Math.ceil(path.duration / 1000)
+                  },
+                  file: {
+                    filename: path.tempFilePath,
+                    file_length: path.fileSize,
+                    length: Math.ceil(path.duration / 1000)
+                  },
+                  from: WebIM.conn.context.userId,
+                  to: me.to,
+                  roomType: true,
+                  chatType: "groupchat",
+                  success: function(argument) {
+                    // disp.fire('em.chat.sendSuccess', id);
+                    console.log("audio send ok", argument);
+                    msgStorage.saveMsg(msg, _msgType);
+                  }
+                });
+                console.log(msg.body);
+                msg.setGroup("groupchat");
+                WebIM.conn.send(msg.body);
+              });
+          } else {
+            me.toast("目前仅支持.wav文件");
           }
         }
       }
@@ -363,7 +470,7 @@ export default {
         count: 1,
         //接口调用成功的回调函数
         success: function(res) {
-          that.upLoadImage(res.tempFilePaths); //数组临时路径
+          that.upLoadFile(res.tempFilePaths); //数组临时路径
         }
       });
     },
@@ -379,12 +486,12 @@ export default {
         success(res) {
           console.log(res);
           if (res.type == "video") {
-            that.upLoadImage(res.tempFiles, msgType.VIDEO);
+            that.upLoadFile(res.tempFiles, msgType.VIDEO);
           } else {
             var paths = res.tempFiles.map(item => {
               return item.tempFilePath;
             });
-            that.upLoadImage(paths, msgType.IMAGE); //临时路径
+            that.upLoadFile(paths, msgType.IMAGE); //临时路径
           }
         }
       });
@@ -400,12 +507,12 @@ export default {
         success(res) {
           console.log(res);
           if (res.type == "video") {
-            that.upLoadImage(res.tempFiles, msgType.VIDEO);
+            that.upLoadFile(res.tempFiles, msgType.VIDEO);
           } else {
             var paths = res.tempFiles.map(item => {
               return item.tempFilePath;
             });
-            that.upLoadImage(paths, msgType.IMAGE); //临时路径
+            that.upLoadFile(paths, msgType.IMAGE); //临时路径
           }
         }
       });
@@ -423,11 +530,11 @@ export default {
             roomType: false,
             lng: res.longitude,
             lat: res.latitude,
-            addr:res.name,
+            addr: res.name,
             // addr: res.address,
-            ext:{
-              name:res.name,
-              address:res.address
+            ext: {
+              name: res.name,
+              address: res.address
             },
             roomType: true,
             chatType: "groupchat",
@@ -453,7 +560,7 @@ export default {
     }
     this.sName = decodeURI(this.$route.query.sName);
     //设置标题
-    wx.setNavigationBarTitle({ title: this.sName });
+    wx.setNavigationBarTitle({ title: shopInfo.sName });
 
     //查询聊天室列表,并尝试获取与该店铺的聊天室
     var listGroup = utils.getItem("listGroup");
@@ -462,7 +569,7 @@ export default {
         return item.name == this.UserInfo.Phone + "_" + this.sName;
       });
     }
-    var desc_obj = {
+    that.desc_obj = {
       store: {
         sId: this.sId,
         sNm: this.sName,
@@ -485,67 +592,61 @@ export default {
     //没有则创建聊天室
     if (!this.chatRoomInfo || !this.chatRoomInfo.roomId) {
       var groupname, owner, members, desc;
-      desc = JSON.stringify(desc_obj);
+      desc = JSON.stringify(that.desc_obj);
       desc = desc.replace(/\//g, "#"); //格式化url
       groupname = `${this.UserInfo.Phone}_${this.sName}`;
       //店铺Id为创建人
       owner = this.sId.replace(/-/g, "") + "_";
       //把店铺成员一起拉进来
-      this.$ShoppingAPI.ShopEmployee_Get(this.sId).then(rep => {
-        if (rep.ret == 0) {
-          var _menberArr = rep.data.map(item => {
-            return item.UserId.replace(/-/g, "");
-          });
-          _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
-          members = _menberArr.join();
-          // console.log(groupname, owner, members, desc);
-          this.$API2
-            .groupChat_Create(groupname, owner, members, desc)
-            .then(rep2 => {
-              // console.log(rep2);
-              if (rep2.ret == 0) {
-                this.chatRoomInfo = {
-                  jid: `888yuezhi-88#ubuild_${rep2.data}@conference.easemob.com`,
-                  name: groupname,
-                  roomId: rep2.data.groupid,
-                  desc: desc_obj
-                };
-                listGroup.push(this.chatRoomInfo);
-                utils.setItem("listGroup", listGroup);
-              }
-            });
+      var rep = await this.$ShoppingAPI.ShopEmployee_Get(this.sId);
+      if (rep.ret == 0) {
+        var _menberArr = rep.data.map(item => {
+          return item.UserId.replace(/-/g, "");
+        });
+        _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
+        members = _menberArr.join();
+        // console.log(groupname, owner, members, desc);
+        let rep2 = await this.$API2.groupChat_Create(
+          groupname,
+          owner,
+          members,
+          desc
+        );
+        if (rep2.ret == 0) {
+          this.chatRoomInfo = {
+            jid: `888yuezhi-88#ubuild_${rep2.data}@conference.easemob.com`,
+            name: groupname,
+            roomId: rep2.data.groupid
+          };
+          console.log(`新建聊天室${this.chatRoomInfo.roomId}成功`)
+          listGroup.push(this.chatRoomInfo);
+          utils.setItem("listGroup", listGroup);
         }
-      });
+      }
     } else {
       // //更新聊天室备注
       WebIM.conn.queryRoomInfo({
         roomId: this.chatRoomInfo.roomId,
         success: function(settings, members, fields) {
           console.log("queryRoomInfo成功", fields);
-          var desc_obj = JSON.parse(fields.description);
-          // console.log(desc_obj);
-          desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-          var json_obj = JSON.stringify(desc_obj);
+          var server_desc_obj = JSON.parse(fields.description);
+          server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
+          // server_desc_obj.buyer=desc_obj.buyer
+          var json_obj = JSON.stringify(server_desc_obj);
           // json_obj = json_obj.replace(/\//g, "#") //格式化url
           that.$API2.groupChat_ModifyDescription(
             that.chatRoomInfo.roomId,
-            json_obj
+            json_obj.replace(/\//g, "#") //格式化url
           );
-          // desc_obj.store.sLogo = desc_obj.store.sLogo.replace(/#/g,"/");
-          // desc_obj.buyer.bLogo = desc_obj.buyer.bLogo.replace(/#/g,"/");
-          // that.chatRoomInfo.desc=desc_obj;
-          // console.log(that.chatRoomInfo);
         },
         error: function(msg) {
           console.log(msg);
         }
       });
     }
-    that.chatRoomInfo.desc = desc_obj;
-    var sessionKey = this.chatRoomInfo.roomId + WebIM.conn.context.userId;
 
-    var chatMsg = utils.getItem(sessionKey);
-    this.readMsg(null, null, chatMsg, sessionKey);
+    var chatMsg = utils.getItem(this.sessionKey);
+    this.readMsg(null, null, chatMsg, this.sessionKey);
     this.EmojiObj2 = WebIM.EmojiObj2;
 
     msgStorage.on("newChatMsg", function(
@@ -556,7 +657,7 @@ export default {
     ) {
       // console.log("newChatMsg:",renderableMsg, curChatMsg)
       // 判断是否属于当前会话
-      if (that.chatRoomInfo.roomId && sesskey == sessionKey) {
+      if (that.chatRoomInfo.roomId && sesskey == that.sessionKey) {
         if (
           renderableMsg.info.from == that.chatRoomInfo.roomId ||
           renderableMsg.info.to == that.chatRoomInfo.roomId
@@ -769,18 +870,22 @@ body {
   }
 }
 
-.recorderbox{
+.recorderbox {
   margin: 0 auto;
   text-align: center;
   padding: 1rem;
-  i,p{
-    margin:0 auto;
+  i,
+  p {
+    margin: 0 auto;
     width: auto;
   }
-  i{
+  i {
     font-size: 2rem;
     font-weight: bold;
   }
+}
+.recorderbox.action {
+  color: #12b7f5;
 }
 
 .emojibox {

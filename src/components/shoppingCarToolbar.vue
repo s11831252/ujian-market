@@ -38,6 +38,8 @@
 import {mapState, mapMutations } from "vuex";
 import buy from "@/components/buy";
 import utils from "@/utils/index.js";
+import WebIM from "@/utils/hx/WebIM";
+
 export default {
     props:{
         sId:String,
@@ -85,10 +87,11 @@ export default {
     },
     goService(){
       var that = this;
+      
       if(this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId)
       {
         var _myUsername = utils.getItem("myUsername");
-        if(_myUsername)
+        if(_myUsername&&WebIM.conn.isOpened())
         {
           this.go({path:'/pages/service/consult',query:{sId:this.sId,sName:this.sName}})
         }else
@@ -187,7 +190,7 @@ export default {
       margin-left: 0.42rem;
       margin-right: 0.72rem;
     }
-    .car-icon, {
+    .car-icon {
       color: #bfbfbf;
       font-size: 0.8rem;
       position: relative;

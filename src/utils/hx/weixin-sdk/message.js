@@ -152,20 +152,20 @@ var StropheAll = require("./libs/strophe");
 
 		this.value = opt.file;
 		this.filename = opt.filename || this.value.filename;
-
 		this.body = {
 			id: this.id,
 			file: this.value,
 			filename: this.filename,
 			apiUrl: opt.apiUrl,
 			accessToken: opt.accessToken,
+			secret:this.value.secret,
 			to: opt.to,
 			from: opt.from,
 			type: this.type,
 			ext: opt.ext || {},
-			length: opt.length || 0,
+			length: this.value.length || 0,
 			roomType: opt.roomType,
-			file_length: opt.file_length,
+			file_length: this.value.file_length,
 			onFileUploadError: opt.onFileUploadError,
 			onFileUploadComplete: opt.onFileUploadComplete,
 			success: opt.success,

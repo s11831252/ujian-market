@@ -5,7 +5,7 @@
     <div class="chat-content" >
       <div class="dialog_box">
         <p v-if="chatdata.info.from==myUsername" class="username">{{UserInfo.UserName}}</p>
-        <p v-else class="username">{{(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sNm:""}}</p>
+        <p v-else class="username">{{(desc&&desc.store)?desc.store.sNm:""}}</p>
         <!-- <span class="read">已读</span> -->
         <div v-if="chatdata.msg.data" class="chatdata">
           <div v-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" class="chatmsgarr">
@@ -21,7 +21,7 @@
         </div>
         <span v-else>&nbsp;</span>
         <img v-if="chatdata.info.from==myUsername" :src="UserInfo.Portrait" alt />
-        <img v-else :src="(chatRoomInfo.desc&&chatRoomInfo.desc.store)?chatRoomInfo.desc.store.sLogo:''" alt />
+        <img v-else :src="(desc&&desc.store)?desc.store.sLogo:''" alt />
       </div>
     </div>
   </div>
@@ -36,6 +36,7 @@ export default {
   props: {
     chatdata: Object,
     chatRoomInfo: Object,
+    desc:Object
   },
   computed: {
     ...mapState({

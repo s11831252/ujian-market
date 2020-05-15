@@ -182,7 +182,7 @@ const net = {
             formData: data,
             header: _header, // 设置请求的 header
             success: (resp) => {
-              // console.log(resp)
+              console.log(resp)
               if(resp.statusCode!=200){
                 wx.showToast({
                   title: "网络出错，稍后再试",
@@ -190,6 +190,7 @@ const net = {
                 });
                 return false;
               }
+              
               var res=JSON.parse(resp.data);
               // console.log(res)
               if(res.ret!=0){

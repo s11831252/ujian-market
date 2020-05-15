@@ -81,7 +81,7 @@ export default {
   methods: {
     exit() {
       this.$store.commit("Login", { Ticket: "" }); //清空Ticket
-      this.$store.commit("GetUserInfo", {});//清空userinfo
+      this.$store.commit("SetUserInfo", {});//清空userinfo
       utils.removeItem("myUsername");
       WebIM.conn.close();//环信IM关闭
       this.$router.push("/pages/index/index"); //回到登录页
@@ -119,7 +119,7 @@ export default {
         {
             if (!this.UserInfo.UserId) {
                     var rep = await this.$ShoppingAPI.User_Get();
-                    if (rep.ret == 0) this.$store.commit("GetUserInfo", rep.data);
+                    if (rep.ret == 0) this.$store.commit("SetUserInfo", rep.data);
             }
             this.$UJAPI.Balance_Purse().then(rep => {
                 this.Balance = rep.data;

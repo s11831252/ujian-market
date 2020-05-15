@@ -56,11 +56,18 @@ Vue.mixin({
             this.$router.replace(path);
         },
         toast(title){
-            wx.showToast({
-                title: title,
-                icon: "none",
-                mask:true
-              });
+            if(typeof title == 'object' )
+            {
+                wx.showToast(title);
+            }else
+            {
+                wx.showToast({
+                    title: title,
+                    icon: "none",
+                    mask:true
+                  });
+            }
+
         },
         showLoading(opt){
             var obj ={mask:true, ...opt};
@@ -112,7 +119,7 @@ Vue.mixin({
                                                 if (userinfo.ret == 0) {
                                                     userinfo.data.unionid= rep.data.result.unionid;
                                                     userinfo.data.openid = rep.data.result.openid;
-                                                    this.$store.commit("GetUserInfo", userinfo.data);
+                                                    this.$store.commit("SetUserInfo", userinfo.data);
                                                 }
                                             });
                                         }

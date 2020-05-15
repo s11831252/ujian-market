@@ -1,11 +1,21 @@
 <template>
-  <div class="audio-box" :class="{open:isOpen}" @click="openAudio">
-    <div class="wifi-symbol" :class="['wifi-symbol-'+position]">
-      <div class="wifi-circle first"></div>
-      <div class="wifi-circle second"></div>
-      <div class="wifi-circle third"></div>
+  <div :class="{open:isOpen}" @click="openAudio">
+    <div v-if="position=='left'" class="audio-box" >
+      <div class="wifi-symbol" :class="['wifi-symbol-'+position]">
+        <div class="wifi-circle first"></div>
+        <div class="wifi-circle second"></div>
+        <div class="wifi-circle third"></div>
+      </div>
+      <span>'{{msgdata.length}}</span>
     </div>
-    <span>'{{msgdata.length}}</span>
+    <div v-else class="audio-box" >
+      <span>'{{msgdata.length}}</span>
+      <div class="wifi-symbol" :class="['wifi-symbol-'+position]">
+        <div class="wifi-circle first"></div>
+        <div class="wifi-circle second"></div>
+        <div class="wifi-circle third"></div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -26,7 +36,8 @@ export default {
       var that = this;
       const _innerAudioContext = wx.createInnerAudioContext();
       _innerAudioContext.onError(res => {
-        console.log("播放失败:" + res.errMsg);
+        that.toast("播放失败:" + res.errMsg);
+        console.log(res)
       });
       _innerAudioContext.onEnded(() => {
         console.log("播放结束");
@@ -51,8 +62,19 @@ export default {
          var audioFilePath =  _audioCache[fileuri];
          if(audioFilePath)
          {
-           that.innerAudioContext.src = audioFilePath;
-           that.innerAudioContext.play();
+          //  let _FileSystemManager = wx.getFileSystemManager();
+           wx.getFileInfo({
+             filePath:audioFilePath,
+             success(res){
+               console.log("本地音频加载成功",res)
+                that.innerAudioContext.src = audioFilePath;
+                that.innerAudioContext.play();
+             },
+             fail(errMsg){
+               console.log(`本地音频加载失败:${errMsg},重新下载`)
+               this.downloadAudio(_audioCache);
+             }
+           })
            return;
          }else
          {
@@ -68,6 +90,7 @@ export default {
       var that = this;
       var _index = this.msgdata.data.lastIndexOf('/');
       var fileuri = this.msgdata.data.substring(++_index);
+      // console.log( this.msgdata.data)
         wx.downloadFile({
           url: this.msgdata.data,
           header: {
@@ -76,7 +99,7 @@ export default {
             Authorization: "Bearer " + that.msgdata.token
           },
           success(res) {
-            console.log("音频本地", res);
+            console.log("下载音频到本地", res);
             var curl = res.tempFilePath;
             //renderableMsg.msg.url = res.tempFilePath;
             var obj=_audioCache||{};
