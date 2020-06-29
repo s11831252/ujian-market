@@ -60,6 +60,7 @@ var routes = [
             enablePullDownRefresh: true,
             EnableNav:true,
         },
+        meta: { noAuth: true },
         alias: '/pages/home/index',
         component: home
     },
@@ -254,6 +255,7 @@ var routes = [
             navigationBarTitleText: '店铺详情',
             enablePullDownRefresh: true
         },
+        meta: { noAuth: true },
         alias: '/pages/shop/index',
         component: shop
     },
@@ -264,6 +266,7 @@ var routes = [
             navigationBarTitleText: '商品详情',
             enablePullDownRefresh: false
         },
+        meta: { noAuth: true },
         alias: '/pages/shop/detail',
         component: shopgoods
     },    

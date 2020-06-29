@@ -60,7 +60,7 @@ body{
   margin: auto 0;
 }
 #app,html{
-  height: 100%;
+  /* height: 100%; */
 }
 </style>
 }
