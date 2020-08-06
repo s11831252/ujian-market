@@ -82,6 +82,9 @@ export default {
   -webkit-transition: width 2s;
   -o-transition: width 2s;
 }
+#app,html{
+  height: 100%;
+}
 /* page{
   background: #ecf0f1;
   margin-bottom: 45px;
