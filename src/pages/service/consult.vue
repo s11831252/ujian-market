@@ -12,7 +12,7 @@
       <div class="input">
         <!-- 引用图标，需要引用其样式 -->
         <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
-        <input type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
+        <input type="text" @click="pending('chat',null)" maxlength="1000" @keyup.enter="sendMsg" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
       </div>
@@ -131,8 +131,13 @@ export default {
     }
   },
   methods: {
-    sendMsg() {
+    sendMsg(e) {
       var that = this;
+      if(e)
+      {
+        if(e.keyCode!=13)
+        return 
+      }
       if (!this.to) {
       } else {
         let id = WebIM.conn.getUniqueId();
@@ -151,6 +156,7 @@ export default {
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
           }
         });
+        debugger;
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
         msgStorage.saveMsg(msg, "txt");
@@ -162,7 +168,7 @@ export default {
       // console.log(renderableMsg,currentChatMsg)
       this.ChatHistory = currentChatMsg;
 
-      if (this.ChatHistory.length) {
+      if (this.ChatHistory&&this.ChatHistory.length) {
         if (isNew) {
           this.toView = currentChatMsg[this.ChatHistory.length - 1].mid;
         } else {
@@ -559,15 +565,29 @@ export default {
       shopInfo = rep.data;
     }
     this.sName = decodeURI(this.$route.query.sName);
+    if(this.isMP)
     //设置标题
     wx.setNavigationBarTitle({ title: shopInfo.sName });
 
     //查询聊天室列表,并尝试获取与该店铺的聊天室
     var listGroup = utils.getItem("listGroup");
     if (listGroup) {
-      this.chatRoomInfo = listGroup.find(item => {
-        return item.name == this.UserInfo.Phone + "_" + this.sName;
-      });
+      if(this.isMP){
+        this.chatRoomInfo = listGroup.find(item => {
+          return item.name == this.UserInfo.Phone + "_" + this.sName;
+        });
+      }else
+      {
+        this.chatRoomInfo = listGroup.map( item=>{
+          return {
+            name:item.groupname,
+            roomId:item.groupid
+          }
+        }).find(item => {
+          return item.name == this.UserInfo.Phone + "_" + this.sName;
+        });
+      }
+
     }
     that.desc_obj = {
       store: {
@@ -606,7 +626,7 @@ export default {
         _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
         members = _menberArr.join();
         // console.log(groupname, owner, members, desc);
-        let rep2 = await this.$API2.groupChat_Create(
+        let rep2 = await that.$API2.groupChat_Create(
           groupname,
           owner,
           members,
@@ -625,19 +645,23 @@ export default {
       }
     } else {
       // //更新聊天室备注
-      WebIM.conn.queryRoomInfo({
-        roomId: this.chatRoomInfo.roomId,
-        success: function(settings, members, fields) {
-          console.log("queryRoomInfo成功", fields);
-          var server_desc_obj = JSON.parse(fields.description);
-          server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-          // server_desc_obj.buyer=desc_obj.buyer
-          var json_obj = JSON.stringify(server_desc_obj);
-          // json_obj = json_obj.replace(/\//g, "#") //格式化url
-          that.$API2.groupChat_ModifyDescription(
-            that.chatRoomInfo.roomId,
-            json_obj.replace(/\//g, "#") //格式化url
-          );
+      // console.log(WebIM.conn)
+      WebIM.conn.getGroupInfo({
+        groupId: this.chatRoomInfo.roomId,
+        success: function(resp) {
+          console.log("queryRoomInfo成功", resp);
+          if(resp.statusCode==200)
+          {
+            var server_desc_obj = JSON.parse(resp.data.data[0].description)
+            server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
+            // server_desc_obj.buyer=desc_obj.buyer
+            var json_obj = JSON.stringify(server_desc_obj);
+            // json_obj = json_obj.replace(/\//g, "#") //格式化url
+            that.$API2.groupChat_ModifyDescription(
+              that.chatRoomInfo.roomId,
+              json_obj.replace(/\//g, "#") //格式化url
+            );
+          }
         },
         error: function(msg) {
           console.log(msg);
@@ -675,119 +699,7 @@ export default {
     });
   },
   created() {
-    var that = this;
-    WebIM.conn.listen({
-      onOpened: function(message) {
-        that.showLoading({ title: "正在同步聊天记录" });
-        console.log("onOpened", message);
-        //连接成功回调
-        // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
-        // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
-        // 则无需调用conn.setPresence();
-        // WebIM.conn.setPresence();
-        WebIM.conn.listRooms({
-          success: function(resp) {
-            utils.setItem("listGroup", resp);
-            utils.setItem("myUsername", WebIM.conn.context.userId);
-            that.hideLoading();
-          },
-          error: function(e) {
-            console.log("error:", e);
-          }
-        });
-      },
-      onClosed: function(message) {
-        console.log("环信onClosed", message);
-      }, //连接关闭回调
-      onTextMessage: function(message) {
-        console.log("onTextMessage", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.TEXT);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
 
-          // if(message.ext.msg_extension){
-          // 	let msgExtension = JSON.parse(message.ext.msg_extension)
-          // 	let conferenceId = message.ext.conferenceId
-          // 	let password = message.ext.password
-          // 	disp.fire("em.xmpp.videoCall", {
-          // 		msgExtension: msgExtension,
-          // 		conferenceId: conferenceId,
-          // 		password: password
-          // 	});
-          // }
-        }
-      }, //收到文本消息
-      onEmojiMessage: function(message) {
-        console.log("onEmojiMessage", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.EMOJI);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
-        }
-      }, //收到表情消息
-      onPictureMessage: function(message) {
-        console.log("onPictureMessage", message);
-        if (onMessageError(message)) {
-          msgStorage.saveReceiveMsg(message, msgType.IMAGE);
-        }
-        // calcUnReadSpot(message);
-        ack(message);
-      }, //收到图片消息
-      onVideoMessage(message) {
-        console.log("onVideoMessage: ", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.VIDEO);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
-        }
-      }, //收到视频消息
-      onAudioMessage(message) {
-        console.log("onAudioMessage", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.AUDIO);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
-        }
-      }, //收到音频消息
-      onCmdMessage(message) {
-        console.log("onCmdMessage", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.CMD);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
-        }
-      }, //收到命令消息
-      onFileMessage: function(message) {}, //收到文件消息
-      onLocationMessage: function(message) {
-        console.log("onLocationMessage", message);
-        if (onMessageError(message)) {
-          msgStorage.saveReceiveMsg(message, msgType.LOCATION);
-        }
-        // calcUnReadSpot(message);
-        ack(message);
-      }, //收到位置消息
-      onRoster: function(message) {}, //处理好友申请
-      onInviteMessage: function(message) {}, //处理群组邀请
-      onOnline: function() {}, //本机网络连接成功
-      onOffline: function() {}, //本机网络掉线
-      onError: function(message) {}, //失败回调
-      onReceivedMessage: function(message) {}, //收到消息送达服务器回执
-      onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
-      onReadMessage: function(message) {} //收到消息已读回执
-      // ......
-    });
-    this.hx_login();
   }
 };
 </script>

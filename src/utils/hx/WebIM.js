@@ -1,12 +1,14 @@
 import Strophe from "./weixin-sdk/libs/strophe";
 //import xmldom from "../sdk/libs/xmldom/dom-parser";
-import websdk from "./weixin-sdk/connection";
-import config from "./WebIMConfig";
+// import websdk from "./weixin-sdk/connection";
+// import config from "./MPIMConfig";
 
 console.group = console.group || {};
 console.groupEnd = console.groupEnd || {};
-
-var window = {};
+let config =  mpvue_Mode === 'WX'?require("./MPIMConfig.js").default:require("./WebIMConfig.js").default;
+var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/connection.js"):require("./web-sdk/websdk3.1.4.js").default;
+// console.log(config)
+if(!window)  window = {};
 let WebIM = window.WebIM = websdk;
 window.WebIM.config = config;
 //var DOMParser = window.DOMParser = xmldom.DOMParser;
@@ -436,22 +438,35 @@ WebIM.EmojiObj2={
 
 // wx.connectSocket({url: WebIM.config.xmppURL, method: "GET"})
 
-WebIM.conn = new WebIM.connection({
+WebIM.conn = mpvue_Mode === 'WX'? new WebIM.connection({
 	isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
-	https: typeof WebIM.config.https === "boolean" ? WebIM.config.https : location.protocol === "https:",
+	https: WebIM.config.https,
 	url: WebIM.config.xmppURL,
 	apiUrl: WebIM.config.apiURL,
-	isAutoLogin: false,
+	isAutoLogin: true,
 	heartBeatWait: WebIM.config.heartBeatWait,
 	autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
-	autoReconnectInterval: WebIM.config.autoReconnectInterval
+	autoReconnectInterval: WebIM.config.autoReconnectInterval,
+    appKey: WebIM.config.appkey,
+
+}): new websdk.connection({
+    isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
+    https: WebIM.config.https,
+	url: WebIM.config.socketServer,
+	apiUrl : WebIM.config.restServer,
+    isAutoLogin: true,
+    heartBeatWait: WebIM.config.heartBeatWait,
+    autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
+    delivery: WebIM.config.delivery,
+	useOwnUploadFun: WebIM.config.useOwnUploadFun,
+    isDebug: WebIM.config.isDebug,
+    isHttpDNS: WebIM.config.isHttpDNS,
+    appKey: WebIM.config.appkey,
 });
 
 // async response
 // WebIM.conn.listen({
 //   onOpened: () => dispatch({type: Types.ON_OPEND})
 // })
-
-// export default WebIM;
 
 export default WebIM

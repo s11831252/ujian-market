@@ -1,78 +1,130 @@
 /**
  * git do not control webim.config.js
- * everyone should copy webim.config.js to webim.config.js
+ * everyone should copy webim.config.js.demo to webim.config.js
  * and have their own configs.
  * In this way , others won't be influenced by this config while git pull.
  *
  */
 
 // for react native
-let location = {
-	protocol: "https"
-};
+// var location = {
+//     protocol: "https"
+// }
 
-let config = {
-	/*
-	 * XMPP server
-	 */
-	xmppURL: "wss://im-api.easemob.com/ws/",
-	// xmppURL: 'ws://39.107.156.84:5280/ws/',
-	/*
-	 * Backend REST API URL
-	 */
-	// apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
-	// ios must be https!!! by lwz
-	apiURL: "https://a1.easemob.com",
-	// apiURL: 'https://172.17.3.155:8080',
-	/*
-	 * Application AppKey
-	 */
-	appkey: "888yuezhi-88#ubuild",
-	/*
-	 * Whether to use HTTPS      '1177161227178308#xcx'
-	 * @parameter {Boolean} true or false
-	 */
-	https: true,
-	/*
-	 * isMultiLoginSessions
-	 * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
-	 * false: A visitor can sign in to only one webpage and receive messages at the webpage.
-	 */
-	isMultiLoginSessions: true,
-	/**
-	 * Whether to use window.doQuery()
-	 * @parameter {Boolean} true or false
-	 */
-	isWindowSDK: false,
-	/**
-	 * isSandBox=true:  xmppURL: 'im-api.sandbox.easemob.com',  apiURL: '//a1.sdb.easemob.com',
-	 * isSandBox=false: xmppURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
-	 * @parameter {Boolean} true or false
-	 */
-	isSandBox: false,
-	/**
-	 * Whether to console.log in strophe.log()
-	 * @parameter {Boolean} true or false
-	 */
-	isDebug: false,
-	/**
-	 * will auto connect the xmpp server autoReconnectNumMax times in background when client is offline.
-	 * won't auto connect if autoReconnectNumMax=0.
-	 */
-	autoReconnectNumMax: 15,
-	/**
-	 * the interval secons between each atuo reconnectting.
-	 * works only if autoReconnectMaxNum >= 2.
-	 */
-	autoReconnectInterval: 2,
-	/**
-	 * webrtc supports WebKit and https only
-	 */
-	isWebRTC: false,
-	/*
-	 * Set to auto sign-in
-	 */
-	isAutoLogin: true
-};
+function getUrl(){
+    var apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+    var socketUrl = '//im-api-v2.easemob.com/ws'
+    if(window.location.href.indexOf('webim-h5.easemob.com') !== -1 ){
+        apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
+    }
+    else if(window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1){
+        apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
+        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+    }
+    else if(window.location.href.indexOf('localhost') !== -1){
+        apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
+    }
+    return {
+        apiUrl: apiUrl,
+        socketUrl: socketUrl,
+        sandBoxApiUrl: 'https://a1-hsb.easemob.com',
+        sandboxSocketUrl: 'https://im-api-v2-hsb.easemob.com/ws'
+    }
+}
 
-export default config;
+
+var config = {
+    /*
+     * websocket server
+     */
+    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
+    /*
+     * Backend REST API URL
+     */
+    // ios must be https!!! by lwz
+    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+    /*
+     * Application AppKey
+     */
+    appkey: '888yuezhi-88#ubuild',
+    /*
+     * Application Host
+     */
+    Host: 'easemob.com',
+    /*
+     * Whether to use HTTPS
+     * @parameter {Boolean} true or false
+     */
+    https: true,
+
+    isHttpDNS: false,
+    /*
+     * isMultiLoginSessions
+     * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
+     * false: A visitor can sign in to only one webpage and receive messages at the webpage.
+     */
+    isMultiLoginSessions: true,
+    /**
+     * isSandBox=true:  socketURL: 'im-api.sandbox.easemob.com',  apiURL: '//a1.sdb.easemob.com',
+     * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
+     * @parameter {Boolean} true or false
+     */
+    isSandBox: false,
+    /**
+     * Whether to console.log
+     * @parameter {Boolean} true or false
+     */
+    isDebug: true,
+    /**
+     * will auto connect the websocket server autoReconnectNumMax times in background when client is offline.
+     * won't auto connect if autoReconnectNumMax=0.
+     */
+    autoReconnectNumMax: 5,
+    /**
+     * webrtc supports WebKit and https only
+     */
+    isWebRTC: window.RTCPeerConnection && /^https\:$/.test(window.location.protocol),
+    /*
+     * Upload pictures or file to your own server and send message with url
+     * @parameter {Boolean} true or false
+     * true: Using the API provided by SDK to upload file to huanxin server
+     * false: Using your method to upload file to your own server
+     */
+    useOwnUploadFun: false,
+    /**
+     *  cn: chinese
+     *  us: english
+     */
+    i18n: 'cn',
+    /*
+     * Set to auto sign-in
+     */
+    isAutoLogin: true,
+    /**
+     * Size of message cache for person to person
+     */
+    p2pMessageCacheSize: 500,
+    /**
+     * When a message arrived, the receiver send an ack message to the
+     * sender, in order to tell the sender the message has delivered.
+     * See call back function onReceivedMessage
+     */
+    delivery: false,
+    /**
+     * Size of message cache for group chating like group, chatroom etc. For use in this demo
+     */
+    groupMessageCacheSize: 200,
+    /**
+     * 5 actual logging methods, ordered and available:
+     * 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'
+     */
+    loglevel: 'ERROR',
+
+    /**
+     * enable localstorage for history messages. For use in this demo
+     */
+    enableLocalStorage: true
+}
+export default config

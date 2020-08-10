@@ -132,8 +132,7 @@ export default {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
         var userinfo = await this.$ShoppingAPI.User_Get();
         this.$store.commit("SetUserInfo", userinfo.data);
-        
-
+        this.hx_login();
         if (this.$route.query.redirect)
         {
           // 切换至redirect页面

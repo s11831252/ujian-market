@@ -5,6 +5,8 @@ import router from './routerH5'
 import UJAPI from "./api/UJAPI"
 import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
+import API2 from "./api/API2"
+import HXAPI from "./api/HXAPI"
 
 import fts from './utils/autorem'
 import Toast from './components/Toast';
@@ -13,6 +15,9 @@ import './assets/global.css';
 import './assets/iconfont.less';
 import './components/Toast/toast.css';
 import VueAwesomeSwiper from 'vue-awesome-swiper'
+import WebIM from "@/utils/hx/WebIM";
+import md5 from "@/utils/md5";
+
 let { swiper, swiperSlide } = VueAwesomeSwiper
 
 import "swiper/dist/css/swiper.css";
@@ -20,9 +25,12 @@ import "swiper/dist/css/swiper.css";
 Vue.use(Toast);
 Vue.use(VueAwesomeSwiper, /* { default global options } */)
 
-Vue.prototype.$UJAPI = UJAPI; //在实例中用this.$UJAPI调用UJAPI封装好的RestAPI
-Vue.prototype.$ShoppingAPI = ShoppingAPI; //在实例中用this.$ShoppingAPI调用ShoppingAPI.js封装好的RestAPI
-Vue.prototype.$WeiXinOpenAPI = WeixinOpenAPI; //在实例中用this.$WeiXinOpenAPI调用WeiXinOpenAPI.js封装好的RestAPI
+//在实例中用this.$xxx调用封装好的RestAPI
+Vue.prototype.$UJAPI = UJAPI; 
+Vue.prototype.$ShoppingAPI = ShoppingAPI; 
+Vue.prototype.$WeiXinOpenAPI = WeixinOpenAPI; 
+Vue.prototype.$API2=API2;
+Vue.prototype.$HXAPI=HXAPI;
 
 Vue.mixin({
   components: {
@@ -53,7 +61,16 @@ Vue.mixin({
           if(cancel)
             cancel();
         }
-      }, //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
+      }, 
+      showLoading(opt){
+        var obj ={mask:true, ...opt};
+        this.$loading.open(obj.title)
+      },
+      hideLoading(){
+        this.$loading.close()
+
+      },
+      //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
       wx_login(callback) {
           var parms ={};
           if(this.launchOptions.query&&this.launchOptions.query.InvitaId)
@@ -63,7 +80,23 @@ Vue.mixin({
           
           if(callback)
             callback();
-                  
+      },
+      hx_login(){
+        // console.log(this.$store.state,this.$store.state.UserInfo)
+        if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
+            var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
+            var hx_psw = md5.hex_md5(hx_username);
+            console.log(hx_username, hx_psw);
+            let options = {
+              grant_type: "password",
+              apiUrl: WebIM.conn.apiUrl,
+              user: hx_username,
+              pwd: hx_psw,
+              appKey: WebIM.config.appkey
+            };
+            this.showLoading({title:"正在连接聊天服务器"})
+            WebIM.conn.open(options);
+        }
       }
     }
 });

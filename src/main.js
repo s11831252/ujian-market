@@ -149,7 +149,6 @@ Vue.mixin({
             if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
                 var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
                 var hx_psw = md5.hex_md5(hx_username);
-                console.log(hx_username, hx_psw);
                 let options = {
                   grant_type: "password",
                   apiUrl: WebIM.config.apiURL,
@@ -157,8 +156,10 @@ Vue.mixin({
                   pwd: hx_psw,
                   appKey: WebIM.config.appkey
                 };
+                console.log(WebIM.config)
                 this.showLoading({title:"正在连接聊天服务器"})
                 WebIM.conn.open(options);
+                console.log(hx_username, hx_psw,"isOpened:"+WebIM.conn.isOpened());
             }
         }
     },

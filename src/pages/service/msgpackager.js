@@ -15,7 +15,6 @@ export default function(sendableMsg, type, myName){
 		yourname: sendableMsg.body.from,
 		msg: {
 			type: type,
-			url: sendableMsg.body.body.url,
 			data: getMsgData(sendableMsg, type),
 			ext: sendableMsg.body.ext
 		},

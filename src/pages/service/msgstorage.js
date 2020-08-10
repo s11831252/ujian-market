@@ -4,6 +4,7 @@ import Disp from "../../utils/hx/Dispatcher";
 import disp from "../../utils/hx/broadcast";
 import msgPackager from "./msgpackager";
 import msgType from "./msgtype";
+import utils from '../../utils/index'
 let msgStorage = new Disp();
 msgStorage.saveReceiveMsg = function(receiveMsg, type){
 	let sendableMsg;
@@ -128,7 +129,7 @@ msgStorage.saveReceiveMsg = function(receiveMsg, type){
 msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 	//console.log('sendableMsgsendableMsg', sendableMsg)
 	let me = this;
-	let myName = wx.getStorageSync("myUsername");
+	let myName = utils.getItem("myUsername");
 	let sessionKey;
 	// 仅用作群聊收消息，发消息没有 receiveMsg
 	if(receiveMsg && receiveMsg.type == "groupchat"){
@@ -140,7 +141,7 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 			? sendableMsg.body.to + myName
 			: sendableMsg.body.from + myName;
 	}
-	let curChatMsg = wx.getStorageSync(sessionKey) || [];
+	let curChatMsg = utils.getItem(sessionKey) || [];
 	let renderableMsg = msgPackager(sendableMsg, type, myName);
 	if(type == msgType.AUDIO) {
 		renderableMsg.msg.length = sendableMsg.body.length;
@@ -177,16 +178,11 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 
 	save();
 	function save(){
-		wx.setStorage({
-			key: sessionKey,
-			data: curChatMsg,
-			success(){
-				if (type == msgType.AUDIO || type == msgType.VIDEO) {
-					disp.fire('em.chat.audio.fileLoaded');
-				}
-				me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey);
-			}
-		});
+		utils.setItem(sessionKey,curChatMsg)
+		if (type == msgType.AUDIO || type == msgType.VIDEO) {
+			disp.fire('em.chat.audio.fileLoaded');
+		}
+		me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey);
 	}
 };
 

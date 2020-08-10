@@ -6,6 +6,6 @@ let BaseHost="https://a1.easemob.com/"
 
 export default {
     chatfiles:(username,appname,filePath,names,header)=>{
-       return  http_wx.upload(BaseHost+`${username}/${appname}/chatfiles`,null,filePath,names,header)
+       return  http.upload(BaseHost+`${username}/${appname}/chatfiles`,null,filePath,names,header)
     },
 }

@@ -53,7 +53,9 @@ function setItem(key,value){
   if(mpvue_Mode === 'WX')
      wx.setStorageSync(key, value)
   else
-    localStorage.setItem(key, value);
+  {
+    localStorage.setItem(key,JSON.stringify(value));
+  }
 }
 
 
@@ -68,7 +70,9 @@ function getItem(key)
     if(mpvue_Mode === 'WX')
       return wx.getStorageSync(key)
     else
-      return localStorage.getItem(key);
+    {
+      return JSON.parse(localStorage.getItem(key));
+    }
 }
 
 /**
@@ -92,5 +96,5 @@ export default {
   delCookie,
   setItem,
   getItem,
-
+  removeItem,
 }
