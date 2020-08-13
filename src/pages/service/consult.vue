@@ -1,30 +1,43 @@
 <template>
   <div class="wai">
-    <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)">
+    <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)" v-if="isMP">
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-      <!-- <div class="msgbox"> -->
       <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scroll-view>
-    <!-- </div> -->
+    <scrollContainer :scroll-to-id="toView" v-else>
+      <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
+      <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <div id="end"></div>
+    </scrollContainer>
     <!-- 输入框 -->
     <div class="input-chat-box">
       <div class="input">
         <!-- 引用图标，需要引用其样式 -->
-        <div class="icon" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
-        <input type="text" @click="pending('chat',null)" maxlength="1000" @keyup.enter="sendMsg" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
+        <div class="icon" v-if="isMP" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
+        <div class="icon" v-else :class="chattype=='audio'?'focus':''" @click="pending(null,'语音')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
+
+        <input type="text" @click="pending('chat',null)"  maxlength="1000" @keyup.enter="sendMsg" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
-        <div class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
+        <div v-if="isMP" class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
+        <div v-else class="icon" :class="chattype=='more'?'focus':''" @click="pending(null,`多媒体`)">&#xe726;</div>
       </div>
       <div v-if="chattype=='audio'" class="recorderbox" :class="{'action':recording}" @touchstart="openRecorder" @touchend="closeRecorder">
         <i class="icon">&#xe648;</i>
         <p>{{recording?'录音中':'长按开始录音'}}</p>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
-        <swiper class="swiper" indicator-dots="true">
+        <swiper class="swiper" indicator-dots="true" v-if="isMP">
           <swiper-item v-for="(item,index) in EmojiObj2.map" :key="index">
             <img v-for="(value,key) in item" :key="key" :src="EmojiObj2.path+value" @click="emojiInput(key)" />
           </swiper-item>
+        </swiper>
+        <swiper v-else ref="mySwiper" :options="swiperOption">
+          <swiper-slide v-for="(item, index) in EmojiObj2.map" :index="index" :key="index">
+            <img v-for="(value,key) in item" :key="key" :src="EmojiObj2.path+value" @click="emojiInput(key)" />
+          </swiper-slide>
+          <!-- Optional controls -->
+          <div class="swiper-pagination" slot="pagination"></div>
         </swiper>
         <div class="toolbox">
           <span class="btn_send" @click="sendMsg">发送</span>
@@ -58,45 +71,15 @@ import chatItem from "@/pages/service/chat-item";
 import WebIM from "@/utils/hx/WebIM";
 import msgStorage from "./msgstorage";
 import msgType from "./msgtype";
-function ack(receiveMsg) {
-  // 处理未读消息回执
-  var bodyId = receiveMsg.id; // 需要发送已读回执的消息id
-  var ackMsg = new WebIM.message("read", WebIM.conn.getUniqueId());
-  ackMsg.set({
-    id: bodyId,
-    to: receiveMsg.from
-  });
-  WebIM.conn.send(ackMsg.body);
-}
-function onMessageError(err) {
-  if (err.type === "error") {
-    wx.showToast({
-      title: err.errorText
-    });
-    return false;
-  }
-  return true;
-}
-function calcUnReadSpot(message) {
-  // 	let myName = wx.getStorageSync("myUsername");
-  // 	let members = wx.getStorageSync("member") || []; //好友
-  // 	var listGroups = wx.getStorageSync('listGroup')|| []; //群组
-  // 	let allMembers = members.concat(listGroups)
-  // 	let count = allMembers.reduce(function(result, curMember, idx){
-  // 		let chatMsgs;
-  // 		if (curMember.roomId) {
-  // 			chatMsgs = wx.getStorageSync(curMember.roomId + myName.toLowerCase()) || [];
-  // 		}else{
-  // 			chatMsgs = wx.getStorageSync(curMember.name.toLowerCase() + myName.toLowerCase()) || [];
-  // 		}
-  // 		return result + chatMsgs.length;
-  // 	}, 0);
-  // 	getApp().globalData.unReadMessageNum = count;
-  // 	disp.fire("em.xmpp.unreadspot", message);
-}
+import scrollContainer from './scrollcontainer'
 export default {
   data() {
     return {
+      swiperOption: {
+        pagination: {
+          el: ".swiper-pagination"
+        }
+      },
       msg: "",
       sId: null,
       ChatHistory: [],
@@ -109,7 +92,8 @@ export default {
     };
   },
   components: {
-    chatItem
+    chatItem,
+    scrollContainer
   },
   computed: {
     ...mapState({
@@ -132,8 +116,9 @@ export default {
   },
   methods: {
     sendMsg(e) {
+      debugger;
       var that = this;
-      if(e)
+      if(e&&e.keyCode)
       {
         if(e.keyCode!=13)
         return 
@@ -156,7 +141,6 @@ export default {
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
           }
         });
-        debugger;
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
         msgStorage.saveMsg(msg, "txt");
@@ -167,7 +151,6 @@ export default {
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, isNew) {
       // console.log(renderableMsg,currentChatMsg)
       this.ChatHistory = currentChatMsg;
-
       if (this.ChatHistory&&this.ChatHistory.length) {
         if (isNew) {
           this.toView = currentChatMsg[this.ChatHistory.length - 1].mid;
@@ -179,7 +162,11 @@ export default {
     pending(type, title) {
       if (this.chattype == type) this.chattype = "chat";
       else {
-        if (title) this.toast(`${title}功能正在开发中`);
+        if (title) 
+        {
+          this.toast(`${title}功能正在开发中`);
+          return ;
+        }
         this.chattype = type;
       }
     },
@@ -703,10 +690,9 @@ export default {
   }
 };
 </script>
-<style scoped>
-body {
+<style>
+page{
   height: 100%;
-  overflow: hidden;
 }
 </style>
 <style lang="scss" scoped>
@@ -726,6 +712,7 @@ body {
   flex-grow: 2;
   padding-bottom: 2%;
   overflow: hidden;
+  overflow-y: scroll;
 }
 
 .top {
@@ -809,6 +796,13 @@ body {
     background-color: #ecf0f1;
     height: 3.3rem;
   }
+  .swiper-slide{
+    margin-bottom: 20px;
+  }
+  .swiper-pagination{
+    bottom: 0;
+    z-index: 0
+  }
   img {
     width: 0.8rem;
     height: 0.8rem;
@@ -828,6 +822,7 @@ body {
       padding: 0.3rem;
       background-color: #12b7f5;
       color: #ecf0f1;
+      font-size: 0.45rem;
     }
   }
 }

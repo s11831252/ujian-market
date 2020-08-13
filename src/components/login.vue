@@ -135,8 +135,12 @@ export default {
         this.hx_login();
         if (this.$route.query.redirect)
         {
+          let url = decodeURIComponent(this.$route.query.redirect); 
           // 切换至redirect页面
-          this.$router.push({ path: this.$route.query.redirect, isTab: true });
+          this.$router.push({ path: url, isTab: true });
+        }
+        else if(this.$route.query.back){//后退
+          this.$router.back()
         }
         // 切换至首页
         else 
