@@ -236,7 +236,7 @@ export default {
   -o-transition: width 2s;
 }
 #app,html{
-  height: 100%;
+  /* height: 100%; */
 }
 /* page{
   background: #ecf0f1;
