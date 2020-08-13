@@ -32,22 +32,22 @@
                     <div class="myInfo_demo" @click="go({path:'/pages/order/index'})" v-if="Config.showBuy">
                         <i class="icon">&#xe653;</i>
                         <p class="myInfo_p">查看全部订单</p>
-                        <img class="next" src="/static/img/next.png" alt="" />
+                        <img class="next" src="../../../static/img/next.png" alt="" />
                     </div>
                     <div class="myInfo_demo" @click="go({path:'/pages/my/address'})" v-if="Config.showBuy">
                         <i class="icon">&#xe627;</i>
                         <p class="myInfo_p">收货地址</p>
-                        <img class="next" src="/static/img/next.png" alt="" />
+                        <img class="next" src="../../../static/img/next.png" alt="" />
                     </div>
                     <div class="myInfo_demo" @click="outShopping" v-if="ShoppingInfo&&ShoppingInfo.AudtiState==1">
                         <i class="icon">&#xe626;</i>
                         <p class="myInfo_p">管理店铺</p>
-                        <img class="next" src="/static/img/next.png" alt="" />
+                        <img class="next" src="../../../static/img/next.png" alt="" />
                     </div>
                     <div class="myInfo_demo" @click="outShopping" v-else>
                         <i class="icon">&#xe60e;</i>
                         <p class="myInfo_p">入驻商城</p>
-                        <img class="next" src="/static/img/next.png" alt="" />
+                        <img class="next" src="../../../static/img/next.png" alt="" />
                     </div>
                 </div>
                 <div v-if="Logined" class="myesc" @click="exit">退出登录</div>

@@ -1,18 +1,18 @@
 <template>
   <div class="index">
     <!-- <div class="top">
-      <img class="back" src="/static/img/back.png" alt>
+      <img class="back" src="../../../static/img/back.png" alt>
       <p class="title">温馨提示</p>
       <div class="moreDiv">
-        <img class="more" src="/static/img/more.png" alt>
-        <img class="eyes" src="/static/img/eyes.png" alt>
+        <img class="more" src="../../../static/img/more.png" alt>
+        <img class="eyes" src="../../../static/img/eyes.png" alt>
       </div>
     </div>-->
     <div class="content" v-if="ShoppingInfo">
       <div class="prompt" v-if="ShoppingInfo.AudtiState==1">
         <div class="prompt_storeDiv">
           <div class="prompt_storeImg">
-            <img class="store" src="/static/img/success.png" alt>
+            <img class="store" src="../../../static/img/success.png" alt>
           </div>
         </div>
         <p class="prompt_store_P">店铺已申请成功！</p>
@@ -29,7 +29,7 @@
       <div class="prompt" v-else-if="ShoppingInfo.AudtiState==0">
         <div class="prompt_storeDiv">
           <div class="prompt_storeImg">
-            <img class="store" src="/static/img/posting.png" alt>
+            <img class="store" src="../../../static/img/posting.png" alt>
           </div>
         </div>
         <p class="prompt_store_P2">店铺申请中...</p>
@@ -50,7 +50,7 @@
       <div class="prompt" v-else>
         <div class="prompt_storeDiv">
           <div class="prompt_storeImg">
-            <img class="store" src="/static/img/lose.png" alt>
+            <img class="store" src="../../../static/img/lose.png" alt>
           </div>
         </div>
         <p class="prompt_store_P2">店铺申请失败...</p>

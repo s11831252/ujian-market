@@ -10,28 +10,28 @@
           <div class="process_IconDiv">
             <div class="process_IconDemo">
               <div class="process_icon">
-                <img class="application_icon" src="/static/img/application_icon1.png" alt>
+                <img class="application_icon" src="../../../static/img/application_icon1.png" alt>
               </div>
               <p class="process_Icon_P">填写信息</p>
             </div>
-            <img class="next_right" src="/static/img/next_right.png" alt>
+            <img class="next_right" src="../../../static/img/next_right.png" alt>
             <div class="process_IconDemo">
               <div class="process_icon">
-                <img class="application_icon" src="/static/img/application_icon2.png" alt>
+                <img class="application_icon" src="../../../static/img/application_icon2.png" alt>
               </div>
               <p class="process_Icon_P">上传资料</p>
             </div>
-            <img class="next_right" src="/static/img/next_right.png" alt>
+            <img class="next_right" src="../../../static/img/next_right.png" alt>
             <div class="process_IconDemo">
               <div class="process_icon">
-                <img class="application_icon" src="/static/img/application_icon3.png" alt>
+                <img class="application_icon" src="../../../static/img/application_icon3.png" alt>
               </div>
               <p class="process_Icon_P">等待审核</p>
             </div>
-            <img class="next_right" src="/static/img/next_right.png" alt>
+            <img class="next_right" src="../../../static/img/next_right.png" alt>
             <div class="process_IconDemo">
               <div class="process_icon">
-                <img class="application_icon" src="/static/img/application_icon4.png" alt>
+                <img class="application_icon" src="../../../static/img/application_icon4.png" alt>
               </div>
               <p class="process_Icon_P">开店成功</p>
             </div>

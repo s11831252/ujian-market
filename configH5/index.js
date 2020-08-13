@@ -50,7 +50,7 @@ module.exports = {
 
     assetsRoot: path.resolve(__dirname, '../distH5'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: './mobil/',
 
     /**
      * Source Maps
