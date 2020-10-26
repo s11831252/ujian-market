@@ -16,8 +16,10 @@
         <!-- 引用图标，需要引用其样式 -->
         <div class="icon" v-if="isMP" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
         <div class="icon" v-else :class="chattype=='audio'?'focus':''" @click="pending(null,'语音')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
-
-        <input type="text" @click="pending('chat',null)"  maxlength="1000" @keyup.enter="sendMsg" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
+        <form action="" @submit.prevent="sendMsg">
+            <input type="text" @click="pending('chat',null)"  maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
+           <input class="submit_btn" type="submit" value="发送" >
+        </form>
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div v-if="isMP" class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
         <div v-else class="icon" :class="chattype=='more'?'focus':''" @click="pending(null,`多媒体`)">&#xe726;</div>
@@ -116,7 +118,6 @@ export default {
   },
   methods: {
     sendMsg(e) {
-      debugger;
       var that = this;
       if(e&&e.keyCode)
       {
@@ -558,6 +559,7 @@ export default {
 
     //查询聊天室列表,并尝试获取与该店铺的聊天室
     var listGroup = utils.getItem("listGroup");
+    console.log(listGroup)
     if (listGroup) {
       if(this.isMP){
         this.chatRoomInfo = listGroup.find(item => {
@@ -574,8 +576,8 @@ export default {
           return item.name == this.UserInfo.Phone + "_" + this.sName;
         });
       }
-
     }
+    // console.log(this.chatRoomInfo)
     that.desc_obj = {
       store: {
         sId: this.sId,
@@ -620,13 +622,28 @@ export default {
           desc
         );
         if (rep2.ret == 0) {
-          this.chatRoomInfo = {
-            jid: `888yuezhi-88#ubuild_${rep2.data}@conference.easemob.com`,
-            name: groupname,
-            roomId: rep2.data.groupid
-          };
-          console.log(`新建聊天室${this.chatRoomInfo.roomId}成功`)
-          listGroup.push(this.chatRoomInfo);
+          if(this.isMP)
+          {
+            this.chatRoomInfo = {
+              jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
+              name: groupname,
+              roomId: rep2.data.groupid
+            };
+            listGroup.push(this.chatRoomInfo);//微信小程序 sdk 数据结构
+          }
+          else//web sdk 数据结构
+          {
+            this.chatRoomInfo = {
+              jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
+              name: groupname,
+              roomId: rep2.data.groupid
+            };
+            listGroup.push({
+               groupid: rep2.data.groupid, 
+               groupname: groupname
+              });
+          }
+          console.log(`新建聊天室成功`,this.chatRoomInfo)
           utils.setItem("listGroup", listGroup);
         }
       }
@@ -637,11 +654,12 @@ export default {
         groupId: this.chatRoomInfo.roomId,
         success: function(resp) {
           console.log("queryRoomInfo成功", resp);
-          if(resp.statusCode==200)
+          if(resp.statusCode&&resp.statusCode==200)
           {
             var server_desc_obj = JSON.parse(resp.data.data[0].description)
             server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-            // server_desc_obj.buyer=desc_obj.buyer
+            server_desc_obj.buyer = that.desc_obj.buyer
+            server_desc_obj.store = that.desc_obj.store
             var json_obj = JSON.stringify(server_desc_obj);
             // json_obj = json_obj.replace(/\//g, "#") //格式化url
             that.$API2.groupChat_ModifyDescription(
@@ -759,6 +777,9 @@ page{
     border: 0.02rem solid #898989;
     margin-right: 0.2rem;
     background-color: #ffffff;
+  }
+  input.submit_btn{
+    display: none;
   }
   .icon {
     font-size: 0.7rem;

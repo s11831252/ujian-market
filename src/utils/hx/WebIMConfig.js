@@ -65,7 +65,7 @@ var config = {
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
      * false: A visitor can sign in to only one webpage and receive messages at the webpage.
      */
-    isMultiLoginSessions: true,
+    isMultiLoginSessions: false,
     /**
      * isSandBox=true:  socketURL: 'im-api.sandbox.easemob.com',  apiURL: '//a1.sdb.easemob.com',
      * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
@@ -81,7 +81,7 @@ var config = {
      * will auto connect the websocket server autoReconnectNumMax times in background when client is offline.
      * won't auto connect if autoReconnectNumMax=0.
      */
-    autoReconnectNumMax: 5,
+    autoReconnectNumMax: 15,
     /**
      * webrtc supports WebKit and https only
      */

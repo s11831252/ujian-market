@@ -124,7 +124,7 @@ export default {
       }
     },
     async login2() {
-      var req = await this.$ShoppingAPI.Account_Login({
+      var req = await this.$UJAPI.Account_Login({
         Account: this.userInfo.Account,
         PassWord: this.userInfo.PassWord
       });
