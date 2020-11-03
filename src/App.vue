@@ -48,8 +48,6 @@ export default {
   created () {
     //debugger
     // `this` 指向 vm 实例
-    // console.log('this is: ' + this, 'vue触发的 created')
-    //  this.wx_login()
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
@@ -70,7 +68,7 @@ export default {
             console.log("error:", e);
           }
         });
-      },
+      },//连接打开
       onClosed: function(message) {
         console.log("环信onClosed", message);
       }, //连接关闭回调
@@ -156,7 +154,13 @@ export default {
       onInviteMessage: function(message) {}, //处理群组邀请
       onOnline: function() {}, //本机网络连接成功
       onOffline: function() {}, //本机网络掉线
-      onError: function(message) {}, //失败回调
+      onError: function(message) {
+        console.log("环信Error:",message)
+            that.modal("连接失败","聊天连接失败,您可重连或稍后重试",()=>{
+              that.hx_login()
+            },null,"重连")
+            return;
+      }, //失败回调
       onReceivedMessage: function(message) {}, //收到消息送达服务器回执
       onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
       onReadMessage: function(message) {} //收到消息已读回执
@@ -175,7 +179,7 @@ export default {
   onLoad(){
     //同上
   },
-  onLaunch() {
+  onLaunch(opt) {
         // 获取小程序更新机制兼容
         if (wx.canIUse('getUpdateManager')) {
             const updateManager = wx.getUpdateManager()
@@ -212,6 +216,14 @@ export default {
                 content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
             })
         }
+
+        //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket, 
+        //2.订单则传递到query.OrderId
+        // let options = wx.getLaunchOptionsSync();
+        let options = opt
+        
+        if(options&&options.referrerInfo&&options.referrerInfo.extraData&&options.referrerInfo.extraData.SingleTicket)
+          this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
         this.GetConfig();
     },
 }

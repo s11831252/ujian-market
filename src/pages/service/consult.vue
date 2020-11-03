@@ -119,12 +119,15 @@ export default {
   methods: {
     sendMsg(e) {
       var that = this;
+      if(!this.msg)
+        return
       if(e&&e.keyCode)
       {
         if(e.keyCode!=13)
         return 
       }
       if (!this.to) {
+          this.toast(`群组信息获取失败,请重试`);
       } else {
         let id = WebIM.conn.getUniqueId();
         let msg = new WebIM.message(msgType.TEXT, id);
@@ -137,6 +140,9 @@ export default {
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`,msg);
+            msgStorage.saveMsg(msg, "txt");
+            that.msg = "";
+            that.chattype = "chat";
           },
           fail(id, serverMsgId) {
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
@@ -144,9 +150,7 @@ export default {
         });
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
-        msgStorage.saveMsg(msg, "txt");
-        that.msg = "";
-        that.chattype = "chat";
+
       }
     },
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, isNew) {
@@ -656,15 +660,16 @@ export default {
           console.log("queryRoomInfo成功", resp);
           if(resp.statusCode&&resp.statusCode==200)
           {
-            var server_desc_obj = JSON.parse(resp.data.data[0].description)
+            var dencode_str = decodeURIComponent(resp.data.data[0].description);
+            var server_desc_obj = JSON.parse(dencode_str)
             server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
             server_desc_obj.buyer = that.desc_obj.buyer
             server_desc_obj.store = that.desc_obj.store
             var json_obj = JSON.stringify(server_desc_obj);
-            // json_obj = json_obj.replace(/\//g, "#") //格式化url
+            json_obj = json_obj.replace(" ", "") //处理空格
             that.$API2.groupChat_ModifyDescription(
               that.chatRoomInfo.roomId,
-              json_obj.replace(/\//g, "#") //格式化url
+              json_obj.replace(/\//g, "#") //处理斜杠
             );
           }
         },
@@ -673,6 +678,8 @@ export default {
         }
       });
     }
+
+    console.log(this.sessionKey);
 
     var chatMsg = utils.getItem(this.sessionKey);
     this.readMsg(null, null, chatMsg, this.sessionKey);

@@ -17,7 +17,8 @@ export default new Vuex.Store({//store对象
       },
       getters:{
         Logined: state =>{
-          return state.SingleTicket&&state.SingleTicket.length>0&&state.UserInfo&&state.UserInfo.UserId;
+          var b =  state.SingleTicket!=null&&state.SingleTicket.length&&state.UserInfo!=null &&state.UserInfo.UserId!=null &&state.UserInfo.UserId.length>0;
+          return b;
         },
       },
       mutations: {

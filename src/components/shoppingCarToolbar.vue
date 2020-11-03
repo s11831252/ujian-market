@@ -87,16 +87,23 @@ export default {
     },
     goService(){
       var that = this;
-      
       if(this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId)
       {
+        if(!WebIM.conn.isOpened())
+        {
+            this.modal("连接失败","聊天连接失败,您可重连或稍后重试",()=>{
+              that.hx_login()
+            },null,"重连")
+            return;
+        }
+
         var _myUsername = utils.getItem("myUsername");
-        if(_myUsername&&WebIM.conn.isOpened())
+        if(_myUsername)
         {
           this.go({path:'/pages/service/consult',query:{sId:this.sId,sName:this.sName}})
         }else
         {
-          this.toast("请稍等,聊天服务登录中");
+            this.toast("请稍等,聊天服务登录中");
         }
       }else
       {

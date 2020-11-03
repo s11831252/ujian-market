@@ -94,13 +94,13 @@ Vue.mixin({
               })
         },
         //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
-        wx_login(callback) {
+        async wx_login(callback) {
             var parms ={};
             if(this.launchOptions.query&&this.launchOptions.query.InvitaId)
             {
                 parms.InvitaId=this.launchOptions.query.InvitaId;
             }
-            if(!this.$store.getters.Logined)//没有登录尝试登录 
+            if(!(this.$store.state.User.SingleTicket&&this.$store.state.User.SingleTicket.length>0))//没有SingleTicket尝试登录 
             {
                 // 调用wx登录接口
                 wx.login({
@@ -120,6 +120,7 @@ Vue.mixin({
                                                     userinfo.data.unionid= rep.data.result.unionid;
                                                     userinfo.data.openid = rep.data.result.openid;
                                                     this.$store.commit("SetUserInfo", userinfo.data);
+                                                    this.hx_login();
                                                 }
                                             });
                                         }
@@ -140,12 +141,16 @@ Vue.mixin({
                 });
             }else
             {
+                var rep = await this.$ShoppingAPI.User_Get();
+                if (rep.ret == 0) 
+                this.$store.commit("SetUserInfo", rep.data);
+                this.hx_login();
                 if(callback)
                     callback();
             }
         },
         hx_login(){
-            // console.log(this.$store.state,this.$store.state.UserInfo)
+            // console.log("hx_login:",this.$store.state,this.$store.state.User.UserInfo)
             if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
                 var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
                 var hx_psw = md5.hex_md5(hx_username);

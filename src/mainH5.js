@@ -80,6 +80,9 @@ Vue.mixin({
           
           if(callback)
             callback();
+            
+          this.hx_login();
+          
       },
       hx_login(){
         // console.log(this.$store.state,this.$store.state.UserInfo)
