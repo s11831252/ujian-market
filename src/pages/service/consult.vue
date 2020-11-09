@@ -555,136 +555,133 @@ export default {
     var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
     if (rep.ret == 0) {
       shopInfo = rep.data;
-    }
-    this.sName = decodeURI(this.$route.query.sName);
-    if(this.isMP)
-    //设置标题
-    wx.setNavigationBarTitle({ title: shopInfo.sName });
+      if(this.isMP)
+      //设置标题
+        wx.setNavigationBarTitle({ title: shopInfo.sName });
 
-    //查询聊天室列表,并尝试获取与该店铺的聊天室
-    var listGroup = utils.getItem("listGroup");
-    console.log(listGroup)
-    if (listGroup) {
-      if(this.isMP){
-        this.chatRoomInfo = listGroup.find(item => {
-          return item.name == this.UserInfo.Phone + "_" + this.sName;
-        });
-      }else
-      {
-        this.chatRoomInfo = listGroup.map( item=>{
-          return {
-            name:item.groupname,
-            roomId:item.groupid
-          }
-        }).find(item => {
-          return item.name == this.UserInfo.Phone + "_" + this.sName;
-        });
-      }
-    }
-    // console.log(this.chatRoomInfo)
-    that.desc_obj = {
-      store: {
-        sId: this.sId,
-        sNm: this.sName,
-        sLogo: shopInfo.sLogo
-      },
-      order: {
-        // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
-        // orderNo: "201906181030089564",
-        // state: "交易完成"
-      },
-      buyer: {
-        bId: this.UserInfo.UserId,
-        bPhone: this.UserInfo.Phone,
-        bLogo: this.UserInfo.Portrait,
-        bNm: this.UserInfo.UserName,
-        auth: this.IsCertification
-      },
-      lastTime: Math.round(new Date().getTime() / 1000)
-    };
-    //没有则创建聊天室
-    if (!this.chatRoomInfo || !this.chatRoomInfo.roomId) {
-      var groupname, owner, members, desc;
-      desc = JSON.stringify(that.desc_obj);
-      desc = desc.replace(/\//g, "#"); //格式化url
-      groupname = `${this.UserInfo.Phone}_${this.sName}`;
-      //店铺Id为创建人
-      owner = this.sId.replace(/-/g, "") + "_";
-      //把店铺成员一起拉进来
-      var rep = await this.$ShoppingAPI.ShopEmployee_Get(this.sId);
-      if (rep.ret == 0) {
-        var _menberArr = rep.data.map(item => {
-          return item.UserId.replace(/-/g, "");
-        });
-        _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
-        members = _menberArr.join();
-        // console.log(groupname, owner, members, desc);
-        let rep2 = await that.$API2.groupChat_Create(
-          groupname,
-          owner,
-          members,
-          desc
-        );
-        if (rep2.ret == 0) {
-          if(this.isMP)
-          {
-            this.chatRoomInfo = {
-              jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
-              name: groupname,
-              roomId: rep2.data.groupid
-            };
-            listGroup.push(this.chatRoomInfo);//微信小程序 sdk 数据结构
-          }
-          else//web sdk 数据结构
-          {
-            this.chatRoomInfo = {
-              jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
-              name: groupname,
-              roomId: rep2.data.groupid
-            };
-            listGroup.push({
-               groupid: rep2.data.groupid, 
-               groupname: groupname
-              });
-          }
-          console.log(`新建聊天室成功`,this.chatRoomInfo)
-          utils.setItem("listGroup", listGroup);
+      //查询聊天室列表,并尝试获取与该店铺的聊天室
+      var listGroup = utils.getItem("listGroup");
+      console.log(listGroup)
+      if (listGroup) {
+        if(this.isMP){
+          this.chatRoomInfo = listGroup.find(item => {
+            return item.name == this.UserInfo.Phone + "_" + shopInfo.sName;
+          });
+        }else
+        {
+          this.chatRoomInfo = listGroup.map( item=>{
+            return {
+              name:item.groupname,
+              roomId:item.groupid
+            }
+          }).find(item => {
+            return item.name == this.UserInfo.Phone + "_" + shopInfo.sName;
+          });
         }
       }
-    } else {
-      // //更新聊天室备注
-      // console.log(WebIM.conn)
-      WebIM.conn.getGroupInfo({
-        groupId: this.chatRoomInfo.roomId,
-        success: function(resp) {
-          console.log("queryRoomInfo成功", resp);
-          if(resp.statusCode&&resp.statusCode==200)
-          {
-            var dencode_str = decodeURIComponent(resp.data.data[0].description);
-            var server_desc_obj = JSON.parse(dencode_str)
-            server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-            server_desc_obj.buyer = that.desc_obj.buyer
-            server_desc_obj.store = that.desc_obj.store
-            var json_obj = JSON.stringify(server_desc_obj);
-            json_obj = json_obj.replace(" ", "") //处理空格
-            that.$API2.groupChat_ModifyDescription(
-              that.chatRoomInfo.roomId,
-              json_obj.replace(/\//g, "#") //处理斜杠
-            );
-          }
+      // console.log(this.chatRoomInfo)
+      that.desc_obj = {
+        store: {
+          sId: shopInfo.sId,
+          sNm: shopInfo.sName,
+          sLogo: shopInfo.sLogo
         },
-        error: function(msg) {
-          console.log(msg);
+        order: {
+          // orderId: "cc3c1767-684b-4eca-87d1-e09f1dea4b16",
+          // orderNo: "201906181030089564",
+          // state: "交易完成"
+        },
+        buyer: {
+          bId: this.UserInfo.UserId,
+          bPhone: this.UserInfo.Phone,
+          bLogo: this.UserInfo.Portrait,
+          bNm: this.UserInfo.UserName,
+          auth: this.IsCertification
+        },
+        lastTime: Math.round(new Date().getTime() / 1000)
+      };
+      //没有则创建聊天室
+      if (!this.chatRoomInfo || !this.chatRoomInfo.roomId) {
+        var groupname, owner, members, desc;
+        desc = JSON.stringify(that.desc_obj);
+        desc = desc.replace(/\//g, "#"); //格式化url
+        groupname = `${this.UserInfo.Phone}_${shopInfo.sName}`;
+        //店铺Id为创建人
+        owner = shopInfo.sId.replace(/-/g, "") + "_";
+        //把店铺成员一起拉进来
+        var rep = await this.$ShoppingAPI.ShopEmployee_Get(shopInfo.sId);
+        if (rep.ret == 0) {
+          var _menberArr = rep.data.map(item => {
+            return item.UserId.replace(/-/g, "");
+          });
+          _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
+          members = _menberArr.join();
+          // console.log(groupname, owner, members, desc);
+          let rep2 = await that.$API2.groupChat_Create(
+            groupname,
+            owner,
+            members,
+            desc
+          );
+          if (rep2.ret == 0) {
+            if(this.isMP)
+            {
+              this.chatRoomInfo = {
+                jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
+                name: groupname,
+                roomId: rep2.data.groupid
+              };
+              listGroup.push(this.chatRoomInfo);//微信小程序 sdk 数据结构
+            }
+            else//web sdk 数据结构
+            {
+              this.chatRoomInfo = {
+                jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
+                name: groupname,
+                roomId: rep2.data.groupid
+              };
+              listGroup.push({
+                groupid: rep2.data.groupid, 
+                groupname: groupname
+                });
+            }
+            console.log(`新建聊天室成功`,this.chatRoomInfo)
+            utils.setItem("listGroup", listGroup);
+          }
         }
-      });
+      } else {
+        // //更新聊天室备注
+        // console.log(WebIM.conn)
+        WebIM.conn.getGroupInfo({
+          groupId: this.chatRoomInfo.roomId,
+          success: function(resp) {
+            console.log("queryRoomInfo成功", resp);
+            if(resp.statusCode&&resp.statusCode==200)
+            {
+              var dencode_str = decodeURIComponent(resp.data.data[0].description);
+              var server_desc_obj = JSON.parse(dencode_str)
+              server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
+              server_desc_obj.buyer = that.desc_obj.buyer
+              server_desc_obj.store = that.desc_obj.store
+              var json_obj = JSON.stringify(server_desc_obj);
+              json_obj = json_obj.replace(" ", "") //处理空格
+              that.$API2.groupChat_ModifyDescription(
+                that.chatRoomInfo.roomId,
+                json_obj.replace(/\//g, "#") //处理斜杠
+              );
+            }
+          },
+          error: function(msg) {
+            console.log(msg);
+          }
+        });
+      }
+      console.log(this.sessionKey);
+      var chatMsg = utils.getItem(this.sessionKey);
+      this.readMsg(null, null, chatMsg, this.sessionKey);
     }
 
-    console.log(this.sessionKey);
-
-    var chatMsg = utils.getItem(this.sessionKey);
-    this.readMsg(null, null, chatMsg, this.sessionKey);
     this.EmojiObj2 = WebIM.EmojiObj2;
-
     msgStorage.on("newChatMsg", function(
       renderableMsg,
       type,

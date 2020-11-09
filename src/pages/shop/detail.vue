@@ -141,15 +141,14 @@ export default {
     });
    },
   async mounted() {
-     this.wx_login(async ()=>{
-        if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
+    if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
           this.sId = this.$route.query.sId;
           this.gId = this.$route.query.gId;
           // console.log(this.$route.query.sName);
           if(this.$route.query.sName)
             this.sName= decodeURI(this.$route.query.sName);
-        }
-      // console.log(this.sName);
+    }
+     this.wx_login(async ()=>{
         if(this.gId)
         {
           var rep = await this.$ShoppingAPI.Goods_Get({
