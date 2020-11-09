@@ -91,27 +91,38 @@ export default {
       {
         if(!WebIM.conn.isOpened())
         {
-            this.modal("连接失败","聊天连接失败,您可重连或稍后重试",()=>{
+          this.modal({
+            title:"连接失败",
+            content:"聊天服务连接失败,您可重连或稍后重试",
+            confirm:()=>{
               that.hx_login()
-            },null,"重连")
-            return;
+            },
+            confirmText:"重连"
+          })
+          return;
         }
 
         var _myUsername = utils.getItem("myUsername");
         if(_myUsername)
         {
           this.go({path:'/pages/service/consult',query:{sId:this.sId,sName:this.sName}})
+          return
         }else
         {
             this.toast("请稍等,聊天服务登录中");
+            return;
         }
       }else
       {
-        this.modal("未登录","请您登录后使用客服功能",()=>{
-          // that.$router.push({path:`/pages/index/index`,query:{redirect:encodeURIComponent(that.$route.fullPath)}})
-          // that.$router.push("/pages/index/index"); //回到登录页
-          that.$router.push({path:`/pages/index/index`,query:{back:1}})
-        },null,"去登录")
+          this.modal({
+            title:"未登录",
+            content:"请您登录后使用客服功能",
+            confirm:()=>{
+              that.$router.push({path:`/pages/index/index`,query:{back:1}})
+            },
+            confirmText:"去登录"
+          })
+
       }
     }
   }

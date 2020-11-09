@@ -41,23 +41,29 @@ export default {
   methods: {
     async deleteAddress(Order_Address_Id) {
       var that = this;
-      this.modal("提示", "确定删除该收货地址?", () => {
-        that.$ShoppingAPI.OrderAddress_Delete(Order_Address_Id).then(rep => {
-          if (rep.ret == 0) {
-             that.DeleteUserAddress(Order_Address_Id);
-          }
-        });
-      });
+      this.modal({
+            content:"确定删除该收货地址?",
+            confirm:()=>{
+              that.$ShoppingAPI.OrderAddress_Delete(Order_Address_Id).then(rep => {
+                if (rep.ret == 0) {
+                  that.DeleteUserAddress(Order_Address_Id);
+                }
+              });
+            },
+      })
     },
     async setDefault(item) {
       var that = this;
-      this.modal("提示", "是否要更换默认收货地址?", () => {
-        that.$ShoppingAPI.OrderAddress_SetDefault(item.Order_Address_Id).then(rep => {
-          if (rep.ret == 0) {
-             that.SetDefault(item);
-          }
-        });
-      });
+      this.modal({
+            content:"是否要更换默认收货地址?",
+            confirm:()=>{
+              that.$ShoppingAPI.OrderAddress_SetDefault(item.Order_Address_Id).then(rep => {
+                if (rep.ret == 0) {
+                  that.SetDefault(item);
+                }
+              });
+            },
+      })
     },
     ...mapMutations([
       'DeleteUserAddress', //`this.$store.commit('DeleteUserAddress')`

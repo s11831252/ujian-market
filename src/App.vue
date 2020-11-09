@@ -156,9 +156,14 @@ export default {
       onOffline: function() {}, //本机网络掉线
       onError: function(message) {
         console.log("环信Error:",message)
-            that.modal("连接失败","聊天连接失败,您可重连或稍后重试",()=>{
+        that.modal({
+            title:"连接失败",
+            content:"聊天服务连接失败,您可重连或稍后重试",
+            confirm:()=>{
               that.hx_login()
-            },null,"重连")
+            },
+            confirmText:"重连"
+          })
             return;
       }, //失败回调
       onReceivedMessage: function(message) {}, //收到消息送达服务器回执
@@ -223,7 +228,11 @@ export default {
         let options = opt
         
         if(options&&options.referrerInfo&&options.referrerInfo.extraData&&options.referrerInfo.extraData.SingleTicket)
+        {
           this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
+          this.$store.commit("SetUserInfo", {});//清空userinfo
+          
+        }
         this.GetConfig();
     },
 }

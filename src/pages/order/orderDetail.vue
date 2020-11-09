@@ -821,15 +821,18 @@ export default {
     },
     delComments(item,index)
     {
-      this.modal("提示","是否删除该评论",async ()=> {
-            var rep=await this.$ShoppingAPI.OrderComment_DeleteGoodsComment(item.CommentGoodsId);
-            if(rep.ret==0){
-              this.getCommentModel.goodsCommentList.splice(index, 1); 
-            }else
-            {
-              this.toast("删除评论失败")
-            }
-      });
+      this.modal({
+            content:"是否删除该评论?",
+            confirm:async ()=>{
+                var rep=await this.$ShoppingAPI.OrderComment_DeleteGoodsComment(item.CommentGoodsId);
+                if(rep.ret==0){
+                  this.getCommentModel.goodsCommentList.splice(index, 1); 
+                }else
+                {
+                  this.toast("删除评论失败")
+                }
+            },
+      })
     }
   },
    async onShow(){

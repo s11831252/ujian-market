@@ -141,27 +141,29 @@ export default {
     });
    },
   async mounted() {
-    if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
-      this.sId = this.$route.query.sId;
-      this.gId = this.$route.query.gId;
-      // console.log(this.$route.query.sName);
-      if(this.$route.query.sName)
-        this.sName= decodeURI(this.$route.query.sName);
-    }
-
+     this.wx_login(async ()=>{
+        if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
+          this.sId = this.$route.query.sId;
+          this.gId = this.$route.query.gId;
+          // console.log(this.$route.query.sName);
+          if(this.$route.query.sName)
+            this.sName= decodeURI(this.$route.query.sName);
+        }
       // console.log(this.sName);
-    if(this.gId)
-    {
-      var rep = await this.$ShoppingAPI.Goods_Get({
-        sId: this.sId,
-        gId: this.gId
-      });
-      if (rep.ret == 0) {
-        this.goods_detail = rep.data;
-        this.sId=this.goods_detail.sId;
-        //  console.log(this.goods_detail);
-      }
-    }
+        if(this.gId)
+        {
+          var rep = await this.$ShoppingAPI.Goods_Get({
+            sId: this.sId,
+            gId: this.gId
+          });
+          if (rep.ret == 0) {
+            this.goods_detail = rep.data;
+            this.sId=this.goods_detail.sId;
+            //  console.log(this.goods_detail);
+          }
+        }
+     })
+
   }
 };
 </script>

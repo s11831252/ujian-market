@@ -76,12 +76,15 @@ Vue.mixin({
         hideLoading(){
             wx.hideLoading();
         },
-        modal(title,content,confirm,cancel,confirmText){
-            
+        modal(opt){
+            console.log(opt)
+            var { title="", content="提示内容", confirm, cancel,confirmText="确定",confirmColor="#12b7f5",cancelColor="#989898" } = opt;
             wx.showModal({
                 confirmText,
                 title,
                 content,
+                confirmColor,
+                cancelColor,
                 success (res) {
                   if (res.confirm) {
                     if(confirm)
