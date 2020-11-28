@@ -26,6 +26,8 @@ axios.interceptors.response.use(response => {
     // console.log(router)
     if(response.data.ret==10000||response.data.ret==10001||response.data.ret==10002)
     {
+      store.commit("Login", { Ticket: "" }); //清空Ticket
+      store.commit("SetUserInfo", {});//清空userinfo
       router.push({path:"/pages/index/index"})
     }
   }

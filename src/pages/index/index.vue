@@ -54,17 +54,6 @@ export default {
           }
         });
       } else {
-        // wx.showModal({
-        //   title: "警告",
-        //   content: "您点击了拒绝授权，将无法进入小程序，请授权之后再进入!!!",
-        //   showCancel: false,
-        //   confirmText: "返回授权",
-        //   success(res) {
-        //     if (res.confirm) {
-        //       console.log("点击了“返回授权”");
-        //     }
-        //   }
-        // });
         this.$router.back();
       }
     }

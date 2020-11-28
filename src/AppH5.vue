@@ -65,7 +65,7 @@ export default {
       ...mapActions(["GetConfig"])
   },
   created(){
-    this.GetConfig();
+    // this.GetConfig();
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
