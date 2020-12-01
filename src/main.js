@@ -108,21 +108,21 @@ Vue.mixin({
                         if (obj.errMsg.indexOf("login:ok") > -1) {
                             this.$ShoppingAPI.Account_wxLogin(obj.code,parms.InvitaId).then(rep => {
                                 if (rep.ret == 0) {
-                                    this.userInfo.unionid = rep.data.result.unionid;
-                                    this.userInfo.openid = rep.data.result.openid;
-                    
+
                                     if (rep.data.ticket) {
                                         this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
                                         if(rep.data.result.errcode==0)//0表示系统用户 -1游客
                                         {
-                                            this.$ShoppingAPI.User_Get().then(userinfo => {
-                                                if (userinfo.ret == 0) {
-                                                    userinfo.data.unionid= rep.data.result.unionid;
-                                                    userinfo.data.openid = rep.data.result.openid;
-                                                    this.$store.commit("SetUserInfo", userinfo.data);
+                                            this.$ShoppingAPI.User_Get().then(res => {
+                                                if (res.ret == 0) {
+                                                    var userinfo = res.data;
+                                                    var _u = {...rep.data.result,...userinfo}
+                                                    this.$store.commit("SetUserInfo",_u);
                                                     this.hx_login();
                                                 }
                                             });
+                                        }else{
+                                            this.$store.commit("SetUserInfo",rep.data.result);
                                         }
                                     }
                                     if(callback)

@@ -246,6 +246,22 @@ var routes = [
             navigationBarTitleText: '物流选择',
             enablePullDownRefresh: false
         },
+    },
+    {
+        path:'pages/live/index',
+        name:'live',
+        config: {
+            navigationBarTitleText: '直播列表',
+            enablePullDownRefresh: false
+        }
+    },
+    {
+        path:'pages/live/room',
+        name:'liveroom',
+        config: {
+            navigationBarTitleText: '直播间',
+            enablePullDownRefresh: false
+        }
     }
 ]
 module.exports =routes

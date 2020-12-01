@@ -38,6 +38,10 @@ export default {
     User_Get: param => {
         return http.get(BaseHost + "api/User/Get", param)
     },
+    //退出微信登录
+    User_wxExit: (openid,unionid) => {
+        return http.post(BaseHost + `api/User/wxExit?openid=${openid}&unionid=${unionid}`,)
+    },
     //获取个人优惠券
     User_Coupon_Get: param => {
         //api/User_Coupon/Get?Coupon_RuleId={Coupon_RuleId}&State={State}&PageIndex={PageIndex}&PageSize={PageSize}
@@ -232,8 +236,21 @@ export default {
     Shop_CancelAudti: sId => {
         return http.post(BaseHost + `api/Shop/CancelAudti?sId=${sId}`)
     },
-    
+    //获取店铺成员
     ShopEmployee_Get:(sId)=>{
         return http.get(BaseHost + `api/ShopEmployee/Get?sId=${sId}`)
-    }
+    },
+    //获取直播列表
+    appserver_Ongoing:(params)=>{
+        return http.get(BaseHost + `api/AppServer/Ongoing`,params)
+    },
+    //获取直播间详情
+    AppServer_LiveRoomsDetail:(LiveRoomId)=>{
+        return http.get(BaseHost + `api/AppServer/LiveRoomsDetail?LiveRoomId=${LiveRoomId}`)
+    },
+    //加入直播间
+    AppServer_JoinRoom:(UserName,portrait)=>{
+        return http.post(BaseHost + `api/AppServer/JoinRoom?UserName=${UserName}&portrait=${portrait}`)
+    },
+    
 }

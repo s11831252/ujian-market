@@ -31,7 +31,8 @@ import storePage from './pages/store/storePage'
 import service from './pages/store/service'
 import dialogBox from './pages/store/dialogBox'
 import distribution from './pages/order/distribution'
-
+import live from './pages/live/index'
+import liveroom from './pages/live/room'
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -359,7 +360,30 @@ var routes = [
         },
         alias: '/pages/order/distribution',
         component: distribution
+    },    
+    {
+        path:'pages/live/index',
+        name:'live',
+        config: {
+            navigationBarTitleText: '直播列表',
+            enablePullDownRefresh: false
+        },
+        meta: { noAuth: true },
+        alias: '/pages/live/index',
+        component: live
+    },
+    {
+        path:'pages/live/room',
+        name:'liveroom',
+        config: {
+            navigationBarTitleText: '直播间',
+            enablePullDownRefresh: false
+        },
+        meta: { noAuth: true },
+        alias: '/pages/live/room',
+        component: liveroom
     }
+
 ]
 
 let router =new Router({routes:routes})

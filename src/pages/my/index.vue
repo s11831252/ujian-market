@@ -80,6 +80,7 @@ export default {
   },
   methods: {
     exit() {
+        this.$ShoppingAPI.User_wxExit(this.UserInfo.openid,this.UserInfo.unionid)
       this.$store.commit("Login", { Ticket: "" }); //清空Ticket
       this.$store.commit("SetUserInfo", {});//清空userinfo
       utils.removeItem("myUsername");

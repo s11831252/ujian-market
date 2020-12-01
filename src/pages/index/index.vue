@@ -3,21 +3,22 @@
     <img class="logo" :class="{logoHide:logoHide}" src="/static/img/logo108.png" mode="widthFix">
     <p>U建商城</p>
     <div class="userinfo">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover">
+      <img class="userinfo-avatar" v-if="UserInfo.avatarUrl" :src="UserInfo.avatarUrl" background-size="cover">
       <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
+        <card :text="UserInfo.nickName"></card>
       </div>
     </div>
-    <div v-if="!userInfo.nickName" class="authorize">
+    <div v-if="!UserInfo.nickName" class="authorize">
       <p>申请获得你的公开信息(昵称、头像等)</p>
       <button open-type="getUserInfo" @getuserinfo="getUserInfoData">授权登录</button>
     </div>
     <!-- <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button> -->
-    <login v-if="userInfo.nickName" :userInfo="userInfo"></login>
+    <login v-else></login>
   </div>
 </template>
 
 <script>
+import {mapState} from 'vuex'
 import card from "@/components/card";
 import login from "@/components/login";
 export default {
@@ -25,34 +26,49 @@ export default {
     return {
       logoHide: false
     };
-  },
+  },  
   components: {
     card,
     login
   },
-
+  computed:{
+    ...mapState({
+      UserInfo: state => state.User.UserInfo
+    })
+  },
   methods: {
     opensetting() {
       wx.openSetting();
     },
     getUserInfoData(obj) {
+      var that = this;
       if (obj.mp.detail.errMsg.indexOf("getUserInfo:ok") != -1) {
-        this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
-        this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
-        this.logoHide = true;
-        wx.login({
-          success: obj => {
-            if (obj.errMsg.indexOf("login:ok") > -1) {
-              this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
-                if (rep.ret == 0) {
-                  // console.log(rep);
-                  this.userInfo.unionid = rep.data.result.unionid;
-                  this.userInfo.openid = rep.data.result.openid;
-                }
-              });
+        // this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
+        // this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
+        var _u = {...obj.mp.detail.userInfo, ...that.UserInfo}
+        if(!that.UserInfo.openid)
+        {
+          wx.login({
+            success: obj => {
+              if (obj.errMsg.indexOf("login:ok") > -1) {
+                this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                  if (rep.ret == 0) {
+                    // console.log(rep);
+                    this.userInfo.unionid = rep.data.result.unionid;
+                    this.userInfo.openid = rep.data.result.openid;
+                    _u = {..._u , ...rep.data.result}
+                    this.$store.commit("SetUserInfo", _u);//清空userinfo
+                    this.logoHide = true;
+                  }
+                });
+              }
             }
-          }
-        });
+          });
+        }else
+        {
+          this.$store.commit("SetUserInfo", _u);//清空userinfo
+          this.logoHide = true;
+        }
       } else {
         this.$router.back();
       }
