@@ -81,11 +81,12 @@ export default {
   methods: {
     exit() {
         this.$ShoppingAPI.User_wxExit(this.UserInfo.openid,this.UserInfo.unionid)
-      this.$store.commit("Login", { Ticket: "" }); //清空Ticket
-      this.$store.commit("SetUserInfo", {});//清空userinfo
-      utils.removeItem("myUsername");
-      WebIM.conn.close();//环信IM关闭
-      this.$router.push("/pages/index/index"); //回到登录页
+        this.$store.commit("Login", { Ticket: "" }); //清空Ticket
+        this.$store.commit("SetUserInfo", {});//清空userinfo
+        utils.removeItem("myUsername");
+        if(WebIM.conn.isOpened())
+          WebIM.conn.close(); //环信IM关闭
+        this.$router.push("/pages/index/index"); //回到登录页
     },
     outShopping(){
         console.log(this.ShoppingInfo);
@@ -102,7 +103,7 @@ export default {
                     break;
                 }
                 case 1:{
-                    this.go({path:'/pages/store/storepage',query:{sId:this.ShoppingInfo.sId}})
+                    this.go({path:'/pages/store/storePage',query:{sId:this.ShoppingInfo.sId}})
                     break;
                 }
                 case 2:{
@@ -120,7 +121,7 @@ export default {
         {
             if (!this.UserInfo.UserId) {
                     var rep = await this.$ShoppingAPI.User_Get();
-                    if (rep.ret == 0) this.$store.commit("SetUserInfo", rep.data);
+                    if (rep.ret == 0) this.$store.commit("SetUserInfo", {...this.UserInfo,...rep.data});
             }
             this.$UJAPI.Balance_Purse().then(rep => {
                 this.Balance = rep.data;

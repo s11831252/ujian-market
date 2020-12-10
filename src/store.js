@@ -257,7 +257,9 @@ export default new Vuex.Store({//store对象
     },
     Global:{
       state:{
-        Config:{}
+        Config:{
+          showBuy:true
+        }
       },
       mutations:{
         setConfig(state,Config){

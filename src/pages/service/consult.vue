@@ -17,7 +17,7 @@
         <div class="icon" v-if="isMP" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
         <div class="icon" v-else :class="chattype=='audio'?'focus':''" @click="pending(null,'语音')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
         <form action="" @submit.prevent="sendMsg">
-            <input type="text" @click="pending('chat',null)"  maxlength="1000" @confirm="sendMsg" confirm-type="send" v-model="msg" placeholder="输入新消息" />
+           <input class="msg_input"  type="text" @click="pending('chat',null)"  maxlength="1000" @confirm="sendMsg" confirm-type="send" fixed="true" v-model="msg" placeholder="输入新消息" />
            <input class="submit_btn" type="submit" value="发送" >
         </form>
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
@@ -25,8 +25,12 @@
         <div v-else class="icon" :class="chattype=='more'?'focus':''" @click="pending(null,`多媒体`)">&#xe726;</div>
       </div>
       <div v-if="chattype=='audio'" class="recorderbox" :class="{'action':recording}" @touchstart="openRecorder" @touchend="closeRecorder">
-        <i class="icon">&#xe648;</i>
-        <p>{{recording?'录音中':'长按开始录音'}}</p>
+        <swiper>
+          <swiper-item>
+            <i class="icon">&#xe648;</i>
+            <p>{{recording?'录音中':'长按开始录音'}}</p>
+          </swiper-item>
+        </swiper>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper" indicator-dots="true" v-if="isMP">
@@ -45,23 +49,29 @@
           <span class="btn_send" @click="sendMsg">发送</span>
         </div>
       </div>
-      <div v-if="chattype=='more'" class="moremsg">
-        <span class="iconbox" @click="openImage">
-          <i class="icon">&#xe89c;</i>
-          <p>图片</p>
-        </span>
-        <span class="iconbox">
-          <i class="icon" @click="openCamera">&#xe634;</i>
-          <p>拍照</p>
-        </span>
-        <span class="iconbox" @click="openVideo">
-          <i class="icon">&#xe6c5;</i>
-          <p>视频</p>
-        </span>
-        <span class="iconbox" @click="chooseLocation">
-          <i class="icon">&#xe65e;</i>
-          <p>位置</p>
-        </span>
+      <div v-if="chattype=='more'">
+        <swiper>
+          <swiper-item>
+            <div class="moremsg">
+              <span class="iconbox" @click="openImage">
+                <i class="icon">&#xe89c;</i>
+                <p>图片</p>
+              </span>
+              <span class="iconbox">
+                <i class="icon" @click="openCamera">&#xe634;</i>
+                <p>拍照</p>
+              </span>
+              <span class="iconbox" @click="openVideo">
+                <i class="icon">&#xe6c5;</i>
+                <p>视频</p>
+              </span>
+              <span class="iconbox" @click="chooseLocation">
+                <i class="icon">&#xe65e;</i>
+                <p>位置</p>
+              </span>
+            </div>
+          </swiper-item>
+        </swiper>
       </div>
     </div>
   </div>
@@ -766,12 +776,15 @@ page{
   bottom: 0rem;
   z-index: 99; */
   /* position: fixed; */
-  input {
-    padding: 0.1rem;
-    height: fit-content;
+   form{
+    flex-grow:2;
+  }
+  .msg_input {
+    padding: 0 0.1rem;
+    // height: fit-content;
     min-height: 1rem;
     max-height: 2rem;
-    width: 8rem;
+    width: auto;
     font-size: 0.4rem;
     /* 允许长单词换行到下一行 */
     word-wrap: break-word;
@@ -788,6 +801,7 @@ page{
   .icon {
     font-size: 0.7rem;
     margin-right: 0.2rem;
+    margin: 0 0.15rem;
   }
   .icon.focus {
     color: #12b7f5;
@@ -798,6 +812,7 @@ page{
   margin: 0 auto;
   text-align: center;
   padding: 1rem;
+  z-index: 101;
   i,
   p {
     margin: 0 auto;
@@ -857,6 +872,7 @@ page{
   align-items: center;
   background-color: #ecf0f1;
   padding: 0.3rem 0;
+  z-index: 101;
   span.iconbox {
     text-align: center;
     .icon {

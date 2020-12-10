@@ -95,6 +95,7 @@ Vue.mixin({
         },
         //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
         async wx_login(callback) {
+            var that = this;
             var parms ={};
             if(this.launchOptions.query&&this.launchOptions.query.InvitaId)
             {
@@ -104,49 +105,55 @@ Vue.mixin({
             {
                 // 调用wx登录接口
                 wx.login({
-                    success: obj => {
+                    success:async (obj) => {
                         if (obj.errMsg.indexOf("login:ok") > -1) {
-                            this.$ShoppingAPI.Account_wxLogin(obj.code,parms.InvitaId).then(rep => {
-                                if (rep.ret == 0) {
-
-                                    if (rep.data.ticket) {
-                                        this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
-                                        if(rep.data.result.errcode==0)//0表示系统用户 -1游客
-                                        {
-                                            this.$ShoppingAPI.User_Get().then(res => {
-                                                if (res.ret == 0) {
-                                                    var userinfo = res.data;
-                                                    var _u = {...rep.data.result,...userinfo}
-                                                    this.$store.commit("SetUserInfo",_u);
-                                                    this.hx_login();
-                                                }
-                                            });
-                                        }else{
-                                            this.$store.commit("SetUserInfo",rep.data.result);
+                            var rep = await that.$ShoppingAPI.Account_wxLogin(obj.code, parms.InvitaId)
+                            if (rep.ret == 0) {
+                                if (rep.data.ticket) {
+                                    that.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
+                                    if (rep.data.result.errcode == 0)//0表示系统用户 -1游客
+                                    {
+                                        var res = await that.$ShoppingAPI.User_Get()
+                                        if (res.ret == 0) {
+                                            var userinfo = res.data;
+                                            var _u = { ...rep.data.result, ...userinfo }
+                                            that.$store.commit("SetUserInfo", _u);
+                                            that.hx_login();
                                         }
+                                    } else {
+                                        that.$store.commit("SetUserInfo", rep.data.result);
                                     }
-                                    if(callback)
-                                        callback();
-                                }else
-                                {
-                                    if(callback)
-                                        allback();
                                 }
-                            });
-                        } else {
-                            if(callback)
-                            callback()
+                            }
                         }
+                        callback&&callback()
+                    },
+                    fail(){
+                        callback&&callback()
                     }
                 });
             }else
             {
-                var rep = await this.$ShoppingAPI.User_Get();
-                if (rep.ret == 0) 
-                this.$store.commit("SetUserInfo", rep.data);
-                this.hx_login();
-                if(callback)
-                    callback();
+                if(this.$store.state.User.UserInfo.errcode!=-1)
+                {
+                        // 调用wx登录接口
+                    wx.login({
+                        success:async (obj) => {
+                            if (obj.errMsg.indexOf("login:ok") > -1) {
+                                var rep = await that.$ShoppingAPI.Account_wxLogin(obj.code, parms.InvitaId)
+                                if (rep.ret == 0) {
+                                    var rep2 = await this.$ShoppingAPI.User_Get();
+                                    if (rep2.ret == 0)
+                                    {
+                                        this.$store.commit("SetUserInfo", {...rep.data.result,...rep2.data});
+                                        this.hx_login();
+                                    }
+                                }
+                            }
+                            callback&&callback()
+                        }
+                    });
+                }else callback&&callback()
             }
         },
         hx_login(){
@@ -163,10 +170,10 @@ Vue.mixin({
                   pwd: hx_psw,
                   appKey: WebIM.config.appkey
                 };
-                console.log(WebIM.config)
+                // console.log(WebIM.config)
                 this.showLoading({title:"正在连接聊天服务器"})
                 WebIM.conn.open(options);
-                console.log(hx_username, hx_psw,"isOpened:"+WebIM.conn.isOpened());
+                console.log("环信Login Account or Password",hx_username, hx_psw);
             }
         }
     },

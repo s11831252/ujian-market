@@ -222,11 +222,11 @@ export default {
           this.viewHistory_push({sId:this.shopDetail.sId,sLogo:this.shopDetail.sLogo,sName:this.shopDetail.sName})
         }
         
-        var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.sId }); //获取店铺商品
+        var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.shopDetail.sId }); //获取店铺商品
         if (rep3.ret == 0) {
           this.shopGoods = rep3.data;
         }
-        var rep2 = await this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.sId }); //获取店铺商品分类
+        var rep2 = await this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.shopDetail.sId }); //获取店铺商品分类
         if (rep2.ret == 0) {
           this.GoodsType = rep2.data;
           this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });

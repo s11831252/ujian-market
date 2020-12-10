@@ -53,9 +53,6 @@ export default {
               if (obj.errMsg.indexOf("login:ok") > -1) {
                 this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
                   if (rep.ret == 0) {
-                    // console.log(rep);
-                    this.userInfo.unionid = rep.data.result.unionid;
-                    this.userInfo.openid = rep.data.result.openid;
                     _u = {..._u , ...rep.data.result}
                     this.$store.commit("SetUserInfo", _u);//清空userinfo
                     this.logoHide = true;
@@ -75,13 +72,6 @@ export default {
     }
   },
   mounted() {
-    if (
-      this.$store.state.User.UserInfo&&
-      this.$store.state.User.UserInfo.UserId
-    ) {
-      // 切换至 tabBar 页面
-      this.$router.push({ path: "/pages/home/index", isTab: true });
-    }
 
     // 检查是否授权
     wx.getSetting({
