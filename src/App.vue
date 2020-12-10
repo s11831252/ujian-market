@@ -7,7 +7,6 @@ import msgType from "./pages/service/msgtype";
 import './assets/style.css';
 import './assets/global.css';
 import './assets/iconfont.less';
-
 function ack(receiveMsg) {
   // 处理未读消息回执
   var bodyId = receiveMsg.id; // 需要发送已读回执的消息id
@@ -60,15 +59,26 @@ export default {
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
         // 则无需调用conn.setPresence();
-        WebIM.conn.setPresence();
-        WebIM.conn.listRooms({
-          success: function(resp) {
-            utils.setItem("listGroup", resp);
+        // WebIM.conn.setPresence();
+        // WebIM.conn.listRooms({
+        //   success: function(resp) {
+        //     utils.setItem("listGroup", resp);
+        //     utils.setItem("myUsername", WebIM.conn.context.userId);
+        //     that.hideLoading();
+        //   },
+        //   error: function(e) {
+        //     console.log("error:", e);
+        //   }
+        // });
+        WebIM.conn.getGroup({
+          success: function(resp){
+            // console.log(resp)
+            utils.setItem("listGroup", resp.data);
             utils.setItem("myUsername", WebIM.conn.context.userId);
             that.hideLoading();
           },
-          error: function(e) {
-            console.log("error:", e);
+          error: function(){
+            that.hideLoading();
           }
         });
       },//连接打开
@@ -159,76 +169,29 @@ export default {
       onOffline: function() {}, //本机网络掉线
       onError: function(message) {
         console.log("环信Error:",message)
-        that.modal({
-            title:"连接失败",
-            content:"聊天服务连接失败,您可重连或稍后重试",
-            confirm:()=>{
-              that.hx_login()
-            },
-            confirmText:"重连"
-          })
-            return;
+        if(message.type==208)
+        {
+          that.modal({
+              title:"连接失败",
+              content:"聊天服务连接失败,您可尝试重连",
+              confirm:()=>{
+                that.hx_login()
+              },
+              confirmText:"重连"
+            })
+        }
       }, //失败回调
       onReceivedMessage: function(message) {}, //收到消息送达服务器回执
       onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
       onReadMessage: function(message) {}, //收到消息已读回执
       onPresence: function(msg){
-      console.log("onPresence",msg)
-      switch(msg.type){
-      case 'rmChatRoomMute':
-        // 解除聊天室一键禁言
-        break;
-      case 'muteChatRoom':
-        // 聊天室一键禁言
-        break;
-      case 'rmUserFromChatRoomWhiteList':
-        // 删除聊天室白名单成员
-        break;
-      case 'addUserToChatRoomWhiteList':
-        // 增加聊天室白名单成员
-        break;
-      case 'deleteFile':
-        // 删除聊天室文件
-        break;
-      case 'uploadFile':
-        // 上传聊天室文件
-        break;
-      case 'deleteAnnouncement':
-        // 删除聊天室公告
-        break;
-      case 'updateAnnouncement':
-        // 更新聊天室公告
-        break;
-      case 'removeMute':
-        // 解除禁言
-        break;
-      case 'addMute':
-        // 禁言
-        break;
-      case 'removeAdmin':
-        // 移除管理员
-        break;
-      case 'addAdmin':
-        // 添加管理员
-        break;
-      case 'changeOwner':
-        // 转让聊天室
-        break;
-      case 'leaveChatRoom':
-        // 退出聊天室
-        break;
-      case 'memberJoinChatRoomSuccess':
-        // 加入聊天室
-        break;
-      case 'leave':
-        // 退出群
-        break;
-      case 'join':
-        // 加入群
-        break;
-      default:
-        break;
-    }}
+        console.log("onPresence",msg)
+        msgStorage.fire('onPresence',msg);
+      },
+      onCustomMessage: function(msg){
+        console.log(msg)
+        msgStorage.fire('newCustomMessage',msg);
+      }
       // ......
     });
     this.hx_login();
@@ -236,10 +199,37 @@ export default {
   mounted(){
     //同上
   },
-  onShow () {
-    // `this` 指向 vm 实例
-    //debugger
-   // console.log('this is: ' + this, '小程序触发的 onshow')
+  onShow(opt) {
+    //1.从其他小程序(U建+、商家独立小程序)跳转到U建行业市场小程序使用功能(微信支付、联系客服、查看商家、查看商品),通过此处获取其他小程序传递过来的用户票据SingleTicket,
+    //2.店铺传递sId,商品传递gId,订单则传递OrderId,均通过 this.$route.query.xxx获取
+    //3.可以使用次微信api单独获取 let options = wx.getLaunchOptionsSync();
+    //4.可以在onShow、onLaunch回调中获取
+    let options = opt;
+    if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
+      console.log("onShow:", opt);
+      console.log("logined status:", this.$store.getters.Logined);
+      if (this.$store.getters.Logined){
+        return false
+        // this.modal({
+        //   title : "是否切换登录信息", 
+        //   content :"您已登录'U建商城',可选择使用跳转前小程序的登录信息", 
+        //   confirm:()=>{
+        //     this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
+        //     this.$store.commit("SetUserInfo", {}); //清空userinfo
+        //     utils.removeItem("myUsername");
+        //     if(WebIM.conn.isOpened())
+        //       WebIM.conn.close(); //环信IM关闭
+        //   },
+        // })
+      }
+      else {
+        this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
+        this.$store.commit("SetUserInfo", {}); //清空userinfo
+        utils.removeItem("myUsername");
+        if(WebIM.conn.isOpened())
+          WebIM.conn.close(); //环信IM关闭
+      }
+    }
   },
   onLoad(){
     //同上
@@ -280,20 +270,6 @@ export default {
                 title: '提示',
                 content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
             })
-        }
-
-        //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket, 
-        //2.订单则传递到query.OrderId
-        // let options = wx.getLaunchOptionsSync();
-        let options = opt
-        
-        if(options&&options.referrerInfo&&options.referrerInfo.extraData&&options.referrerInfo.extraData.SingleTicket)
-        {
-          this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
-          this.$store.commit("SetUserInfo", {});//清空userinfo
-          utils.removeItem("myUsername");
-          WebIM.conn.close();//环信IM关闭
-          
         }
         // this.GetConfig();
     },

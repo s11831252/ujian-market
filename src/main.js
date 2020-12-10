@@ -10,38 +10,27 @@ import HXAPI from "./api/HXAPI"
 
 import { debug } from 'util';
 import WebIM from "@/utils/hx/WebIM";
+import utils from "@/utils/index.js";
 import md5 from "@/utils/md5";
 
 //在实例中用this.$xxx调用封装好的RestAPI
-Vue.prototype.$UJAPI = UJAPI; 
-Vue.prototype.$ShoppingAPI = ShoppingAPI; 
+Vue.prototype.$UJAPI = UJAPI;
+Vue.prototype.$ShoppingAPI = ShoppingAPI;
 Vue.prototype.$WeixinOpenAPI = WeixinOpenAPI;
-Vue.prototype.$API2=API2;
-Vue.prototype.$HXAPI=HXAPI;
+Vue.prototype.$API2 = API2;
+Vue.prototype.$HXAPI = HXAPI;
 
 Vue.prototype.$store = store;
 Vue.mixin({
-    data(){
-        return{
-            userInfo: {
-                Account: "",
-                PassWord: "",
-                avatarUrl: "",
-                nickName: "",
-                unionid: "",
-                openid: ""
-              },
-        }
-    },
     computed: {
         $route: function () {
             return this.$router.currentRoute
         },
-        isMP(){
+        isMP() {
             return true;
         },
-        launchOptions(){
-            var options =  wx.getLaunchOptionsSync();
+        launchOptions() {
+            var options = wx.getLaunchOptionsSync();
             return options;
         }
     },
@@ -52,125 +41,116 @@ Vue.mixin({
         replace: function (path) {
             this.$router.replace(path);
         },
-        toast(title){
-            if(typeof title == 'object' )
-            {
+        toast(title) {
+            if (typeof title == 'object') {
                 wx.showToast(title);
-            }else
-            {
+            } else {
                 wx.showToast({
                     title: title,
                     icon: "none",
-                    mask:true
-                  });
+                    mask: true
+                });
             }
 
         },
-        showLoading(opt){
-            var obj ={mask:true, ...opt};
+        showLoading(opt) {
+            var obj = { mask: true, ...opt };
             wx.showLoading(obj);
         },
-        hideLoading(){
+        hideLoading() {
             wx.hideLoading();
         },
-        modal(opt){
+        modal(opt) {
             console.log(opt)
-            var { title="", content="提示内容", confirm, cancel,confirmText="确定",confirmColor="#12b7f5",cancelColor="#989898" } = opt;
+            var { title = "", content = "提示内容", confirm, cancel, confirmText = "确定", confirmColor = "#12b7f5", cancelColor = "#989898" } = opt;
             wx.showModal({
                 confirmText,
                 title,
                 content,
                 confirmColor,
                 cancelColor,
-                success (res) {
-                  if (res.confirm) {
-                    if(confirm)
-                        confirm();
-                  } else if (res.cancel) {
-                    if(cancel)
-                        cancel();
-                  }
+                success(res) {
+                    if (res.confirm) {
+                        if (confirm)
+                            confirm();
+                    } else if (res.cancel) {
+                        if (cancel)
+                            cancel();
+                    }
                 }
-              })
+            })
         },
         //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
         async wx_login(callback) {
-            var parms ={};
-            if(this.launchOptions.query&&this.launchOptions.query.InvitaId)
-            {
-                parms.InvitaId=this.launchOptions.query.InvitaId;
+            var that = this;
+            var parms = {};
+            if (this.launchOptions.query && this.launchOptions.query.InvitaId) {
+                parms.InvitaId = this.launchOptions.query.InvitaId;
             }
-            if(!(this.$store.state.User.SingleTicket&&this.$store.state.User.SingleTicket.length>0))//没有SingleTicket尝试登录 
+            if (!(this.$store.state.User.SingleTicket && this.$store.state.User.SingleTicket.length > 0))//没有SingleTicket尝试登录 
             {
                 // 调用wx登录接口
                 wx.login({
-                    success: obj => {
+                    success: async (obj) => {
                         if (obj.errMsg.indexOf("login:ok") > -1) {
-                            this.$ShoppingAPI.Account_wxLogin(obj.code,parms.InvitaId).then(rep => {
-                                if (rep.ret == 0) {
-
-                                    if (rep.data.ticket) {
-                                        this.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
-                                        if(rep.data.result.errcode==0)//0表示系统用户 -1游客
-                                        {
-                                            this.$ShoppingAPI.User_Get().then(res => {
-                                                if (res.ret == 0) {
-                                                    var userinfo = res.data;
-                                                    var _u = {...rep.data.result,...userinfo}
-                                                    this.$store.commit("SetUserInfo",_u);
-                                                    this.hx_login();
-                                                }
-                                            });
-                                        }else{
-                                            this.$store.commit("SetUserInfo",rep.data.result);
+                            var rep = await that.$ShoppingAPI.Account_wxLogin(obj.code, parms.InvitaId)
+                            if (rep.ret == 0) {
+                                if (rep.data.ticket) {
+                                    that.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
+                                    if (rep.data.result.errcode == 0)//0表示系统用户 -1游客
+                                    {
+                                        var res = await that.$ShoppingAPI.User_Get()
+                                        if (res.ret == 0) {
+                                            var userinfo = res.data;
+                                            var _u = { ...rep.data.result, ...userinfo }
+                                            that.$store.commit("SetUserInfo", _u);
+                                            that.hx_login();
                                         }
+                                    } else {
+                                        that.$store.commit("SetUserInfo", rep.data.result);
                                     }
-                                    if(callback)
-                                        callback();
-                                }else
-                                {
-                                    if(callback)
-                                        allback();
                                 }
-                            });
-                        } else {
-                            if(callback)
-                            callback()
+                            }
                         }
+                        if (callback)
+                            callback()
                     }
                 });
-            }else
-            {
-                var rep = await this.$ShoppingAPI.User_Get();
-                if (rep.ret == 0) 
-                this.$store.commit("SetUserInfo", rep.data);
-                this.hx_login();
-                if(callback)
+            } else {
+                if(this.$store.state.User.UserInfo.errcode!=-1)
+                {
+                    var rep = await this.$ShoppingAPI.User_Get();
+                    if (rep.ret == 0)
+                        this.$store.commit("SetUserInfo", rep.data);
+                    this.hx_login();
+                }
+                if (callback)
                     callback();
             }
         },
-        hx_login(){
+        hx_login() {
             // console.log("hx_login:",this.$store.state,this.$store.state.User.UserInfo)
             if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
-                if(WebIM.conn.isOpened())
+                if (WebIM.conn.isOpened())
                     return
                 var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
                 var hx_psw = md5.hex_md5(hx_username);
                 let options = {
-                  grant_type: "password",
-                  apiUrl: WebIM.config.apiURL,
-                  user: hx_username,
-                  pwd: hx_psw,
-                  appKey: WebIM.config.appkey
+                    grant_type: "password",
+                    apiUrl: WebIM.config.apiURL,
+                    user: hx_username,
+                    pwd: hx_psw,
+                    appKey: WebIM.config.appkey
                 };
                 console.log(WebIM.config)
-                this.showLoading({title:"正在连接聊天服务器"})
+                this.showLoading({ title: "正在连接聊天服务器" })
                 WebIM.conn.open(options);
-                console.log(hx_username, hx_psw,"isOpened:"+WebIM.conn.isOpened());
+                console.log(hx_username, hx_psw);
             }
         }
     },
-    onLoad () {
+    onLoad() {
+        // var that = this;
         // debugger;
         // if (this.$initData$) {
         //   Object.assign(this, JSON.parse(this.$initData$))
@@ -178,9 +158,9 @@ Vue.mixin({
         //   this.$initData$ = JSON.stringify(this.$data)
         // }
     },
-    onUnload(){
-        if( this.$options.data)
-         Object.assign(this, this.$options.data())
+    onUnload() {
+        if (this.$options.data)
+            Object.assign(this, this.$options.data())
     }
     // created: function () {
     //     if (this.$route)

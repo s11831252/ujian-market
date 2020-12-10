@@ -102,7 +102,7 @@ export default {
                     break;
                 }
                 case 1:{
-                    this.go({path:'/pages/store/storepage',query:{sId:this.ShoppingInfo.sId}})
+                    this.go({path:'/pages/store/storePage',query:{sId:this.ShoppingInfo.sId}})
                     break;
                 }
                 case 2:{
@@ -120,7 +120,7 @@ export default {
         {
             if (!this.UserInfo.UserId) {
                     var rep = await this.$ShoppingAPI.User_Get();
-                    if (rep.ret == 0) this.$store.commit("SetUserInfo", rep.data);
+                    if (rep.ret == 0) this.$store.commit("SetUserInfo", {...this.UserInfo,...rep.data});
             }
             this.$UJAPI.Balance_Purse().then(rep => {
                 this.Balance = rep.data;
@@ -136,7 +136,6 @@ export default {
                 this.ShoppingInfo=rep.data[0];
             }
         }
-
     }
   },
   components: {

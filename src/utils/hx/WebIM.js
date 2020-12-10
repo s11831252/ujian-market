@@ -1,4 +1,4 @@
-import Strophe from "./weixin-sdk/libs/strophe";
+// import Strophe from "./weixin-sdk/libs/strophe";
 //import xmldom from "../sdk/libs/xmldom/dom-parser";
 // import websdk from "./weixin-sdk/connection";
 // import config from "./MPIMConfig";
@@ -6,11 +6,12 @@ import Strophe from "./weixin-sdk/libs/strophe";
 console.group = console.group || {};
 console.groupEnd = console.groupEnd || {};
 let config =  mpvue_Mode === 'WX'?require("./MPIMConfig.js").default:require("./WebIMConfig.js").default;
-var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/connection.js"):require("./web-sdk/websdk3.1.4.js").default;
-// console.log(config)
-if(!window)  window = {};
-let WebIM = window.WebIM = websdk;
-window.WebIM.config = config;
+var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/wxsdk3.3.2").default:require("./web-sdk/websdk3.1.4.js").default;
+
+// if(!window)  window = {};
+
+let WebIM = websdk;
+WebIM.config = config;
 //var DOMParser = window.DOMParser = xmldom.DOMParser;
 //let document = window.document = new DOMParser().parseFromString("<?xml version='1.0'?>\n", "text/xml");
 
@@ -29,24 +30,21 @@ WebIM.isDebug = function(option){
 			return (Hours < 10 ? "0" + Hours : Hours) + ":" + (Minutes < 10 ? "0" + Minutes : Minutes) + ":" + (Seconds < 10 ? "0" + Seconds : Seconds) + " ";
 		}
 
-		Strophe.Strophe.log = function(level, msg){
-			// console.log(ts(), level, msg);
-		};
 
-		if (value) {
-			Strophe.Strophe.Connection.prototype.rawOutput = function(data){
-				try{
-					console.group("%csend # " + ts(), "color: blue; font-size: large");
-					console.log("%c" + data, "color: blue");
-					console.groupEnd();
-				}
-				catch(e){
-					console.log(e);
-				}
-			};
-		}else{
-			Strophe.Strophe.Connection.prototype.rawOutput = function(){};
-		}
+		// if (value) {
+		// 	Strophe.Strophe.Connection.prototype.rawOutput = function(data){
+		// 		try{
+		// 			console.group("%csend # " + ts(), "color: blue; font-size: large");
+		// 			console.log("%c" + data, "color: blue");
+		// 			console.groupEnd();
+		// 		}
+		// 		catch(e){
+		// 			console.log(e);
+		// 		}
+		// 	};
+		// }else{
+		// 	Strophe.Strophe.Connection.prototype.rawOutput = function(){};
+		// }
 		
 	}
 }
@@ -438,17 +436,19 @@ WebIM.EmojiObj2={
 
 
 // wx.connectSocket({url: WebIM.config.xmppURL, method: "GET"})
-
+// console.log(websdk)
 WebIM.conn = mpvue_Mode === 'WX'? new WebIM.connection({
+	appKey: WebIM.config.appkey,
 	isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
-	https: WebIM.config.https,
-	url: WebIM.config.xmppURL,
+	https: typeof WebIM.config.https === "boolean" ? WebIM.config.https : location.protocol === "https:",
+	url: WebIM.config.socketServer,
 	apiUrl: WebIM.config.apiURL,
-	isAutoLogin: true,
-	heartBeatWait: WebIM.config.heartBeatWait,
+	isAutoLogin: false,
+	heartBeatWait: WebIM.config.heartBeatWait, //WebIM.config.heartBeatWait,
 	autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
 	autoReconnectInterval: WebIM.config.autoReconnectInterval,
-    appKey: WebIM.config.appkey,
+	isDebug: WebIM.config.isDebug,
+	deviceId: WebIM.config.deviceId
 
 }): new websdk.connection({
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
@@ -469,5 +469,5 @@ WebIM.conn = mpvue_Mode === 'WX'? new WebIM.connection({
 // WebIM.conn.listen({
 //   onOpened: () => dispatch({type: Types.ON_OPEND})
 // })
-
+// console.log(WebIM)
 export default WebIM

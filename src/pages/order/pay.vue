@@ -10,7 +10,7 @@
         <i class="icon right" v-if="PayMode==0">&#xe633;</i>
       </li>
       <li :class="{action:PayMode==1}" @click="selectPayMode(1)">
-        <img class="wx" src="/static/img/wx.png" mode="aspectFit">
+        <img class="wx" src="/static/img/wx.png" mode="aspectFit" />
         <i class="icon right" v-if="PayMode==1">&#xe633;</i>
       </li>
       <!-- <li :class="{action:PayMode==2}" @click="selectPayMode(2)">
@@ -35,7 +35,7 @@
             <a class="countDown" @click="countDown">{{countDownStr}}</a>
           </p>
           <div class="blocks">
-            <input type="number" maxlength="4" v-model="code" focus="’true’" auto-focus="’true’">
+            <input type="number" maxlength="4" v-model="code" focus="’true’" auto-focus="’true’" />
             <div class="block">
               <span v-if="!code.length" class="cursor"></span>
               <span v-if="code.length">{{code[0]}}</span>
@@ -118,6 +118,31 @@ export default {
           }
         }
       } else if (this.PayMode == 1) {
+        if (!this.UserInfo.openid) {
+          //弹出提示框
+          that.modal({
+            title: "您还未登录",
+            content: "您还未使用微信登录，请登录后再使用微信支付",
+            confirm: () => {
+              wx.login({
+                success: obj => {
+                  if (obj.errMsg.indexOf("login:ok") > -1) {
+                    that.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                      if (rep.ret == 0) {
+                        // console.log(rep);
+                        var _u = {...this.UserInfo , ...rep.data.result}
+                        that.$store.commit("SetUserInfo", _u);//清空userinfo
+                      }
+                    });
+                  }
+                }
+              });
+            },
+            confirmText:"微信登录"
+          });
+          return false;
+        }
+
         var rep = await this.$ShoppingAPI.Order_Pay({
           OrderId: this.OrderId,
           Type: 1,
@@ -141,36 +166,40 @@ export default {
               //   })
               //   .then(rep => {
               //   });
-              
+
               //场景值scene=1037 则返回调用过来的商家小程序
               let options = await that.launchOptions;
-              if(options&&options.scene==1037)
-              {
-                  wx.navigateBackMiniProgram({
-                    extraData: {
-                    OrderId:this.OrderId,
+              if (options && options.scene == 1037) {
+                wx.navigateBackMiniProgram({
+                  extraData: {
+                    OrderId: this.OrderId,
                     success: "true",
-                    msg:"支付成功"
+                    msg: "支付成功"
                   },
                   success(res2) {
                     // 返回成功
-                    console.log(res2)
+                    console.log(res2);
                   }
-                  })
-              }else
-              {
+                });
+              } else {
                 //弹出提示框
-                that.modal("支付成功","您已支付成功,请稍后检查订单状态。",
-                ()=>{
-                  that.go({ path: "/pages/order/index", reLaunch: true });
-                },
-                ()=>{
-                  that.go({ path: "/pages/order/index", reLaunch: true });
+                that.modal({
+                  title: "支付成功",
+                  content: "您已支付成功,请稍后检查订单状态。",
+                  confirm: () => {
+                    that.go({ path: "/pages/order/index", reLaunch: true });
+                  },
+                  cancel: () => {
+                    that.go({ path: "/pages/order/index", reLaunch: true });
+                  }
                 });
               }
             },
             fail: function(res) {
-              that.toast( res.errMsg || res.err_desc||"支付失败")
+              if(res.errMsg == "requestPayment:fail cancel")
+                return
+              else
+                that.toast(res.errMsg || res.err_desc || "支付失败");
             }
           };
           // console.log(payData);
@@ -203,14 +232,13 @@ export default {
       UserInfo: state => state.User.UserInfo
     })
   },
-  async onShow(){
-    //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket, 
+  async onShow() {
+    //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket,
     //2.订单则传递到query.OrderId
     let options = await this.launchOptions;
-    
+
     // console.log(options)
-    if(options&&options.referrerInfo&&options.referrerInfo.extraData&&options.referrerInfo.extraData.SingleTicket)
-      this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
+    if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
   },
   async mounted() {
     if (this.$route.query && this.$route.query.OrderId) {

@@ -1,5 +1,5 @@
 <template>
-    <span class="chatmsg">
+    <span class="chatmsg" v-if="msgdata">
         <img :src="emojiPath+msgdata.data" v-if="msgdata.type=='emoji'">
         <span v-else-if="msgdata.type=='txt'">{{ msgdata.data}}</span>
     </span>
@@ -16,11 +16,14 @@ export default {
         }
         
     },
+    mounted(){
+        // console.log(this.msgdata)
+    }
 }
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .chatmsg{
-    line-height: 0.4rem;
+    // line-height: 0.4rem;
     font-size: 0.4rem;
     img{
         width: 0.48rem;

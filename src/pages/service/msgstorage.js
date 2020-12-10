@@ -128,11 +128,13 @@ msgStorage.saveReceiveMsg = function(receiveMsg, type){
 };
 msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 	//console.log('sendableMsgsendableMsg', sendableMsg)
+	debugger
+
 	let me = this;
 	let myName = utils.getItem("myUsername");
 	let sessionKey;
-	// 仅用作群聊收消息，发消息没有 receiveMsg
-	if(receiveMsg && receiveMsg.type == "groupchat"){
+	// 仅用作群聊、聊天室接收消息，发消息没有 receiveMsg
+	if(receiveMsg && (receiveMsg.type == "groupchat"|| receiveMsg.type == "chatroom")){
 		sessionKey = receiveMsg.to + myName;
 	}
 	// 群聊发 & 单发 & 单收

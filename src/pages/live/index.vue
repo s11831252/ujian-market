@@ -22,6 +22,8 @@
 // is no need to assign it to a variable.
 // require('videojs-flash');
 // var videojs = require('ue-video-player');
+import {mapState} from 'vuex'
+import WebIM from "@/utils/hx/WebIM";
 
 export default {
     // components:{
@@ -43,14 +45,32 @@ export default {
 			// }
         }
     },
+    computed:{
+        ...mapState({
+            UserInfo: state => state.User.UserInfo
+        })
+    },
     methods:{
-        async joinRoom(item){
-            var res2 = await this.$ShoppingAPI.AppServer_JoinRoom(this.UserInfo.UserName,this.$route.query.roomId)
-            if(res2.ret==0&&res2.data)
-            {
-                    that.go({path:'/pages/live/room',query:{roomId:item.id}})
-            }
-            
+        joinRoom(item){
+            var that =  this;
+                //进入直播间
+            // WebIM.conn.joinChatRoom({ roomId: item.id}).then((res) => {
+            //     console.log(res)
+            // })  
+            WebIM.conn.joinChatRoom({
+                roomId: item.id,
+                success : async(msg)=>{
+                    console.log("加入直播间成功",msg)
+                    var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName,item.id)
+                    if(res2.ret==0)
+                    {
+                        that.$router.push({path:'/pages/live/room',query:{roomId:item.id}})
+                    }
+                },
+                error(msg){
+                    console.log("加入直播间失败",msg)
+                }
+            })
         },
         statechange(e) {
             console.log('live-player code:', e)

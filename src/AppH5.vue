@@ -74,13 +74,7 @@ export default {
         //连接成功回调
         // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
         // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
-        // 则无需调用conn.setPresence();
-        // WebIM.conn.setPresence();
-        console.log(WebIM.conn)
         WebIM.conn.getGroup({
-          // apiUrl: 'https://a1.easemob.com',
-          // pagenum: 1,                                 // 页数
-          // pagesize: 20,                               // 每页个数
           success: function(resp) {
             utils.setItem("listGroup", resp.data);
             utils.setItem("myUsername", WebIM.conn.context.userId);
@@ -88,6 +82,7 @@ export default {
           },
           error: function(e) {
             console.log("error:", e);
+            that.hideLoading();
           }
         });
       },

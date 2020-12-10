@@ -53,9 +53,9 @@ export default function(sendableMsg, type, myName){
 		else if(type==msgType.LOCATION)
 		{
 			return {
-				lat: sendableMsg.body.body.lat,
-				lng: sendableMsg.body.body.lng,
-				addr:sendableMsg.body.body.addr
+				lat: sendableMsg.body.lat,
+				lng: sendableMsg.body.lng,
+				addr:sendableMsg.body.addr
 			};
 
 		}
