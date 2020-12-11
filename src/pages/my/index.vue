@@ -81,11 +81,12 @@ export default {
   methods: {
     exit() {
         this.$ShoppingAPI.User_wxExit(this.UserInfo.openid,this.UserInfo.unionid)
-      this.$store.commit("Login", { Ticket: "" }); //清空Ticket
-      this.$store.commit("SetUserInfo", {});//清空userinfo
-      utils.removeItem("myUsername");
-      WebIM.conn.close();//环信IM关闭
-      this.$router.push("/pages/index/index"); //回到登录页
+        this.$store.commit("Login", { Ticket: "" }); //清空Ticket
+        this.$store.commit("SetUserInfo", {});//清空userinfo
+        utils.removeItem("myUsername");
+        if(WebIM.conn.isOpened())
+            WebIM.conn.close(); //环信IM关闭
+        this.$router.push("/pages/index/index"); //回到登录页
     },
     outShopping(){
         console.log(this.ShoppingInfo);

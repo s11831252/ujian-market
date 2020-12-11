@@ -112,20 +112,30 @@ Vue.mixin({
                                 }
                             }
                         }
-                        if (callback)
-                            callback()
+                        callback&&callback()
                     }
                 });
             } else {
                 if(this.$store.state.User.UserInfo.errcode!=-1)
                 {
-                    var rep = await this.$ShoppingAPI.User_Get();
-                    if (rep.ret == 0)
-                        this.$store.commit("SetUserInfo", rep.data);
-                    this.hx_login();
-                }
-                if (callback)
-                    callback();
+                        // 调用wx登录接口
+                    wx.login({
+                        success:async (obj) => {
+                            if (obj.errMsg.indexOf("login:ok") > -1) {
+                                var rep = await that.$ShoppingAPI.Account_wxLogin(obj.code, parms.InvitaId)
+                                if (rep.ret == 0) {
+                                    var rep2 = await this.$ShoppingAPI.User_Get();
+                                    if (rep2.ret == 0)
+                                    {
+                                        this.$store.commit("SetUserInfo", {...rep.data.result,...rep2.data});
+                                        this.hx_login();
+                                    }
+                                }
+                            }
+                            callback&&callback()
+                        }
+                    });
+                }else callback&&callback()
             }
         },
         hx_login() {

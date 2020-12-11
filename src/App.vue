@@ -208,8 +208,8 @@ export default {
     if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
       console.log("onShow:", opt);
       console.log("logined status:", this.$store.getters.Logined);
-      if (this.$store.getters.Logined){
-        return false
+      // if (this.$store.getters.Logined){
+      //   return false
         // this.modal({
         //   title : "是否切换登录信息", 
         //   content :"您已登录'U建商城',可选择使用跳转前小程序的登录信息", 
@@ -221,14 +221,14 @@ export default {
         //       WebIM.conn.close(); //环信IM关闭
         //   },
         // })
-      }
-      else {
+      // }
+      // else {
         this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
         this.$store.commit("SetUserInfo", {}); //清空userinfo
         utils.removeItem("myUsername");
         if(WebIM.conn.isOpened())
           WebIM.conn.close(); //环信IM关闭
-      }
+      // }
     }
   },
   onLoad(){

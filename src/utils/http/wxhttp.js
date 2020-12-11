@@ -6,7 +6,9 @@ let bmobConfig={
     restApiKey:""
 }
 const net = {
+  showAuthModal:true,
   get(url, data) {
+    var that = this;
     wx.showLoading({
       title: '加载中',//数据请求前loading，提高用户体验
       mask:true
@@ -38,29 +40,46 @@ const net = {
           {
             if(res.data.ret==10000||res.data.ret==10001||res.data.ret==10002)
             {
-              // store.state.User.SingleTicket="";
-              // store.state.User.UserInfo={};
+              if(!that.showing)
+                wx.hideLoading(); 
+              //防止多个请求弹出授权提示框
+              if(!that.showAuthModal)
+                return;
+              that.showAuthModal=false;
+
               store.commit("Login", { Ticket: "" }); //清空Ticket
               store.commit("SetUserInfo", {});//清空userinfo
 
-              var pages = getCurrentPages();    //获取加载的页面
-              var currentPage = pages[pages.length-1];    //获取当前页面的对象
-              var url = `/pages/index/index?redirect=/${currentPage.route}`;    //当前页面url
+              wx.showModal({
+                confirmText:"去登陆",
+                title:"登录授权已失效",
+                content:"您当前的登录授权信息已失效或已过期,请尝试重新登录",
+                success (res2) {
+                  if (res2.confirm) {
+                    var pages = getCurrentPages();    //获取加载的页面
+                    var currentPage = pages[pages.length-1];    //获取当前页面的对象
+                    var url = `/pages/index/index?redirect=/${currentPage.route}`;    //当前页面url
 
-              //拼接页面参数
-              var parms=[];
-              for(var key in currentPage.options)
-              {
-                parms.push(`${key}=${currentPage.options[key]}`);
-              }
-              if(parms.length>0)
-              {
-                //url转码
-                var parmsStr = parms.join("&")
-                let encodeparms = encodeURIComponent(`?${parmsStr}`);
-                url=url+encodeparms;
-              }
-              wx.redirectTo({url:url});
+                    //拼接页面参数
+                    var parms=[];
+                    for(var key in currentPage.options)
+                    {
+                      parms.push(`${key}=${currentPage.options[key]}`);
+                    }
+                    if(parms.length>0)
+                    {
+                      //url转码
+                      var parmsStr = parms.join("&")
+                      let encodeparms = encodeURIComponent(`?${parmsStr}`);
+                      url=url+encodeparms;
+                    }
+                    wx.redirectTo({url:url});
+                  } else if (res2.cancel) {
+
+                  }
+                }
+              })
+              return false;
             }else if(res.data.ret!=0)
             {
               if(res.data.msg)
@@ -71,6 +90,7 @@ const net = {
               return false;
             }
           }
+          that.showAuthModal=true;
           resolve(res.data);
         },
         fail: function (error) {
