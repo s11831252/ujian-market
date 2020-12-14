@@ -134,7 +134,7 @@ Vue.mixin({
                 });
             }else
             {
-                if(this.$store.state.User.UserInfo.errcode!=-1)
+                if(this.$store.state.User.UserInfo.errcode!=-1&& !this.$store.state.User.UserInfo.openid)
                 {
                         // 调用wx登录接口
                     wx.login({
