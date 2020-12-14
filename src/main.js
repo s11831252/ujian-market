@@ -112,30 +112,36 @@ Vue.mixin({
                                 }
                             }
                         }
-                        callback&&callback()
+                        callback && callback()
                     }
                 });
             } else {
-                if(this.$store.state.User.UserInfo.errcode!=-1)
-                {
-                        // 调用wx登录接口
+                console.log(this.$store.state.User.UserInfo)
+                if (this.$store.state.User.UserInfo.errcode != -1 && !this.$store.state.User.UserInfo.openid) {
+                    // 调用wx登录接口
                     wx.login({
-                        success:async (obj) => {
+                        success: async (obj) => {
                             if (obj.errMsg.indexOf("login:ok") > -1) {
                                 var rep = await that.$ShoppingAPI.Account_wxLogin(obj.code, parms.InvitaId)
                                 if (rep.ret == 0) {
                                     var rep2 = await this.$ShoppingAPI.User_Get();
-                                    if (rep2.ret == 0)
-                                    {
-                                        this.$store.commit("SetUserInfo", {...rep.data.result,...rep2.data});
+                                    if (rep2.ret == 0) {
+                                        this.$store.commit("SetUserInfo", { ...rep.data.result, ...rep2.data });
                                         this.hx_login();
                                     }
                                 }
                             }
-                            callback&&callback()
+                            callback && callback()
                         }
                     });
-                }else callback&&callback()
+                } else {
+                    var rep2 = await this.$ShoppingAPI.User_Get();
+                    if (rep2.ret == 0) {
+                        this.$store.commit("SetUserInfo", { ...rep.data.result, ...rep2.data });
+                        this.hx_login();
+                    }
+                    callback && callback()
+                }
             }
         },
         hx_login() {
