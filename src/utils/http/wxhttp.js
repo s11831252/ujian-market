@@ -6,7 +6,9 @@ let bmobConfig={
     restApiKey:""
 }
 const net = {
+  showAuthModal:true,
   get(url, data) {
+    var that = this;
     wx.showLoading({
       title: '加载中',//数据请求前loading，提高用户体验
       mask:true
@@ -120,6 +122,7 @@ const net = {
     })
   },
   post(url, data) {
+    var that = this;
     wx.showLoading({
       title: '加载中',
       mask:true
