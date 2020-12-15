@@ -160,15 +160,17 @@ export default {
       onOffline: function() {}, //本机网络掉线
       onError: function(message) {
         console.log("环信Error:",message)
-        that.modal({
-            title:"连接失败",
-            content:"聊天服务连接失败,您可重连或稍后重试",
-            confirm:()=>{
-              that.hx_login()
-            },
-            confirmText:"重连"
-          })
-            return;
+        if(message.type==208)
+        {
+          that.modal({
+              title:"连接失败",
+              content:"聊天服务连接失败,您可尝试重连",
+              confirm:()=>{
+                that.hx_login()
+              },
+              confirmText:"重连"
+            })
+        }
       }, //失败回调
       onReceivedMessage: function(message) {}, //收到消息送达服务器回执
       onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
@@ -236,38 +238,6 @@ export default {
   },
   mounted(){
     //同上
-  },
-  onShow (opt) {
-    //1.从其他小程序(U建+、商家独立小程序)跳转到U建行业市场小程序使用功能(微信支付、联系客服、查看商家、查看商品),通过此处获取其他小程序传递过来的用户票据SingleTicket,
-    //2.店铺传递sId,商品传递gId,订单则传递OrderId,均通过 this.$route.query.xxx获取
-    //3.可以使用次微信api单独获取 let options = wx.getLaunchOptionsSync();
-    //4.可以在onShow、onLaunch回调中获取
-    let options = opt;
-    if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
-      console.log("onShow:", opt);
-      console.log("logined status:", this.$store.getters.Logined);
-      // if (this.$store.getters.Logined){
-      //   return false
-        // this.modal({
-        //   title : "是否切换登录信息", 
-        //   content :"您已登录'U建商城',可选择使用跳转前小程序的登录信息", 
-        //   confirm:()=>{
-        //     this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
-        //     this.$store.commit("SetUserInfo", {}); //清空userinfo
-        //     utils.removeItem("myUsername");
-        //     if(WebIM.conn.isOpened())
-        //       WebIM.conn.close(); //环信IM关闭
-        //   },
-        // })
-      // }
-      // else {
-        this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
-        this.$store.commit("SetUserInfo", {}); //清空userinfo
-        utils.removeItem("myUsername");
-        if(WebIM.conn.isOpened())
-          WebIM.conn.close(); //环信IM关闭
-      // }
-    }
   },
   onLoad(){
     //同上

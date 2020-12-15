@@ -192,6 +192,7 @@ export default {
   async mounted() {
 
     let that = this;
+    this.extraDataHandler();
     this.wx_login(async ()=>{
       this.activeIndex = 0;
       this.Tabs = [

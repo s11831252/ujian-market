@@ -11,6 +11,7 @@ import HXAPI from "./api/HXAPI"
 import { debug } from 'util';
 import WebIM from "@/utils/hx/WebIM";
 import md5 from "@/utils/md5";
+import utils from "@/utils/index.js";
 
 //在实例中用this.$xxx调用封装好的RestAPI
 Vue.prototype.$UJAPI = UJAPI; 
@@ -73,6 +74,23 @@ Vue.mixin({
         hideLoading(){
             wx.hideLoading();
         },
+        extraDataHandler() {
+            //1.从其他小程序(U建+、商家独立小程序)跳转到U建行业市场小程序使用功能(微信支付、联系客服、查看商家、查看商品),通过此处获取其他小程序传递过来的用户票据SingleTicket,
+            //2.店铺传递sId,商品传递gId,订单则传递OrderId,均通过 this.$route.query.xxx获取
+            //3.可以使用次微信api单独获取 let options = wx.getLaunchOptionsSync();
+            //4.可以在onShow、onLaunch回调中获取
+            let options = this.launchOptions;
+            if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
+                console.log("isOtherApp",this.$store.state.User.UserInfo)
+                if(this.$store.state.User.UserInfo.isOtherApp)//传递过来的授权票据已失效或已过期时,会有可能重复执行,在这里判断跳出
+                    return
+                console.log("extraDataHandler:", this.launchOptions);
+                console.log("logined status:", this.$store.getters.Logined);
+                this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
+                this.$store.commit("SetUserInfo", {isOtherApp:true}); //清空userinfo,写入一个变量用来判断是其他小程序跳转,后续重新获取用户信息后再移除
+                utils.removeItem("myUsername");
+            }
+        },
         modal(opt){
             console.log(opt)
             var { title="", content="提示内容", confirm, cancel,confirmText="确定",confirmColor="#12b7f5",cancelColor="#989898" } = opt;
@@ -103,6 +121,7 @@ Vue.mixin({
             }
             if(!(this.$store.state.User.SingleTicket&&this.$store.state.User.SingleTicket.length>0))//没有SingleTicket尝试登录 
             {
+                console.log("no login action wxlogin")
                 // 调用wx登录接口
                 wx.login({
                     success:async (obj) => {
@@ -118,6 +137,8 @@ Vue.mixin({
                                             var userinfo = res.data;
                                             var _u = { ...rep.data.result, ...userinfo }
                                             that.$store.commit("SetUserInfo", _u);
+                                            if(WebIM.conn.isOpened())
+                                                WebIM.conn.close(); //环信IM关闭
                                             that.hx_login();
                                         }
                                     } else {
@@ -132,11 +153,12 @@ Vue.mixin({
                         callback&&callback()
                     }
                 });
-            }else
+            }else if(this.$store.state.User.UserInfo.isOtherApp)
             {
-                if(this.$store.state.User.UserInfo.errcode!=-1&& !this.$store.state.User.UserInfo.openid)
-                {
-                        // 调用wx登录接口
+                // if(this.$store.state.User.UserInfo.errcode!=-1&& !this.$store.state.User.UserInfo.openid)
+                // {
+                    console.log("isOtherApp action wxlogin")
+                    // 调用wx登录接口
                     wx.login({
                         success:async (obj) => {
                             if (obj.errMsg.indexOf("login:ok") > -1) {
@@ -146,18 +168,28 @@ Vue.mixin({
                                     if (rep2.ret == 0)
                                     {
                                         this.$store.commit("SetUserInfo", {...rep.data.result,...rep2.data});
+                                        if(WebIM.conn.isOpened())
+                                            WebIM.conn.close(); //环信IM关闭
                                         this.hx_login();
                                     }
                                 }
                             }
                             callback&&callback()
+                        },
+                        fail(){
+                            callback&&callback()
                         }
                     });
-                }else callback&&callback()
+                // }else 
+                callback&&callback()
+            }else
+            {
+                console.log("logined action wxlogin")
+                this.hx_login();
+                callback&&callback()
             }
         },
         hx_login(){
-            // console.log("hx_login:",this.$store.state,this.$store.state.User.UserInfo)
             if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
                 if(WebIM.conn.isOpened())
                     return

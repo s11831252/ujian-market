@@ -141,6 +141,7 @@ export default {
     });
    },
   async mounted() {
+    this.extraDataHandler();
     if (this.$route.query && this.$route.query.sId && this.$route.query.gId) {
           this.sId = this.$route.query.sId;
           this.gId = this.$route.query.gId;

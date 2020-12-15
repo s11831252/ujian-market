@@ -91,7 +91,7 @@ const net = {
                       let encodeparms = `?${parmsStr}`;
                       url=url+encodeparms;
                     }
-                    store.commit("SetUserInfo", {});//清空userinfo
+                    // store.commit("SetUserInfo", {});//清空userinfo
                     wx.redirectTo({url:url});
                   }
                 }
@@ -203,7 +203,7 @@ const net = {
                       let encodeparms = `?${parmsStr}`;
                       url=url+encodeparms;
                     }
-                    store.commit("SetUserInfo", {});//清空userinfo
+                    // store.commit("SetUserInfo", {});//清空userinfo
                     wx.redirectTo({url:url});
                   }
                 }

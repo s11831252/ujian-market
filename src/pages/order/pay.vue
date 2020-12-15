@@ -235,13 +235,16 @@ export default {
     })
   },
   async mounted() {
-    if (this.$route.query && this.$route.query.OrderId) {
-      this.OrderId = this.$route.query.OrderId;
-      var rep = await this.$ShoppingAPI.Order_Get({ OrderId: this.OrderId });
-      if (rep.ret == 0) {
-        this.OrderInfo = rep.data[0];
+     this.extraDataHandler();
+     this.wx_login(async ()=>{
+      if (this.$route.query && this.$route.query.OrderId) {
+        this.OrderId = this.$route.query.OrderId;
+        var rep = await this.$ShoppingAPI.Order_Get({ OrderId: this.OrderId });
+        if (rep.ret == 0) {
+          this.OrderInfo = rep.data[0];
+        }
       }
-    }
+     })
   }
 };
 </script>
