@@ -1,6 +1,9 @@
 <template>
   <div v-if="roomInfo" class="root">
     <live-player :src="roomInfo.livePushUrl" mode="live" autoplay @statechange="statechange" @error="error" class="live-play" />
+    <div class="top-tool">
+       <div @click="showMember=true" class="people_num">{{roomInfo.affiliations_count}}人</div>
+    </div>
     <div class="chart-container">
       <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" v-if="isMP">
         <div class="top">欢迎您进入直播间</div>
@@ -30,6 +33,19 @@
         <i class="icon gift">&#xe651;</i>
       </div>
     </div>
+    <div class="modal" v-if="showMember">
+      <div class="mask" @click.stop="showMember=false"></div>
+      <span class="title">观众</span>
+
+      <div class="member-list">
+        <scroll-view scroll-into-view="" enable-flex="true" scroll-y="true">
+          <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
+            <img :src="item.Portrait">
+            <span>{{item.UserName}}</span>
+          </div>
+        </scroll-view>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -48,6 +64,7 @@ export default {
       roomInfo: null,
       toView:"",
       ChatHistory:[],
+      showMember:false
     };
   },
   components:{
@@ -202,7 +219,17 @@ export default {
             break;
           case 'leaveChatRoom':
             // 退出聊天室
-            break;
+            {
+                var memberInfo =  this.roomInfo.affiliations.find(item=>{
+                  return item.member==msg.from||item.owner==msg.from
+                });
+                if(!memberInfo)
+                {
+                   var _index = this.roomInfo.affiliations.indexOf(memberInfo);
+                   this.roomInfo.affiliations.splice(_index,1)
+                }
+              break;
+            }
           case 'memberJoinChatRoomSuccess':
             // 加入聊天室
             {
@@ -249,6 +276,25 @@ body {
     width: 100%;
     height: 100%;
     z-index: 1;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  .top-tool{
+    position:fixed;
+    top: 0.3rem;
+    right: 0.3rem;
+    background-color: transparent;
+    z-index: 9;
+    color: #fff;
+    display: flex;
+    .people_num{
+      background-color: rgba(255, 255, 255, 0.6);
+      border-radius:0.5rem;
+      // border: 0.02rem solid #fff;
+      height: 0.8rem;
+      line-height: 0.8rem;
+      padding:0 0.4rem;
+      letter-spacing:0.02rem;
+    }
   }
   .chart-container {
     position: fixed;
@@ -310,6 +356,43 @@ body {
       }
     }
 
+  }
+  .modal{
+    position: absolute;
+    bottom: 0;
+    // display: flex;
+    width: 100%;
+    height: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 888;
+    color: #ffffff;
+    .mask{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+    }
+    .title{
+      width: 100%;
+      padding-left: 0.4rem 0 0 0.4rem;
+    }
+    .member-list{
+      .item{
+        display: flex;
+        align-items:center;
+        margin: 0.2rem 0;
+        img{
+          width: 0.8rem;
+          height: 0.8rem;
+          border-radius: 50%;
+          margin-right: 0.3rem;
+        }
+      }
+    }
+  }
+  .modal.show{
+    display: block;
   }
 }
 </style>
