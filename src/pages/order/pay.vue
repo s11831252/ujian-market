@@ -232,22 +232,17 @@ export default {
       UserInfo: state => state.User.UserInfo
     })
   },
-  async onShow() {
-    //1.从商家小程序跳转到U建行业市场小程序进行微信支付,此处通过小程序api获取启动时商家小程序传递过来的用户票据SingleTicket,
-    //2.订单则传递到query.OrderId
-    let options = await this.launchOptions;
-
-    // console.log(options)
-    if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
-  },
   async mounted() {
-    if (this.$route.query && this.$route.query.OrderId) {
-      this.OrderId = this.$route.query.OrderId;
-      var rep = await this.$ShoppingAPI.Order_Get({ OrderId: this.OrderId });
-      if (rep.ret == 0) {
-        this.OrderInfo = rep.data[0];
+     this.extraDataHandler();
+     this.wx_login(async ()=>{
+      if (this.$route.query && this.$route.query.OrderId) {
+        this.OrderId = this.$route.query.OrderId;
+        var rep = await this.$ShoppingAPI.Order_Get({ OrderId: this.OrderId });
+        if (rep.ret == 0) {
+          this.OrderInfo = rep.data[0];
+        }
       }
-    }
+    });
   }
 };
 </script>

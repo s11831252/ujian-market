@@ -209,6 +209,7 @@ export default {
   async mounted() {
     console.log("mounted",this.$route.query)
     let that = this;
+    this.extraDataHandler();
     this.wx_login(async () => {
       this.activeIndex = 0;
       this.Tabs = [

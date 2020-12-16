@@ -46,7 +46,7 @@ const net = {
               that.showAuthModal=false;
 
               store.commit("Login", { Ticket: "" }); //清空Ticket
-              store.commit("SetUserInfo", {});//清空userinfo
+              // store.commit("SetUserInfo", {});//清空userinfo
 
               wx.showModal({
                 confirmText:"去登陆",

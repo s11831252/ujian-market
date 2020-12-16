@@ -148,6 +148,7 @@ export default {
           if(this.$route.query.sName)
             this.sName= decodeURI(this.$route.query.sName);
     }
+    this.extraDataHandler();
      this.wx_login(async ()=>{
         if(this.gId)
         {
