@@ -668,17 +668,27 @@ export default {
             console.log("queryRoomInfo成功", resp);
             if(resp.statusCode&&resp.statusCode==200)
             {
-              var dencode_str = decodeURIComponent(resp.data.data[0].description);
-              var server_desc_obj = JSON.parse(dencode_str)
-              server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-              server_desc_obj.buyer = that.desc_obj.buyer
-              server_desc_obj.store = that.desc_obj.store
-              var json_obj = JSON.stringify(server_desc_obj);
-              json_obj = json_obj.replace(" ", "") //处理空格
-              that.$API2.groupChat_ModifyDescription(
-                that.chatRoomInfo.roomId,
-                json_obj.replace(/\//g, "#") //处理斜杠
-              );
+              try{
+                var dencode_str = decodeURIComponent(resp.data.data[0].description);
+                var server_desc_obj = JSON.parse(dencode_str)
+                server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
+                server_desc_obj.buyer = that.desc_obj.buyer
+                server_desc_obj.store = that.desc_obj.store
+                var json_obj = JSON.stringify(server_desc_obj);
+                json_obj = json_obj.replace(" ", "") //处理空格
+                that.$API2.groupChat_ModifyDescription(
+                  that.chatRoomInfo.roomId,
+                  json_obj.replace(/\//g, "#") //处理斜杠
+                );
+              }catch(e){
+               var desc = JSON.stringify(that.desc_obj);
+                desc = desc.replace(/\//g, "#"); //处理斜杠
+                that.$API2.groupChat_ModifyDescription(
+                  that.chatRoomInfo.roomId,
+                  desc 
+                );
+              }
+
             }
           },
           error: function(msg) {

@@ -83,6 +83,8 @@ Vue.mixin({
             let options = this.launchOptions;
             if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
                 console.log("isOtherApp",this.$store.state.User.UserInfo)
+                if(options.referrerInfo.extraData.SingleTicket==this.$store.state.User.SingleTicket)//跳转过来票据相同,在这里判断跳出
+                    return
                 if(this.$store.state.User.UserInfo.isOtherApp)//传递过来的授权票据已失效或已过期时,会有可能重复执行,在这里判断跳出
                     return
                 console.log("extraDataHandler:", this.launchOptions);
@@ -154,7 +156,7 @@ Vue.mixin({
                         callback&&callback()
                     }
                 });
-            }else if(this.$store.state.User.UserInfo.isOtherApp)
+            }else if(this.$store.state.User.UserInfo.isOtherApp&&!this.$store.state.User.UserInfo.openid)
             {
                 // if(this.$store.state.User.UserInfo.errcode!=-1&& !this.$store.state.User.UserInfo.openid)
                 // {
@@ -186,8 +188,8 @@ Vue.mixin({
             }else
             {
                 console.log("logined action wxlogin")
+                callback&&await callback()
                 this.hx_login();
-                callback&&callback()
             }
         },
         hx_login(){
