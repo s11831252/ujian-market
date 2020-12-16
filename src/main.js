@@ -69,6 +69,7 @@ Vue.mixin({
         },
         showLoading(opt){
             var obj ={mask:true, ...opt};
+            console.log(obj)
             wx.showLoading(obj);
         },
         hideLoading(){
@@ -137,9 +138,6 @@ Vue.mixin({
                                             var userinfo = res.data;
                                             var _u = { ...rep.data.result, ...userinfo }
                                             that.$store.commit("SetUserInfo", _u);
-                                            if(WebIM.conn.isOpened())
-                                                WebIM.conn.close(); //环信IM关闭
-                                            that.hx_login();
                                         }
                                     } else {
                                         that.$store.commit("SetUserInfo", rep.data.result);
@@ -147,7 +145,10 @@ Vue.mixin({
                                 }
                             }
                         }
-                        callback&&callback()
+                        callback&&await callback()
+                        if(WebIM.conn.isOpened())
+                            WebIM.conn.close(); //环信IM关闭
+                        that.hx_login();
                     },
                     fail(){
                         callback&&callback()
@@ -168,20 +169,20 @@ Vue.mixin({
                                     if (rep2.ret == 0)
                                     {
                                         this.$store.commit("SetUserInfo", {...rep.data.result,...rep2.data});
-                                        if(WebIM.conn.isOpened())
-                                            WebIM.conn.close(); //环信IM关闭
-                                        this.hx_login();
                                     }
                                 }
                             }
-                            callback&&callback()
+                            callback&&await callback()
+                            if(WebIM.conn.isOpened())
+                                WebIM.conn.close(); //环信IM关闭
+                            that.hx_login();
                         },
                         fail(){
                             callback&&callback()
                         }
                     });
                 // }else 
-                callback&&callback()
+                // callback&&callback()
             }else
             {
                 console.log("logined action wxlogin")

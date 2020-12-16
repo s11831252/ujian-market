@@ -107,6 +107,7 @@ const net = {
               return false;
             }
           }
+
           resolve(res.data);
         },
         fail: function (error) {
@@ -115,8 +116,8 @@ const net = {
           reject(error);//请求失败
         },
         complete: function () {
+          // console.log("wx.request complete")
           wx.hideLoading();
-          // complete
         }
       })
     })

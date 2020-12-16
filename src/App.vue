@@ -176,65 +176,66 @@ export default {
       onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
       onReadMessage: function(message) {}, //收到消息已读回执
       onPresence: function(msg){
-      console.log("onPresence",msg)
-      switch(msg.type){
-      case 'rmChatRoomMute':
-        // 解除聊天室一键禁言
-        break;
-      case 'muteChatRoom':
-        // 聊天室一键禁言
-        break;
-      case 'rmUserFromChatRoomWhiteList':
-        // 删除聊天室白名单成员
-        break;
-      case 'addUserToChatRoomWhiteList':
-        // 增加聊天室白名单成员
-        break;
-      case 'deleteFile':
-        // 删除聊天室文件
-        break;
-      case 'uploadFile':
-        // 上传聊天室文件
-        break;
-      case 'deleteAnnouncement':
-        // 删除聊天室公告
-        break;
-      case 'updateAnnouncement':
-        // 更新聊天室公告
-        break;
-      case 'removeMute':
-        // 解除禁言
-        break;
-      case 'addMute':
-        // 禁言
-        break;
-      case 'removeAdmin':
-        // 移除管理员
-        break;
-      case 'addAdmin':
-        // 添加管理员
-        break;
-      case 'changeOwner':
-        // 转让聊天室
-        break;
-      case 'leaveChatRoom':
-        // 退出聊天室
-        break;
-      case 'memberJoinChatRoomSuccess':
-        // 加入聊天室
-        break;
-      case 'leave':
-        // 退出群
-        break;
-      case 'join':
-        // 加入群
-        break;
-      default:
-        break;
-    }}
+        console.log("onPresence",msg)
+        switch(msg.type){
+          case 'rmChatRoomMute':
+            // 解除聊天室一键禁言
+            break;
+          case 'muteChatRoom':
+            // 聊天室一键禁言
+            break;
+          case 'rmUserFromChatRoomWhiteList':
+            // 删除聊天室白名单成员
+            break;
+          case 'addUserToChatRoomWhiteList':
+            // 增加聊天室白名单成员
+            break;
+          case 'deleteFile':
+            // 删除聊天室文件
+            break;
+          case 'uploadFile':
+            // 上传聊天室文件
+            break;
+          case 'deleteAnnouncement':
+            // 删除聊天室公告
+            break;
+          case 'updateAnnouncement':
+            // 更新聊天室公告
+            break;
+          case 'removeMute':
+            // 解除禁言
+            break;
+          case 'addMute':
+            // 禁言
+            break;
+          case 'removeAdmin':
+            // 移除管理员
+            break;
+          case 'addAdmin':
+            // 添加管理员
+            break;
+          case 'changeOwner':
+            // 转让聊天室
+            break;
+          case 'leaveChatRoom':
+            // 退出聊天室
+            break;
+          case 'memberJoinChatRoomSuccess':
+            // 加入聊天室
+            break;
+          case 'leave':
+            // 退出群
+            break;
+          case 'join':
+            // 加入群
+            break;
+          default:
+            break;
+        }
+      }
       // ......
     });
-    this.hx_login();
+    // this.hx_login();
   },
   mounted(){
     //同上
