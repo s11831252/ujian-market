@@ -167,7 +167,6 @@ Vue.mixin({
                 console.log("logined action wxlogin")
                 callback && await callback()
                 this.hx_login();
-                callback && callback()
             }
         },
         hx_login() {
