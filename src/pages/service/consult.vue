@@ -24,13 +24,8 @@
         <div v-if="isMP" class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
         <div v-else class="icon" :class="chattype=='more'?'focus':''" @click="pending(null,`多媒体`)">&#xe726;</div>
       </div>
-      <div v-if="chattype=='audio'" class="recorderbox" :class="{'action':recording}" @touchstart="openRecorder" @touchend="closeRecorder">
-        <swiper>
-          <swiper-item>
-            <i class="icon">&#xe648;</i>
-            <p>{{recording?'录音中':'长按开始录音'}}</p>
-          </swiper-item>
-        </swiper>
+      <div v-if="chattype=='audio'">
+        <recordInput :recordSuccess="recordSuccess"></recordInput>
       </div>
       <div v-if="chattype=='emoji'" class="emojibox">
         <swiper class="swiper" indicator-dots="true" v-if="isMP">
@@ -84,6 +79,7 @@ import WebIM from "@/utils/hx/WebIM";
 import msgStorage from "./msgstorage";
 import msgType from "./msgtype";
 import scrollContainer from './scrollcontainer'
+import recordInput from './record' 
 export default {
   data() {
     return {
@@ -99,13 +95,13 @@ export default {
       toView: "",
       chattype: "chat",
       EmojiObj2: {},
-      recording: false,
       desc_obj:{}
     };
   },
   components: {
     chatItem,
-    scrollContainer
+    scrollContainer,
+    recordInput
   },
   computed: {
     ...mapState({
@@ -115,9 +111,6 @@ export default {
     to() {
       if (this.chatRoomInfo) return this.chatRoomInfo.groupid;
       else return null;
-    },
-    recorderManager() {
-      return wx.getRecorderManager();
     },
     sessionKey(){
       if(this.chatRoomInfo&&this.chatRoomInfo.groupid)
@@ -185,88 +178,8 @@ export default {
         this.chattype = type;
       }
     },
-    openRecorder() {
-      var that = this;
-      this.recorderManager.onStart(() => {
-        console.log("recorder start");
-        this.recording = true;
-      });
-      this.recorderManager.onPause(() => {
-        console.log("recorder pause");
-      });
-      this.recorderManager.onStop(res => {
-        console.log("recorder stop", res);
-        const { tempFilePath } = res;
-        if (res.duration < 1000) 
-        {
-          this.toast("录音时间太短");
-        }else
-        {
-          this.upLoadFile([res], msgType.AUDIO);
-        }
-      });
-      this.recorderManager.onFrameRecorded(res => {
-        const { frameBuffer } = res;
-        console.log("frameBuffer.byteLength", frameBuffer.byteLength);
-      });
-
-      executeRecord();
-      function executeRecord() {
-        wx.getSetting({
-          success: res => {
-            let recordAuth = res.authSetting["scope.record"];
-            if (recordAuth == false) {
-              //已申请过授权，但是用户拒绝
-              wx.openSetting({
-                success: function(res) {
-                  let recordAuth = res.authSetting["scope.record"];
-                  if (recordAuth == true) {
-                    that.toast({
-                      title: "授权成功",
-                      icon: "success"
-                    });
-                  } else {
-                    that.toast({
-                      title: "请授权录音",
-                      icon: "none"
-                    });
-                  }
-                }
-              });
-            } else if (recordAuth == true) {
-              // 用户已经同意授权
-              const options = {
-                duration: 10000,
-                sampleRate: 44100,
-                numberOfChannels: 2,
-                encodeBitRate: 192000,
-                format: "wav",
-                frameSize: 50
-              };
-              that.recorderManager.start(options);
-            } else {
-              // 第一次进来，未发起授权
-              wx.authorize({
-                scope: "scope.record",
-                success: () => {
-                  //授权成功
-                  that.toast({
-                    title: "授权成功",
-                    icon: "success"
-                  });
-                }
-              });
-            }
-          },
-          fail: function() {
-            that.toast("鉴权失败，请重试");
-          }
-        });
-      }
-    },
-    closeRecorder() {
-      this.recording = false;
-      this.recorderManager.stop();
+    recordSuccess(res){
+      this.upLoadFile([res], msgType.AUDIO)
     },
     emojiInput(emoji) {
       // console.log(item,item2)
@@ -835,24 +748,6 @@ page{
   }
 }
 
-.recorderbox {
-  margin: 0 auto;
-  text-align: center;
-  padding: 1rem;
-  z-index: 101;
-  i,
-  p {
-    margin: 0 auto;
-    width: auto;
-  }
-  i {
-    font-size: 2rem;
-    font-weight: bold;
-  }
-}
-.recorderbox.action {
-  color: #12b7f5;
-}
 
 .emojibox {
   height: auto;

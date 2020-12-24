@@ -128,7 +128,6 @@ msgStorage.saveReceiveMsg = function(receiveMsg, type){
 };
 msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 	//console.log('sendableMsgsendableMsg', sendableMsg)
-	debugger
 
 	let me = this;
 	let myName = utils.getItem("myUsername");
