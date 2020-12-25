@@ -61,7 +61,8 @@ export default {
                 roomId: item.id,
                 success : async(msg)=>{
                     console.log("加入直播间成功",msg)
-                    var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName,item.id)
+                    //保存加入人信息
+                    var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName,that.UserInfo.Portrait)
                     if(res2.ret==0)
                     {
                         that.$router.push({path:'/pages/live/room',query:{roomId:item.id}})
@@ -80,8 +81,13 @@ export default {
         }
     },
     async mounted(){
-        var res = await this.$ShoppingAPI.appserver_Ongoing({limit:10,video_type:"live"})
-        this.rooms = res.data.entities
+        var that = this;
+
+        this.wx_login(async ()=>{
+            var res = await that.$ShoppingAPI.appserver_Ongoing({limit:10,video_type:"live"})
+            that.rooms = res.data.entities
+        })
+
     }
 }
 </script>

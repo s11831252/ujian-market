@@ -252,5 +252,8 @@ export default {
     AppServer_JoinRoom:(UserName,portrait)=>{
         return http.post(BaseHost + `api/AppServer/JoinRoom?UserName=${UserName}&portrait=${portrait}`)
     },
-    
+    //获取直播间礼物列表
+    AppServer_GetGiftList:()=>{
+        return http.get(BaseHost + `api/AppServer/GetGiftList`)
+    },
 }

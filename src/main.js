@@ -191,13 +191,12 @@ Vue.mixin({
         }
     },
     onLoad() {
-        // var that = this;
-        // debugger;
-        // if (this.$initData$) {
-        //   Object.assign(this, JSON.parse(this.$initData$))
-        // } else {
-        //   this.$initData$ = JSON.stringify(this.$data)
-        // }
+        var that = this;
+        if (this.$initData$) {
+          Object.assign(this, JSON.parse(this.$initData$))
+        } else {
+          this.$initData$ = JSON.stringify(this.$data)
+        }
     },
     onUnload() {
         if (this.$options.data)

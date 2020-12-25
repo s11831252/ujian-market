@@ -76,7 +76,7 @@ var config = {
      * Whether to console.log
      * @parameter {Boolean} true or false
      */
-    isDebug: true,
+    isDebug: false,
     /**
      * will auto connect the websocket server autoReconnectNumMax times in background when client is offline.
      * won't auto connect if autoReconnectNumMax=0.

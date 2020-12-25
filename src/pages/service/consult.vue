@@ -138,7 +138,7 @@ export default {
           msg: this.msg,
           from: WebIM.conn.context.userId,
           to: this.to,
-          roomType: true,
+          // roomType: true,
           chatType: "groupchat",
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
@@ -230,7 +230,7 @@ export default {
                       body: body,
                       from: WebIM.conn.context.userId,
                       to: me.to,
-                      roomType: true,
+                      // roomType: true,
                       chatType: "groupchat",
                       success: function(argument) {
                         // disp.fire('em.chat.sendSuccess', id);
@@ -309,7 +309,7 @@ export default {
                       },
                       from: WebIM.conn.context.userId,
                       to: me.to,
-                      roomType: true,
+                      // roomType: true,
                       chatType: "groupchat",
                       success: function(argument) {
                         // disp.fire('em.chat.sendSuccess', id);
@@ -365,7 +365,7 @@ export default {
                   },
                   from: WebIM.conn.context.userId,
                   to: me.to,
-                  roomType: true,
+                  // roomType: true,
                   chatType: "groupchat",
                   success: function(argument) {
                     // disp.fire('em.chat.sendSuccess', id);
@@ -448,7 +448,6 @@ export default {
             msg: "",
             from: WebIM.conn.context.userId,
             to: that.to,
-            roomType: false,
             lng: res.longitude,
             lat: res.latitude,
             addr: res.name,
@@ -457,7 +456,7 @@ export default {
               name: res.name,
               address: res.address
             },
-            roomType: true,
+            // roomType: true,
             chatType: "groupchat",
             success(argument) {
               // disp.fire('em.chat.sendSuccess', id);

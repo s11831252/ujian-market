@@ -3,6 +3,7 @@ import { mapActions  } from "vuex";
 import utils from "@/utils/index.js";
 import WebIM from "@/utils/hx/WebIM";
 import msgStorage from "./pages/service/msgstorage";
+import disp from "./utils/hx/broadcast";
 import msgType from "./pages/service/msgtype";
 import './assets/style.css';
 import './assets/global.css';
@@ -186,11 +187,11 @@ export default {
       onReadMessage: function(message) {}, //收到消息已读回执
       onPresence: function(msg){
         console.log("onPresence",msg)
-        msgStorage.fire('onPresence',msg);
+        disp.fire('onPresence',msg);
       },
       onCustomMessage: function(msg){
-        console.log(msg)
-        msgStorage.fire('newCustomMessage',msg);
+        console.log("onCustomMessage",msg)
+        disp.fire('newCustomMessage',msg);
       }
       // ......
     });

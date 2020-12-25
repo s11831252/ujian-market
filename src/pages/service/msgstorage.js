@@ -128,7 +128,6 @@ msgStorage.saveReceiveMsg = function(receiveMsg, type){
 };
 msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 	//console.log('sendableMsgsendableMsg', sendableMsg)
-
 	let me = this;
 	let myName = utils.getItem("myUsername");
 	let sessionKey;
@@ -179,11 +178,12 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 
 	save();
 	function save(){
-		utils.setItem(sessionKey,curChatMsg)
+		if(!sendableMsg.body.roomType)
+			utils.setItem(sessionKey,curChatMsg)
 		if (type == msgType.AUDIO || type == msgType.VIDEO) {
 			disp.fire('em.chat.audio.fileLoaded');
 		}
-		me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey);
+		me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey,receiveMsg);
 	}
 };
 
