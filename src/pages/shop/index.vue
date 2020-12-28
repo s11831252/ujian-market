@@ -208,6 +208,21 @@ export default {
         if (rep.ret == 0) {
           this.shopDetail = rep.data;
           // this.Tabs[1].name += `(${this.shopDetail.CommentCount})`; //绑定评价数量
+
+           //获取店铺商品
+          this.$ShoppingAPI.Goods_GetByShop({ sId: this.shopDetail.sId }).then(rep3=>{
+            if (rep3.ret == 0) {
+              this.shopGoods = rep3.data;
+            }
+          }).then(()=>{
+            this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.shopDetail.sId }).then(rep2=>{
+              if (rep2.ret == 0) {
+                this.GoodsType = rep2.data;
+                this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
+                this.changeGoodsType(this.GoodsType[0].TypeId);
+              }
+            }); //获取店铺商品分类
+          });
           if (this.isMP)
           {
             wx.setNavigationBarTitle({ title: this.shopDetail.sName });
@@ -221,17 +236,6 @@ export default {
             });
           }
           this.viewHistory_push({sId:this.shopDetail.sId,sLogo:this.shopDetail.sLogo,sName:this.shopDetail.sName})
-        }
-        
-        var rep3 = await this.$ShoppingAPI.Goods_GetByShop({ sId: this.shopDetail.sId }); //获取店铺商品
-        if (rep3.ret == 0) {
-          this.shopGoods = rep3.data;
-        }
-        var rep2 = await this.$ShoppingAPI.CustomGoodsType_Get({ sId: this.shopDetail.sId }); //获取店铺商品分类
-        if (rep2.ret == 0) {
-          this.GoodsType = rep2.data;
-          this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
-          this.changeGoodsType(this.GoodsType[0].TypeId);
         }
       }
     })

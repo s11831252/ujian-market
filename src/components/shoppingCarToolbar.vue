@@ -48,9 +48,21 @@ export default {
     data(){
       return {
         showed:false,
+        emplist:[]
       };
     },
   computed: {
+    isShopEmployee(){
+      console.log(this.emplist,this.UserInfo)
+      if(this.emplist&&this.emplist.length>0)
+      {
+        var empItem =  this.emplist.find(item=>{
+          return item.UserId==this.UserInfo.UserId;
+        })
+        return empItem!=null;
+      }else
+        return false;
+    },
     getShoppingCarBysId(){
       var shopCar =this.$store.getters.getShoppingCarBysId(this.sId);
       if(shopCar)
@@ -72,7 +84,8 @@ export default {
       return this.$store.getters.getShoppingCarCountBysId(this.sId);
     },
     ...mapState({
-      Config: state => state.Global.Config      
+      Config: state => state.Global.Config,
+      UserInfo: state => state.User.UserInfo      
     })
   },
   components:{
@@ -89,6 +102,11 @@ export default {
       var that = this;
       if(this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId)
       {
+        if(this.isShopEmployee)
+        {
+          this.toast("您是该店管理员，无法咨询自己店铺。")
+          return;
+        }
         if(!WebIM.conn.isOpened())
         {
           this.modal({
@@ -124,6 +142,18 @@ export default {
           })
 
       }
+    }
+  },
+  mounted(){
+    let that = this;
+    if(this.$store.getters.Logined)
+    {
+      this.$ShoppingAPI.ShopEmployee_Get(this.sId).then(res=>{
+        if(res.ret==0)
+        {
+          that.emplist =  res.data;
+        }
+      })
     }
   }
 };

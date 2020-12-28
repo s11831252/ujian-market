@@ -92,7 +92,8 @@ var routes = [
         name: 'my',
         config: {
             navigationBarTitleText: '我的',
-            enablePullDownRefresh: true
+            enablePullDownRefresh: true,
+            disableScroll: true
           },
     },
     {
@@ -212,7 +213,8 @@ var routes = [
         name:'consult',
         config: {
             navigationBarTitleText: '商家名称',
-            enablePullDownRefresh: false
+            enablePullDownRefresh: false,
+            disableScroll: true
         },
     },
     {

@@ -82,13 +82,12 @@ Vue.mixin({
             //4.可以在onShow、onLaunch回调中获取
             let options = this.launchOptions;
             if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
-                console.log("isOtherApp",this.$store.state.User.UserInfo)
                 if(options.referrerInfo.extraData.SingleTicket==this.$store.state.User.SingleTicket)//跳转过来票据相同,在这里判断跳出
                     return
                 if(this.$store.state.User.UserInfo.isOtherApp)//传递过来的授权票据已失效或已过期时,会有可能重复执行,在这里判断跳出
                     return
                 console.log("extraDataHandler:", this.launchOptions);
-                console.log("logined status:", this.$store.getters.Logined);
+                console.log("logined status:", this.$store.state.User);
                 this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
                 this.$store.commit("SetUserInfo", {isOtherApp:true}); //清空userinfo,写入一个变量用来判断是其他小程序跳转,后续重新获取用户信息后再移除
                 utils.removeItem("myUsername");
