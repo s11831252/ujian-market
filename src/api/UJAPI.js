@@ -16,5 +16,8 @@ export default {
     },
     GetKeyword:param=>{
         return http.get(BaseHost+ "api/CommonInfo/GetKeyword",param) 
-     }
+    },
+     Error_upload:param=>{
+        return http.post(BaseHost+ "api/Error/upload",param) 
+    }
 }

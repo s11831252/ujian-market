@@ -1,5 +1,5 @@
 <template>
-    <div class="page">
+    <div class="page" v-if="goods_detail">
         <swipeWeb :swiperData="good_images"></swipeWeb>
         <div class="goods">
             <div class="goods-info">
@@ -57,7 +57,7 @@
                 <div v-else class="goods-detail-content" style="font-size:initial;" v-html="goods_detail.gDetailed"></div>
             </div>
         </div>
-        <shoppingCar :sId="sId" :sName="sName"></shoppingCar>
+        <shoppingCar :sId="sId" v-if="sId" :sName="sName"></shoppingCar>
     </div>
 </template>
 <script>
@@ -73,11 +73,7 @@ export default {
       sId: "",
       sName: "",
       gId: "",
-      goods_detail: {
-        Price:"",
-        MarketingPrice:"",
-        Stock:"",
-      },
+      goods_detail: null,
       selectItem_index: 0
     };
   },

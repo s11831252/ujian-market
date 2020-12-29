@@ -170,13 +170,23 @@ export default {
       onOffline: function() {}, //本机网络掉线
       onError: function(message) {
         console.log("环信Error:",message)
-        if(message.type==208)
+        that.$UJAPI.Error_upload({
+          ApplicationName: "U建行业市场小程序",
+          ErrorThread: "环信ERROR",
+          ErrorClassName: "App.VUE",
+          ErrorMsg: JSON.stringify(message),
+          ErrorType: message.type,
+        });
+        if(message.type==206||message.type==8||message.type==16)
         {
           that.modal({
               title:"连接失败",
-              content:"聊天服务连接失败,您可尝试重连",
+              content:"聊天服务已断开,您可尝试重连",
               confirm:()=>{
                 that.hx_login()
+              },
+              cancel:()=>{
+                
               },
               confirmText:"重连"
             })
