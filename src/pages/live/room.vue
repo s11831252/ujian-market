@@ -1,7 +1,13 @@
 <template>
   <div v-if="roomInfo" class="root">
-    <live-player :src="roomInfo.livePushUrl" mode="live" autoplay @statechange="statechange" @error="error" class="live-play" />
+    <live-player :src="roomInfo.livePushUrl[0]" mode="live" autoplay @statechange="statechange" @error="error" class="live-play" />
+    <ul class="otherPush">
+        <li v-for="(iten,index) in otherPush" :key="index">
+              <live-player :src="iten" mode="live" autoplay @statechange="statechange" @error="error" class="other-play" />
+        </li>
+      </ul>
     <div class="top-tool">
+      <div class="room_name">{{roomInfo.name}}</div>
       <div @click="showMember=true" class="people_num">{{roomInfo.affiliations.length}}人</div>
     </div>
     <div class="chart-container">
@@ -9,12 +15,21 @@
         <div class="top">欢迎您进入直播间</div>
         <!-- <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem> -->
         <div class="chat-item" v-for="(item,index) in ChatHistory" :key="index" :id="item.mid">
-          <div>{{item.ext.nickName}} </div>
           <!-- <chatMsg :msgData="item"></chatMsg> -->
-          <span class="txt_praise" v-if="item.msg.type=='chatroom_praise'"> 给主播点了{{item.msg.customExts.num}}个赞</span>
-          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_join'">加入直播间</span>
+          <span class="txt_praise" v-if="item.msg.type=='chatroom_praise'">
+            <span>{{item.ext.nickName}}</span>
+            给主播点了{{item.msg.customExts.num}}个赞
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_join'">
+            <span>{{item.ext.nickName}}</span>加入直播间
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_gift'">
+            收到
+            <span>{{item.ext.nickName}}送出的{{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}个</span>
+          </span>
           <div v-else>
-            ：<chatMsg v-for="(item,index2) in item.msg.data" :key="index2" :msgdata="item"></chatMsg>
+            <span>{{item.ext.nickName}} ：</span>
+            <chatMsg v-for="(item,index2) in item.msg.data" :key="index2" :msgdata="item"></chatMsg>
           </div>
         </div>
         <div id="end"></div>
@@ -31,13 +46,12 @@
         </div>
         <i class="icon exit" @click="exitLiveRoom">&#xe609;</i>
         <i class="icon praise" @click="giveLike">&#xe619;</i>
-        <i class="icon gift">&#xe651;</i>
+        <i class="icon gift" @click="showGift=true">&#xe651;</i>
       </div>
     </div>
     <div class="modal" v-if="showMember">
       <div class="mask" @click.stop="showMember=false"></div>
       <span class="title">观众</span>
-
       <div class="member-list">
         <scroll-view scroll-into-view enable-flex="true" scroll-y="true">
           <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
@@ -45,6 +59,24 @@
             <span>{{item.UserName}}</span>
           </div>
         </scroll-view>
+      </div>
+    </div>
+    <div class="modal" v-if="showGift">
+      <div class="mask" @click.stop="showGift=false"></div>
+      <span class="title">
+        <span class="txt">礼物</span>
+        <span class="close icon" @click="showGift=false">&#xe613;</span>
+      </span>
+      <scroll-view class="gift-list" scroll-into-view enable-flex="true" scroll-y="true">
+        <div class="item" :class="{action:item.giftId==selectGift.giftId}" v-for="(item,index) in giftList" :key="index" @click="selectGift=item">
+          <img :src="item.giftUrl" />
+          <span>{{item.giftName}}</span>
+          <span>{{item.giftPoints}}煎饼</span>
+        </div>
+      </scroll-view>
+      <div class="bottom-box">
+        <span class="txt">{{livePoints}}煎饼</span>
+        <button @click="sendGiftMsg(1);showGift=false;">赠送</button>
       </div>
     </div>
   </div>
@@ -67,7 +99,11 @@ export default {
       toView: "",
       ChatHistory: [],
       showMember: false,
-      textMsg:""
+      giftList: [],
+      showGift: false,
+      textMsg: "",
+      selectGift: {},
+      livePoints:0
     };
   },
   components: {
@@ -82,6 +118,19 @@ export default {
     sessionKey() {
       if (this.roomInfo && this.roomInfo.id) return this.roomInfo.id + WebIM.conn.context.userId;
       else return "";
+    },
+    mainPush(){
+      if(this.roomInfo&&this.roomInfo.livePushUrl&&this.roomInfo.livePushUrl.length>0)
+        return this.roomInfo.livePushUrl[0];
+      else
+        return null;
+    },
+    otherPush(){
+      if(this.roomInfo&&this.roomInfo.livePushUrl&&this.roomInfo.livePushUrl.length>0)
+        return this.roomInfo.livePushUrl.slice(1);
+        // return [this.roomInfo.livePushUrl[0],this.roomInfo.livePushUrl[0]]
+      else
+        return [];
     }
   },
   methods: {
@@ -92,56 +141,50 @@ export default {
       console.error("live-player error:", e);
     },
     //读取消息
-    readMsg(renderableMsg, type, currentChatMsg, sessionKey,msg) {
+    readMsg(renderableMsg, type, currentChatMsg, sessionKey, msg) {
       // console.log(renderableMsg, type, currentChatMsg, sessionKey,msg)
-      if(msg)
-      {
+      if (msg) {
         var memberInfo = this.roomInfo.affiliations.find(item => {
-            return item.member == msg.from || item.owner == msg.from;
+          return item.member == msg.from || item.owner == msg.from;
         });
-        if(memberInfo)
-        {
-          if(renderableMsg)renderableMsg.ext.nickName=memberInfo.UserName
+        if (memberInfo) {
+          if (renderableMsg) renderableMsg.ext.nickName = memberInfo.UserName;
         }
       }
 
-      if (renderableMsg) 
-       this.ChatHistory.push(renderableMsg);
-      // else if (currentChatMsg) 
+      if (renderableMsg) this.ChatHistory.push(renderableMsg);
+      // else if (currentChatMsg)
       //  this.ChatHistory = currentChatMsg;
-      if(this.ChatHistory&&this.ChatHistory.length>0)
-        this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
+      if (this.ChatHistory && this.ChatHistory.length > 0) this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
     },
 
-  //发送普通消息
-  sendMsg() {
-    let self = this;
-    if(this.textMsg)
-    {
-      let roomId = this.roomInfo.id
-      let from = WebIM.conn.context.userId;
-      let id = WebIM.conn.getUniqueId();                 // 生成本地消息id
-      let msg = new WebIM.message('txt', id);      // 创建文本消息
-      msg.set({
-        msg: this.textMsg,                            // 消息内容
-        to: roomId,
-        from,
-        roomType: true,
-        ext: { nickName: this.UserInfo.UserName },                                 //扩展消息
-        success: function (id, serverMsgId) {
-          console.log('send private text Success',msg);
-          msgStorage.saveMsg(msg, "txt");
-          self.textMsg="";
-        },
-        fail: function (e) {
-          console.log("Send private text error");
-        }
-      });
-      msg.setGroup('groupchat');
-      WebIM.conn.send(msg.body);
-    }
-
-  },
+    //发送普通消息
+    sendMsg() {
+      let self = this;
+      if (this.textMsg) {
+        let roomId = this.roomInfo.id;
+        let from = WebIM.conn.context.userId;
+        let id = WebIM.conn.getUniqueId(); // 生成本地消息id
+        let msg = new WebIM.message("txt", id); // 创建文本消息
+        msg.set({
+          msg: this.textMsg, // 消息内容
+          to: roomId,
+          from,
+          roomType: true,
+          ext: { nickName: this.UserInfo.UserName }, //扩展消息
+          success: function(id, serverMsgId) {
+            console.log("send private text Success", msg);
+            msgStorage.saveMsg(msg, "txt");
+            self.textMsg = "";
+          },
+          fail: function(e) {
+            console.log("Send private text error", e);
+          }
+        });
+        msg.setGroup("groupchat");
+        WebIM.conn.send(msg.body);
+      }
+    },
     // 发点赞消息
     giveLike() {
       let self = this;
@@ -153,28 +196,26 @@ export default {
         to: roomId,
         roomType: true,
         customEvent: "chatroom_praise",
-        customExts: { note: "点赞" },
+        customExts: { note: "点赞", num: 1 },
         params: { num: 1 },
-        success: ()=> {
-            console.log("send private text Success",msg);
-            var renderableMsg = {
-              info: {
-                from: from,
-                to: msg.body.to
-              },
-              username: from == WebIM.conn.context.userId ? msg.body.to : from,
-              yourname: from,
-              msg: {
-                type: msg.body.customEvent,
-                customExts: msg.body.customExts,
-                ext: msg.body.ext
-              },
-              ext: msg.body.ext,
-              time: msg.body.time,
-              mid: msg.body.customEvent + msg.body.id,
-              chatType: msg.body.contentsType
-            };
-            self.readMsg(renderableMsg,msg.body.customEvent, null, this.sesskey);
+        success: () => {
+          console.log("send private text Success", msg);
+          var renderableMsg = {
+            info: {
+              from: from,
+              to: msg.body.to
+            },
+            msg: {
+              type: msg.body.customEvent,
+              customExts: msg.body.customExts,
+              ext: msg.body.ext
+            },
+            ext: msg.body.ext,
+            time: msg.body.time,
+            mid: msg.body.customEvent + msg.body.id,
+            chatType: msg.body.contentsType
+          };
+          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sesskey);
         },
         fail: function() {},
         ext: { nickName: this.UserInfo.UserName },
@@ -183,153 +224,253 @@ export default {
       msg.setGroup("groupchat");
       WebIM.conn.send(msg.body);
     },
-
+    //发礼物消息
+    async sendGiftMsg(giftNum) {
+      let self = this;
+      let roomId = this.roomInfo.id;
+      let from = WebIM.conn.context.userId;
+      let id = WebIM.conn.getUniqueId();
+      let msg = new WebIM.message("custom", id);
+      msg.set({
+        to: roomId,
+        roomType: true,
+        customEvent: "chatroom_gift",
+        customExts: { id: self.selectGift.giftId, num: giftNum },
+        params: {id: self.selectGift.giftId, num: giftNum},
+        success: function() {
+          console.log("send private text Success",msg);
+          var renderableMsg = {
+            info: {
+              from: msg.body.from,
+              to: msg.body.to
+            },
+            msg: {
+              type: msg.body.customEvent,
+              customExts: {
+                giftUrl : self.selectGift.giftUrl,
+                giftId : self.selectGift.giftId,
+                num : giftNum,
+                giftName : self.selectGift.giftName,
+              }
+            },
+            ext: msg.body.ext,
+            time: msg.body.time,
+            mid: msg.body.customEvent + msg.id,
+            chatType: msg.body.contentsType
+          };
+          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sesskey);
+        },
+        fail: function() {},
+        ext: { nickName: self.UserInfo.UserName }
+      });
+      msg.setGroup("groupchat");
+      var res = await this.$ShoppingAPI.AppServer_SendGift(self.roomInfo.owner,self.selectGift.giftId,giftNum)
+      if(res.ret==0&&res.data)
+      {
+        WebIM.conn.send(msg.body);
+      }
+      
+    },
     // 退出直播间
     exitLiveRoom() {
       WebIM.conn.quitChatRoom({
         roomId: this.roomInfo.id,
         success: res => {
-          this.$router.replace({ path: "/pages/live/index" });
+          this.$router.back()
         },
         error: e => {
           console.log("退出失败", e);
         }
       });
     },
-    customMsgHanderler(msg){
+    //处理自定义消息回调
+    customMsgHanderler(msg) {
       var that = this;
-              var renderableMsg = {
-                info: {
-                  from: msg.from,
-                  to: msg.to
-                },
-                username: msg.from == WebIM.conn.context.userId ? msg.to : msg.from,
-                yourname: msg.from,
-                msg: {
-                  type: msg.customEvent,
-                  customExts: msg.customExts,
-                },
-                ext: msg.ext,
-                time: msg.time,
-                mid: msg.customEvent + msg.id,
-                chatType: msg.contentsType
-              };
-        switch (msg.customEvent) {
-          case "chatroom_praise": {
-            console.log("chatroom_praise", msg);
-            renderableMsg.msg ={
-                type: msg.customEvent,
-                customExts: msg.customExts,
-                ext: msg.ext
-            };
-            var memberInfo = this.roomInfo.affiliations.find(item => {
-              return item.member == msg.from || item.owner == msg.from;
-            });
-            if (memberInfo) {
-              renderableMsg.ext.nickName = memberInfo.UserName;
-            }
-            that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey,msg);
-            break;
+      var renderableMsg = {
+        info: {
+          from: msg.from,
+          to: msg.to
+        },
+        msg: {
+          type: msg.customEvent,
+          customExts: msg.customExts
+        },
+        ext: msg.ext,
+        time: msg.time,
+        mid: msg.customEvent + msg.id,
+        chatType: msg.contentsType
+      };
+      switch (msg.customEvent) {
+        case "chatroom_praise": {
+          renderableMsg.msg = {
+            type: msg.customEvent,
+            customExts: msg.customExts,
+            ext: msg.ext
+          };
+          var memberInfo = this.roomInfo.affiliations.find(item => {
+            return item.member == msg.from || item.owner == msg.from;
+          });
+          if (memberInfo) {
+            renderableMsg.ext.nickName = memberInfo.UserName;
           }
-          case "chatroom_gift": {
-            break;
-          }
-          case "chatroom_member_join": {
-            console.log("chatroom_member_join", that.roomInfo.affiliations);
-            var memberInfo = this.roomInfo.affiliations.find(item => {
-              return item.member == msg.from || item.owner == msg.from;
-            });
-
-            if (!memberInfo) {
-              that.roomInfo.affiliations.push({
-                Portrait: msg.customExts.avatar,
-                UserName: msg.customExts.nick,
-                member: msg.from,
-                owner: null
-              });
-
-              that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey,msg);
-              console.log("chatroom_member_join", that.roomInfo.affiliations);
-            }
-            break;
-          }
-          case "chatroom_member_video_call": {
-            //                 customExts:
-            // video_call: "rtmp://pullStreamUrl"
-            // video_call_status: "start"
-          }
-          default:
-            break;
+          that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
+          break;
         }
+        case "chatroom_gift": {
+          renderableMsg.msg = {
+            type: msg.customEvent,
+            customExts: msg.customExts,
+            ext: msg.ext
+          };
+          var memberInfo = this.roomInfo.affiliations.find(item => {
+            return item.member == msg.from || item.owner == msg.from;
+          });
+          if (memberInfo) {
+            renderableMsg.ext.nickName = memberInfo.UserName;
+          }
+          var gift = this.giftList.find(item => {
+            return item.giftId == msg.customExts.id;
+          });
+          if (gift) {
+            renderableMsg.msg.customExts.giftUrl = gift.giftUrl;
+            renderableMsg.msg.customExts.giftId = msg.customExts.id;
+            renderableMsg.msg.customExts.num = msg.customExts.num;
+            renderableMsg.msg.customExts.giftName = gift.giftName;
+          } else {
+          }
+          that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
+          break;
+        }
+        case "chatroom_member_join": {
+          var memberInfo = this.roomInfo.affiliations.find(item => {
+            return item.member == msg.from || item.owner == msg.from;
+          });
+
+          if (!memberInfo) {
+            that.roomInfo.affiliations.push({
+              Portrait: msg.customExts.avatar,
+              UserName: msg.customExts.nick,
+              member: msg.from,
+              owner: null
+            });
+
+            that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
+            // console.log("chatroom_member_join", that.roomInfo.affiliations);
+          }
+          break;
+        }
+        case "chatroom_member_video_call": {
+          // customExts:chatroom_member_video_call
+          // video_call: "rtmp://pullStreamUrl"
+          // video_call_status: "start"
+          //video_call_status: "end"
+          if(msg.customExts.video_call_status=="start")
+          {
+            that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.$route.query.roomId)
+            .then(res=>{
+              if(res.ret==0&&res.data)
+              {
+                for (let index = 0; index < res.data.livePushUrl.length; index++) {
+                  const element = res.data.livePushUrl[index];
+                  if(!~that.roomInfo.livePushUrl.indexOf(element))
+                  {
+                    that.roomInfo.livePushUrl.push(element)
+                  }
+                }
+              }
+            });
+
+          }else if(msg.customExts.video_call_status=="end")
+          {
+            that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.$route.query.roomId)
+            .then(res=>{
+              if(res.ret==0&&res.data)
+              {
+                
+                for (let index = 0; index < that.roomInfo.livePushUrl.length; index++) {
+                  const element = that.roomInfo.livePushUrl[index];
+                  let curTypeCbIdx = res.data.livePushUrl.indexOf(element)
+                  if(!~curTypeCbIdx)
+                  {
+                    that.roomInfo.livePushUrl.splice(curTypeCbIdx, 1);
+                  }
+                }
+              }
+            });
+
+          }
+        }
+        default:
+          break;
+      }
     },
-    presenceHanderler(msg){
+    //处理onPresence指令
+    presenceHanderler(msg) {
       var that = this;
       switch (msg.type) {
-          case "rmChatRoomMute":
-            // 解除聊天室一键禁言
-            break;
-          case "muteChatRoom":
-            // 聊天室一键禁言
-            break;
-          case "rmUserFromChatRoomWhiteList":
-            // 删除聊天室白名单成员
-            break;
-          case "addUserToChatRoomWhiteList":
-            // 增加聊天室白名单成员
-            break;
-          case "deleteFile":
-            // 删除聊天室文件
-            break;
-          case "uploadFile":
-            // 上传聊天室文件
-            break;
-          case "deleteAnnouncement":
-            // 删除聊天室公告
-            break;
-          case "updateAnnouncement":
-            // 更新聊天室公告
-            break;
-          case "removeMute":
-            // 解除禁言
-            break;
-          case "addMute":
-            // 禁言
-            break;
-          case "removeAdmin":
-            // 移除管理员
-            break;
-          case "addAdmin":
-            // 添加管理员
-            break;
-          case "changeOwner":
-            // 转让聊天室
-            break;
-          case "leaveChatRoom": // 退出聊天室
-          {
+        case "rmChatRoomMute":
+          // 解除聊天室一键禁言
+          break;
+        case "muteChatRoom":
+          // 聊天室一键禁言
+          break;
+        case "rmUserFromChatRoomWhiteList":
+          // 删除聊天室白名单成员
+          break;
+        case "addUserToChatRoomWhiteList":
+          // 增加聊天室白名单成员
+          break;
+        case "deleteFile":
+          // 删除聊天室文件
+          break;
+        case "uploadFile":
+          // 上传聊天室文件
+          break;
+        case "deleteAnnouncement":
+          // 删除聊天室公告
+          break;
+        case "updateAnnouncement":
+          // 更新聊天室公告
+          break;
+        case "removeMute":
+          // 解除禁言
+          break;
+        case "addMute":
+          // 禁言
+          break;
+        case "removeAdmin":
+          // 移除管理员
+          break;
+        case "addAdmin":
+          // 添加管理员
+          break;
+        case "changeOwner":
+          // 转让聊天室
+          break;
+        case "leaveChatRoom": { // 退出聊天室
+          console.log("leaveChatRoom", that.roomInfo.affiliations);
+          var memberInfo = this.roomInfo.affiliations.find(item => {
+            return item.member == msg.from || item.owner == msg.from;
+          });
+          if (memberInfo) {
+            var _index = that.roomInfo.affiliations.indexOf(memberInfo);
+            that.roomInfo.affiliations.splice(_index, 1);
             console.log("leaveChatRoom", that.roomInfo.affiliations);
-            var memberInfo = this.roomInfo.affiliations.find(item => {
-              return item.member == msg.from || item.owner == msg.from;
-            });
-            if (memberInfo) {
-              var _index = that.roomInfo.affiliations.indexOf(memberInfo);
-              that.roomInfo.affiliations.splice(_index, 1);
-              console.log("leaveChatRoom", that.roomInfo.affiliations);
-            }
-            break;
           }
-          case "memberJoinChatRoomSuccess": // 加入聊天室
-          {
-            break;
-          }
-          case "leave":
-            // 退出群
-            break;
-          case "join":
-            // 加入群
-            break;
-          default:
-            break;
+          break;
         }
+        case "memberJoinChatRoomSuccess": { // 加入聊天室
+          break;
+        }
+        case "leave":
+          // 退出群
+          break;
+        case "join":
+          // 加入群
+          break;
+        default:
+          break;
+      }
     }
   },
   onUnload() {
@@ -337,6 +478,9 @@ export default {
     disp.off("newCustomMessage", this.customMsgHanderler);
     disp.off("onPresence", this.presenceHanderler);
 
+      WebIM.conn.quitChatRoom({
+        roomId: this.$route.query.roomId,
+      });
   },
   async mounted() {
     var that = this;
@@ -344,16 +488,25 @@ export default {
       var res = await this.$ShoppingAPI.AppServer_LiveRoomsDetail(this.$route.query.roomId);
       if (res) {
         this.roomInfo = res.data;
-        
-        var res =  await this.$ShoppingAPI.AppServer_GetGiftList();
-        
+
+        this.$ShoppingAPI.AppServer_GetGiftList().then(response=>{
+          if (response.ret == 0&&response.data) {
+            this.giftList = response.data;
+          }
+        });
+
+        this.$ShoppingAPI.AppServer_GetPoints().then(response=>{
+          if (response.ret == 0&&response.data) {
+            this.livePoints = response.data;
+          }
+        })
         // var chatMsg = utils.getItem(this.sessionKey);
         // this.readMsg(null, null, chatMsg, this.sessionKey);
       }
       this.EmojiObj2 = WebIM.EmojiObj2;
       msgStorage.on("newChatMsg", this.readMsg);
       disp.on("newCustomMessage", this.customMsgHanderler);
-      disp.on("onPresence",this.presenceHanderler);
+      disp.on("onPresence", this.presenceHanderler);
     }
   }
 };
@@ -373,15 +526,38 @@ body {
     z-index: 1;
     background-color: rgba(0, 0, 0, 0.2);
   }
+  .otherPush{
+    position: absolute;
+    top: 1.4rem;
+    right: 0.3rem;
+    .other-play{
+      width: 2.3rem;
+      height: 2.5rem;
+      margin-bottom: 0.4rem;
+      z-index: 2;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
   .top-tool {
     position: fixed;
     top: 0.3rem;
-    right: 0.3rem;
     background-color: transparent;
     z-index: 9;
     color: #fff;
     display: flex;
+    width: 100%;
+    justify-content: space-between;
+    .room_name {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 0.5rem;
+      height: 0.8rem;
+      line-height: 0.8rem;
+      padding: 0 0.4rem;
+      letter-spacing: 0.02rem;
+      margin-left: 0.3rem;
+    }
     .people_num {
+      margin-right: 0.3rem;
       background-color: rgba(255, 255, 255, 0.6);
       border-radius: 0.5rem;
       // border: 0.02rem solid #fff;
@@ -457,7 +633,7 @@ body {
     // display: flex;
     width: 100%;
     height: 50%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(22, 24, 36, 1);
     z-index: 888;
     color: #ffffff;
     .mask {
@@ -469,19 +645,68 @@ body {
     }
     .title {
       width: 100%;
-      padding-left: 0.4rem 0 0 0.4rem;
+      margin: 0.51rem;
+      display: block;
+      .close {
+        float: right;
+        position: absolute;
+        right: 0.51rem;
+      }
     }
     .member-list {
       .item {
         display: flex;
         align-items: center;
         margin: 0.2rem 0;
+        margin-left: 0.3rem;
         img {
           width: 0.8rem;
           height: 0.8rem;
           border-radius: 50%;
           margin-right: 0.3rem;
         }
+      }
+    }
+    .gift-list {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-left: 0.3rem;
+      .item {
+        // margin: 0.1rem 0.36rem;
+        padding: 0.4rem 0.42rem 0.26rem 0.42rem;
+        text-align: center;
+        border: solid 0.04rem transparent;
+        border-radius: 0.4rem;
+        img {
+          width: 1.68rem;
+          height: 1.65rem;
+          display: block;
+        }
+      }
+      .item.action {
+        background-color: #2d1d29;
+        border-color: #362536;
+      }
+    }
+    .bottom-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.4rem;
+      padding: 0.29rem 0 0.42rem 0;
+      .txt {
+        margin-left: 0.5rem;
+      }
+      button {
+        color: #fff;
+        background-color: #2cacfc;
+        margin: 0;
+        line-height: auto;
+        padding: 0.32rem 0.56rem;
+        border-radius: 0.5rem;
+        font-size: 0.4rem;
+        margin-right: 0.34rem;
       }
     }
   }

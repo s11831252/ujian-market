@@ -98,7 +98,9 @@
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
-                        {{item.sName}}
+                        <span class="txt">{{item.sName}}
+                          <span class="liveroom" v-if="item.LiveRoomId"><i class="icon">&#xe723;</i><span>直播中</span></span>
+                        </span>
                         <span class="shop-item-info-distance">{{item.Distance}}</span>
                       </p>
                       <p class="shop-item-info-score">
@@ -341,7 +343,10 @@ export default {
       var param = {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
-        OrderType: tab.parm.OrderType
+        OrderType: tab.parm.OrderType,
+        isGood:false,
+        isDetail:false,
+        isLive:true
       };
       //赋值用户当前定位
       if (
@@ -382,18 +387,26 @@ export default {
       var param = {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
-        OrderType: tab.parm.OrderType
+        OrderType: tab.parm.OrderType,
+        isGood:false,
+        isDetail:false,
+        isLive:true
       };
       if (this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
         (param.Lon = this.CurrentLocation.longitude),
           (param.Lat = this.CurrentLocation.latitude);
       }
-      var rep = await this.unit(param);
-      if (rep.data || rep.data.length) {
-        this.ShopList.push.apply(this.ShopList, rep.data);
-      } else {
+      this.unit(param).then((rep)=>{
+        if (rep.ret==0 &&rep.data && rep.data.length) {
+          this.ShopList.push.apply(this.ShopList, rep.data);
+        } else {
+          tab.parm.hasPage = false;
+        }
+      }).catch(()=>{
         tab.parm.hasPage = false;
-      }
+        console.log("异常")
+      });
+
     }
   },
   created() {
@@ -757,6 +770,7 @@ $borderColor: #ecf0f1;
         padding-bottom: 0.46rem;
         border-bottom: 0.01rem solid #ecf0f1;
         font-size: 0;
+        display: flex;
         .shop-item-logo {
           // width: 25%;
           img {
@@ -768,24 +782,49 @@ $borderColor: #ecf0f1;
             border: 0.01rem solid #d7d7d7;
           }
         }
-        .shop-item-info-distance {
-          font-size: 0.36rem;
-          position: absolute;
-          right: 0;
-          color: #5c5c5c;
-        }
+
         .shop-item-info {
           padding-left: 0.33rem;
-          width: 66%;
-
+          // width: 66%;
+          flex-grow:2;
           .shop-item-info-name {
-            font-size: 0.44rem;
-            color: #021218;
+            display: flex;
+            justify-content: space-between;
+            align-items:center;
+            width: 100%;
             margin-bottom: 0.35rem;
-            width: 80%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+
+            .txt{
+              font-size: 0.44rem;
+              color: #021218;
+              // overflow-x: hidden;
+              // text-overflow: ellipsis;
+              // white-space: nowrap;
+              flex-grow:1;
+              .liveroom{
+                font-size: 0.32rem;
+                border-radius: 0.23rem;
+                .icon{
+                  display: inline-block;
+                  width: 0.46rem;
+                  line-height: 0.46rem;
+                  border-radius: 50%;
+                  background-color: #fc8749;
+                  color: #fff0ee;
+                }
+                padding-right: 0.23rem;
+                color: #fff;
+                background-color: #f85d4a;
+                display: inline-block;
+              }
+            }
+            .shop-item-info-distance {
+              flex-shrink:0;
+              font-size: 0.36rem;
+              // position: absolute;
+              // right: 0;
+              color: #5c5c5c;
+            }
           }
 
           .shop-item-info-score {

@@ -102,6 +102,7 @@ const net = {
                   title: res.data.msg,
                   icon: "none"
                 });
+              reject(res.data.msg)
               return false;
             }
           }

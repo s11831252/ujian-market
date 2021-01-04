@@ -256,4 +256,17 @@ export default {
     AppServer_GetGiftList:()=>{
         return http.get(BaseHost + `api/AppServer/GetGiftList`)
     },
+    //获取直播间礼物列表
+    AppServer_SendGift:(userId,giftId,Count)=>{
+        return http.post(BaseHost + `api/AppServer/SendGift?userId=${userId}&giftId=${giftId}&Count=${Count}`)
+    },
+    //获取积分用于兑换直播礼物
+    AppServer_GetPoints:()=>{
+        return http.get(BaseHost + `api/AppServer/GetPoints`)
+    },
+    //使用U建钱包余额购买礼物积分
+    AppServer_BuyPoints:(userId,giftId,Count)=>{
+        return http.get(BaseHost + `api/AppServer/BuyPoints`)
+    },
+    
 }

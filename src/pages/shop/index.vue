@@ -87,6 +87,10 @@
         </div>
       </div>
     </div>
+    <div class="live-room" v-if="shopDetail.LiveRoomId" @click="joinRoom(shopDetail.LiveRoomId)">
+      <i class="icon">&#xe723;</i>
+      <span class="txt">直播中</span>
+    </div>
     <shoppingCar :sId="sId" :sName="shopDetail.sName"></shoppingCar>
   </div>
 </template>
@@ -94,6 +98,8 @@
 import shoppingCar from "@/components/shoppingCarToolbar";
 import indexGoodDetail from "./index-good-detail";
 import { mapState, mapMutations } from "vuex";
+import WebIM from "@/utils/hx/WebIM";
+
 export default {
   data() {
     return {
@@ -141,6 +147,23 @@ export default {
     })
   },
   methods: {
+    joinRoom(id) {
+      var that = this;
+      WebIM.conn.joinChatRoom({
+        roomId: id,
+        success: async msg => {
+          console.log("加入直播间成功", msg);
+          //保存加入人信息
+          var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
+          if (res2.ret == 0) {
+            that.$router.push({ path: "/pages/live/room", query: { roomId: id } });
+          }
+        },
+        error(msg) {
+          console.log("加入直播间失败", msg);
+        }
+      });
+    },
     openLocation() {
       var that = this;
       // console.log(that.gcj02);
@@ -207,7 +230,7 @@ export default {
     });
   },
   async mounted() {
-    console.log("mounted",this.$route.query)
+    console.log("mounted", this.$route.query);
     let that = this;
     this.extraDataHandler();
     this.wx_login(async () => {
@@ -257,7 +280,7 @@ export default {
   padding-bottom: 65px;
   .shop-detail-head {
     background-color: #12b7f5;
-    padding: 20px 5px 0 10px;
+    padding: 0.64rem 0 0 0.29rem;
     color: #fff;
     .shop-detail-logo {
       width: 2.46rem;
@@ -281,9 +304,10 @@ export default {
       }
       .shop-detail-notice {
         font-size: 14px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        overflow-y: hidden;
+        height: 0.84rem;
+        // text-overflow: ellipsis;
+        // white-space: nowrap;
       }
       .shop-detail-statistics {
         font-size: 14px;
@@ -375,6 +399,31 @@ export default {
           margin: 0 0 0 5px;
         }
       }
+    }
+  }
+  .live-room {
+    position: absolute;
+    width: 1.33rem;
+    right: 0.3rem;
+    top: 1.6rem;
+    border-radius: 30%;
+    border: solid #8fc4d8 0.02rem;
+    background-color: rgba(160, 227, 251, 0.3);
+    text-align: center;
+    padding: 0.21rem 0.24rem 0.29rem 0.21rem;
+    .icon {
+      width: 0.62rem;
+      height: 0.62rem;
+      line-height: 0.62rem;
+      border-radius: 50%;
+      display: inline-block;
+      background-color: #fc8749;
+      color: #fff0ee;
+      margin-bottom: 0.27rem;
+    }
+    .txt {
+      display: inline-block;
+      font-size: 0.36rem;
     }
   }
 }

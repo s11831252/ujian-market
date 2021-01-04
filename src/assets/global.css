@@ -79,6 +79,13 @@ button {
     -webkit-appearance: none;
     -moz-appearance: none;
     cursor: pointer;
+    background-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+    line-height:inherit;
+}
+button::after {
+    border: none;
 }
 :focus {
     outline: none;

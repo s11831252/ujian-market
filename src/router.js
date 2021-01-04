@@ -262,7 +262,8 @@ var routes = [
         name:'liveroom',
         config: {
             navigationBarTitleText: '直播间',
-            enablePullDownRefresh: false
+            enablePullDownRefresh: false,
+            disableScroll: true
         }
     }
 ]
