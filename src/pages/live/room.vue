@@ -223,8 +223,8 @@ export default {
         to: roomId,
         roomType: true,
         customEvent: "chatroom_praise",
-        customExts: { note: "点赞", num: 1 },
-        params: { num: 1 },
+        customExts: { "num": "1"},
+        ext: { "nickName": this.UserInfo.UserName},
         success: () => {
           console.log("send private text Success", msg);
           var renderableMsg = {
@@ -246,7 +246,6 @@ export default {
           self.praiseCount++;
         },
         fail: function() {},
-        ext: { nickName: this.UserInfo.UserName,num: 1  },
         nickName: this.UserInfo.UserName
       });
       msg.setGroup("groupchat");
@@ -263,8 +262,8 @@ export default {
         to: roomId,
         roomType: true,
         customEvent: "chatroom_gift",
-        customExts: { id: self.selectGift.giftId, num: giftNum },
-        params: { id: self.selectGift.giftId, num: giftNum },
+        customExts: { "id": self.selectGift.giftId, "num": giftNum.toString() },
+        params: { "id": self.selectGift.giftId, "num": giftNum.toString() },
         success: function() {
           console.log("send private text Success", msg);
           var renderableMsg = {
@@ -277,7 +276,7 @@ export default {
               customExts: {
                 giftUrl: self.selectGift.giftUrl,
                 giftId: self.selectGift.giftId,
-                num: giftNum,
+                "num": giftNum.toString(),
                 giftName: self.selectGift.giftName
               }
             },
@@ -576,8 +575,8 @@ export default {
           switch(msgData.action)
           {
             case "UpdatePraiseAndGiftCount":{
-              that.giftCount =  that.giftCount + parseInt(msgData.data.gift);
-              that.praiseCount = that.praiseCount + parseInt(msgData.data.praise);
+              that.giftCount = parseInt(msgData.data.gift);
+              that.praiseCount = parseInt(msgData.data.praise);
               break
             }
             default:{
