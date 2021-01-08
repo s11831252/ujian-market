@@ -90,7 +90,7 @@ const net = {
                       let encodeparms = `?${parmsStr}`;
                       url=url+encodeparms;
                     }
-                    wx.redirectTo({url:url});
+                    wx.reLaunch({url:`${url}`})
                   }
                 }
               })
