@@ -49,26 +49,28 @@
         <i class="icon gift" @click="showGift=true">&#xe651;</i>
       </div>
     </div>
-    <div class="modal" v-if="showMember">
+    <div class="modal" v-show="showMember">
       <div class="mask" @click.stop="showMember=false"></div>
-      <span class="title">观众</span>
-      <div class="member-list">
-        <scroll-view scroll-into-view enable-flex="true" scroll-y="true">
-          <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
-            <img :src="item.Portrait" />
-            <span>{{item.UserName}}</span>
-          </div>
-        </scroll-view>
+      <div class="modal-wrap">
+        <span class="title">观众</span>
+        <div class="member-list">
+          <scroll-view scroll-into-view enable-flex="true" scroll-y="true">
+            <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
+              <img :src="item.Portrait" />
+              <span>{{item.UserName}}</span>
+            </div>
+          </scroll-view>
+        </div>
       </div>
     </div>
-    <div class="modal" v-if="showGift">
+    <div class="modal" v-show="showGift">
       <div class="mask" @click.stop="showGift=false"></div>
       <div class="modal-wrap">
         <span class="title">
           <span class="txt">礼物</span>
           <span class="close icon" @click="showGift=false">&#xe613;</span>
         </span>
-        <scroll-view class="gift-list" scroll-into-view enable-flex="true" scroll-y="true">
+        <scroll-view class="gift-list" enable-flex="true" scroll-y="true">
           <div class="item" :class="{action:item.giftId==selectGift.giftId}" v-for="(item,index) in giftList" :key="index" @click="selectGift=item">
             <img :src="item.giftUrl" />
             <div>{{item.giftName}}</div>
@@ -76,12 +78,16 @@
           </div>
         </scroll-view>
         <div class="bottom-box">
-          <span class="txt">{{livePoints}}煎饼</span>
+          <span class="txt">
+            <img src="../../../static/img/ub.png" />
+            <span class="points">{{livePoints}}</span>
+            <span class="pay">充值 〉</span>
+          </span>
           <button @click="sendGiftMsg(1);showGift=false;">赠送</button>
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-if="dialog">
+    <div class="uj_dialog" v-show="dialog">
       <div class="mask" @click="dialog=false"></div>
       <div class="dialog_wrapper" @click="dialog=false">
         <div class="dialog" @click.stop>
@@ -119,7 +125,7 @@ import chatMsg from "@/pages/service/chat-msg";
 export default {
   data() {
     return {
-      roomId:"",
+      roomId: "",
       roomInfo: null,
       toView: "",
       ChatHistory: [],
@@ -129,12 +135,12 @@ export default {
       textMsg: "",
       selectGift: {},
       livePoints: 0,
-      dialog:false,
-      joined:false,
-      giftCount:0,
-      praiseCount:0,
-      followCount:0,
-      isFollow:false,
+      dialog: false,
+      joined: false,
+      giftCount: 0,
+      praiseCount: 0,
+      followCount: 0,
+      isFollow: false
     };
   },
   components: {
@@ -223,8 +229,8 @@ export default {
         to: roomId,
         roomType: true,
         customEvent: "chatroom_praise",
-        customExts: { "num": "1"},
-        ext: { "nickName": this.UserInfo.UserName},
+        customExts: { num: "1" },
+        ext: { nickName: this.UserInfo.UserName },
         success: () => {
           console.log("send private text Success", msg);
           var renderableMsg = {
@@ -262,8 +268,8 @@ export default {
         to: roomId,
         roomType: true,
         customEvent: "chatroom_gift",
-        customExts: { "id": self.selectGift.giftId, "num": giftNum.toString() },
-        params: { "id": self.selectGift.giftId, "num": giftNum.toString() },
+        customExts: { id: self.selectGift.giftId, num: giftNum.toString() },
+        params: { id: self.selectGift.giftId, num: giftNum.toString() },
         success: function() {
           console.log("send private text Success", msg);
           var renderableMsg = {
@@ -276,7 +282,7 @@ export default {
               customExts: {
                 giftUrl: self.selectGift.giftUrl,
                 giftId: self.selectGift.giftId,
-                "num": giftNum.toString(),
+                num: giftNum.toString(),
                 giftName: self.selectGift.giftName
               }
             },
@@ -286,7 +292,7 @@ export default {
             chatType: msg.body.contentsType
           };
           self.readMsg(renderableMsg, msg.body.customEvent, null, this.sesskey);
-          self.giftCount= self.giftCount+giftNum;
+          self.giftCount = self.giftCount + giftNum;
         },
         fail: function() {},
         ext: { nickName: self.UserInfo.UserName }
@@ -339,7 +345,7 @@ export default {
           if (memberInfo) {
             renderableMsg.ext.nickName = memberInfo.UserName;
           }
-          that.praiseCount =  that.praiseCount + parseInt(msg.customExts.num);
+          that.praiseCount = that.praiseCount + parseInt(msg.customExts.num);
           that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
           break;
         }
@@ -366,7 +372,7 @@ export default {
           } else {
             //todo...
           }
-          that.giftCount =  that.giftCount + parseInt(msg.customExts.num);
+          that.giftCount = that.giftCount + parseInt(msg.customExts.num);
 
           that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
           break;
@@ -469,19 +475,19 @@ export default {
         case "leaveChatRoom": {
           // 退出聊天室
           console.log("leaveChatRoom", that.roomInfo.affiliations);
-          if(msg.from==this.roomInfo.owner)//直播间拥有者用户退出,认为是关闭直播间
-          {
+          if (msg.from == this.roomInfo.owner) {
+            //直播间拥有者用户退出,认为是关闭直播间
             that.modal({
-              content:"直播已结束",
-              showCancel:false,
-              confirm:()=>{
-                that.$router.back()
+              content: "直播已结束",
+              showCancel: false,
+              confirm: () => {
+                that.$router.back();
               },
-              cancel:()=>{
-                that.$router.back()
+              cancel: () => {
+                that.$router.back();
               },
-              confirmText:"返回"
-            })
+              confirmText: "返回"
+            });
           }
           var memberInfo = this.roomInfo.affiliations.find(item => {
             return item.member == msg.from;
@@ -514,101 +520,92 @@ export default {
       disp.on("newCustomMessage", that.customMsgHanderler);
       disp.on("onPresence", that.presenceHanderler);
       disp.on("onCmdMessage", that.cmdMsgHanderler);
-      if(this.roomId&&!this.joined)
-      {
+      // that.EmojiObj2 = WebIM.EmojiObj2; //表情包
+
+      if (this.roomId && !this.joined) {
         WebIM.conn.joinChatRoom({
           roomId: that.roomId,
           success: async msg => {
             console.log("加入直播间成功", msg);
 
-            //服务端保存加入人信息
-            that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
-
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
               that.roomInfo = res.data;
-              that.joined=true;
+              that.joined = true;
               that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
                 if (response.ret == 0 && response.data) {
                   that.giftList = response.data;
                 }
               });
-
+              //当前关注人数
+              that.$ShoppingAPI.AppServer_MyFollowCount(that.roomInfo.owner).then(res => {
+                if (res.ret == 0 && res.data) {
+                  that.followCount = res.data;
+                }
+              });
+              //服务端保存加入人信息
+              that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
+              //积分
               that.$ShoppingAPI.AppServer_GetPoints().then(response => {
                 if (response.ret == 0 && response.data) {
                   that.livePoints = response.data;
                 }
               });
 
-              that.$ShoppingAPI.AppServer_MyFollowCount(that.roomInfo.owner).then(res=>{
-                if (res.ret == 0 && res.data) {
-                  that.followCount = res.data;
-                }
-              })
-              that.$ShoppingAPI.AppServer_IsFollow(that.roomInfo.owner).then(res=>{
+              //当前用户是否关注
+              that.$ShoppingAPI.AppServer_IsFollow(that.roomInfo.owner).then(res => {
                 if (res.ret == 0 && res.data) {
                   that.isFollow = res.data;
                 }
-              })
-              // var chatMsg = utils.getItem(that.sessionKey);
-              // that.readMsg(null, null, chatMsg, that.sessionKey);
+              });
             }
-            that.EmojiObj2 = WebIM.EmojiObj2;
-
           },
           error(msg) {
             console.log("加入直播间失败", msg);
           }
         });
       }
-
     },
     //环信命令消息处理
-    cmdMsgHanderler(msg){
+    cmdMsgHanderler(msg) {
       var that = this;
-      try{
-        console.log("cmdMsgHanderler",msg.action)
-        let msgData =  JSON.parse(msg.action)
-        if(msgData.action)
-        {
-          msgData.data = JSON.parse(msgData.data)
-          switch(msgData.action)
-          {
-            case "UpdatePraiseAndGiftCount":{
+      try {
+        console.log("cmdMsgHanderler", msg.action);
+        let msgData = JSON.parse(msg.action);
+        if (msgData.action) {
+          msgData.data = JSON.parse(msgData.data);
+          switch (msgData.action) {
+            case "UpdatePraiseAndGiftCount": {
               that.giftCount = parseInt(msgData.data.gift);
               that.praiseCount = parseInt(msgData.data.praise);
-              break
+              break;
             }
-            default:{
+            default: {
               break;
             }
           }
         }
-
-      }catch(ex)
-      {
-        console.log("cmdMsgHanderler error:",ex)
+      } catch (ex) {
+        console.log("cmdMsgHanderler error:", ex);
       }
     },
     //取消关注
-    unFollow(){
-      this.$ShoppingAPI.AppServer_Follow(this.roomInfo.owner).then(res=>{
-        if(res.ret==0&&res.data)
-        {
+    unFollow() {
+      this.$ShoppingAPI.AppServer_Follow(this.roomInfo.owner).then(res => {
+        if (res.ret == 0 && res.data) {
           this.followCount--;
-          this.isFollow=false;
+          this.isFollow = false;
         }
-      })
+      });
     },
     //关注
-    follow(){
-      this.$ShoppingAPI.AppServer_Follow(this.roomInfo.owner).then(res=>{
-        if(res.ret==0&&res.data)
-        {
+    follow() {
+      this.$ShoppingAPI.AppServer_Follow(this.roomInfo.owner).then(res => {
+        if (res.ret == 0 && res.data) {
           this.followCount++;
-          this.isFollow=true;
+          this.isFollow = true;
         }
-      })
+      });
     }
   },
   onLoad(query) {
@@ -631,26 +628,41 @@ export default {
   mounted() {
     var that = this;
     if (this.$route.query.roomId) {
-      this.roomId=this.$route.query.roomId;
+      this.roomId = this.$route.query.roomId;
     }
-      this.wx_login(() => {
-        if (!this.$store.getters.Logined) {
-          this.modal({
-            title: "未登录",
-            content: "请您登录后使用直播功能",
-            confirm: () => {
-              that.$router.push({ path: `/pages/index/index`, query: { back: 1 } });
-            },
-            confirmText: "去登录"
-          });
-        }else if(WebIM.conn.isOpened())
-        {
-          if(!this.joined)
-            this.initHanderler();
-        }
-      });
-      disp.on("onOpened", this.initHanderler);
-    
+    this.wx_login(() => {
+      // if (!this.$store.getters.Logined) {
+      //   this.modal({
+      //     title: "未登录",
+      //     content: "请您登录后使用直播功能",
+      //     confirm: () => {
+      //       that.$router.push({ path: `/pages/index/index`, query: { back: 1 } });
+      //     },
+      //     confirmText: "去登录"
+      //   });
+      // }else
+      if (WebIM.conn.isOpened()) {
+        if (!this.joined) this.initHanderler();
+      } else {
+        that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
+          if (res.ret == 0 && res.data) {
+            that.roomInfo = res.data;
+            that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
+              if (response.ret == 0 && response.data) {
+                that.giftList = response.data;
+              }
+            });
+            //当前关注人数
+            that.$ShoppingAPI.AppServer_MyFollowCount(that.roomInfo.owner).then(res => {
+              if (res.ret == 0 && res.data) {
+                that.followCount = res.data;
+              }
+            });
+          }
+        });
+      }
+    });
+    disp.on("onOpened", this.initHanderler);
   }
 };
 </script>
@@ -698,9 +710,9 @@ body {
       padding: 0 0.4rem;
       letter-spacing: 0.02rem;
       margin-left: 0.3rem;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .people_num {
       margin-right: 0.3rem;
@@ -774,33 +786,44 @@ body {
     }
   }
   .modal {
-    position: absolute;
-    bottom: 0;
-    // display: flex;
-    width: 100%;
-    height: 50%;
-    background: rgba(22, 24, 36, 1);
-    z-index: 888;
-    color: #ffffff;
+    // position: absolute;
+    // bottom: 0;
+    // // display: flex;
+    // width: 100%;
+    // height: 50%;
+    // background: rgba(22, 24, 36, 1);
+    // z-index: 888;
+    // color: #ffffff;
     .mask {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 50%;
-    }
-    .modal-wrap{
-      display: flex;
-      align-items: center;
-      flex-direction:column;
-      justify-content: center;
       height: 100%;
+      z-index: 9;
+      background: rgba(0, 0, 0, 0.6);
+    }
+    .modal-wrap {
+      // display: flex;
+      // align-items: center;
+      // flex-direction: column;
+      // justify-content: center;
+      width: 100%;
+      height: 50%;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      height: 50%;
+      z-index: 10;
+      background: rgba(22, 24, 36, 1);
+      color: #ffffff;
+      overflow: hidden;
     }
     .title {
       width: 100%;
       margin: 0.2rem 0.51rem;
       display: block;
-      .txt{
+      .txt {
         margin-left: 0.3rem;
       }
       .close {
@@ -824,11 +847,12 @@ body {
       }
     }
     .gift-list {
-      flex-grow:1;
+      flex-grow: 1;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       margin-left: 0.3rem;
+      height: 71%;
       .item {
         // margin: 0.1rem 0.36rem;
         padding: 0.2rem 0.42rem 0.2rem 0.42rem;
@@ -851,10 +875,23 @@ body {
       justify-content: space-between;
       align-items: center;
       font-size: 0.4rem;
-      padding: .21rem 0;
-      width:100%;
+      padding: 0.21rem 0;
+      width: 100%;
       .txt {
         margin-left: 0.5rem;
+        img {
+          width: 0.55rem;
+          height: 0.55rem;
+          display: inline-block;
+          margin-right: 0.3rem;
+        }
+        .points {
+          margin-right: 0.5rem;
+        }
+        .pay {
+          font-size: 0.4rem;
+          color: #ffd215;
+        }
       }
       button {
         color: #fff;
@@ -906,18 +943,18 @@ body {
       -webkit-box-pack: center;
       -webkit-justify-content: center;
       justify-content: center;
-      .dialog{
-      background-color: #fff;
-      text-align: center;
-      border-radius: 12px;
-      overflow: hidden;
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: column;
-      flex-direction: column;
-      max-height: 90%;
-        .dialog_wrapper_head{
+      .dialog {
+        background-color: #fff;
+        text-align: center;
+        border-radius: 12px;
+        overflow: hidden;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        max-height: 90%;
+        .dialog_wrapper_head {
           padding: 0.3rem;
         }
         .dialog_wrapper_body {
@@ -933,35 +970,34 @@ body {
           color: rgba(0, 0, 0, 0.5);
         }
       }
-
     }
   }
   .dialog {
-    .userinfo{
-      img.logo{
+    .userinfo {
+      img.logo {
         width: 2.3rem;
         height: 2.3rem;
         border-radius: 50%;
       }
-        .txt_name{
-          font-size: 0.6rem;
+      .txt_name {
+        font-size: 0.6rem;
+      }
+      .txt_statistics {
+        padding-left: 0.3rem;
+        span {
+          margin-right: 0.3rem;
         }
-        .txt_statistics{
-          padding-left: 0.3rem;
-          span{
-            margin-right: 0.3rem;
-          }
-        }
-      button{
+      }
+      button {
         margin-top: 0.3rem;
         font-size: 0.4rem;
         width: 3rem;
         border-radius: 0.4rem;
-        line-height: .8rem;
+        line-height: 0.8rem;
         color: #fff;
         background-color: #717070;
       }
-      button.action{
+      button.action {
         background-color: #12b7f5;
       }
     }
