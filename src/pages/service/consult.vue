@@ -294,7 +294,7 @@ export default {
                         file_length: path.size,
                         length: path.duration * 1000,
                         thumb: _thumbUrl,
-                        thumb_secret: _thumb_secret
+                        thumb_secret: _thumb_secret,
                         // size: {
                         //   width: width,
                         //   height: height
@@ -304,9 +304,8 @@ export default {
                         filename: path.tempFilePath,
                         file_length: path.size,
                         length: path.duration * 1000,
-                        thumb: _thumbUrl,
-                        thumb_secret: _thumb_secret
                       },
+                      ext:{imageBase64: _thumbUrl},
                       from: WebIM.conn.context.userId,
                       to: me.to,
                       // roomType: true,
@@ -363,6 +362,7 @@ export default {
                     file_length: path.fileSize,
                     length: Math.ceil(path.duration / 1000)
                   },
+                  length: Math.ceil(path.duration / 1000),
                   from: WebIM.conn.context.userId,
                   to: me.to,
                   // roomType: true,
@@ -373,7 +373,6 @@ export default {
                     msgStorage.saveMsg(msg, _msgType);
                   }
                 });
-                console.log(msg.body);
                 msg.setGroup("groupchat");
                 WebIM.conn.send(msg.body);
               });

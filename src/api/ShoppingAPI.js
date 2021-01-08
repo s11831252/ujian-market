@@ -2,7 +2,7 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.119:811/":"https://market.ujianchina.net/";
+let BaseHost = process.env.NODE_ENV == 'development'?"http://www.luozuzhan.top:811/":"https://market.ujianchina.net/";
 
 export default {
     //百度坐标转换
@@ -266,7 +266,26 @@ export default {
     },
     //使用U建钱包余额购买礼物积分
     AppServer_BuyPoints:(userId,giftId,Count)=>{
-        return http.get(BaseHost + `api/AppServer/BuyPoints`)
+        return http.post(BaseHost + `api/AppServer/BuyPoints`)
     },
-    
+    //获取用户是否已经关注了某直播店铺
+    AppServer_IsFollow:(userId)=>{
+        return http.post(BaseHost + `api/AppServer/IsFollow?userId=${userId}`)
+    },
+    //获取用户已经关注的直播店铺列表
+    AppServer_MyFollowLst:(pageSize,pageIndex)=>{
+        return http.post(BaseHost + `api/AppServer/MyFollowLst?pageSize=${pageSize}&pageIndex=${pageIndex}`)
+    },
+    //返回某直播店铺的关注人数
+    AppServer_MyFollowCount:(userId)=>{
+        return http.get(BaseHost + `api/AppServer/MyFollowCount?userId=${userId}`)
+    },
+    //取消关注某店铺
+    AppServer_UnFollow:(userId)=>{
+        return http.post(BaseHost + `api/AppServer/UnFollow?userId=${userId}`)
+    },
+    //关注某店铺
+    AppServer_Follow:(userId)=>{
+        return http.post(BaseHost + `api/AppServer/Follow?userId=${userId}`)
+    },
 }

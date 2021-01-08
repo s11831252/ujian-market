@@ -185,8 +185,8 @@ export default {
     background-color: #ffffff;
     box-shadow: 0 0.03rem 0.21rem 0 rgba(51, 150, 254, 0.35);
     i {
-      width: 0.44rem;
-      height: 0.69rem;
+      // width: 0.44rem;
+      // height: 0.69rem;
       margin-top: 0.35rem;
       margin-left: 0.65rem;
       margin-right: 0.47rem;
@@ -243,11 +243,11 @@ export default {
 }
 
 .index .nr .message .emal i {
-  width: 0.56rem;
-  height: 0.43rem;
+  // width: 0.56rem;
+  // height: 0.43rem;
   margin-left: 0.65rem;
   margin-right: 0.35rem;
-  margin-top: 0.49rem;
+  margin-top: 0.35rem;
   float: left;
   font-size: 22px;
   color: #93e4fc;

@@ -76,6 +76,7 @@ export default {
             // console.log(resp)
             utils.setItem("listGroup", resp.data);
             utils.setItem("myUsername", WebIM.conn.context.userId);
+            disp.fire('onOpened',message);
             that.hideLoading();
           },
           error: function(){
@@ -147,13 +148,14 @@ export default {
       }, //收到音频消息
       onCmdMessage(message) {
         console.log("onCmdMessage", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.CMD);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
-        }
+        disp.fire('onCmdMessage',message);
+        // if (message) {
+        //   if (onMessageError(message)) {
+        //     msgStorage.saveReceiveMsg(message, msgType.CMD);
+        //   }
+        //   // calcUnReadSpot(message);
+        //   ack(message);
+        // }
       }, //收到命令消息
       onFileMessage: function(message) {}, //收到文件消息
       onLocationMessage: function(message) {

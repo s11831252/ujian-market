@@ -149,20 +149,21 @@ export default {
   methods: {
     joinRoom(id) {
       var that = this;
-      WebIM.conn.joinChatRoom({
-        roomId: id,
-        success: async msg => {
-          console.log("加入直播间成功", msg);
-          //保存加入人信息
-          var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
-          if (res2.ret == 0) {
-            that.$router.push({ path: "/pages/live/room", query: { roomId: id } });
-          }
-        },
-        error(msg) {
-          console.log("加入直播间失败", msg);
-        }
-      });
+      that.$router.push({ path: "/pages/live/room", query: { roomId: id } });
+
+      // WebIM.conn.joinChatRoom({
+      //   roomId: id,
+      //   success: async msg => {
+      //     console.log("加入直播间成功", msg);
+      //     //保存加入人信息
+      //     var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
+      //     if (res2.ret == 0) {
+      //     }
+      //   },
+      //   error(msg) {
+      //     console.log("加入直播间失败", msg);
+      //   }
+      // });
     },
     openLocation() {
       var that = this;

@@ -3,7 +3,7 @@
     <div class="top">
       <div class="sousuo">
         <i class="icon ss" alt>&#xe6e3;</i>
-        <input class="shuru" v-model="keyword" placeholder="输入商品关键词" placeholder-style="color:#d0f1fd;">
+        <input class="shuru" v-model="keyword" placeholder="输入商品关键词" placeholder-style="color:#d0f1fd;" />
         <i class="icon false" alt @click="clearKeyword">&#xe603;</i>
       </div>
       <!-- <img src="img/more_icon.png" class="more" alt="" /> -->
@@ -20,10 +20,19 @@
       <div class="navbar_slider" :class="navbarSliderClass"></div>
       <div class="demo" v-for="(item,index) in GoodList" :key="index">
         <div class="shop">
-          <img :src="item.sLogo" alt>
+          <img :src="item.sLogo" alt />
           <div class="name">
             <div class="title">
-              <p class="shopname">{{item.sName}}</p>
+              <p class="shopname">
+                <span class="txt">
+                  {{item.sName}}
+                  <span class="liveroom" v-if="item.LiveRoomId">
+                    <i class="icon">&#xe723;</i>
+                    <span>直播中</span>
+                  </span>
+                </span>
+              </p>
+
               <p class="space">{{item.Distance}}米</p>
             </div>
             <div class="intruduce">
@@ -141,13 +150,8 @@ export default {
         OrderType: tab.parm.OrderType,
         Keyword: this.keyword
       };
-      if (
-        this.CurrentLocation &&
-        this.CurrentLocation.longitude &&
-        this.CurrentLocation.latitude
-      ) {
-        (param.Lon = this.CurrentLocation.longitude),
-          (param.Lat = this.CurrentLocation.latitude);
+      if (this.CurrentLocation && this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
+        (param.Lon = this.CurrentLocation.longitude), (param.Lat = this.CurrentLocation.latitude);
       }
       var rep = await this.$ShoppingAPI.Goods_Search(param);
       if (rep.ret == 0) {
@@ -176,13 +180,8 @@ export default {
         PageSize: tab.parm.PageSize,
         OrderType: tab.parm.OrderType
       };
-      if (
-        this.CurrentLocation &&
-        this.CurrentLocation.longitude &&
-        this.CurrentLocation.latitude
-      ) {
-        (param.Lon = this.CurrentLocation.longitude),
-          (param.Lat = this.CurrentLocation.latitude);
+      if (this.CurrentLocation && this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
+        (param.Lon = this.CurrentLocation.longitude), (param.Lat = this.CurrentLocation.latitude);
       }
       var rep = await this.$ShoppingAPI.Goods_Search(param);
       if (rep.ret == 0) {
@@ -212,10 +211,7 @@ export default {
     //this.sId = decodeURIComponent(query.scene);
   },
   mounted() {
-    if (
-      this.keyword ||
-      (this.$route.query.keyword && this.$route.query.keyword.length > 0)
-    ) {
+    if (this.keyword || (this.$route.query.keyword && this.$route.query.keyword.length > 0)) {
       this.keyword = this.$route.query.keyword;
 
       this.tabClick(this.Tabs[0]);
@@ -377,6 +373,25 @@ input::-webkit-input-placeholder {
   font-size: 0.44rem;
   font-family: "MicrosoftYaHei";
   float: left;
+  .txt {
+    display: inline-block;
+    .liveroom {
+      font-size: 0.32rem;
+      border-radius: 0.23rem;
+      .icon {
+        display: inline-block;
+        width: 0.46rem;
+        line-height: 0.46rem;
+        border-radius: 50%;
+        background-color: #fc8749;
+        color: #fff0ee;
+      }
+      padding-right: 0.23rem;
+      color: #fff;
+      background-color: #f85d4a;
+      display: inline-block;
+    }
+  }
 }
 
 .search .main .demo .shop .name .title .space {

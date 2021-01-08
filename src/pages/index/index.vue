@@ -112,7 +112,7 @@ export default {
     color: #12b7f5;
     border: 1px solid #12b7f5;
     border-radius: 10px;
-    padding: 0px;
+    padding: 0.25rem;
     width: 50%;
   }
   p {
