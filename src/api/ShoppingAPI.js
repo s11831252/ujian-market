@@ -34,6 +34,10 @@ export default {
     Account_SimpleLogin: param => {
         return http.post(BaseHost + "api/Account/SimpleLogin", param)
     },
+    //微信登录(用户在微信小程序首次登录绑定账号后即可自动登录)
+    Account_wxAESDecrypt: (param) => {
+        return http.post(BaseHost + `api/Account/wxAESDecrypt`, param)
+    },
     //获取用户信息
     User_Get: param => {
         return http.get(BaseHost + "api/User/Get", param)

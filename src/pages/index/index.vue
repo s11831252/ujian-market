@@ -5,7 +5,7 @@
     <div class="userinfo">
       <img class="userinfo-avatar" v-if="UserInfo.avatarUrl" :src="UserInfo.avatarUrl" background-size="cover">
       <div class="userinfo-nickname">
-        <card :text="UserInfo.nickName"></card>
+        <span>{{UserInfo.nickName}}</span>
       </div>
     </div>
     <div v-if="!UserInfo.nickName" class="authorize">
@@ -13,22 +13,24 @@
       <button open-type="getUserInfo" @getuserinfo="getUserInfoData">授权登录</button>
     </div>
     <!-- <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button> -->
-    <login v-else></login>
+    <login v-else :mode="$route.query.mode||'SMS'" :model="model"></login>
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import card from "@/components/card";
 import login from "@/components/login";
 export default {
   data() {
     return {
-      logoHide: false
+      logoHide: false,
+      model:{
+        Account:"",
+        PassWord:""
+      }
     };
   },  
   components: {
-    card,
     login
   },
   computed:{
@@ -73,7 +75,11 @@ export default {
     }
   },
   mounted() {
-
+    console.log("mounted",this.UserInfo)
+    if(this.UserInfo.Phone)
+    {
+      this.model.Account=this.UserInfo.Phone
+    }
     // 检查是否授权
     wx.getSetting({
       success: res => {

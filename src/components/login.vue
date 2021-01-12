@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="width: 100%;">
     <div class="index">
-      <div v-if="isMP" class="nr">
+      <div v-if="isMP&&mode=='SMS'" class="nr">
         <!-- 输入手机号码 -->
         <div class="tel">
           <i class="icon">&#xe60d;</i>
@@ -23,7 +23,7 @@
           <p>请您输入手机号码进入下步购物环节</p>
         </div>
       </div>
-      <div v-else class="nr">
+      <div v-else-if="!isMP||(mode=='PWD')" class="nr">
         <!-- 输入手机号码 -->
         <div class="tel">
           <i class="icon">&#xe60d;</i>
@@ -54,11 +54,20 @@ export default {
       countDownStr: "获取验证码",
       sendTime: 0,
       VerificationCode: "",
-      model: {
-        Account: "",
+    };
+  },
+  props:{
+    mode:{
+      type:String,
+      default:"SMS"
+    },
+    model:{
+      type:Object,
+      default:{
+        Account:"",
         PassWord: ""
       }
-    };
+    }
   },
   computed: {
     ...mapState({
@@ -100,19 +109,29 @@ export default {
       });
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
-        var userinfo = await this.$ShoppingAPI.User_Get();
-        this.$store.commit("SetUserInfo", userinfo.data);
-        this.hx_login();
+        var res = await this.$ShoppingAPI.User_Get();
+        if (res.ret == 0) {
+          var _u = { ...res.data, ...this.UserInfo };
+          this.$store.commit("SetUserInfo", _u);
+        }
+        // this.hx_login();
         if (this.$route.query.redirect) {
           let url = decodeURIComponent(this.$route.query.redirect);
           // 切换至redirect页面
-          this.$router.push({ path: url, isTab: true });
+          this.$router.push({ path: url ,reLaunch:true},//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
+          null,
+          msg=>{this.$router.push({path: url, isTab: true })}
+          );
         } else if (this.$route.query.back) {
+          var pages = getCurrentPages();    //获取加载的页面
+          var currentPage = pages[pages.length-2];    //获取当前页面的对象
+          console.log(pages,currentPage)
           //后退
           this.$router.back();
+        } // 切换至首页页面
+        else {
+          this.$router.push({ path: "/pages/home/index", isTab: true });
         }
-        // 切换至首页
-        else this.$router.push({ path: "/pages/home/index", isTab: true });
       } else {
         this.toast("登录失败");
       }
@@ -141,18 +160,13 @@ export default {
           var _u = { ...res.data, ...this.UserInfo };
           this.$store.commit("SetUserInfo", _u);
         }
-        this.hx_login();
+        // this.hx_login();
         if (this.$route.query.redirect) {
           let url = decodeURIComponent(this.$route.query.redirect);
           // 切换至redirect页面
-          this.$router.push(
-            { path: url, isTab: true },
-            //执行完毕回调
-            msg => {},
-            //跳转失败回调,失败了可以认为不是tabBar页面
-            msg => {
-              this.$router.replace({ path: url });
-            }
+          this.$router.push({ path: url ,reLaunch:true},//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
+          null,
+          msg=>{this.$router.push({path: url, isTab: true })}
           );
         } else if (this.$route.query.back) {
           //后退
@@ -165,6 +179,9 @@ export default {
         this.toast("登录失败");
       }
     }
+  },
+  mounted(){
+    console.log("mounted",this.account, this.model)
   }
 };
 </script>
@@ -226,7 +243,6 @@ export default {
 }
 
 .index .nr .message {
-  width: 10.8rem;
   height: 1.4rem;
   margin-top: 0.64rem;
   /*验证码文字*/

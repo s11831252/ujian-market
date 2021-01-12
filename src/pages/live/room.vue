@@ -11,6 +11,7 @@
       <div @click="showMember=true" class="people_num">{{roomInfo.affiliations.length}}人</div>
     </div>
     <div class="chart-container">
+      <div class="mask" v-if="!Logined" :class="!Logined" @click="login_dialog=true"></div>
       <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" v-if="isMP">
         <div class="top">欢迎您进入直播间</div>
         <!-- <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem> -->
@@ -109,10 +110,25 @@
         </div>
       </div>
     </div>
+    <div class="uj_dialog" v-show="login_dialog">
+      <div class="mask" @click="login_dialog=false"></div>
+      <div class="dialog_wrapper bottom" @click="login_dialog=false">
+        <div class="dialog bg_grey" @click.stop>
+          <div class="dialog_wrapper_body">
+              <div class="loginbox">
+                <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信一键登录</button>
+                <button @click="go({path:'/pages/index/index',query:{redirect:redirect,mode:'PWD'}})">U建账号登录</button>
+                <button class="cancel" @click="login_dialog=false">取消</button>
+              </div>
+          </div>
+          <div class="dialog_wrapper_bottom"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState,mapGetters } from "vuex";
 import WebIM from "@/utils/hx/WebIM";
 import msgStorage from "@/pages/service/msgstorage";
 import disp from "../../utils/hx/broadcast";
@@ -137,6 +153,7 @@ export default {
       livePoints: 0,
       dialog: false,
       joined: false,
+      login_dialog:false,
       giftCount: 0,
       praiseCount: 0,
       followCount: 0,
@@ -150,8 +167,9 @@ export default {
   },
   computed: {
     ...mapState({
-      UserInfo: state => state.User.UserInfo
+      UserInfo: state => state.User.UserInfo,
     }),
+    ...mapGetters(["Logined"]),
     sessionKey() {
       if (this.roomInfo && this.roomInfo.id) return this.roomInfo.id + WebIM.conn.context.userId;
       else return "";
@@ -164,6 +182,12 @@ export default {
       if (this.roomInfo && this.roomInfo.livePushUrl && this.roomInfo.livePushUrl.length > 0) return this.roomInfo.livePushUrl.slice(1);
       // return [this.roomInfo.livePushUrl[0],this.roomInfo.livePushUrl[0]]
       else return [];
+    },
+    redirect() {
+        var url = `/pages/live/room`; //当前页面url
+        let encodeparms = encodeURIComponent(`?roomId=${this.roomId}`);
+        url = url + encodeparms;
+        return url;
     }
   },
   methods: {
@@ -190,7 +214,6 @@ export default {
       //  this.ChatHistory = currentChatMsg;
       if (this.ChatHistory && this.ChatHistory.length > 0) this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
     },
-
     //发送普通消息
     sendMsg() {
       let self = this;
@@ -606,6 +629,28 @@ export default {
           this.isFollow = true;
         }
       });
+    },
+    getPhoneNumber(e){
+      var that = this;
+      if (e.mp.detail.errMsg == "getPhoneNumber:ok") {
+        that.$ShoppingAPI.Account_wxAESDecrypt({
+          encryptedData: e.mp.detail.encryptedData,
+          iv: e.mp.detail.iv,
+          session_key: that.UserInfo.session_key
+        }).then(res=>{
+          if (res.ret == 0) {
+            var msg = JSON.parse(res.data);
+            console.log(msg);
+            var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
+            that.$store.commit("SetUserInfo", _u);
+            this.$router.push({ path: "/pages/index/index" ,query:{redirect:this.redirect} });
+          } else {
+            //解密失败
+          }
+        });
+      } else {
+        that.toast("拒绝授权访问用户信息,将无法继续下一步");
+      }
     }
   },
   onLoad(query) {
@@ -630,6 +675,7 @@ export default {
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
     }
+    console.log(this.Logined)
     this.wx_login(() => {
       // if (!this.$store.getters.Logined) {
       //   this.modal({
@@ -643,7 +689,7 @@ export default {
       // }else
       if (WebIM.conn.isOpened()) {
         if (!this.joined) this.initHanderler();
-      } else {
+      } else if(!this.Logined) {
         that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
           if (res.ret == 0 && res.data) {
             that.roomInfo = res.data;
@@ -697,7 +743,7 @@ body {
     position: fixed;
     top: 0.3rem;
     background-color: transparent;
-    z-index: 9;
+    z-index: 3;
     color: #fff;
     display: flex;
     width: 100%;
@@ -733,7 +779,15 @@ body {
     height: 30%;
     background: transparent;
     color: #fff;
-    z-index: 9;
+    z-index: 3;
+    .mask{
+        position:absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 4;
+    }
     .chatbox {
       // height: 100%;
       height: 80%;
@@ -749,6 +803,7 @@ body {
       display: flex;
       align-items: center;
       font-size: 0.5rem;
+      height: 20%;
       .icon {
         // flex-grow:1
         width: 0.9rem;
@@ -786,14 +841,6 @@ body {
     }
   }
   .modal {
-    // position: absolute;
-    // bottom: 0;
-    // // display: flex;
-    // width: 100%;
-    // height: 50%;
-    // background: rgba(22, 24, 36, 1);
-    // z-index: 888;
-    // color: #ffffff;
     .mask {
       position: fixed;
       top: 0;
@@ -905,13 +952,10 @@ body {
       }
     }
   }
-  .modal.show {
-    display: block;
-  }
   .uj_dialog {
     .mask {
       position: fixed;
-      z-index: 1000;
+      z-index: 10;
       top: 0;
       right: 0;
       left: 0;
@@ -929,7 +973,7 @@ body {
     }
     .dialog_wrapper {
       position: fixed;
-      z-index: 5000;
+      z-index: 10;
       top: 0;
       right: 0;
       bottom: 0;
@@ -946,7 +990,7 @@ body {
       .dialog {
         background-color: #fff;
         text-align: center;
-        border-radius: 12px;
+        border-radius: 5%;
         overflow: hidden;
         display: -webkit-box;
         display: -webkit-flex;
@@ -961,9 +1005,7 @@ body {
           flex: 1;
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
-          padding: 0 0.4rem;
           font-size: 0.4rem;
-          margin-bottom: 0.5rem;
           overflow-wrap: break-word;
           -webkit-hyphens: auto;
           hyphens: auto;
@@ -971,9 +1013,17 @@ body {
         }
       }
     }
+    .dialog_wrapper.bottom{
+      align-items: flex-end;
+      .dialog{
+        width: 100%;
+        border-radius: 5% 5% 0 0;
+      }
+    }
   }
   .dialog {
     .userinfo {
+      margin: 0 0.4rem;
       img.logo {
         width: 2.3rem;
         height: 2.3rem;
@@ -996,9 +1046,21 @@ body {
         line-height: 0.8rem;
         color: #fff;
         background-color: #717070;
+        margin-bottom: 0.5rem;
       }
       button.action {
         background-color: #12b7f5;
+      }
+    }
+    .loginbox{
+      font-size: 0.6rem;
+      button{
+        padding: 0.5rem 0;
+        width: 100%;
+        text-align: center;
+      }
+      button.cancel{
+        border-top: 0.3rem solid #dddddd;
       }
     }
   }
