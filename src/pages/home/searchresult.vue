@@ -27,7 +27,11 @@
                 <span class="txt">
                   {{item.sName}}
                   <span class="liveroom" v-if="item.LiveRoomId">
-                    <i class="icon">&#xe723;</i>
+                    <i class="icon rectbox">
+                      <span class="rect"></span>
+                      <span class="rect rect2"></span>
+                      <span class="rect rect3"></span>
+                    </i>
                     <span>直播中</span>
                   </span>
                 </span>
@@ -378,6 +382,7 @@ input::-webkit-input-placeholder {
     .liveroom {
       font-size: 0.32rem;
       border-radius: 0.23rem;
+      text-align: center;
       .icon {
         display: inline-block;
         width: 0.46rem;

@@ -88,7 +88,11 @@
       </div>
     </div>
     <div class="live-room" v-if="shopDetail.LiveRoomId" @click="joinRoom(shopDetail.LiveRoomId)">
-      <i class="icon">&#xe723;</i>
+      <i class="icon rectbox">
+        <span class="rect"></span>
+        <span class="rect rect2"></span>
+        <span class="rect rect3"></span>
+      </i>
       <span class="txt">直播中</span>
     </div>
     <shoppingCar :sId="sId" :sName="shopDetail.sName"></shoppingCar>

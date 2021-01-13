@@ -99,7 +99,14 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         <span class="txt">{{item.sName}}
-                          <span class="liveroom" v-if="item.LiveRoomId"><i class="icon">&#xe723;</i><span>直播中</span></span>
+                          <span class="liveroom" v-if="item.LiveRoomId">
+                            <i class="icon rectbox">
+                              <span class="rect"></span>
+                              <span class="rect rect2"></span>
+                              <span class="rect rect3"></span>
+                            </i>
+                          <span>直播中</span>
+                        </span>
                         </span>
                         <span class="shop-item-info-distance">{{item.Distance}}</span>
                       </p>
@@ -804,6 +811,7 @@ $borderColor: #ecf0f1;
               .liveroom{
                 font-size: 0.32rem;
                 border-radius: 0.23rem;
+                text-align: center;
                 .icon{
                   display: inline-block;
                   width: 0.46rem;

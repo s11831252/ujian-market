@@ -11,3 +11,73 @@
     font-family: 'iconfont';
     font-style: normal;
 }
+.rectbox{
+  .rect{
+    width: 0.06rem;
+    height: 0.20rem;
+    line-height: 0.46rem;
+    background-color: #fff0ee;
+    display: inline-block;
+  }
+  .rect:not(:first-child){
+    margin-left: 0.06rem;
+  }
+  
+  .rect{
+    -webkit-animation: stretchdelay 0.8s infinite ease-in-out;
+    animation: stretchdelay 0.8s infinite ease-in-out;
+  }
+  .rect_desc{
+    -webkit-animation-delay: 0.4s;
+    animation-delay: 0.4s;
+  }
+  .rect2{
+    -webkit-animation-delay: -0.7s;
+    animation-delay: -0.7s;
+  }
+  .rect3{
+    -webkit-animation-delay: -0.6s;
+    animation-delay: -0.6s;
+  }
+  .rect4{
+    -webkit-animation-delay: -0.5s;
+    animation-delay: -0.5s;
+  }
+  .rect4{
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+  }
+}
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.8) } 
+  20% { -webkit-transform: scaleY(1.5) }
+}
+ 
+@keyframes stretchdelay {
+  0%, 100% {
+    transform: scaleY(0.8);
+  }  
+  50% {
+    transform: scaleY(1.5);
+  }
+  // 0%{
+  //   transform: scaleY(0.8)
+  // }
+  // 50%{
+  //   transform: scaleY(1.5)
+  // }
+  // 100%{
+  //   transform: scaleY(0.8)
+  // }
+}
+@keyframes stretchdelay_Desc{
+  0%{
+    transform: scaleY(0.8)
+  }
+  50%{
+    transform: scaleY(1.5)
+  }
+  100%{
+    transform: scaleY(0.8)
+  }
+}
