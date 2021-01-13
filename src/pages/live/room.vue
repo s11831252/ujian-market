@@ -22,7 +22,7 @@
             给主播点了{{item.msg.customExts.num}}个赞
           </span>
           <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_join'">
-            <span>{{item.ext.nickName}}</span>加入直播间
+            <span>{{item.ext.nickName}}</span>进入直播间
           </span>
           <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_gift'">
             收到
@@ -54,14 +54,13 @@
       <div class="mask" @click.stop="showMember=false"></div>
       <div class="modal-wrap">
         <span class="title">观众</span>
-        <div class="member-list">
-          <scroll-view scroll-into-view enable-flex="true" scroll-y="true">
+        <scroll-view scroll-y="true" class="member-list">
             <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
               <img :src="item.Portrait" />
               <span>{{item.UserName}}</span>
+              <span class="owner" v-if="item.owner">主播</span>
             </div>
-          </scroll-view>
-        </div>
+        </scroll-view>
       </div>
     </div>
     <div class="modal" v-show="showGift">
@@ -74,15 +73,15 @@
         <scroll-view class="gift-list" enable-flex="true" scroll-y="true">
           <div class="item" :class="{action:item.giftId==selectGift.giftId}" v-for="(item,index) in giftList" :key="index" @click="selectGift=item">
             <img :src="item.giftUrl" />
-            <div>{{item.giftName}}</div>
-            <div>{{item.giftPoints}}煎饼</div>
+            <div class="giftname">{{item.giftName}}</div>
+            <div>{{item.giftPoints}}U币</div>
           </div>
         </scroll-view>
         <div class="bottom-box">
           <span class="txt">
             <img src="../../../static/img/ub.png" />
             <span class="points">{{livePoints}}</span>
-            <span class="pay">充值 〉</span>
+            <span class="pay" @click="buy_dialog=true;showGift=false;">充值 〉</span>
           </span>
           <button @click="sendGiftMsg(1);showGift=false;">赠送</button>
         </div>
@@ -115,11 +114,38 @@
       <div class="dialog_wrapper bottom" @click="login_dialog=false">
         <div class="dialog bg_grey" @click.stop>
           <div class="dialog_wrapper_body">
-              <div class="loginbox">
-                <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信一键登录</button>
-                <button @click="go({path:'/pages/index/index',query:{redirect:redirect,mode:'PWD'}})">U建账号登录</button>
-                <button class="cancel" @click="login_dialog=false">取消</button>
-              </div>
+            <div class="loginbox">
+              <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信一键登录</button>
+              <button @click="go({path:'/pages/index/index',query:{redirect:redirect,mode:'PWD'}})">U建账号登录</button>
+              <button class="cancel" @click="login_dialog=false">取消</button>
+            </div>
+          </div>
+          <div class="dialog_wrapper_bottom"></div>
+        </div>
+      </div>
+    </div>
+    <div class="uj_dialog" v-show="buy_dialog">
+      <div class="mask" @click="buy_dialog=false"></div>
+      <div class="dialog_wrapper bottom" @click="buy_dialog=false">
+        <div class="dialog bg_grey" @click.stop>
+          <div class="dialog_wrapper_body">
+            <div class="buybox">
+              <p class="points_show">
+                <span>我的U币：</span>
+                <img src="../../../static/img/ub.png" />
+                <span class="points">{{livePoints}}</span>
+              </p>
+              <ul class="buy_package">
+                <li class="item" v-for="(item,index) in buyPackage" :key="index">
+                  <div class="package_points">
+                    <img src="../../../static/img/ub.png">
+                    <span class="txt">{{item.points}}</span>
+                  </div>
+                  <div class="package_price">￥{{item.price}}</div>
+                </li>
+              </ul>
+              <p class="tip">充值代表已阅读并同意<span>《用户充值协议》</span></p>
+            </div>
           </div>
           <div class="dialog_wrapper_bottom"></div>
         </div>
@@ -128,7 +154,7 @@
   </div>
 </template>
 <script>
-import { mapState,mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import WebIM from "@/utils/hx/WebIM";
 import msgStorage from "@/pages/service/msgstorage";
 import disp from "../../utils/hx/broadcast";
@@ -145,19 +171,46 @@ export default {
       roomInfo: null,
       toView: "",
       ChatHistory: [],
-      showMember: false,
       giftList: [],
-      showGift: false,
       textMsg: "",
       selectGift: {},
       livePoints: 0,
-      dialog: false,
-      joined: false,
-      login_dialog:false,
       giftCount: 0,
       praiseCount: 0,
       followCount: 0,
-      isFollow: false
+      isFollow: false,
+      showMember: false,
+      showGift: false,
+      dialog: false,
+      joined: false,
+      login_dialog: false,
+      buy_dialog: false,
+      buyPackage:[
+        {
+          points:"10",
+          price:"1.00",
+        },
+        {
+          points:"20",
+          price:"2.00",
+        },
+        {
+          points:"30",
+          price:"3.00",
+        },
+        {
+          points:"100",
+          price:"10.00",
+        },
+        {
+          points:"200",
+          price:"20.00",
+        },
+        {
+          points:"300",
+          price:"30.00",
+        },
+      ]
     };
   },
   components: {
@@ -167,7 +220,7 @@ export default {
   },
   computed: {
     ...mapState({
-      UserInfo: state => state.User.UserInfo,
+      UserInfo: state => state.User.UserInfo
     }),
     ...mapGetters(["Logined"]),
     sessionKey() {
@@ -184,10 +237,10 @@ export default {
       else return [];
     },
     redirect() {
-        var url = `/pages/live/room`; //当前页面url
-        let encodeparms = encodeURIComponent(`?roomId=${this.roomId}`);
-        url = url + encodeparms;
-        return url;
+      var url = `/pages/live/room`; //当前页面url
+      let encodeparms = encodeURIComponent(`?roomId=${this.roomId}`);
+      url = url + encodeparms;
+      return url;
     }
   },
   methods: {
@@ -548,8 +601,23 @@ export default {
       if (this.roomId && !this.joined) {
         WebIM.conn.joinChatRoom({
           roomId: that.roomId,
-          success: async msg => {
-            console.log("加入直播间成功", msg);
+          success: async r => {
+            console.log("加入直播间成功", r);
+
+            let id = WebIM.conn.getUniqueId();
+            var msg = new WebIM.message("custom", id);
+            msg.set({
+              to: that.roomId,
+              roomType: true,
+              customEvent: "chatroom_member_join",
+              customExts: { nick: that.UserInfo.UserName,avatar:that.UserInfo.Portrait},
+              success: () => {
+                console.log("send member join message Success", msg);
+              },
+              fail: function() {},
+            });
+            msg.setGroup("groupchat");
+            WebIM.conn.send(msg.body);
 
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
@@ -630,24 +698,26 @@ export default {
         }
       });
     },
-    getPhoneNumber(e){
+    getPhoneNumber(e) {
       var that = this;
       if (e.mp.detail.errMsg == "getPhoneNumber:ok") {
-        that.$ShoppingAPI.Account_wxAESDecrypt({
-          encryptedData: e.mp.detail.encryptedData,
-          iv: e.mp.detail.iv,
-          session_key: that.UserInfo.session_key
-        }).then(res=>{
-          if (res.ret == 0) {
-            var msg = JSON.parse(res.data);
-            console.log(msg);
-            var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
-            that.$store.commit("SetUserInfo", _u);
-            this.$router.push({ path: "/pages/index/index" ,query:{redirect:this.redirect} });
-          } else {
-            //解密失败
-          }
-        });
+        that.$ShoppingAPI
+          .Account_wxAESDecrypt({
+            encryptedData: e.mp.detail.encryptedData,
+            iv: e.mp.detail.iv,
+            session_key: that.UserInfo.session_key
+          })
+          .then(res => {
+            if (res.ret == 0) {
+              var msg = JSON.parse(res.data);
+              console.log(msg);
+              var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
+              that.$store.commit("SetUserInfo", _u);
+              this.$router.push({ path: "/pages/index/index", query: { redirect: this.redirect } });
+            } else {
+              //解密失败
+            }
+          });
       } else {
         that.toast("拒绝授权访问用户信息,将无法继续下一步");
       }
@@ -675,7 +745,7 @@ export default {
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
     }
-    console.log(this.Logined)
+    console.log(this.Logined);
     this.wx_login(() => {
       // if (!this.$store.getters.Logined) {
       //   this.modal({
@@ -689,7 +759,7 @@ export default {
       // }else
       if (WebIM.conn.isOpened()) {
         if (!this.joined) this.initHanderler();
-      } else if(!this.Logined) {
+      } else if (!this.Logined) {
         that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
           if (res.ret == 0 && res.data) {
             that.roomInfo = res.data;
@@ -780,13 +850,13 @@ body {
     background: transparent;
     color: #fff;
     z-index: 3;
-    .mask{
-        position:absolute;
-        height: 100%;
-        width: 100%;
-        top: 0;
-        left: 0;
-        z-index: 4;
+    .mask {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 4;
     }
     .chatbox {
       // height: 100%;
@@ -860,7 +930,6 @@ body {
       position: fixed;
       left: 0;
       bottom: 0;
-      height: 50%;
       z-index: 10;
       background: rgba(22, 24, 36, 1);
       color: #ffffff;
@@ -880,6 +949,7 @@ body {
       }
     }
     .member-list {
+      height: 89%;
       .item {
         display: flex;
         align-items: center;
@@ -890,6 +960,16 @@ body {
           height: 0.8rem;
           border-radius: 50%;
           margin-right: 0.3rem;
+        }
+        span{
+          margin-right: 0.5rem;
+        }
+        span.owner{
+          background-color: #2cacfc;
+          border-radius: 0.4rem;
+          padding:0 0.4rem;
+          height: 0.8rem;
+          line-height: 0.8rem;
         }
       }
     }
@@ -906,6 +986,10 @@ body {
         text-align: center;
         border: solid 0.04rem transparent;
         border-radius: 0.4rem;
+        font-size: 0.28rem;
+        .giftname {
+          font-size: 0.36rem;
+        }
         img {
           width: 1.68rem;
           height: 1.65rem;
@@ -1013,9 +1097,9 @@ body {
         }
       }
     }
-    .dialog_wrapper.bottom{
+    .dialog_wrapper.bottom {
       align-items: flex-end;
-      .dialog{
+      .dialog {
         width: 100%;
         border-radius: 5% 5% 0 0;
       }
@@ -1052,15 +1136,82 @@ body {
         background-color: #12b7f5;
       }
     }
-    .loginbox{
+    .loginbox {
       font-size: 0.6rem;
-      button{
+      button {
         padding: 0.5rem 0;
         width: 100%;
         text-align: center;
       }
-      button.cancel{
+      button.cancel {
         border-top: 0.3rem solid #dddddd;
+      }
+    }
+    .buybox {
+      .points_show {
+        color: #000;
+        font-size: 0.42rem;
+        margin: 0.56rem 0 0.53rem 0.62rem;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        > span,
+        > img {
+          line-height: 0.55rem;
+        }
+        img {
+          width: 0.55rem;
+          height: 0.55rem;
+          display: inline-block;
+          margin: 0 0.18rem;
+        }
+      }
+      .buy_package{
+        border-top: 0.02rem solid #dddddd;
+        padding: 0.48rem;
+        display: flex;
+        flex-wrap:wrap;
+        justify-content: space-between;
+        align-content: space-around;
+        height:6.9rem;
+        .item{
+            width: 3.11rem;
+            height: 1.91rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f8f8f8;
+            border-radius: 0.2rem;
+          .package_points{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.22rem;
+            img{
+              width: 0.42rem;
+              height: 0.42rem;
+              display: inline-block;
+              margin: 0 0.18rem;
+            }
+            .txt{
+              font-size: 0.5rem;
+              color: #000;
+            }
+          }
+          .package_price{
+            font-size: 0.31rem;
+            color: #808080;
+          }
+        }
+      }
+      .tip{
+        margin-bottom: 1.06rem;
+        font-size: 0.3rem;
+        color: #808080;
+        span{
+          color: #15aaff;
+        }
       }
     }
   }
