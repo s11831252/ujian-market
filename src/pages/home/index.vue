@@ -73,10 +73,9 @@
         </p>
       </div>
       <div class="box-body">
-        <div class="nearby-location">
-          <p @click="openLocation">
-            我的定位:
-            <span>{{CurrentLocation.LocationAddress}}</span>
+        <div class="nearby-location" @click="openLocation">
+          <p>
+            我的定位:{{CurrentLocation.LocationAddress}}
           </p>
           <span class="icon">&#xe65e;</span>
           <span class="icon Right">&#xe601;</span>
@@ -753,7 +752,6 @@ $borderColor: #ecf0f1;
 .nearby {
   .nearby-location {
     display: flex;
-    align-items: center;
     overflow: hidden;
     font-size: 0.4rem;
     color: #6b6b6b;
@@ -762,10 +760,12 @@ $borderColor: #ecf0f1;
     .icon,
     p {
       display: inline;
+      line-height: 0.5rem;
+
     }
     .Right {
-      font-size: 0.4rem;
       padding-left: 0.16rem;
+      font-size: 0.6rem;
     }
   }
   .nearby-merchants {
