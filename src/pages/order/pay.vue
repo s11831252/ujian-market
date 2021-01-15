@@ -246,7 +246,7 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .pay {
   margin-top: 5px;
   .pay-info {
@@ -344,6 +344,7 @@ export default {
       }
       .tip {
         font-size: 12px;
+        color: #717070;
       }
       .blocks {
         text-align: center;
@@ -352,6 +353,7 @@ export default {
         // flex-direction: row;
         // align-items: center;
         justify-content: center;
+        margin:0.3rem 0;
         .block {
           width: 30px;
           height: 30px;

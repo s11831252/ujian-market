@@ -269,8 +269,8 @@ export default {
         return http.get(BaseHost + `api/AppServer/GetPoints`)
     },
     //使用U建钱包余额购买礼物积分
-    AppServer_BuyPoints:(userId,giftId,Count)=>{
-        return http.post(BaseHost + `api/AppServer/BuyPoints`)
+    AppServer_BuyPoints:(params)=>{
+        return http.post(BaseHost + `api/AppServer/BuyPoints`,params)
     },
     //获取用户是否已经关注了某直播店铺
     AppServer_IsFollow:(userId)=>{

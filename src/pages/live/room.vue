@@ -46,7 +46,8 @@
           <input placeholder="说点什么..." type="text" v-model="textMsg" maxlength="200" @confirm="sendMsg" confirm-type="send" fixed="true" />
         </div>
         <i class="icon exit" @click="exitLiveRoom">&#xe609;</i>
-        <i class="icon praise" @click="giveLike">&#xe619;</i>
+        <i class="icon goods" hover-class="goods-hover" @click="getGoods();showgoods=true;">&#xe639;</i>
+        <i class="icon praise" hover-class="goods-hover" @click="giveLike">&#xe619;</i>
         <i class="icon gift" @click="showGift=true">&#xe651;</i>
       </div>
     </div>
@@ -54,12 +55,12 @@
       <div class="mask" @click.stop="showMember=false"></div>
       <div class="modal-wrap">
         <span class="title">观众</span>
-        <scroll-view scroll-y="true" class="member-list">
-            <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
-              <img :src="item.Portrait" />
-              <span>{{item.UserName}}</span>
-              <span class="owner" v-if="item.owner">主播</span>
-            </div>
+        <scroll-view scroll-y="true" enable-flex="true" class="member-list">
+          <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
+            <img :src="item.Portrait" />
+            <span>{{item.UserName}}</span>
+            <span class="owner" v-if="item.owner">主播</span>
+          </div>
         </scroll-view>
       </div>
     </div>
@@ -81,7 +82,7 @@
           <span class="txt">
             <img src="../../../static/img/ub.png" />
             <span class="points">{{livePoints}}</span>
-            <span class="pay" @click="buy_dialog=true;showGift=false;">充值 〉</span>
+            <span class="pay" @click="buy_dialog=true;showGift=false;getBalance();">充值 〉</span>
           </span>
           <button @click="sendGiftMsg(1);showGift=false;">赠送</button>
         </div>
@@ -130,27 +131,89 @@
         <div class="dialog bg_grey" @click.stop>
           <div class="dialog_wrapper_body">
             <div class="buybox">
-              <p class="points_show">
+              <div class="points_show">
                 <span>我的U币：</span>
                 <img src="../../../static/img/ub.png" />
                 <span class="points">{{livePoints}}</span>
-              </p>
+              </div>
               <ul class="buy_package">
-                <li class="item" v-for="(item,index) in buyPackage" :key="index">
+                <li class="item" v-for="(item,index) in buyPackage" :key="index" @click="selectPackage=item;">
                   <div class="package_points">
-                    <img src="../../../static/img/ub.png">
+                    <img src="../../../static/img/ub.png" />
                     <span class="txt">{{item.points}}</span>
                   </div>
                   <div class="package_price">￥{{item.price}}</div>
                 </li>
               </ul>
-              <p class="tip">充值代表已阅读并同意<span>《用户充值协议》</span></p>
+              <p class="tip">
+                充值代表已阅读并同意
+                <span>《用户充值协议》</span>
+              </p>
             </div>
           </div>
           <div class="dialog_wrapper_bottom"></div>
         </div>
       </div>
     </div>
+    <div class="uj_dialog" v-show="selectPackage">
+      <div class="mask" @click="selectPackage=null"></div>
+      <div class="dialog_wrapper bottom" @click="selectPackage=null">
+        <div class="dialog bg_grey" @click.stop>
+          <div class="dialog_wrapper_body">
+            <div class="head">
+              <span class="close icon" @click="selectPackage=null">&#xe613;</span>
+            </div>
+            <div class="paybox" v-if="selectPackage">
+              <div class="packageInfo">
+                <p class="price">
+                  <span class="unit">￥</span>
+                  <span class="value">{{selectPackage.price}}</span>
+                </p>
+                <p class="points">{{selectPackage.points}}U币</p>
+              </div>
+              <div class="select" @click="paymode=1">
+                <img src="../../../static/img/logo108.png" />
+                <span class="txt">
+                  U建钱包支付
+                  <small>(钱包余额￥{{Balance}})</small>
+                </span>
+                <i class="icon" :class="{selected:paymode==1}">&#xe8e7;</i>
+              </div>
+              <div class="select" @click="paymode=2">
+                <img src="../../../static/img/wxpay.png" />
+                <span class="txt">微信支付</span>
+                <i class="icon" :class="{selected:paymode==2}">&#xe8e7;</i>
+              </div>
+              <button class="confirm" @click="payPackage">确认付款</button>
+            </div>
+          </div>
+          <div class="dialog_wrapper_bottom"></div>
+        </div>
+      </div>
+    </div>
+    <div class="uj_dialog" v-show="showgoods&&shopGoods">
+      <div class="mask" @click="showgoods=false"></div>
+      <div class="dialog_wrapper bottom" @click="showgoods=false;">
+        <div class="dialog bg_grey" @click.stop>
+          <div class="dialog_wrapper_body">
+            <scroll-view scroll-y="true" class="goodsbox" v-if="isMP">
+              <div class="item" v-for="(item,index) in shopGoods" :key="index">
+                <img :src="item.Images.length>0?item.Images[0].Thumbnail_url:''"/>
+                <div class="info">
+                  <span class="name">{{item.gName}}</span>
+                  <span class="price">
+                    ￥<span class="txt">{{item.Price}}</span>
+                  </span>
+                  <span class="btn" @click="go({path:'/pages/shop/detail',query:{gId:item.gId,sId:item.sId,sName:item.sName}})">去购买</span>
+                </div>
+              </div>
+            </scroll-view>
+          </div>
+          <div class="dialog_wrapper_bottom"></div>
+        </div>
+      </div>
+    </div>
+    <vaildCodeBox :openModal="openVaildCode" @close="openVaildCode=false" v-if="selectPackage" :price="selectPackage.price" :inputBefore="codeBefore" :inputComplete="codeComplete"></vaildCodeBox>
   </div>
 </template>
 <script>
@@ -163,6 +226,7 @@ import scrollContainer from "@/pages/service/scrollcontainer";
 import utils from "@/utils/index.js";
 import chatItem from "@/pages/service/chat-item";
 import chatMsg from "@/pages/service/chat-msg";
+import vaildCodeBox from "../../components/validCodeBox";
 
 export default {
   data() {
@@ -185,38 +249,45 @@ export default {
       joined: false,
       login_dialog: false,
       buy_dialog: false,
-      buyPackage:[
+      buyPackage: [
         {
-          points:"10",
-          price:"1.00",
+          points: "10",
+          price: "1.00"
         },
         {
-          points:"20",
-          price:"2.00",
+          points: "20",
+          price: "2.00"
         },
         {
-          points:"30",
-          price:"3.00",
+          points: "30",
+          price: "3.00"
         },
         {
-          points:"100",
-          price:"10.00",
+          points: "100",
+          price: "10.00"
         },
         {
-          points:"200",
-          price:"20.00",
+          points: "200",
+          price: "20.00"
         },
         {
-          points:"300",
-          price:"30.00",
-        },
-      ]
+          points: "300",
+          price: "30.00"
+        }
+      ],
+      selectPackage: null,
+      paymode: 2,
+      openVaildCode: false,
+      Balance: 0,
+      shopGoods:null,
+      showgoods:false,
     };
   },
   components: {
     scrollContainer,
     chatItem,
-    chatMsg
+    chatMsg,
+    vaildCodeBox
   },
   computed: {
     ...mapState({
@@ -369,6 +440,11 @@ export default {
           };
           self.readMsg(renderableMsg, msg.body.customEvent, null, this.sesskey);
           self.giftCount = self.giftCount + giftNum;
+          self.$ShoppingAPI.AppServer_GetPoints().then(response => {
+            if (response.ret == 0 && response.data) {
+              self.livePoints = response.data;
+            }
+          });
         },
         fail: function() {},
         ext: { nickName: self.UserInfo.UserName }
@@ -610,11 +686,11 @@ export default {
               to: that.roomId,
               roomType: true,
               customEvent: "chatroom_member_join",
-              customExts: { nick: that.UserInfo.UserName,avatar:that.UserInfo.Portrait},
+              customExts: { nick: that.UserInfo.UserName, avatar: that.UserInfo.Portrait },
               success: () => {
                 console.log("send member join message Success", msg);
               },
-              fail: function() {},
+              fail: function() {}
             });
             msg.setGroup("groupchat");
             WebIM.conn.send(msg.body);
@@ -653,6 +729,18 @@ export default {
           },
           error(msg) {
             console.log("加入直播间失败", msg);
+            //加入直播间失败,认为是直播间已关闭或已结束
+            that.modal({
+              content: "直播间不存在",
+              showCancel: false,
+              confirm: () => {
+                that.$router.back();
+              },
+              cancel: () => {
+                that.$router.back();
+              },
+              confirmText: "返回"
+            });
           }
         });
       }
@@ -698,6 +786,7 @@ export default {
         }
       });
     },
+    //获取微信用户手机号
     getPhoneNumber(e) {
       var that = this;
       if (e.mp.detail.errMsg == "getPhoneNumber:ok") {
@@ -721,6 +810,104 @@ export default {
       } else {
         that.toast("拒绝授权访问用户信息,将无法继续下一步");
       }
+    },
+    //购买U币套餐
+    payPackage() {
+      var that = this;
+      if (this.selectPackage == null) return;
+      if (this.paymode == 1) {
+        //U建支付
+        this.openVaildCode = true;
+      } else if (this.paymode == 2) {
+        //微信支付
+        this.$MoneyAPI.Recharge_RechargeWX_Json(this.UserInfo.UserId, this.selectPackage.price, this.UserInfo.openid).then(rep => {
+          if (rep) {
+            // var payData = JSON.parse(rep);
+            var payData = {
+              timeStamp: rep.timeStamp,
+              nonceStr: rep.nonceStr,
+              package: rep.package,
+              signType: rep.signType,
+              paySign: rep.paySign,
+              success(res) {
+                //弹出提示框
+                that.toast("支付成功,请稍后查看U币");
+                that.selectPackage = null;
+                //更新积分
+                that.$ShoppingAPI.AppServer_GetPoints().then(response => {
+                  if (response.ret == 0 && response.data) {
+                    that.livePoints = response.data;
+                  }
+                });
+              },
+              fail(res) {
+                console.log(res);
+                if (res && res.errMsg == "requestPayment:fail cancel") {
+                } else {
+                  that.toast("支付失败" && res.errMsg && res.err_desc);
+                }
+              }
+            };
+            console.log(payData);
+            wx.requestPayment(payData);
+          } else {
+            that.toast("请求支付失败");
+          }
+        });
+      }
+    },
+    //打开验证码框,发送验证短信请求
+    async codeBefore() {
+      console.log("codeBefore");
+      var res = await this.$ShoppingAPI.Order_ValidationCode();
+      if (res.ret == 0) {
+        return true;
+      }
+    },
+    //验证码输入完成,发送U币兑换请求
+    async codeComplete(code) {
+      console.log("codeComplete", code);
+      var that = this;
+      var rep = await that.$ShoppingAPI.AppServer_BuyPoints({
+        money: that.selectPackage.price,
+        VerificationCode: code
+      });
+      if (rep.ret == 0 && rep.data) {
+        that.openVaildCode = false;
+        that.selectPackage = null;
+        //更新积分
+        that.$ShoppingAPI.AppServer_GetPoints().then(response => {
+          if (response.ret == 0 && response.data) {
+            that.livePoints = response.data;
+          }
+        });
+        return true;
+      } else {
+        that.toast(ret.msg);
+        return false;
+      }
+    },
+    //关闭验证码框
+    codeClose($event) {
+      console.log("codeClose", $event);
+      this.openVaildCode = false;
+    },
+    //获取U建钱包余额
+    getBalance() {
+      this.$UJAPI.Balance_Purse().then(rep => {
+        this.Balance = rep.data;
+      });
+    },
+    getGoods(){
+        if(this.roomInfo&&this.roomInfo.sId&&this.shopGoods==null)
+        {
+          //获取店铺商品
+          this.$ShoppingAPI.Goods_GetByShop({ sId: this.roomInfo.sId }).then(rep3=>{
+            if (rep3.ret == 0) {
+              this.shopGoods = rep3.data;
+            }
+          })
+        }
     }
   },
   onLoad(query) {
@@ -847,8 +1034,8 @@ body {
     left: 0;
     width: 100%;
     height: 30%;
-    background: transparent;
-    color: #fff;
+    background: #fff;
+    color: #000;
     z-index: 3;
     .mask {
       position: absolute;
@@ -861,7 +1048,7 @@ body {
     .chatbox {
       // height: 100%;
       height: 80%;
-      background: rgba(0, 0, 0, 0.2);
+      // background: rgba(0,0,0,0.2);
       .chat-item {
         display: flex;
         .txt_praise {
@@ -874,6 +1061,7 @@ body {
       align-items: center;
       font-size: 0.5rem;
       height: 20%;
+      color: #fff;
       .icon {
         // flex-grow:1
         width: 0.9rem;
@@ -887,12 +1075,21 @@ body {
         margin-right: 2%;
       }
       .praise {
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(0, 0, 0, 0.4);
         margin-right: 2%;
       }
       .gift {
         margin-right: 2%;
         background: rgb(240, 85, 34);
+      }
+      .goods {
+        margin-right: 2%;
+        color: #fff;
+        background: #ff74af;
+      }
+      .goods-hover{
+        color: #e60000;
+        background: rgba(0, 0, 0, 0.4);
       }
       .input-box {
         margin-left: 1%;
@@ -900,12 +1097,13 @@ body {
         display: flex;
         align-items: center;
         .icon {
-          background: rgba(0, 0, 0, 0.2);
+          background: rgba(0, 0, 0, 0.4);
         }
         input {
           margin-left: 1%;
           font-size: 0.4rem;
           width: auto;
+          color:#000;
         }
       }
     }
@@ -950,6 +1148,9 @@ body {
     }
     .member-list {
       height: 89%;
+      display: flex;
+      flex-direction: column;
+
       .item {
         display: flex;
         align-items: center;
@@ -961,13 +1162,13 @@ body {
           border-radius: 50%;
           margin-right: 0.3rem;
         }
-        span{
+        span {
           margin-right: 0.5rem;
         }
-        span.owner{
+        span.owner {
           background-color: #2cacfc;
           border-radius: 0.4rem;
-          padding:0 0.4rem;
+          padding: 0 0.4rem;
           height: 0.8rem;
           line-height: 0.8rem;
         }
@@ -1081,7 +1282,7 @@ body {
         display: flex;
         -webkit-flex-direction: column;
         flex-direction: column;
-        max-height: 90%;
+        max-height: 60%;
         .dialog_wrapper_head {
           padding: 0.3rem;
         }
@@ -1101,7 +1302,7 @@ body {
       align-items: flex-end;
       .dialog {
         width: 100%;
-        border-radius: 5% 5% 0 0;
+        border-radius: 0.24rem 0.24rem 0 0;
       }
     }
   }
@@ -1166,53 +1367,172 @@ body {
           margin: 0 0.18rem;
         }
       }
-      .buy_package{
+      .buy_package {
         border-top: 0.02rem solid #dddddd;
         padding: 0.48rem;
         display: flex;
-        flex-wrap:wrap;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-content: space-around;
-        height:6.9rem;
-        .item{
-            width: 3.11rem;
-            height: 1.91rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            background-color: #f8f8f8;
-            border-radius: 0.2rem;
-          .package_points{
+        height: 5.55rem;
+        .item {
+          width: 3.11rem;
+          height: 1.91rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          background-color: #f8f8f8;
+          border-radius: 0.2rem;
+          .package_points {
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 0.22rem;
-            img{
+            img {
               width: 0.42rem;
               height: 0.42rem;
               display: inline-block;
               margin: 0 0.18rem;
             }
-            .txt{
+            .txt {
               font-size: 0.5rem;
               color: #000;
             }
           }
-          .package_price{
+          .package_price {
             font-size: 0.31rem;
             color: #808080;
           }
         }
       }
-      .tip{
+      .tip {
         margin-bottom: 1.06rem;
         font-size: 0.3rem;
         color: #808080;
-        span{
+        span {
           color: #15aaff;
         }
       }
+    }
+    .head {
+      width: 100%;
+      text-align: right;
+      display: block;
+      .close {
+        padding: 0.27rem 0.56rem 0 0;
+        display: inline-block;
+        color: #000;
+        font-size: 0.5rem;
+      }
+    }
+
+    .paybox {
+      .packageInfo {
+        margin: 0.8rem 0.51rem 0.51rem;
+        padding-bottom: 0.91rem;
+        border-bottom: 0.03rem solid #e3e3e3;
+        .price {
+          color: #000;
+          .unit {
+            font-size: 0.55rem;
+          }
+          .value {
+            font-size: 1rem;
+          }
+        }
+        .points {
+          margin-top: 0.34rem;
+          font-size: 0.38rem;
+          color: #808080;
+        }
+      }
+      .select {
+        display: flex;
+        align-items: center;
+        padding: 0.64rem 0.5rem;
+        img {
+          width: 0.62rem;
+          height: 0.62rem;
+        }
+        .txt {
+          font-size: 0.38rem;
+          color: #1a1a1a;
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          margin-left: 0.41rem;
+          small {
+            font-size: 0.35rem;
+            color: #666666;
+          }
+        }
+        i {
+          font-size: 0.62rem;
+          color: #e2e2e2;
+        }
+        .selected {
+          color: #00a8ec;
+        }
+      }
+      .confirm {
+        margin: 0 auto;
+        margin-top: 0.7rem;
+        margin-bottom: 0.6rem;
+        font-size: 0.6rem;
+        width: 9.85rem;
+        height: 1.3rem;
+        line-height: 1.3rem;
+        color: #fff;
+        background-color: #00a8ec;
+        border-radius: 0.65rem;
+      }
+    }
+    .goodsbox{
+      padding-bottom: 0.47rem;
+      .item{
+        display: flex;
+        margin: 0.47rem 0.38rem 0 0.36rem;
+        img{
+          width: 2.64rem;
+          height: 2.65rem;
+          flex-shrink:0;
+          border-radius: 0.13rem;
+        }
+        .info{
+          margin-top: 0.11rem;
+          margin-left: 0.51rem;
+          position: relative;
+          flex-grow:1;
+          text-align: left;
+          .name{
+            font-size: 0.41rem;
+            color: #1a1a1a;
+            display: block;
+            margin-bottom: 1.2rem;
+          }
+          .price{
+            font-size: 0.5rem;
+            color: #ff2120;
+            .txt{
+              font-size: 0.63rem;
+            }
+          }
+          .btn{
+            position: absolute;
+            top:1.6rem;
+            right: 0;
+            background-color: #3fbefe;
+            color: #fff;
+            width: 2.13rem;
+            height: 0.94rem;
+            line-height:  0.94rem;
+            border-radius: 0.47rem;
+            text-align: center;
+          }
+        }
+      }
+
     }
   }
 }

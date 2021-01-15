@@ -7,6 +7,7 @@ import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
 import API2 from "./api/API2"
 import HXAPI from "./api/HXAPI"
+import MoneyAPI from "./api/MoneyAPI"
 
 import { debug } from 'util';
 import WebIM from "@/utils/hx/WebIM";
@@ -19,6 +20,7 @@ Vue.prototype.$ShoppingAPI = ShoppingAPI;
 Vue.prototype.$WeixinOpenAPI = WeixinOpenAPI;
 Vue.prototype.$API2 = API2;
 Vue.prototype.$HXAPI = HXAPI;
+Vue.prototype.$MoneyAPI = MoneyAPI;
 
 Vue.prototype.$store = store;
 Vue.mixin({
