@@ -169,12 +169,12 @@ export default {
         justify-content: center;
         margin: 0.3rem 0;
         .block {
-          width: 1.3rem;
-          height: 1.3rem;
+          width: 1.03rem;
+          height: 1.03rem;
           border: 0.02rem solid #5c5c5c;
           margin-left: 10px;
           span {
-            line-height: 1.3rem;
+            line-height: 1.03rem;
             font-size: 0.6rem;
           }
         }
@@ -183,7 +183,7 @@ export default {
           color: transparent;
           //光标的样式
           width: 0.02rem;
-          height: 1.3rem;
+          height: 1.03rem;
           display: block;
           background-color: #000;
           animation: focus 0.7s infinite;

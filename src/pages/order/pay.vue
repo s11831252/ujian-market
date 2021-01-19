@@ -5,11 +5,11 @@
       <div class="pay-money">￥{{money}}</div>
     </div>
     <ul class="pay-mode">
-      <li :class="{action:PayMode==0}" @click="selectPayMode(0)">
+      <li :class="{action:PayMode==0}" @click="PayMode=0">
         <i class="icon icon-ye">&#xe62a;</i>余额支付
         <i class="icon right" v-if="PayMode==0">&#xe633;</i>
       </li>
-      <li :class="{action:PayMode==1}" @click="selectPayMode(1)">
+      <li :class="{action:PayMode==1}" @click="PayMode=1">
         <img class="wx" src="/static/img/wx.png" mode="aspectFit" />
         <i class="icon right" v-if="PayMode==1">&#xe633;</i>
       </li>
@@ -22,7 +22,9 @@
       <button class="btn-ok" @click="pay">确定支付</button>
       <button class="btn-no" @click="$router.back();">稍后付款</button>
     </div>
-    <div class="modal pay-validCodeBox" v-if="modalOpen" @click="openModal">
+    <vaildCodeBox :openModal="modalOpen" @close="modalOpen=false" v-if="OrderInfo" :price="money" :inputBefore="codeBefore" :inputComplete="codeComplete"></vaildCodeBox>
+
+    <!-- <div class="modal pay-validCodeBox" v-if="modalOpen" @click="openModal">
       <div class="modal-container" @click.stop>
         <div class="box-title">
           <i class="icon"></i>
@@ -56,13 +58,17 @@
           <p class="tip">支付验证码已发送到您账号手机，“5分钟”有效</p>
         </div>
       </div>
-    </div>
+    </div>-->
   </div>
 </template>
 <script>
 import { mapState } from "vuex";
+import vaildCodeBox from "../../components/validCodeBox";
 
 export default {
+  components: {
+    vaildCodeBox
+  },
   data() {
     return {
       OrderInfo: {
@@ -72,51 +78,44 @@ export default {
         DifferenceAmount: 0.0,
         State: 0
       },
-      code: "",
       PayMode: 0,
       OrderId: "",
       modalOpen: false,
-      countDownStr: "点击发送验证码",
-      sendTime: 0
     };
   },
-  watch: {
-    code(newval, oldval) {
-      if (newval.length == 4) {
-        // console.log(oldval,newval);
-        var that = this;
-        this.$ShoppingAPI
-          .Order_Pay({
-            OrderId: this.OrderId,
-            VerificationCode: newval
-          })
-          .then(rep => {
-            // console.log(rep)
-            if (rep.ret == 0) {
-              that.go({ path: "/pages/order/index", reLaunch: true });
-            }
-          });
-      }
-    }
-  },
   methods: {
-    selectPayMode(paymode) {
-      this.PayMode = paymode;
+    async codeComplete(code) {
+      var rep = await this.$ShoppingAPI.Order_Pay({
+        OrderId: this.OrderId,
+        VerificationCode: code
+      });
+
+      if (rep.ret == 0) {
+        that.go({ path: "/pages/order/index", reLaunch: true });
+      }
     },
-    openModal() {
-      this.modalOpen = !this.modalOpen;
-      this.code = "";
+    // openModal() {
+    //   this.modalOpen = !this.modalOpen;
+    //   this.code = "";
+    // },
+    async codeBefore() {
+      console.log("codeBefore")
+      var rep = await this.$ShoppingAPI.Order_ValidationCode();
+      if (rep.ret == 0) {
+        return true;
+      }
     },
     async pay() {
       let that = this;
       if (this.PayMode == 0) {
-        this.openModal();
-        if (this.sendTime == 0) {
-          var rep = await this.$ShoppingAPI.Order_ValidationCode();
-          if (rep.ret == 0) {
-            this.countDown();
-          }
-        }
+        this.modalOpen = true;
+        // this.openModal();
+        // if (this.sendTime == 0) {
+        //   var rep = await this.$ShoppingAPI.Order_ValidationCode();
+        //   if (rep.ret == 0) {
+        //     this.countDown();
+        //   }
+        // }
       } else if (this.PayMode == 1) {
         if (!this.UserInfo.openid) {
           //弹出提示框
@@ -130,15 +129,15 @@ export default {
                     that.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
                       if (rep.ret == 0) {
                         // console.log(rep);
-                        var _u = {...this.UserInfo , ...rep.data.result}
-                        that.$store.commit("SetUserInfo", _u);//清空userinfo
+                        var _u = { ...this.UserInfo, ...rep.data.result };
+                        that.$store.commit("SetUserInfo", _u); //清空userinfo
                       }
                     });
                   }
                 }
               });
             },
-            confirmText:"微信登录"
+            confirmText: "微信登录"
           });
           return false;
         }
@@ -196,31 +195,13 @@ export default {
               }
             },
             fail: function(res) {
-              if(res.errMsg == "requestPayment:fail cancel")
-                return
-              else
-                that.toast(res.errMsg || res.err_desc || "支付失败");
+              if (res.errMsg == "requestPayment:fail cancel") return;
+              else that.toast(res.errMsg || res.err_desc || "支付失败");
             }
           };
           // console.log(payData);
           wx.requestPayment(payData);
         }
-      }
-    },
-    countDown() {
-      if (this.sendTime == 0) {
-        this.sendTime = 60;
-        this.countDownStr = this.sendTime + "s后可重新发送";
-        var clock = setInterval(() => {
-          this.sendTime--;
-          if (this.sendTime <= 0) {
-            this.countDownStr = "点击发送验证码";
-            this.sendTime = 0;
-            clearInterval(clock);
-          } else {
-            this.countDownStr = this.sendTime + "s后可重新发送";
-          }
-        }, 1000);
       }
     }
   },
@@ -233,8 +214,8 @@ export default {
     })
   },
   async mounted() {
-     this.extraDataHandler();
-     this.wx_login(async ()=>{
+    this.extraDataHandler();
+    this.wx_login(async () => {
       if (this.$route.query && this.$route.query.OrderId) {
         this.OrderId = this.$route.query.OrderId;
         var rep = await this.$ShoppingAPI.Order_Get({ OrderId: this.OrderId });
@@ -314,84 +295,6 @@ export default {
       display: inline-block;
       width: 80%;
       margin-bottom: 5px;
-    }
-  }
-  .modal {
-    position: fixed;
-    background: rgba(0, 0, 0, 0.3);
-    height: 100%;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
-    text-align: center;
-    .modal-container {
-      top: 25%;
-      margin: 0 auto;
-      width: 70%;
-      background-color: #fff;
-      text-align: center;
-      position: relative;
-      .countDown {
-        color: #12b7f5;
-      }
-      .pay-money {
-        margin-top: 10px;
-        color: #ff5252;
-        font-size: 25px;
-      }
-      .tip {
-        font-size: 12px;
-        color: #717070;
-      }
-      .blocks {
-        text-align: center;
-        position: relative;
-        display: flex;
-        // flex-direction: row;
-        // align-items: center;
-        justify-content: center;
-        margin:0.3rem 0;
-        .block {
-          width: 30px;
-          height: 30px;
-          border: 1px solid #5c5c5c;
-          margin-left: 10px;
-          span {
-            line-height: 30px;
-          }
-        }
-        .cursor {
-          text-align: center;
-          color: transparent;
-          //光标的样式
-          width: 1px;
-          height: 30px;
-          display: block;
-          background-color: #000;
-          animation: focus 0.7s infinite;
-        }
-        @keyframes focus {
-          from {
-            opacity: 1;
-          }
-
-          to {
-            opacity: 0;
-          }
-        }
-        input {
-          width: 100%;
-          position: absolute;
-          color: transparent;
-          left: -40%;
-          text-align: left;
-          padding-right: 100%;
-          height: 30px;
-        }
-      }
     }
   }
 }

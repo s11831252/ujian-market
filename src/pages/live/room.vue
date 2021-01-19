@@ -46,9 +46,27 @@
           <input placeholder="说点什么..." type="text" v-model="textMsg" maxlength="200" @confirm="sendMsg" confirm-type="send" fixed="true" />
         </div>
         <i class="icon exit" @click="exitLiveRoom">&#xe609;</i>
-        <i class="icon goods" hover-class="goods-hover" @click="getGoods();showgoods=true;">&#xe639;</i>
+        <i class="icon goods" hover-class="goods-hover" @click="showgoods=true;">&#xe639;</i>
         <i class="icon praise" hover-class="goods-hover" @click="giveLike">&#xe619;</i>
         <i class="icon gift" @click="showGift=true">&#xe651;</i>
+      </div>
+    </div>
+    <div class="float-goods" v-if="floatingGoods&&showFloating">
+      <div class="top">
+        <i class="icon recommend">&#xe655;</i>
+        <span class="txt">店铺明星产品</span>
+        <i class="icon" @click="showFloating=false">&#xe613;</i>
+      </div>
+      <div class="body" @click="go({path:'/pages/shop/detail',query:{gId:floatingGoods.gId,sId:floatingGoods.sId,sName:floatingGoods.sName}})">
+        <img :src="floatingGoods.Images.length>0?floatingGoods.Images[0].Thumbnail_url:''" />
+        <span class="name">{{floatingGoods.gName}}</span>
+        <span class="txt">推荐</span>
+      </div>
+      <div class="bottom" @click="go({path:'/pages/shop/detail',query:{gId:floatingGoods.gId,sId:floatingGoods.sId,sName:floatingGoods.sName}})">
+        <div class="price">
+          ￥<span class="txt">{{floatingGoods.Price}}</span>
+        </div>
+        <i class="icon">&#xe601;</i>
       </div>
     </div>
     <div class="modal" v-show="showMember">
@@ -281,6 +299,7 @@ export default {
       Balance: 0,
       shopGoods:null,
       showgoods:false,
+      showFloating:true,
     };
   },
   components: {
@@ -312,6 +331,17 @@ export default {
       let encodeparms = encodeURIComponent(`?roomId=${this.roomId}`);
       url = url + encodeparms;
       return url;
+    },
+    floatingGoods(){
+      if(this.shopGoods==null||this.shopGoods.length==0)
+      {
+        return
+      }else
+      {
+        return this.shopGoods.find(item=>{
+           return item.liveModel.isFloating
+        })
+      }
     }
   },
   methods: {
@@ -725,6 +755,8 @@ export default {
                   that.isFollow = res.data;
                 }
               });
+
+              that.getGoods();
             }
           },
           error(msg) {
@@ -749,15 +781,18 @@ export default {
     cmdMsgHanderler(msg) {
       var that = this;
       try {
-        console.log("cmdMsgHanderler", msg.action);
         let msgData = JSON.parse(msg.action);
         if (msgData.action) {
-          msgData.data = JSON.parse(msgData.data);
           switch (msgData.action) {
             case "UpdatePraiseAndGiftCount": {
+              msgData.data = JSON.parse(msgData.data);
               that.giftCount = parseInt(msgData.data.gift);
               that.praiseCount = parseInt(msgData.data.praise);
               break;
+            }
+            case "UpdateHangingGoodsState":{
+              console.log("cmdMsgHanderler", msg.action);
+              that.getGoods();
             }
             default: {
               break;
@@ -887,24 +922,22 @@ export default {
         return false;
       }
     },
-    //关闭验证码框
-    codeClose($event) {
-      console.log("codeClose", $event);
-      this.openVaildCode = false;
-    },
     //获取U建钱包余额
     getBalance() {
       this.$UJAPI.Balance_Purse().then(rep => {
         this.Balance = rep.data;
       });
     },
+    //获取商品列表
     getGoods(){
-        if(this.roomInfo&&this.roomInfo.sId&&this.shopGoods==null)
+      var that =  this;
+        if(this.roomInfo&&this.roomInfo.sId)
         {
           //获取店铺商品
-          this.$ShoppingAPI.Goods_GetByShop({ sId: this.roomInfo.sId }).then(rep3=>{
+          this.$ShoppingAPI.AppServer_Follow(this.roomInfo.sId).then(rep3=>{
             if (rep3.ret == 0) {
-              this.shopGoods = rep3.data;
+              that.shopGoods = rep3.data;
+              that.showFloating = true;
             }
           })
         }
@@ -926,6 +959,16 @@ export default {
     WebIM.conn.quitChatRoom({
       roomId: this.$route.query.roomId
     });
+  },
+  onShareAppMessage(result) {
+    let title = `【${this.roomInfo.name}】正在直播中`;
+    let path = `/pages/live/room?roomId=${this.roomId}`;
+    let imageUrl = this.roomInfo.cover;
+    return {
+      title,
+      path,
+      imageUrl
+    };
   },
   mounted() {
     var that = this;
@@ -1108,6 +1151,101 @@ body {
       }
     }
   }
+  .float-goods{
+    padding: 0.24rem;
+    background-color: #f7f0fa;
+    position: fixed;
+    right: 0.31rem;
+    bottom: 2rem;
+    z-index: 4;
+    border-radius: 0.13rem;
+    .top{
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.29rem;
+      font-size: 0.29rem;
+      .icon{
+        width:0.36rem;
+        height: 0.36rem;
+        line-height: 0.36rem;
+        text-align: center;
+        flex-shrink:0;
+        color: #a49baf;
+      }
+      .icon.recommend{
+        background-color:#7b33dd ;
+        color: #fcfaff;
+        font-size: 0.19rem;
+        border-radius: 50%;
+      }
+      .txt{
+        color: #7b33dd;
+        width: 100%;
+        flex-grow:1;
+        font-size: 0.29rem;
+        margin-left: 0.06rem;
+      }
+    }
+    .body{
+      position: relative;
+      margin-bottom: 0.22rem;
+      img{
+        width: 2.9rem;
+        height: 2.63rem;
+        border-radius: 0.1rem;
+      }
+      .txt{
+        width: 1rem;
+        height: 0.54rem;
+        border-radius: 0.2rem 0 0.2rem 0;
+        text-align: center;
+        background-color: #c519f1;
+        color: #fff;
+        position:absolute;
+        top: -0.16rem;
+        left: 0;
+        font-size: 0.33rem;
+      }
+      .name{
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        font-size: 0.34rem;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        line-height: 0.64rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-indent:0.14rem;
+        border-radius:0 0 0.1rem 0.1rem;
+      }
+    }
+    .bottom{
+      color: #fe2b54;
+      display: flex;
+      align-items: center;
+      .price{
+        flex-grow:1;
+        font-size: 0.33rem;
+        .txt{
+          font-size: 0.43rem;
+        }
+      }
+      .icon{
+        width: 0.56rem;
+        height: 0.55rem;
+        line-height: 0.55rem;
+        text-align: center;
+        font-size: 0.3;
+        flex-shrink:0;
+        border-radius: 50%;
+        color: #fff;
+        background-color: #fe2b54;
+      }
+    }
+  }
   .modal {
     .mask {
       position: fixed;
@@ -1282,7 +1420,7 @@ body {
         display: flex;
         -webkit-flex-direction: column;
         flex-direction: column;
-        max-height: 60%;
+        max-height: 12.49rem;
         .dialog_wrapper_head {
           padding: 0.3rem;
         }
