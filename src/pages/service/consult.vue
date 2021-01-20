@@ -630,12 +630,7 @@ export default {
     }
 
     this.EmojiObj2 = WebIM.EmojiObj2;
-    msgStorage.on("newChatMsg", function(
-      renderableMsg,
-      type,
-      curChatMsg,
-      sesskey
-    ) {
+    msgStorage.on("newChatMsg", function(renderableMsg,type,curChatMsg,sesskey) {
       // console.log("newChatMsg:",renderableMsg, curChatMsg)
       // 判断是否属于当前会话
       if (that.chatRoomInfo.groupid && sesskey == that.sessionKey) {

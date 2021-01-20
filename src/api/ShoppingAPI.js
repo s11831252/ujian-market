@@ -2,7 +2,8 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = process.env.NODE_ENV == 'development'?"http://www.luozuzhan.top:811/":"https://market.ujianchina.net/";
+let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.119:811/":"https://market.ujianchina.net/";
+// let BaseHost = process.env.NODE_ENV == 'development'?"http://www.luozuzhan.top:811/":"https://market.ujianchina.net/";
 
 export default {
     //百度坐标转换
@@ -292,4 +293,9 @@ export default {
     AppServer_Follow:(userId)=>{
         return http.post(BaseHost + `api/AppServer/Follow?userId=${userId}`)
     },
+    //获取店铺直播间关联的商品
+    AppServer_Follow:(sId)=>{
+        return http.get(BaseHost + `api/Goods/GetLiveGoods?sId=${sId}`)
+    },
+    
 }

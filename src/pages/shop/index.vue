@@ -309,8 +309,8 @@ export default {
       }
       .shop-detail-notice {
         font-size: 14px;
-        overflow-y: hidden;
-        height: 0.84rem;
+        // overflow-y: hidden;
+        // height: 0.84rem;
         // text-overflow: ellipsis;
         // white-space: nowrap;
       }

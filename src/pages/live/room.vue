@@ -1,8 +1,12 @@
 <template>
   <div v-if="roomInfo" class="root">
-    <live-player :src="roomInfo.livePushUrl[0]" mode="live" autoplay @statechange="statechange" @error="error" class="live-play" />
+    <live-player id="myPlayer" :src="roomInfo.livePushUrl[0]" mode="live" autoplay @statechange="statechange" @error="error" @fullscreenchange="fullscreenchange" class="live-play">
+      <cover-view class="player-tool" v-if="fullscreen" @click="fullscreenHandler">
+        退出全屏
+      </cover-view>
+    </live-player>
     <ul class="otherPush">
-      <li v-for="(iten,index) in otherPush" :key="index">
+      <li v-for="(iten,index) in otherPush" :key="index" @click="changeMainPushUrl(iten,index)">
         <live-player :src="iten" mode="live" autoplay @statechange="statechange" @error="error" class="other-play" />
       </li>
     </ul>
@@ -12,6 +16,9 @@
     </div>
     <div class="chart-container">
       <div class="mask" v-if="!Logined" :class="!Logined" @click="login_dialog=true"></div>
+      <div class="player-tool">
+        <i class="icon" @click="fullscreenHandler">&#xe656;</i>
+      </div>
       <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" v-if="isMP">
         <div class="top">欢迎您进入直播间</div>
         <!-- <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem> -->
@@ -209,7 +216,7 @@
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-show="showgoods&&shopGoods">
+    <div class="uj_dialog" v-show="showgoods&&shopGoods&&shopGoods.length>0">
       <div class="mask" @click="showgoods=false"></div>
       <div class="dialog_wrapper bottom" @click="showgoods=false;">
         <div class="dialog bg_grey" @click.stop>
@@ -300,6 +307,7 @@ export default {
       shopGoods:null,
       showgoods:false,
       showFloating:true,
+      fullscreen:false
     };
   },
   components: {
@@ -350,6 +358,38 @@ export default {
     },
     error(e) {
       console.error("live-player error:", e);
+    },
+    fullscreenchange(e){
+      console.log("fullscreenchange e:", e);
+    },
+    //直播全屏/正常切换
+    fullscreenHandler(){
+      var that = this;
+      var _livePlayerContext = wx.createLivePlayerContext("myPlayer")
+      console.log("fullscreen by",_livePlayerContext)
+      if(that.fullscreen)
+      {
+        _livePlayerContext.exitFullScreen({
+          success(e){
+            that.fullscreen=false;
+            console.log("exitFullScreen success",e)
+          },
+          fail(e){
+            console.log("exitFullScreen fail",e)
+          }})
+      }else{
+        _livePlayerContext.requestFullScreen({
+          direction:90,
+          success(e){
+            that.fullscreen=true;
+            console.log("fullscreen success",e)
+          },
+          fail(e){
+            console.log("fullscreen fail",e)
+          }
+        })
+      }
+
     },
     //读取消息
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, msg) {
@@ -879,7 +919,7 @@ export default {
                 console.log(res);
                 if (res && res.errMsg == "requestPayment:fail cancel") {
                 } else {
-                  that.toast("支付失败" && res.errMsg && res.err_desc);
+                  that.toast(res.errMsg || res.err_desc||"支付失败");
                 }
               }
             };
@@ -941,6 +981,13 @@ export default {
             }
           })
         }
+    },
+    //切换直播推流, 用于切换显示连麦者的直播视频
+    changeMainPushUrl(item,index){
+      // var _index =  this.roomInfo.livePushUrl.indexOf(item);
+      console.log("changeMainPushUrl :",item,index);
+      this.roomInfo.livePushUrl.splice(index + 1, 1);//推流数组下标0是主播视频, 连麦数组是去除主播后的集合,所以此处+1
+      this.roomInfo.livePushUrl.unshift(item);
     }
   },
   onLoad(query) {
@@ -963,7 +1010,7 @@ export default {
   onShareAppMessage(result) {
     let title = `【${this.roomInfo.name}】正在直播中`;
     let path = `/pages/live/room?roomId=${this.roomId}`;
-    let imageUrl = this.roomInfo.cover;
+    let imageUrl = "https://image.ujianchina.net/MiniProgram/liveroomshare.png";
     return {
       title,
       path,
@@ -1023,9 +1070,19 @@ body {
   overflow: hidden;
   .live-play {
     width: 100%;
-    height: 100%;
+    height: 35%;
     z-index: 1;
     background-color: rgba(0, 0, 0, 0.2);
+    .player-tool{
+      position: absolute;
+      z-index: 4;
+      color: #fff;
+      bottom: 0.6rem;
+      right: 0.4rem;
+      .icon{
+        color: #fff;
+      }
+    }
   }
   .otherPush {
     position: absolute;
@@ -1076,7 +1133,7 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 30%;
+    height: 65%;
     background: #fff;
     color: #000;
     z-index: 3;
@@ -1088,9 +1145,21 @@ body {
       left: 0;
       z-index: 4;
     }
+    .player-tool{
+      position: absolute;
+      width: 100%;
+      top: -0.6rem;
+      z-index: 4;
+      color: #fff;
+      display: flex;
+      justify-content: flex-end;
+      .icon{
+        margin-right: 0.4rem;
+      }
+    }
     .chatbox {
       // height: 100%;
-      height: 80%;
+      height: 90%;
       // background: rgba(0,0,0,0.2);
       .chat-item {
         display: flex;
@@ -1103,7 +1172,7 @@ body {
       display: flex;
       align-items: center;
       font-size: 0.5rem;
-      height: 20%;
+      height: 10%;
       color: #fff;
       .icon {
         // flex-grow:1
@@ -1349,6 +1418,8 @@ body {
       width: 100%;
       .txt {
         margin-left: 0.5rem;
+        display: flex;
+        align-items: center;
         img {
           width: 0.55rem;
           height: 0.55rem;
@@ -1617,7 +1688,7 @@ body {
         margin: 0 auto;
         margin-top: 0.7rem;
         margin-bottom: 0.6rem;
-        font-size: 0.6rem;
+        font-size: 0.55rem;
         width: 9.85rem;
         height: 1.3rem;
         line-height: 1.3rem;
@@ -1647,11 +1718,14 @@ body {
             font-size: 0.41rem;
             color: #1a1a1a;
             display: block;
-            margin-bottom: 1.2rem;
+            // margin-bottom: 1.2rem;
           }
           .price{
             font-size: 0.5rem;
             color: #ff2120;
+            position: absolute;
+            bottom: 0;
+            left: 0;
             .txt{
               font-size: 0.63rem;
             }
