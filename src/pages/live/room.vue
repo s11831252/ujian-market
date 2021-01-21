@@ -24,19 +24,17 @@
         <!-- <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem> -->
         <div class="chat-item" v-for="(item,index) in ChatHistory" :key="index" :id="item.mid">
           <!-- <chatMsg :msgData="item"></chatMsg> -->
-          <span class="txt_praise" v-if="item.msg.type=='chatroom_praise'">
-            <span>{{item.ext.nickName}}</span>
-            给主播点了{{item.msg.customExts.num}}个赞
+          <span class=" txt_praise" v-if="item.msg.type=='chatroom_praise'">
+            <span>{{item.ext.nickName}}</span>给主播点了{{item.msg.customExts.num}}个赞
           </span>
           <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_join'">
             <span>{{item.ext.nickName}}</span>进入直播间
           </span>
-          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_gift'">
-            收到
-            <span>{{item.ext.nickName}}送出的{{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}个</span>
+          <span class="txt_gift" v-else-if="item.msg.type=='chatroom_gift'">
+            收到{{item.ext.nickName}}送出的<img :src="item.msg.customExts.giftUrl"/>{{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}个
           </span>
           <div v-else>
-            <span>{{item.ext.nickName}} ：</span>
+            <span>{{item.ext.nickName}}: </span>
             <chatMsg v-for="(item,index2) in item.msg.data" :key="index2" :msgdata="item"></chatMsg>
           </div>
         </div>
@@ -76,7 +74,7 @@
         <i class="icon">&#xe601;</i>
       </div>
     </div>
-    <div class="modal" v-show="showMember">
+    <div class="modal" :class="showMember?'open':''">
       <div class="mask" @click.stop="showMember=false"></div>
       <div class="modal-wrap">
         <span class="title">观众</span>
@@ -89,7 +87,7 @@
         </scroll-view>
       </div>
     </div>
-    <div class="modal" v-show="showGift">
+    <div class="modal" :class="showGift?'open':''">
       <div class="mask" @click.stop="showGift=false"></div>
       <div class="modal-wrap">
         <span class="title">
@@ -107,13 +105,13 @@
           <span class="txt">
             <img src="../../../static/img/ub.png" />
             <span class="points">{{livePoints}}</span>
-            <span class="pay" @click="buy_dialog=true;showGift=false;getBalance();">充值 〉</span>
+            <span class="pay" @click="buy_dialog=true;">充值 〉</span>
           </span>
-          <button @click="sendGiftMsg(1);showGift=false;">赠送</button>
+          <button @click="sendGiftMsg(1);" :style="{visibility:selectGift.giftId?'visible':'hidden'}">赠送</button>
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-show="dialog">
+    <div class="uj_dialog" :class="dialog?'open':''">
       <div class="mask" @click="dialog=false"></div>
       <div class="dialog_wrapper" @click="dialog=false">
         <div class="dialog" @click.stop>
@@ -135,7 +133,7 @@
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-show="login_dialog">
+    <div class="uj_dialog" :class="login_dialog?'open':''">
       <div class="mask" @click="login_dialog=false"></div>
       <div class="dialog_wrapper bottom" @click="login_dialog=false">
         <div class="dialog bg_grey" @click.stop>
@@ -150,7 +148,7 @@
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-show="buy_dialog">
+    <div class="uj_dialog" :class="buy_dialog?'open':''">
       <div class="mask" @click="buy_dialog=false"></div>
       <div class="dialog_wrapper bottom" @click="buy_dialog=false">
         <div class="dialog bg_grey" @click.stop>
@@ -180,7 +178,7 @@
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-show="selectPackage">
+    <div class="uj_dialog" :class="selectPackage?'open':''">
       <div class="mask" @click="selectPackage=null"></div>
       <div class="dialog_wrapper bottom" @click="selectPackage=null">
         <div class="dialog bg_grey" @click.stop>
@@ -196,7 +194,7 @@
                 </p>
                 <p class="points">{{selectPackage.points}}U币</p>
               </div>
-              <div class="select" @click="paymode=1">
+              <div class="select" @click="paymode=1;getBalance();">
                 <img src="../../../static/img/logo108.png" />
                 <span class="txt">
                   U建钱包支付
@@ -216,7 +214,7 @@
         </div>
       </div>
     </div>
-    <div class="uj_dialog" v-show="showgoods&&shopGoods&&shopGoods.length>0">
+    <div class="uj_dialog" :class="showgoods&&shopGoods&&shopGoods.length>0?'open':''">
       <div class="mask" @click="showgoods=false"></div>
       <div class="dialog_wrapper bottom" @click="showgoods=false;">
         <div class="dialog bg_grey" @click.stop>
@@ -476,6 +474,10 @@ export default {
     },
     //发礼物消息
     async sendGiftMsg(giftNum) {
+      if(!this.selectGift.giftId)
+      {
+        return
+      }
       let self = this;
       let roomId = this.roomInfo.id;
       let from = WebIM.conn.context.userId;
@@ -1154,7 +1156,7 @@ body {
       display: flex;
       justify-content: flex-end;
       .icon{
-        margin-right: 0.4rem;
+        padding: 0 0.4rem;
       }
     }
     .chatbox {
@@ -1162,11 +1164,21 @@ body {
       height: 90%;
       // background: rgba(0,0,0,0.2);
       .chat-item {
-        display: flex;
         .txt_praise {
           color: #497fe6;
         }
+        .txt_gift{
+          img{
+            width: 0.55rem;
+            height: 0.55rem;
+          }
+        }
       }
+      .chat-item>span{
+          line-height: 0.55rem;
+          display: flex;
+          align-items: center;
+        }
     }
     .chat-tool {
       display: flex;
@@ -1324,18 +1336,19 @@ body {
       height: 100%;
       z-index: 9;
       background: rgba(0, 0, 0, 0.6);
+      display: none;
     }
     .modal-wrap {
-      // display: flex;
-      // align-items: center;
-      // flex-direction: column;
-      // justify-content: center;
       width: 100%;
-      height: 50%;
+      height:50%;
       position: fixed;
       left: 0;
       bottom: 0;
       z-index: 10;
+      transform:translateY(100%);
+      visibility: hidden;
+      opacity:0;
+      transition: opacity 700ms ease-out, transform 300ms ease-out,visibility 700ms ease-out;
       background: rgba(22, 24, 36, 1);
       color: #ffffff;
       overflow: hidden;
@@ -1415,6 +1428,7 @@ body {
       align-items: center;
       font-size: 0.4rem;
       padding: 0.21rem 0;
+      border-top: 0.03rem solid rgba(45, 47, 59, 0.6);;
       width: 100%;
       .txt {
         margin-left: 0.5rem;
@@ -1446,6 +1460,16 @@ body {
       }
     }
   }
+  .modal.open{
+    .mask{
+      display: block;
+    }
+    .modal-wrap{
+      transform: none;
+      visibility: visible;
+      opacity: 1;
+    }
+  }
   .uj_dialog {
     .mask {
       position: fixed;
@@ -1455,16 +1479,20 @@ body {
       left: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.6);
-    }
-    .mask {
-      opacity: 1;
-      transform: scale3d(1, 1, 1);
-      transition: all 0.3s ease-in;
-    }
-    .mask.mask_hidden {
+      display: none;
       opacity: 0;
       transform: scale3d(1, 1, 0);
+      transition: all 0.3s ease-in;
     }
+    // .mask {
+    //   opacity: 1;
+    //   transform: scale3d(1, 1, 1);
+    //   transition: all 0.3s ease-in;
+    // }
+    // .mask.mask_hidden {
+    //   opacity: 0;
+    //   transform: scale3d(1, 1, 0);
+    // }
     .dialog_wrapper {
       position: fixed;
       z-index: 10;
@@ -1481,6 +1509,10 @@ body {
       -webkit-box-pack: center;
       -webkit-justify-content: center;
       justify-content: center;
+      transform:translateY(-100%);
+      visibility: hidden;
+      opacity:0;
+      transition: opacity 700ms ease-out, transform 300ms ease-out,visibility 700ms ease-out;
       .dialog {
         background-color: #fff;
         text-align: center;
@@ -1509,10 +1541,28 @@ body {
     }
     .dialog_wrapper.bottom {
       align-items: flex-end;
+      transform:translateY(100%);
       .dialog {
         width: 100%;
         border-radius: 0.24rem 0.24rem 0 0;
       }
+    }
+  }
+  .uj_dialog.open{
+    .mask{
+      display: block;
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+    // .mask {
+    //   opacity: 1;
+    //   transform: scale3d(1, 1, 1);
+    //   transition: all 0.3s ease-in;
+    // }
+    .dialog_wrapper{
+      transform: none;
+      visibility: visible;
+      opacity: 1;
     }
   }
   .dialog {
