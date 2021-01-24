@@ -81,7 +81,7 @@
         <scroll-view scroll-y="true" enable-flex="true" class="member-list">
           <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
             <img :src="item.Portrait" />
-            <span>{{item.UserName}}</span>
+            <span class="txt">{{item.UserName}}</span>
             <span class="owner" v-if="item.owner">主播</span>
           </div>
         </scroll-view>
@@ -847,7 +847,7 @@ export default {
     },
     //取消关注
     unFollow() {
-      this.$ShoppingAPI.AppServer_Follow(this.roomInfo.owner).then(res => {
+      this.$ShoppingAPI.AppServer_UnFollow(this.roomInfo.owner).then(res => {
         if (res.ret == 0 && res.data) {
           this.followCount--;
           this.isFollow = false;
@@ -976,7 +976,7 @@ export default {
         if(this.roomInfo&&this.roomInfo.sId)
         {
           //获取店铺商品
-          this.$ShoppingAPI.AppServer_Follow(this.roomInfo.sId).then(rep3=>{
+          this.$ShoppingAPI.Goods_GetLiveGoods(this.roomInfo.sId).then(rep3=>{
             if (rep3.ret == 0) {
               that.shopGoods = rep3.data;
               that.showFloating = true;
@@ -1107,27 +1107,24 @@ body {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    .room_name {
-      background-color: rgba(255, 255, 255, 0.3);
+    .room_name,.people_num{
       border-radius: 0.5rem;
       height: 0.8rem;
-      line-height: 0.8rem;
       padding: 0 0.4rem;
+      line-height: 0.8rem;
       letter-spacing: 0.02rem;
+    }
+    .room_name {
+      background-color: rgba(255, 255, 255, 0.3);
       margin-left: 0.3rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      max-width:70%;
     }
     .people_num {
       margin-right: 0.3rem;
       background-color: rgba(255, 255, 255, 0.6);
-      border-radius: 0.5rem;
-      // border: 0.02rem solid #fff;
-      height: 0.8rem;
-      line-height: 0.8rem;
-      padding: 0 0.4rem;
-      letter-spacing: 0.02rem;
     }
   }
   .chart-container {
@@ -1368,9 +1365,8 @@ body {
     }
     .member-list {
       height: 89%;
-      display: flex;
-      flex-direction: column;
-
+      // display: flex;
+      // flex-direction: column;
       .item {
         display: flex;
         align-items: center;
@@ -1381,9 +1377,14 @@ body {
           height: 0.8rem;
           border-radius: 50%;
           margin-right: 0.3rem;
+          flex-shrink:0;
         }
-        span {
+        span.txt {
           margin-right: 0.5rem;
+          max-width: 70%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         span.owner {
           background-color: #2cacfc;
@@ -1391,6 +1392,7 @@ body {
           padding: 0 0.4rem;
           height: 0.8rem;
           line-height: 0.8rem;
+          flex-shrink:0;
         }
       }
     }

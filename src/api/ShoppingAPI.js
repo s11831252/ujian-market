@@ -294,7 +294,7 @@ export default {
         return http.post(BaseHost + `api/AppServer/Follow?userId=${userId}`)
     },
     //获取店铺直播间关联的商品
-    AppServer_Follow:(sId)=>{
+    Goods_GetLiveGoods:(sId)=>{
         return http.get(BaseHost + `api/Goods/GetLiveGoods?sId=${sId}`)
     },
     
