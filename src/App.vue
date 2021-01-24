@@ -8,6 +8,9 @@ import msgType from "./pages/service/msgtype";
 import './assets/style.css';
 import './assets/global.css';
 import './assets/iconfont.less';
+//异常时的弹框锁,避免重复触发
+let lockOnError=false;
+
 function ack(receiveMsg) {
   // 处理未读消息回执
   var bodyId = receiveMsg.id; // 需要发送已读回执的消息id
@@ -55,22 +58,6 @@ export default {
     WebIM.conn.listen({
       onOpened: function(message) {
         that.showLoading({ title: "正在同步聊天记录" });
-        // console.log("onOpened", message);
-        //连接成功回调
-        // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
-        // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
-        // 则无需调用conn.setPresence();
-        // WebIM.conn.setPresence();
-        // WebIM.conn.listRooms({
-        //   success: function(resp) {
-        //     utils.setItem("listGroup", resp);
-        //     utils.setItem("myUsername", WebIM.conn.context.userId);
-        //     that.hideLoading();
-        //   },
-        //   error: function(e) {
-        //     console.log("error:", e);
-        //   }
-        // });
         WebIM.conn.getGroup({
           success: function(resp){
             // console.log(resp)
@@ -168,8 +155,12 @@ export default {
       }, //收到位置消息
       onRoster: function(message) {}, //处理好友申请
       onInviteMessage: function(message) {}, //处理群组邀请
-      onOnline: function() {}, //本机网络连接成功
-      onOffline: function() {}, //本机网络掉线
+      onOnline: function(msg) {
+        console.log("onOnline",msg)
+      }, //本机网络连接成功
+      onOffline: function(msg) {
+        console.log("onOffline",msg)
+      }, //本机网络掉线
       onError: function(message) {
         console.log("环信Error:",message)
         that.$UJAPI.Error_upload({
@@ -179,19 +170,30 @@ export default {
           ErrorMsg: JSON.stringify(message),
           ErrorType: message.type,
         });
-        if(message.type==206||message.type==8||message.type==16)
+
+        if(message.type==16 ){
+          console.log(`环信 autoReconnectNum:${WebIM.conn.autoReconnectNumTotal} , autoReconnectNumMax:${WebIM.conn.autoReconnectNumMax}`)
+          that.hx_login();
+        }
+        if(message.type==206||message.type==8)
         {
-          that.modal({
-              title:"连接失败",
-              content:"聊天服务已断开,您可尝试重连",
-              confirm:()=>{
-                that.hx_login()
-              },
-              cancel:()=>{
-                
-              },
-              confirmText:"重连"
-            })
+          if(!lockOnError)
+          {
+            that.modal({
+                title:"连接失败",
+                content:"聊天服务已断开,您可尝试重连",
+                confirm:()=>{
+                  that.hx_login();
+                  lockOnError = false;
+
+                },
+                cancel:()=>{
+                  lockOnError = false;
+                },
+                confirmText:"重连"
+              });
+          }
+          lockOnError = true;
         }
       }, //失败回调
       onReceivedMessage: function(message) {}, //收到消息送达服务器回执
@@ -204,8 +206,10 @@ export default {
       onCustomMessage: function(msg){
         console.log("onCustomMessage",msg)
         disp.fire('newCustomMessage',msg);
-      }
-      // ......
+      },// 自定义消息
+      onClosed(msg){
+        console.log("onClosed",msg,WebIM.conn.isOpened())
+      },//链接已关闭
     });
   },
   mounted(){
