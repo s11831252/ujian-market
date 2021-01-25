@@ -57,19 +57,21 @@ export default {
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
+        console.log("onOpened")
         that.showLoading({ title: "正在同步聊天记录" });
         WebIM.conn.getGroup({
           success: function(resp){
             // console.log(resp)
             utils.setItem("listGroup", resp.data);
             utils.setItem("myUsername", WebIM.conn.context.userId);
-            disp.fire('onOpened',message);
+            disp.fire('onGetGroupSuccess',resp);
             that.hideLoading();
           },
           error: function(){
             that.hideLoading();
           }
         });
+        disp.fire('onOpened');
       },//连接打开
       onClosed: function(message) {
         console.log("环信onClosed", message);
@@ -173,7 +175,8 @@ export default {
 
         if(message.type==16 ){
           console.log(`环信 autoReconnectNum:${WebIM.conn.autoReconnectNumTotal} , autoReconnectNumMax:${WebIM.conn.autoReconnectNumMax}`)
-          that.hx_login();
+          // that.hx_login();
+          disp.fire('onSocketDisconnected',message);
         }
         if(message.type==206||message.type==8)
         {
@@ -181,7 +184,7 @@ export default {
           {
             that.modal({
                 title:"连接失败",
-                content:"聊天服务已断开,您可尝试重连",
+                content:"账号已在其他设备登录,您可尝试重连",
                 confirm:()=>{
                   that.hx_login();
                   lockOnError = false;
@@ -207,9 +210,6 @@ export default {
         console.log("onCustomMessage",msg)
         disp.fire('newCustomMessage',msg);
       },// 自定义消息
-      onClosed(msg){
-        console.log("onClosed",msg,WebIM.conn.isOpened())
-      },//链接已关闭
     });
   },
   mounted(){

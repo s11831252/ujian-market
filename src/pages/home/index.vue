@@ -98,14 +98,14 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         <span class="txt">{{item.sName}}
-                          <span class="liveroom" v-if="item.LiveRoomId">
+                          <span class="liveroom" v-if="item.LiveRoomId" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
                             <i class="icon rectbox">
                               <span class="rect"></span>
                               <span class="rect rect2"></span>
                               <span class="rect rect3"></span>
                             </i>
-                          <span>直播中</span>
-                        </span>
+                            <span>直播中</span>
+                          </span>
                         </span>
                         <span class="shop-item-info-distance">{{item.Distance}}</span>
                       </p>

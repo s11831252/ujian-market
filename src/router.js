@@ -93,7 +93,6 @@ var routes = [
         config: {
             navigationBarTitleText: '我的',
             enablePullDownRefresh: true,
-            disableScroll: true
           },
     },
     {

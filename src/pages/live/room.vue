@@ -269,7 +269,7 @@ export default {
       showMember: false,
       showGift: false,
       dialog: false,
-      joined: false,
+      // joined: false,
       login_dialog: false,
       buy_dialog: false,
       buyPackage: [
@@ -352,13 +352,13 @@ export default {
   },
   methods: {
     statechange(e) {
-      console.log("live-player code:", e);
+      // console.log("live-player code:", e);
     },
     error(e) {
       console.error("live-player error:", e);
     },
     fullscreenchange(e){
-      console.log("fullscreenchange e:", e);
+      // console.log("fullscreenchange e:", e);
     },
     //直播全屏/正常切换
     fullscreenHandler(){
@@ -392,19 +392,25 @@ export default {
     //读取消息
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, msg) {
       // console.log(renderableMsg, type, currentChatMsg, sessionKey,msg)
-      if (msg) {
-        var memberInfo = this.roomInfo.affiliations.find(item => {
-          return item.member == msg.from || item.owner == msg.from;
-        });
-        if (memberInfo) {
-          if (renderableMsg) renderableMsg.ext.nickName = memberInfo.UserName;
+
+      if(sessionKey == this.sessionKey)
+      {
+        if (msg) {
+          var memberInfo = this.roomInfo.affiliations.find(item => {
+            return item.member == msg.from || item.owner == msg.from;
+          });
+          if (memberInfo) {
+            if (renderableMsg) renderableMsg.ext.nickName = memberInfo.UserName;
+          }
         }
+
+        if (renderableMsg) 
+          this.ChatHistory.push(renderableMsg);
+
+        if (this.ChatHistory && this.ChatHistory.length > 0) 
+          this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
       }
 
-      if (renderableMsg) this.ChatHistory.push(renderableMsg);
-      // else if (currentChatMsg)
-      //  this.ChatHistory = currentChatMsg;
-      if (this.ChatHistory && this.ChatHistory.length > 0) this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
     },
     //发送普通消息
     sendMsg() {
@@ -463,7 +469,7 @@ export default {
             mid: msg.body.customEvent + msg.body.id,
             chatType: msg.body.contentsType
           };
-          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sesskey);
+          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sessionKey);
           self.praiseCount++;
         },
         fail: function() {},
@@ -510,7 +516,7 @@ export default {
             mid: msg.body.customEvent + msg.id,
             chatType: msg.body.contentsType
           };
-          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sesskey);
+          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sessionKey);
           self.giftCount = self.giftCount + giftNum;
           self.$ShoppingAPI.AppServer_GetPoints().then(response => {
             if (response.ret == 0 && response.data) {
@@ -570,7 +576,7 @@ export default {
             renderableMsg.ext.nickName = memberInfo.UserName;
           }
           that.praiseCount = that.praiseCount + parseInt(msg.customExts.num);
-          that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
+          that.readMsg(renderableMsg, msg.customEvent, null, this.sessionKey, msg);
           break;
         }
         case "chatroom_gift": {
@@ -598,7 +604,7 @@ export default {
           }
           that.giftCount = that.giftCount + parseInt(msg.customExts.num);
 
-          that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
+          that.readMsg(renderableMsg, msg.customEvent, null, this.sessionKey, msg);
           break;
         }
         case "chatroom_member_join": {
@@ -614,7 +620,7 @@ export default {
               owner: null
             });
 
-            that.readMsg(renderableMsg, msg.customEvent, null, this.sesskey, msg);
+            that.readMsg(renderableMsg, msg.customEvent, null, this.sessionKey, msg);
             // console.log("chatroom_member_join", that.roomInfo.affiliations);
           }
           break;
@@ -625,7 +631,7 @@ export default {
           // video_call_status: "start"
           //video_call_status: "end"
           if (msg.customExts.video_call_status == "start") {
-            that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.$route.query.roomId).then(res => {
+            that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
                 for (let index = 0; index < res.data.livePushUrl.length; index++) {
                   const element = res.data.livePushUrl[index];
@@ -636,7 +642,7 @@ export default {
               }
             });
           } else if (msg.customExts.video_call_status == "end") {
-            that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.$route.query.roomId).then(res => {
+            that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
                 for (let index = 0; index < that.roomInfo.livePushUrl.length; index++) {
                   const element = that.roomInfo.livePushUrl[index];
@@ -723,6 +729,15 @@ export default {
           }
           break;
         }
+        case "removedFromGroup" :{
+          console.log(`${msg.type}== removedFromGroup  gId${msg.gid} ==roomId${that.roomId}`)
+          // if(msg.gId == that.roomId)
+          // {
+          //   this.joined=false;
+          //   that.initHanderler();
+          // }
+          break
+        }
         case "memberJoinChatRoomSuccess": {
           // 加入聊天室
           break;
@@ -738,15 +753,17 @@ export default {
       }
     },
     //该页面特殊处理,环信连接初始化之后开始调用api
-    initHanderler(msg) {
+    initHanderler() {
       var that = this;
+      // this.joined = false;
       msgStorage.on("newChatMsg", that.readMsg);
       disp.on("newCustomMessage", that.customMsgHanderler);
       disp.on("onPresence", that.presenceHanderler);
       disp.on("onCmdMessage", that.cmdMsgHanderler);
       // that.EmojiObj2 = WebIM.EmojiObj2; //表情包
-
-      if (this.roomId && !this.joined) {
+      // console.log(`initHanderler,joined:${this.joined}`)
+      //&& !this.joined
+      if (this.roomId ) {
         WebIM.conn.joinChatRoom({
           roomId: that.roomId,
           success: async r => {
@@ -770,7 +787,7 @@ export default {
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
               that.roomInfo = res.data;
-              that.joined = true;
+              // that.joined = true;
               that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
                 if (response.ret == 0 && response.data) {
                   that.giftList = response.data;
@@ -1000,14 +1017,19 @@ export default {
     });
   },
   onUnload() {
+    var that = this;
+    console.log("onUnload")
     msgStorage.off("newChatMsg", this.readMsg);
     disp.off("newCustomMessage", this.customMsgHanderler);
     disp.off("onPresence", this.presenceHanderler);
     disp.off("onOpened", this.initHanderler);
     disp.off("onCmdMessage", this.cmdMsgHanderler);
     WebIM.conn.quitChatRoom({
-      roomId: this.$route.query.roomId
-    });
+      roomId: this.roomId
+    })
+    // .then(res=>{
+    //   that.joined = false;
+    // });
   },
   onShareAppMessage(result) {
     let title = `【${this.roomInfo.name}】正在直播中`;
@@ -1024,7 +1046,7 @@ export default {
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
     }
-    console.log(this.Logined);
+    console.log("mounted",this.Logined);
     this.wx_login(() => {
       // if (!this.$store.getters.Logined) {
       //   this.modal({
@@ -1037,7 +1059,8 @@ export default {
       //   });
       // }else
       if (WebIM.conn.isOpened()) {
-        if (!this.joined) this.initHanderler();
+        // if (!this.joined) 
+        this.initHanderler();
       } else if (!this.Logined) {
         that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
           if (res.ret == 0 && res.data) {

@@ -6,7 +6,7 @@
 console.group = console.group || {};
 console.groupEnd = console.groupEnd || {};
 let config =  mpvue_Mode === 'WX'?require("./MPIMConfig.js").default:require("./WebIMConfig.js").default;
-var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/wxsdk3.4.0").default:require("./web-sdk/websdk3.1.4.js").default;
+var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/wxsdk").default:require("./web-sdk/websdk.js").default;
 
 // if(!window)  window = {};
 
@@ -465,9 +465,4 @@ WebIM.conn = mpvue_Mode === 'WX'? new WebIM.connection({
     appKey: WebIM.config.appkey,
 });
 
-// async response
-// WebIM.conn.listen({
-//   onOpened: () => dispatch({type: Types.ON_OPEND})
-// })
-// console.log(WebIM)
 export default WebIM
