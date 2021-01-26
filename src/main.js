@@ -13,6 +13,7 @@ import { debug } from 'util';
 import WebIM from "@/utils/hx/WebIM";
 import utils from "@/utils/index.js";
 import md5 from "@/utils/md5";
+import disp from "./utils/hx/broadcast";
 
 //在实例中用this.$xxx调用封装好的RestAPI
 Vue.prototype.$UJAPI = UJAPI;
@@ -190,6 +191,7 @@ Vue.mixin({
                 // console.log(WebIM.config)
                 this.showLoading({ title: "正在连接聊天服务器" })
                 WebIM.conn.open(options);
+                disp.fire('onOpening');
                 console.log("环信Login Account or Password",hx_username, hx_psw);
             }
         }

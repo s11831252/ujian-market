@@ -1,9 +1,7 @@
 <template>
   <div v-if="roomInfo" class="root">
     <live-player id="myPlayer" :src="roomInfo.livePushUrl[0]" mode="live" autoplay @statechange="statechange" @error="error" @fullscreenchange="fullscreenchange" class="live-play">
-      <cover-view class="player-tool" v-if="fullscreen" @click="fullscreenHandler">
-        退出全屏
-      </cover-view>
+      <cover-view class="player-tool" v-if="fullscreen" @click="fullscreenHandler">退出全屏</cover-view>
     </live-player>
     <ul class="otherPush">
       <li v-for="(iten,index) in otherPush" :key="index" @click="changeMainPushUrl(iten,index)">
@@ -20,21 +18,24 @@
         <i class="icon" @click="fullscreenHandler">&#xe656;</i>
       </div>
       <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" v-if="isMP">
-        <div class="top">欢迎您进入直播间</div>
+        <div class="top">{{welcomeMsg}}</div>
         <!-- <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem> -->
         <div class="chat-item" v-for="(item,index) in ChatHistory" :key="index" :id="item.mid">
           <!-- <chatMsg :msgData="item"></chatMsg> -->
-          <span class=" txt_praise" v-if="item.msg.type=='chatroom_praise'">
-            <span>{{item.ext.nickName}}</span>给主播点了{{item.msg.customExts.num}}个赞
+          <span class="txt_praise" v-if="item.msg.type=='chatroom_praise'">
+            <span>{{item.ext.nickName}}</span>
+            给主播点了{{item.msg.customExts.num}}个赞
           </span>
           <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_join'">
             <span>{{item.ext.nickName}}</span>进入直播间
           </span>
           <span class="txt_gift" v-else-if="item.msg.type=='chatroom_gift'">
-            收到{{item.ext.nickName}}送出的<img :src="item.msg.customExts.giftUrl"/>{{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}个
+            收到{{item.ext.nickName}}送出的
+            <img :src="item.msg.customExts.giftUrl" />
+            {{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}个
           </span>
           <div v-else>
-            <span>{{item.ext.nickName}}: </span>
+            <span>{{item.ext.nickName}}:</span>
             <chatMsg v-for="(item,index2) in item.msg.data" :key="index2" :msgdata="item"></chatMsg>
           </div>
         </div>
@@ -69,7 +70,8 @@
       </div>
       <div class="bottom" @click="go({path:'/pages/shop/detail',query:{gId:floatingGoods.gId,sId:floatingGoods.sId,sName:floatingGoods.sName}})">
         <div class="price">
-          ￥<span class="txt">{{floatingGoods.Price}}</span>
+          ￥
+          <span class="txt">{{floatingGoods.Price}}</span>
         </div>
         <i class="icon">&#xe601;</i>
       </div>
@@ -221,11 +223,12 @@
           <div class="dialog_wrapper_body">
             <scroll-view scroll-y="true" class="goodsbox" v-if="isMP">
               <div class="item" v-for="(item,index) in shopGoods" :key="index">
-                <img :src="item.Images.length>0?item.Images[0].Thumbnail_url:''"/>
+                <img :src="item.Images.length>0?item.Images[0].Thumbnail_url:''" />
                 <div class="info">
                   <span class="name">{{item.gName}}</span>
                   <span class="price">
-                    ￥<span class="txt">{{item.Price}}</span>
+                    ￥
+                    <span class="txt">{{item.Price}}</span>
                   </span>
                   <span class="btn" @click="go({path:'/pages/shop/detail',query:{gId:item.gId,sId:item.sId,sName:item.sName}})">去购买</span>
                 </div>
@@ -255,7 +258,27 @@ export default {
   data() {
     return {
       roomId: "",
-      roomInfo: null,
+      roomInfo: {
+        name: "直播间",
+        cover: "https://image.ujianchina.net/Shopping/ShopImages//7eb046ff17724f5e97da3d2a3c01be91/201808241024127524ZGG.jpg",
+        status: "ongoing",
+        mute: false,
+        id: "",
+        affiliations_count: 0,
+        chatroomId: "",
+        owner: "",
+        description: "",
+        sId: "",
+        livePushUrl: [""],
+        livePullUrl: [""],
+        ext: null,
+        maxusers: 200,
+        affiliations: [
+        ],
+        persistent: false,
+        video_type: "live",
+        force: false,
+      },
       toView: "",
       ChatHistory: [],
       giftList: [],
@@ -302,10 +325,11 @@ export default {
       paymode: 2,
       openVaildCode: false,
       Balance: 0,
-      shopGoods:null,
-      showgoods:false,
-      showFloating:true,
-      fullscreen:false
+      shopGoods: null,
+      showgoods: false,
+      showFloating: true,
+      fullscreen: false,
+      welcomeMsg: ""
     };
   },
   components: {
@@ -338,15 +362,13 @@ export default {
       url = url + encodeparms;
       return url;
     },
-    floatingGoods(){
-      if(this.shopGoods==null||this.shopGoods.length==0)
-      {
-        return
-      }else
-      {
-        return this.shopGoods.find(item=>{
-           return item.liveModel.isFloating
-        })
+    floatingGoods() {
+      if (this.shopGoods == null || this.shopGoods.length == 0) {
+        return;
+      } else {
+        return this.shopGoods.find(item => {
+          return item.liveModel.isFloating;
+        });
       }
     }
   },
@@ -357,44 +379,42 @@ export default {
     error(e) {
       console.error("live-player error:", e);
     },
-    fullscreenchange(e){
+    fullscreenchange(e) {
       // console.log("fullscreenchange e:", e);
     },
     //直播全屏/正常切换
-    fullscreenHandler(){
+    fullscreenHandler() {
       var that = this;
-      var _livePlayerContext = wx.createLivePlayerContext("myPlayer")
-      console.log("fullscreen by",_livePlayerContext)
-      if(that.fullscreen)
-      {
+      var _livePlayerContext = wx.createLivePlayerContext("myPlayer");
+      console.log("fullscreen by", _livePlayerContext);
+      if (that.fullscreen) {
         _livePlayerContext.exitFullScreen({
-          success(e){
-            that.fullscreen=false;
-            console.log("exitFullScreen success",e)
+          success(e) {
+            that.fullscreen = false;
+            console.log("exitFullScreen success", e);
           },
-          fail(e){
-            console.log("exitFullScreen fail",e)
-          }})
-      }else{
-        _livePlayerContext.requestFullScreen({
-          direction:90,
-          success(e){
-            that.fullscreen=true;
-            console.log("fullscreen success",e)
-          },
-          fail(e){
-            console.log("fullscreen fail",e)
+          fail(e) {
+            console.log("exitFullScreen fail", e);
           }
-        })
+        });
+      } else {
+        _livePlayerContext.requestFullScreen({
+          direction: 90,
+          success(e) {
+            that.fullscreen = true;
+            console.log("fullscreen success", e);
+          },
+          fail(e) {
+            console.log("fullscreen fail", e);
+          }
+        });
       }
-
     },
     //读取消息
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, msg) {
       // console.log(renderableMsg, type, currentChatMsg, sessionKey,msg)
 
-      if(sessionKey == this.sessionKey)
-      {
+      if (sessionKey == this.sessionKey) {
         if (msg) {
           var memberInfo = this.roomInfo.affiliations.find(item => {
             return item.member == msg.from || item.owner == msg.from;
@@ -404,13 +424,10 @@ export default {
           }
         }
 
-        if (renderableMsg) 
-          this.ChatHistory.push(renderableMsg);
+        if (renderableMsg) this.ChatHistory.push(renderableMsg);
 
-        if (this.ChatHistory && this.ChatHistory.length > 0) 
-          this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
+        if (this.ChatHistory && this.ChatHistory.length > 0) this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
       }
-
     },
     //发送普通消息
     sendMsg() {
@@ -480,9 +497,8 @@ export default {
     },
     //发礼物消息
     async sendGiftMsg(giftNum) {
-      if(!this.selectGift.giftId)
-      {
-        return
+      if (!this.selectGift.giftId) {
+        return;
       }
       let self = this;
       let roomId = this.roomInfo.id;
@@ -729,14 +745,14 @@ export default {
           }
           break;
         }
-        case "removedFromGroup" :{
-          console.log(`${msg.type}== removedFromGroup  gId${msg.gid} ==roomId${that.roomId}`)
+        case "removedFromGroup": {
+          console.log(`${msg.type}== removedFromGroup  gId${msg.gid} ==roomId${that.roomId}`);
           // if(msg.gId == that.roomId)
           // {
           //   this.joined=false;
           //   that.initHanderler();
           // }
-          break
+          break;
         }
         case "memberJoinChatRoomSuccess": {
           // 加入聊天室
@@ -756,14 +772,11 @@ export default {
     initHanderler() {
       var that = this;
       // this.joined = false;
-      msgStorage.on("newChatMsg", that.readMsg);
-      disp.on("newCustomMessage", that.customMsgHanderler);
-      disp.on("onPresence", that.presenceHanderler);
-      disp.on("onCmdMessage", that.cmdMsgHanderler);
       // that.EmojiObj2 = WebIM.EmojiObj2; //表情包
       // console.log(`initHanderler,joined:${this.joined}`)
       //&& !this.joined
-      if (this.roomId ) {
+      if (this.roomId) {
+        this.welcomeMsg = "正在加入聊天直播间";
         WebIM.conn.joinChatRoom({
           roomId: that.roomId,
           success: async r => {
@@ -787,6 +800,7 @@ export default {
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
               that.roomInfo = res.data;
+              that.welcomeMsg = "欢迎您进入直播间";
               // that.joined = true;
               that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
                 if (response.ret == 0 && response.data) {
@@ -820,6 +834,7 @@ export default {
           },
           error(msg) {
             console.log("加入直播间失败", msg);
+            this.welcomeMsg = "加入直播间失败";
             //加入直播间失败,认为是直播间已关闭或已结束
             that.modal({
               content: "直播间不存在",
@@ -849,7 +864,7 @@ export default {
               that.praiseCount = parseInt(msgData.data.praise);
               break;
             }
-            case "UpdateHangingGoodsState":{
+            case "UpdateHangingGoodsState": {
               console.log("cmdMsgHanderler", msg.action);
               that.getGoods();
             }
@@ -860,6 +875,13 @@ export default {
         }
       } catch (ex) {
         console.log("cmdMsgHanderler error:", ex);
+      }
+    },
+    DisconnectedHanderler() {
+      if (WebIM.conn.autoReconnectNumTotal > 0 && WebIM.conn.autoReconnectNumTotal <= WebIM.conn.autoReconnectNumMax) {
+        //连接已断开,正在连接服务器
+        console.log("DisconnectedHanderler: 连接已断开,正在连接服务器");
+        this.welcomeMsg = "正在重新连接聊天服务器";
       }
     },
     //取消关注
@@ -938,7 +960,7 @@ export default {
                 console.log(res);
                 if (res && res.errMsg == "requestPayment:fail cancel") {
                 } else {
-                  that.toast(res.errMsg || res.err_desc||"支付失败");
+                  that.toast(res.errMsg || res.err_desc || "支付失败");
                 }
               }
             };
@@ -988,24 +1010,23 @@ export default {
       });
     },
     //获取商品列表
-    getGoods(){
-      var that =  this;
-        if(this.roomInfo&&this.roomInfo.sId)
-        {
-          //获取店铺商品
-          this.$ShoppingAPI.Goods_GetLiveGoods(this.roomInfo.sId).then(rep3=>{
-            if (rep3.ret == 0) {
-              that.shopGoods = rep3.data;
-              that.showFloating = true;
-            }
-          })
-        }
+    getGoods() {
+      var that = this;
+      if (this.roomInfo && this.roomInfo.sId) {
+        //获取店铺商品
+        this.$ShoppingAPI.Goods_GetLiveGoods(this.roomInfo.sId).then(rep3 => {
+          if (rep3.ret == 0) {
+            that.shopGoods = rep3.data;
+            that.showFloating = true;
+          }
+        });
+      }
     },
     //切换直播推流, 用于切换显示连麦者的直播视频
-    changeMainPushUrl(item,index){
+    changeMainPushUrl(item, index) {
       // var _index =  this.roomInfo.livePushUrl.indexOf(item);
-      console.log("changeMainPushUrl :",item,index);
-      this.roomInfo.livePushUrl.splice(index + 1, 1);//推流数组下标0是主播视频, 连麦数组是去除主播后的集合,所以此处+1
+      console.log("changeMainPushUrl :", item, index);
+      this.roomInfo.livePushUrl.splice(index + 1, 1); //推流数组下标0是主播视频, 连麦数组是去除主播后的集合,所以此处+1
       this.roomInfo.livePushUrl.unshift(item);
     }
   },
@@ -1018,15 +1039,16 @@ export default {
   },
   onUnload() {
     var that = this;
-    console.log("onUnload")
+    console.log("onUnload");
     msgStorage.off("newChatMsg", this.readMsg);
     disp.off("newCustomMessage", this.customMsgHanderler);
     disp.off("onPresence", this.presenceHanderler);
     disp.off("onOpened", this.initHanderler);
     disp.off("onCmdMessage", this.cmdMsgHanderler);
+    disp.off("onCmdMessage", this.DisconnectedHanderler);
     WebIM.conn.quitChatRoom({
       roomId: this.roomId
-    })
+    });
     // .then(res=>{
     //   that.joined = false;
     // });
@@ -1046,7 +1068,19 @@ export default {
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
     }
-    console.log("mounted",this.Logined);
+    this.welcomeMsg= "正在初始化"
+    disp.on("onOpened", that.initHanderler);
+    msgStorage.on("newChatMsg", that.readMsg);
+    disp.on("newCustomMessage", that.customMsgHanderler);
+    disp.on("onPresence", that.presenceHanderler);
+    disp.on("onCmdMessage", that.cmdMsgHanderler);
+    disp.on("onSocketDisconnected", that.DisconnectedHanderler);
+    disp.on("onOpening", () => {
+      that.welcomeMsg = "正在连接聊天服务器";
+    });
+
+
+    console.log("mounted", this.Logined);
     this.wx_login(() => {
       // if (!this.$store.getters.Logined) {
       //   this.modal({
@@ -1059,7 +1093,7 @@ export default {
       //   });
       // }else
       if (WebIM.conn.isOpened()) {
-        // if (!this.joined) 
+        // if (!this.joined)
         this.initHanderler();
       } else if (!this.Logined) {
         that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
@@ -1080,7 +1114,7 @@ export default {
         });
       }
     });
-    disp.on("onOpened", this.initHanderler);
+
   }
 };
 </script>
@@ -1098,13 +1132,13 @@ body {
     height: 35%;
     z-index: 1;
     background-color: rgba(0, 0, 0, 0.2);
-    .player-tool{
+    .player-tool {
       position: absolute;
       z-index: 4;
       color: #fff;
       bottom: 0.6rem;
       right: 0.4rem;
-      .icon{
+      .icon {
         color: #fff;
       }
     }
@@ -1130,7 +1164,8 @@ body {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    .room_name,.people_num{
+    .room_name,
+    .people_num {
       border-radius: 0.5rem;
       height: 0.8rem;
       padding: 0 0.4rem;
@@ -1143,7 +1178,7 @@ body {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width:70%;
+      max-width: 70%;
     }
     .people_num {
       margin-right: 0.3rem;
@@ -1167,7 +1202,7 @@ body {
       left: 0;
       z-index: 4;
     }
-    .player-tool{
+    .player-tool {
       position: absolute;
       width: 100%;
       top: -0.6rem;
@@ -1175,7 +1210,7 @@ body {
       color: #fff;
       display: flex;
       justify-content: flex-end;
-      .icon{
+      .icon {
         padding: 0 0.4rem;
       }
     }
@@ -1187,18 +1222,18 @@ body {
         .txt_praise {
           color: #497fe6;
         }
-        .txt_gift{
-          img{
+        .txt_gift {
+          img {
             width: 0.55rem;
             height: 0.55rem;
           }
         }
       }
-      .chat-item>span{
-          line-height: 0.55rem;
-          display: flex;
-          align-items: center;
-        }
+      .chat-item > span {
+        line-height: 0.55rem;
+        display: flex;
+        align-items: center;
+      }
     }
     .chat-tool {
       display: flex;
@@ -1231,7 +1266,7 @@ body {
         color: #fff;
         background: #ff74af;
       }
-      .goods-hover{
+      .goods-hover {
         color: #e60000;
         background: rgba(0, 0, 0, 0.4);
       }
@@ -1247,12 +1282,12 @@ body {
           margin-left: 1%;
           font-size: 0.4rem;
           width: auto;
-          color:#000;
+          color: #000;
         }
       }
     }
   }
-  .float-goods{
+  .float-goods {
     padding: 0.24rem;
     background-color: #f7f0fa;
     position: fixed;
@@ -1260,54 +1295,54 @@ body {
     bottom: 2rem;
     z-index: 4;
     border-radius: 0.13rem;
-    .top{
+    .top {
       display: flex;
       align-items: center;
       margin-bottom: 0.29rem;
       font-size: 0.29rem;
-      .icon{
-        width:0.36rem;
+      .icon {
+        width: 0.36rem;
         height: 0.36rem;
         line-height: 0.36rem;
         text-align: center;
-        flex-shrink:0;
+        flex-shrink: 0;
         color: #a49baf;
       }
-      .icon.recommend{
-        background-color:#7b33dd ;
+      .icon.recommend {
+        background-color: #7b33dd;
         color: #fcfaff;
         font-size: 0.19rem;
         border-radius: 50%;
       }
-      .txt{
+      .txt {
         color: #7b33dd;
         width: 100%;
-        flex-grow:1;
+        flex-grow: 1;
         font-size: 0.29rem;
         margin-left: 0.06rem;
       }
     }
-    .body{
+    .body {
       position: relative;
       margin-bottom: 0.22rem;
-      img{
+      img {
         width: 2.9rem;
         height: 2.63rem;
         border-radius: 0.1rem;
       }
-      .txt{
+      .txt {
         width: 1rem;
         height: 0.54rem;
         border-radius: 0.2rem 0 0.2rem 0;
         text-align: center;
         background-color: #c519f1;
         color: #fff;
-        position:absolute;
+        position: absolute;
         top: -0.16rem;
         left: 0;
         font-size: 0.33rem;
       }
-      .name{
+      .name {
         width: 100%;
         background-color: rgba(0, 0, 0, 0.6);
         color: #fff;
@@ -1319,28 +1354,28 @@ body {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        text-indent:0.14rem;
-        border-radius:0 0 0.1rem 0.1rem;
+        text-indent: 0.14rem;
+        border-radius: 0 0 0.1rem 0.1rem;
       }
     }
-    .bottom{
+    .bottom {
       color: #fe2b54;
       display: flex;
       align-items: center;
-      .price{
-        flex-grow:1;
+      .price {
+        flex-grow: 1;
         font-size: 0.33rem;
-        .txt{
+        .txt {
           font-size: 0.43rem;
         }
       }
-      .icon{
+      .icon {
         width: 0.56rem;
         height: 0.55rem;
         line-height: 0.55rem;
         text-align: center;
         font-size: 0.3;
-        flex-shrink:0;
+        flex-shrink: 0;
         border-radius: 50%;
         color: #fff;
         background-color: #fe2b54;
@@ -1360,15 +1395,15 @@ body {
     }
     .modal-wrap {
       width: 100%;
-      height:50%;
+      height: 50%;
       position: fixed;
       left: 0;
       bottom: 0;
       z-index: 10;
-      transform:translateY(100%);
+      transform: translateY(100%);
       visibility: hidden;
-      opacity:0;
-      transition: opacity 700ms ease-out, transform 300ms ease-out,visibility 700ms ease-out;
+      opacity: 0;
+      transition: opacity 700ms ease-out, transform 300ms ease-out, visibility 700ms ease-out;
       background: rgba(22, 24, 36, 1);
       color: #ffffff;
       overflow: hidden;
@@ -1400,7 +1435,7 @@ body {
           height: 0.8rem;
           border-radius: 50%;
           margin-right: 0.3rem;
-          flex-shrink:0;
+          flex-shrink: 0;
         }
         span.txt {
           margin-right: 0.5rem;
@@ -1415,7 +1450,7 @@ body {
           padding: 0 0.4rem;
           height: 0.8rem;
           line-height: 0.8rem;
-          flex-shrink:0;
+          flex-shrink: 0;
         }
       }
     }
@@ -1453,7 +1488,7 @@ body {
       align-items: center;
       font-size: 0.4rem;
       padding: 0.21rem 0;
-      border-top: 0.03rem solid rgba(45, 47, 59, 0.6);;
+      border-top: 0.03rem solid rgba(45, 47, 59, 0.6);
       width: 100%;
       .txt {
         margin-left: 0.5rem;
@@ -1485,11 +1520,11 @@ body {
       }
     }
   }
-  .modal.open{
-    .mask{
+  .modal.open {
+    .mask {
       display: block;
     }
-    .modal-wrap{
+    .modal-wrap {
       transform: none;
       visibility: visible;
       opacity: 1;
@@ -1534,10 +1569,10 @@ body {
       -webkit-box-pack: center;
       -webkit-justify-content: center;
       justify-content: center;
-      transform:translateY(-100%);
+      transform: translateY(-100%);
       visibility: hidden;
-      opacity:0;
-      transition: opacity 700ms ease-out, transform 300ms ease-out,visibility 700ms ease-out;
+      opacity: 0;
+      transition: opacity 700ms ease-out, transform 300ms ease-out, visibility 700ms ease-out;
       .dialog {
         background-color: #fff;
         text-align: center;
@@ -1566,15 +1601,15 @@ body {
     }
     .dialog_wrapper.bottom {
       align-items: flex-end;
-      transform:translateY(100%);
+      transform: translateY(100%);
       .dialog {
         width: 100%;
         border-radius: 0.24rem 0.24rem 0 0;
       }
     }
   }
-  .uj_dialog.open{
-    .mask{
+  .uj_dialog.open {
+    .mask {
       display: block;
       opacity: 1;
       transform: scale3d(1, 1, 1);
@@ -1584,7 +1619,7 @@ body {
     //   transform: scale3d(1, 1, 1);
     //   transition: all 0.3s ease-in;
     // }
-    .dialog_wrapper{
+    .dialog_wrapper {
       transform: none;
       visibility: visible;
       opacity: 1;
@@ -1772,54 +1807,53 @@ body {
         border-radius: 0.65rem;
       }
     }
-    .goodsbox{
+    .goodsbox {
       padding-bottom: 0.47rem;
-      .item{
+      .item {
         display: flex;
         margin: 0.47rem 0.38rem 0 0.36rem;
-        img{
+        img {
           width: 2.64rem;
           height: 2.65rem;
-          flex-shrink:0;
+          flex-shrink: 0;
           border-radius: 0.13rem;
         }
-        .info{
+        .info {
           margin-top: 0.11rem;
           margin-left: 0.51rem;
           position: relative;
-          flex-grow:1;
+          flex-grow: 1;
           text-align: left;
-          .name{
+          .name {
             font-size: 0.41rem;
             color: #1a1a1a;
             display: block;
             // margin-bottom: 1.2rem;
           }
-          .price{
+          .price {
             font-size: 0.5rem;
             color: #ff2120;
             position: absolute;
             bottom: 0;
             left: 0;
-            .txt{
+            .txt {
               font-size: 0.63rem;
             }
           }
-          .btn{
+          .btn {
             position: absolute;
-            top:1.6rem;
+            top: 1.6rem;
             right: 0;
             background-color: #3fbefe;
             color: #fff;
             width: 2.13rem;
             height: 0.94rem;
-            line-height:  0.94rem;
+            line-height: 0.94rem;
             border-radius: 0.47rem;
             text-align: center;
           }
         }
       }
-
     }
   }
 }

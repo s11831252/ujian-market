@@ -175,7 +175,6 @@ export default {
 
         if(message.type==16 ){
           console.log(`环信 autoReconnectNum:${WebIM.conn.autoReconnectNumTotal} , autoReconnectNumMax:${WebIM.conn.autoReconnectNumMax}`)
-          // that.hx_login();
           disp.fire('onSocketDisconnected',message);
         }
         if(message.type==206||message.type==8)
