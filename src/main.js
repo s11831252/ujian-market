@@ -196,18 +196,18 @@ Vue.mixin({
             }
         }
     },
-    // onLoad() {
-    //     if (this.$initData$) {
-    //       Object.assign(this, JSON.parse(this.$initData$))
-    //     } else {
-    //       this.$initData$ = JSON.stringify(this.$data)
-    //     }
-    // },
+    onLoad() {
+        if (this.$initData$) {
+          Object.assign(this, JSON.parse(this.$initData$))
+        } else {
+          this.$initData$ = JSON.stringify(this.$data)
+        }
+    },
     //两个方法都可以解决mpvue 同页面不重置data中的数据问题
-    onUnload() {
-        if (this.$options.data)
-            Object.assign(this, this.$options.data())
-    }
+    // onUnload() {
+    //     if (this.$options.data)
+    //         Object.assign(this, this.$options.data())
+    // }
     // created: function () {
     //     if (this.$route)
     //         console.log("进入页面:" + this.$route.path);

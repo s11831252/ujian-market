@@ -249,18 +249,10 @@ var routes = [
         },
     },
     {
-        path:'pages/live/index',
-        name:'live',
-        config: {
-            navigationBarTitleText: '直播列表',
-            enablePullDownRefresh: false
-        }
-    },
-    {
         path:'pages/live/room',
         name:'liveroom',
         config: {
-            navigationBarTitleText: '直播间',
+            navigationBarTitleText: '店铺在线',
             enablePullDownRefresh: false,
             disableScroll: true
         }

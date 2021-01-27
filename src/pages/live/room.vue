@@ -1,11 +1,14 @@
 <template>
   <div v-if="roomInfo" class="root">
-    <live-player id="myPlayer" :src="roomInfo.livePushUrl[0]" mode="live" autoplay @statechange="statechange" @error="error" @fullscreenchange="fullscreenchange" class="live-play">
+    <live-player id="myPlayer" :src="mainPull" mode="live" autoplay @fullscreenchange="fullscreenchange" class="live-play">
       <cover-view class="player-tool" v-if="fullscreen" @click="fullscreenHandler">退出全屏</cover-view>
     </live-player>
-    <ul class="otherPush">
-      <li v-for="(iten,index) in otherPush" :key="index" @click="changeMainPushUrl(iten,index)">
-        <live-player :src="iten" mode="live" autoplay @statechange="statechange" @error="error" class="other-play" />
+    <ul class="otherPull">
+      <li v-if="PusherUrl">
+        <live-pusher :url="PusherUrl" @statechange="statechange" mode="RTC" autopush @error="error" class="other-pusher"></live-pusher>
+      </li>
+      <li v-for="(item,index) in otherPull" :key="index" @click="changeMainPushUrl(item,index)">
+        <live-player :src="item" mode="live" autoplay class="other-play" />
       </li>
     </ul>
     <div class="top-tool">
@@ -42,7 +45,7 @@
         <div id="end"></div>
       </scroll-view>
       <scrollContainer :scroll-to-id="toView" v-else>
-        <div class="top">欢迎您进入直播间</div>
+        <div class="top">{{welcomeMsg}}</div>
         <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
         <div id="end"></div>
       </scrollContainer>
@@ -52,6 +55,8 @@
           <input placeholder="说点什么..." type="text" v-model="textMsg" maxlength="200" @confirm="sendMsg" confirm-type="send" fixed="true" />
         </div>
         <i class="icon exit" @click="exitLiveRoom">&#xe609;</i>
+        <i class="icon disconnect" v-if="PusherUrl" @click="disconnectRoom">&#xe658;</i>
+        <i class="icon connect" v-else @click="connectRoom">&#xe657;</i>
         <i class="icon goods" hover-class="goods-hover" @click="showgoods=true;">&#xe639;</i>
         <i class="icon praise" hover-class="goods-hover" @click="giveLike">&#xe619;</i>
         <i class="icon gift" @click="showGift=true">&#xe651;</i>
@@ -269,15 +274,14 @@ export default {
         owner: "",
         description: "",
         sId: "",
-        livePushUrl: [""],
-        livePullUrl: [""],
+        livePushUrl: [],
+        livePullUrl: [],
         ext: null,
         maxusers: 200,
-        affiliations: [
-        ],
+        affiliations: [],
         persistent: false,
         video_type: "live",
-        force: false,
+        force: false
       },
       toView: "",
       ChatHistory: [],
@@ -329,7 +333,8 @@ export default {
       showgoods: false,
       showFloating: true,
       fullscreen: false,
-      welcomeMsg: ""
+      welcomeMsg: "",
+      PusherUrl:null
     };
   },
   components: {
@@ -347,13 +352,18 @@ export default {
       if (this.roomInfo && this.roomInfo.id) return this.roomInfo.id + WebIM.conn.context.userId;
       else return "";
     },
-    mainPush() {
-      if (this.roomInfo && this.roomInfo.livePushUrl && this.roomInfo.livePushUrl.length > 0) return this.roomInfo.livePushUrl[0];
-      else return null;
+    /**
+     * @description: '主屏拉流显示'
+     * @param {*}
+     * @return {*}
+     */
+    mainPull() {
+      if (this.roomInfo && this.roomInfo.livePullUrl && this.roomInfo.livePullUrl.length > 0) return this.roomInfo.livePullUrl[0];
+      else return "";
     },
-    otherPush() {
-      if (this.roomInfo && this.roomInfo.livePushUrl && this.roomInfo.livePushUrl.length > 0) return this.roomInfo.livePushUrl.slice(1);
-      // return [this.roomInfo.livePushUrl[0],this.roomInfo.livePushUrl[0]]
+    otherPull() {
+      if (this.roomInfo && this.roomInfo.livePullUrl && this.roomInfo.livePullUrl.length > 0) return this.roomInfo.livePullUrl.slice(1);
+      // return [this.roomInfo.livePullUrl[0],this.roomInfo.livePullUrl[0]]
       else return [];
     },
     redirect() {
@@ -374,7 +384,7 @@ export default {
   },
   methods: {
     statechange(e) {
-      // console.log("live-player code:", e);
+      console.log("live-player code:", e);
     },
     error(e) {
       console.error("live-player error:", e);
@@ -470,7 +480,7 @@ export default {
         customExts: { num: "1" },
         ext: { nickName: this.UserInfo.UserName },
         success: () => {
-          console.log("send private text Success", msg);
+          console.log("send praise msg Success", msg);
           var renderableMsg = {
             info: {
               from: from,
@@ -486,7 +496,7 @@ export default {
             mid: msg.body.customEvent + msg.body.id,
             chatType: msg.body.contentsType
           };
-          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sessionKey);
+          self.readMsg(renderableMsg, msg.body.customEvent, null, self.sessionKey);
           self.praiseCount++;
         },
         fail: function() {},
@@ -512,7 +522,7 @@ export default {
         customExts: { id: self.selectGift.giftId, num: giftNum.toString() },
         params: { id: self.selectGift.giftId, num: giftNum.toString() },
         success: function() {
-          console.log("send private text Success", msg);
+          console.log("send gift msg success", msg);
           var renderableMsg = {
             info: {
               from: msg.body.from,
@@ -532,7 +542,7 @@ export default {
             mid: msg.body.customEvent + msg.id,
             chatType: msg.body.contentsType
           };
-          self.readMsg(renderableMsg, msg.body.customEvent, null, this.sessionKey);
+          self.readMsg(renderableMsg, msg.body.customEvent, null, self.sessionKey);
           self.giftCount = self.giftCount + giftNum;
           self.$ShoppingAPI.AppServer_GetPoints().then(response => {
             if (response.ret == 0 && response.data) {
@@ -560,6 +570,73 @@ export default {
           console.log("退出失败", e);
         }
       });
+    },
+
+    /**
+     * @description: '直播间连麦'
+     * @param {*}
+     * @return {*}
+     */
+    connectRoom() {
+      var self = this;
+      if(this.roomId)
+      {
+        this.$ShoppingAPI.AppServer_ConnectRoom(this.roomId, "video").then(res => {
+          console.log(res);
+          if(res&&res.ret==0&&res.data)
+          {
+            let id = WebIM.conn.getUniqueId();
+            let msg = new WebIM.message("custom", id);
+            msg.set({
+              to: self.roomId,
+              roomType: true,
+              customEvent: "chatroom_member_video_call",
+              customExts: { video_call_status: "start", video_call: res.data },
+              success: function() {
+                self.PusherUrl = res.data;
+                console.log("send video_call_start msg success", msg);
+              },
+              fail: function() {}
+            });
+            msg.setGroup("groupchat");
+            WebIM.conn.send(msg.body);
+          }
+        });
+      }
+
+    },
+    /**
+     * @description: '挂断连麦'
+     * @param {*}
+     * @return {*}
+     */
+    disconnectRoom() {
+      var self = this;
+      if(this.roomId&&self.PusherUrl)
+      {
+        this.$ShoppingAPI.AppServer_UnConnectRoom(this.roomId, self.PusherUrl).then(res => {
+          console.log(res);
+          if(res&&res.ret==0&&res.data)
+          {
+            let id = WebIM.conn.getUniqueId();
+            let msg = new WebIM.message("custom", id);
+            msg.set({
+              to: self.roomId,
+              roomType: true,
+              customEvent: "chatroom_member_video_call",
+              customExts: { video_call_status: "end" },
+              success: function() {
+                self.PusherUrl = null;
+                console.log("send video_call_end msg success", msg);
+              },
+              fail: function() {}
+            });
+            msg.setGroup("groupchat");
+            WebIM.conn.send(msg.body);
+          }
+        });
+      }
+
     },
     //处理自定义消息回调
     customMsgHanderler(msg) {
@@ -592,7 +669,7 @@ export default {
             renderableMsg.ext.nickName = memberInfo.UserName;
           }
           that.praiseCount = that.praiseCount + parseInt(msg.customExts.num);
-          that.readMsg(renderableMsg, msg.customEvent, null, this.sessionKey, msg);
+          that.readMsg(renderableMsg, msg.customEvent, null, that.sessionKey, msg);
           break;
         }
         case "chatroom_gift": {
@@ -620,7 +697,7 @@ export default {
           }
           that.giftCount = that.giftCount + parseInt(msg.customExts.num);
 
-          that.readMsg(renderableMsg, msg.customEvent, null, this.sessionKey, msg);
+          that.readMsg(renderableMsg, msg.customEvent, null, that.sessionKey, msg);
           break;
         }
         case "chatroom_member_join": {
@@ -636,7 +713,7 @@ export default {
               owner: null
             });
 
-            that.readMsg(renderableMsg, msg.customEvent, null, this.sessionKey, msg);
+            that.readMsg(renderableMsg, msg.customEvent, null, that.sessionKey, msg);
             // console.log("chatroom_member_join", that.roomInfo.affiliations);
           }
           break;
@@ -649,10 +726,10 @@ export default {
           if (msg.customExts.video_call_status == "start") {
             that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
-                for (let index = 0; index < res.data.livePushUrl.length; index++) {
-                  const element = res.data.livePushUrl[index];
-                  if (!~that.roomInfo.livePushUrl.indexOf(element)) {
-                    that.roomInfo.livePushUrl.push(element);
+                for (let index = 0; index < res.data.livePullUrl.length; index++) {
+                  const element = res.data.livePullUrl[index];
+                  if (!~that.roomInfo.livePullUrl.indexOf(element)) {
+                    that.roomInfo.livePullUrl.push(element);
                   }
                 }
               }
@@ -660,11 +737,11 @@ export default {
           } else if (msg.customExts.video_call_status == "end") {
             that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
-                for (let index = 0; index < that.roomInfo.livePushUrl.length; index++) {
-                  const element = that.roomInfo.livePushUrl[index];
-                  let curTypeCbIdx = res.data.livePushUrl.indexOf(element);
+                for (let index = 0; index < that.roomInfo.livePullUrl.length; index++) {
+                  const element = that.roomInfo.livePullUrl[index];
+                  let curTypeCbIdx = res.data.livePullUrl.indexOf(element);
                   if (!~curTypeCbIdx) {
-                    that.roomInfo.livePushUrl.splice(curTypeCbIdx, 1);
+                    that.roomInfo.livePullUrl.splice(curTypeCbIdx, 1);
                   }
                 }
               }
@@ -776,7 +853,7 @@ export default {
       // console.log(`initHanderler,joined:${this.joined}`)
       //&& !this.joined
       if (this.roomId) {
-        this.welcomeMsg = "正在加入聊天直播间";
+        this.welcomeMsg = "正在加入直播间聊天室";
         WebIM.conn.joinChatRoom({
           roomId: that.roomId,
           success: async r => {
@@ -800,8 +877,7 @@ export default {
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
               that.roomInfo = res.data;
-              that.welcomeMsg = "欢迎您进入直播间";
-              // that.joined = true;
+              that.welcomeMsg = "欢迎您进入直播间聊天室";
               that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
                 if (response.ret == 0 && response.data) {
                   that.giftList = response.data;
@@ -834,7 +910,7 @@ export default {
           },
           error(msg) {
             console.log("加入直播间失败", msg);
-            this.welcomeMsg = "加入直播间失败";
+            this.welcomeMsg = "加入直播间聊天室失败";
             //加入直播间失败,认为是直播间已关闭或已结束
             that.modal({
               content: "直播间不存在",
@@ -1024,10 +1100,10 @@ export default {
     },
     //切换直播推流, 用于切换显示连麦者的直播视频
     changeMainPushUrl(item, index) {
-      // var _index =  this.roomInfo.livePushUrl.indexOf(item);
+      // var _index =  this.roomInfo.livePullUrl.indexOf(item);
       console.log("changeMainPushUrl :", item, index);
-      this.roomInfo.livePushUrl.splice(index + 1, 1); //推流数组下标0是主播视频, 连麦数组是去除主播后的集合,所以此处+1
-      this.roomInfo.livePushUrl.unshift(item);
+      this.roomInfo.livePullUrl.splice(index + 1, 1); //推流数组下标0是主播视频, 连麦数组是去除主播后的集合,所以此处+1
+      this.roomInfo.livePullUrl.unshift(item);
     }
   },
   onLoad(query) {
@@ -1039,15 +1115,16 @@ export default {
   },
   onUnload() {
     var that = this;
-    console.log("onUnload");
+    console.log("onUnload exit liveroom :", that.roomId);
     msgStorage.off("newChatMsg", this.readMsg);
     disp.off("newCustomMessage", this.customMsgHanderler);
     disp.off("onPresence", this.presenceHanderler);
     disp.off("onOpened", this.initHanderler);
     disp.off("onCmdMessage", this.cmdMsgHanderler);
     disp.off("onCmdMessage", this.DisconnectedHanderler);
+    that.disconnectRoom();
     WebIM.conn.quitChatRoom({
-      roomId: this.roomId
+      roomId: that.roomId
     });
     // .then(res=>{
     //   that.joined = false;
@@ -1068,7 +1145,8 @@ export default {
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
     }
-    this.welcomeMsg= "正在初始化"
+    console.log("mounted", this.Logined);
+    this.welcomeMsg = "正在初始化";
     disp.on("onOpened", that.initHanderler);
     msgStorage.on("newChatMsg", that.readMsg);
     disp.on("newCustomMessage", that.customMsgHanderler);
@@ -1079,8 +1157,6 @@ export default {
       that.welcomeMsg = "正在连接聊天服务器";
     });
 
-
-    console.log("mounted", this.Logined);
     this.wx_login(() => {
       // if (!this.$store.getters.Logined) {
       //   this.modal({
@@ -1114,7 +1190,6 @@ export default {
         });
       }
     });
-
   }
 };
 </script>
@@ -1143,11 +1218,11 @@ body {
       }
     }
   }
-  .otherPush {
+  .otherPull {
     position: absolute;
     top: 1.4rem;
     right: 0.3rem;
-    .other-play {
+    .other-play,.other-pusher {
       width: 2.3rem;
       height: 2.5rem;
       margin-bottom: 0.4rem;
@@ -1248,21 +1323,27 @@ body {
         line-height: 0.9rem;
         text-align: center;
         border-radius: 50%;
+        margin-right: 2%;
       }
       .exit {
         background-color: rgba(105, 16, 16, 0.8);
-        margin-right: 2%;
+      }
+      .connect {
+        background-color: rgba(163, 229, 255, 0.8);
+        color: #2cacfc;
+      }
+      .disconnect{
+        background: #ff74af;
+        color: #e60000;
       }
       .praise {
         background: rgba(0, 0, 0, 0.4);
-        margin-right: 2%;
       }
+
       .gift {
-        margin-right: 2%;
         background: rgb(240, 85, 34);
       }
       .goods {
-        margin-right: 2%;
         color: #fff;
         background: #ff74af;
       }
