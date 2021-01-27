@@ -1,5 +1,5 @@
 <template>
-  <div class="buy" @click.stop v-if="Config.showBuy">
+  <div class="buy" @click.stop>
     <div v-if="goods.Stock>0&&getShoppingCarNumberByItemId>0">
       <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span>
       <input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number">
@@ -80,10 +80,7 @@ export default {
           }
         }
       }
-    },
-    ...mapState({
-      Config: state => state.Global.Config      
-    })
+    }
   },
   methods: {
     ...mapMutations([

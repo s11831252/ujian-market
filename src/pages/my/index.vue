@@ -29,12 +29,12 @@
                     </div>
                 </div>
                 <div class="myInfo" v-if="Logined">
-                    <div class="myInfo_demo" @click="go({path:'/pages/order/index'})" v-if="Config.showBuy">
+                    <div class="myInfo_demo" @click="go({path:'/pages/order/index'})">
                         <i class="icon">&#xe653;</i>
                         <p class="myInfo_p">查看全部订单</p>
                         <img class="next" src="../../../static/img/next.png" alt="" />
                     </div>
-                    <div class="myInfo_demo" @click="go({path:'/pages/my/address'})" v-if="Config.showBuy">
+                    <div class="myInfo_demo" @click="go({path:'/pages/my/address'})">
                         <i class="icon">&#xe627;</i>
                         <p class="myInfo_p">收货地址</p>
                         <img class="next" src="../../../static/img/next.png" alt="" />

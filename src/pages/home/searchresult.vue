@@ -26,7 +26,7 @@
               <p class="shopname">
                 <span class="txt">
                   {{item.sName}}
-                  <span class="liveroom" v-if="item.LiveRoomId" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
+                  <span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
                     <i class="icon rectbox">
                       <span class="rect"></span>
                       <span class="rect rect2"></span>

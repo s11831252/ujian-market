@@ -1,5 +1,5 @@
 <template>
-    <div class="shoppingcar" :class="{showed:showed}" v-if="Config.showBuy">
+    <div class="shoppingcar" :class="{showed:showed}">
         <div class="shoppingcar-goods" v-if="showed">
             <span class="icon close" @click="taggle">&#xe603;</span>
             <div class="bar">
@@ -83,7 +83,6 @@ export default {
       return this.$store.getters.getShoppingCarCountBysId(this.sId);
     },
     ...mapState({
-      Config: state => state.Global.Config,
       UserInfo: state => state.User.UserInfo      
     })
   },

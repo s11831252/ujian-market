@@ -19,14 +19,14 @@
         <span>搜索</span>
       </div>
     </div>
-    <swiper v-if="isMP&&Config.showBuy" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
+    <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <swiper-item>
           <img :src="item.ImageUrl" class="slide-image" mode="aspectFill">
         </swiper-item>
       </block>
     </swiper>
-    <swiper v-else-if="Config.showBuy" ref="mySwiper" :options="swiperOption">
+    <swiper v-else ref="mySwiper" :options="swiperOption">
       <swiper-slide v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <img :src="item.ImageUrl" class="slide-image">
       </swiper-slide>
@@ -98,7 +98,7 @@
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
                         <span class="txt">{{item.sName}}
-                          <span class="liveroom" v-if="item.LiveRoomId" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
+                          <span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
                             <i class="icon rectbox">
                               <span class="rect"></span>
                               <span class="rect rect2"></span>

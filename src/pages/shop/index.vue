@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="live-room" v-if="shopDetail.LiveRoomId" @click="joinRoom(shopDetail.LiveRoomId)">
+    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy" @click="joinRoom(shopDetail.LiveRoomId)">
       <i class="icon rectbox">
         <span class="rect"></span>
         <span class="rect rect2"></span>
@@ -147,7 +147,8 @@ export default {
       return list;
     },
     ...mapState({
-      UserInfo: state => state.User.UserInfo
+      UserInfo: state => state.User.UserInfo,
+      Config: state => state.Global.Config,
     })
   },
   methods: {
