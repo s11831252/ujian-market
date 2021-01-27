@@ -252,7 +252,7 @@ var routes = [
         path:'pages/live/room',
         name:'liveroom',
         config: {
-            navigationBarTitleText: '店铺在线',
+            navigationBarTitleText: '在线咨询',
             enablePullDownRefresh: false,
             disableScroll: true
         }

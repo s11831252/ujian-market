@@ -11,7 +11,7 @@
         <live-player :src="item" mode="live" autoplay class="other-play" />
       </li>
     </ul>
-    <div class="top-tool">
+    <div class="top-tool" v-if="roomInfo.id">
       <div class="room_name" @click="dialog=true">{{roomInfo.name}}</div>
       <div @click="showMember=true" class="people_num">{{roomInfo.affiliations.length}}人</div>
     </div>
@@ -49,7 +49,7 @@
         <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
         <div id="end"></div>
       </scrollContainer>
-      <div class="chat-tool">
+      <div class="chat-tool" v-if="roomInfo.id">
         <div class="input-box">
           <i class="icon">&#xe637;</i>
           <input placeholder="说点什么..." type="text" v-model="textMsg" maxlength="200" @confirm="sendMsg" confirm-type="send" fixed="true" />
@@ -264,7 +264,7 @@ export default {
     return {
       roomId: "",
       roomInfo: {
-        name: "直播间",
+        name: "",
         cover: "https://image.ujianchina.net/Shopping/ShopImages//7eb046ff17724f5e97da3d2a3c01be91/201808241024127524ZGG.jpg",
         status: "ongoing",
         mute: false,
@@ -701,6 +701,8 @@ export default {
           break;
         }
         case "chatroom_member_join": {
+          // if(msg.to!=that.roomInfo.id)
+          //   break;
           var memberInfo = this.roomInfo.affiliations.find(item => {
             return item.member == msg.from || item.owner == msg.from;
           });
@@ -877,6 +879,8 @@ export default {
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
               that.roomInfo = res.data;
+              if(that.isMP)
+                wx.setNavigationBarTitle({ title: `${that.roomInfo.name}直播间` });
               that.welcomeMsg = "欢迎您进入直播间聊天室";
               that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
                 if (response.ret == 0 && response.data) {
@@ -957,7 +961,7 @@ export default {
       if (WebIM.conn.autoReconnectNumTotal > 0 && WebIM.conn.autoReconnectNumTotal <= WebIM.conn.autoReconnectNumMax) {
         //连接已断开,正在连接服务器
         console.log("DisconnectedHanderler: 连接已断开,正在连接服务器");
-        this.welcomeMsg = "正在重新连接聊天服务器";
+        this.welcomeMsg = "正在重新连接";
       }
     },
     //取消关注
@@ -1144,6 +1148,8 @@ export default {
     var that = this;
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
+      if(this.isMP)
+        wx.setNavigationBarTitle({ title: "直播间" });
     }
     console.log("mounted", this.Logined);
     this.welcomeMsg = "正在初始化";
@@ -1154,7 +1160,7 @@ export default {
     disp.on("onCmdMessage", that.cmdMsgHanderler);
     disp.on("onSocketDisconnected", that.DisconnectedHanderler);
     disp.on("onOpening", () => {
-      that.welcomeMsg = "正在连接聊天服务器";
+      that.welcomeMsg = "正在连接中";
     });
 
     this.wx_login(() => {

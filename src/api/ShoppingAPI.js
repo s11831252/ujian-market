@@ -297,5 +297,22 @@ export default {
     Goods_GetLiveGoods:(sId)=>{
         return http.get(BaseHost + `api/Goods/GetLiveGoods?sId=${sId}`)
     },
-    
+    /**
+     * @description: '直播间连麦'
+     * @param {*} liveRoomId 房间ID
+     * @param {*} type 连麦类型,video,audio
+     * @return {*}
+     */    
+    AppServer_ConnectRoom(liveRoomId,type){
+        return http.post(BaseHost + `api/AppServer/ConnectRoom?liveRoomId=${liveRoomId}&type=${type}`)
+    },
+    /**
+     * @description: '断开连麦'
+     * @param {*} liveRoomId 房间ID
+     * @param {*} Url 要断开的地址
+     * @return {*}
+     */
+    AppServer_UnConnectRoom(liveRoomId,Url){
+        return http.post(BaseHost + `api/AppServer/UnConnectRoom?liveRoomId=${liveRoomId}&Url=${Url}`)
+    },
 }
