@@ -5,10 +5,10 @@
     </live-player>
     <ul class="otherPull">
       <li v-if="PusherUrl">
-        <live-pusher :url="PusherUrl" @statechange="statechange" mode="RTC" autopush @error="error" class="other-pusher"></live-pusher>
+        <otherPusher :url="PusherUrl"></otherPusher>
       </li>
       <li v-for="(item,index) in otherPull" :key="index" @click="changeMainPushUrl(item,index)">
-        <live-player :src="item" mode="live" autoplay class="other-play" />
+        <otherPull :url="item" :members="roomInfo.affiliations"></otherPull>
       </li>
     </ul>
     <div class="top-tool" v-if="roomInfo.id">
@@ -258,6 +258,8 @@ import utils from "@/utils/index.js";
 import chatItem from "@/pages/service/chat-item";
 import chatMsg from "@/pages/service/chat-msg";
 import vaildCodeBox from "../../components/validCodeBox";
+import otherPull from "./otherPull";
+import otherPusher from  "./otherPusher"
 
 export default {
   data() {
@@ -341,7 +343,9 @@ export default {
     scrollContainer,
     chatItem,
     chatMsg,
-    vaildCodeBox
+    vaildCodeBox,
+    otherPull,
+    otherPusher
   },
   computed: {
     ...mapState({
@@ -383,12 +387,6 @@ export default {
     }
   },
   methods: {
-    statechange(e) {
-      console.log("live-player code:", e);
-    },
-    error(e) {
-      console.error("live-player error:", e);
-    },
     fullscreenchange(e) {
       // console.log("fullscreenchange e:", e);
     },
@@ -1226,15 +1224,8 @@ body {
   }
   .otherPull {
     position: absolute;
-    top: 1.4rem;
-    right: 0.3rem;
-    .other-play,.other-pusher {
-      width: 2.3rem;
-      height: 2.5rem;
-      margin-bottom: 0.4rem;
-      z-index: 2;
-      background-color: rgba(0, 0, 0, 0.2);
-    }
+    top: 0.1rem;
+    right: 0.1rem;
   }
   .top-tool {
     position: fixed;
