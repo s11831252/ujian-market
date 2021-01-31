@@ -418,8 +418,21 @@ export default {
   created() {
     // console.log("page index created", this);
   },
-  onLoad() {
+  onLoad(query) {
+    // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
+    if (query.scene) {
+      // this.sId = decodeURIComponent(query.scene);
+    }
+    wx.showShareMenu({
+      withShareTicket: true
+    });
     // console.log("page index onLoad", this);
+  },
+  onShareAppMessage(){
+    return {
+      title: 'U建行业市场',
+      imageUrl: '/static/img/homeshare.jpg',
+    }
   },
   onReady() {
     // console.log("page index onReady", this);
