@@ -366,7 +366,10 @@ export default {
       else return "";
     },
     otherPull() {
-      if (this.roomInfo && this.roomInfo.livePullUrl && this.roomInfo.livePullUrl.length > 0) return this.roomInfo.livePullUrl.slice(1);
+      if (this.roomInfo && this.roomInfo.livePullUrl && this.roomInfo.livePullUrl.length > 0) 
+      return this.roomInfo.livePullUrl.slice(1).filter(item=>{
+        return item.indexOf(WebIM.conn.context.userId)<0
+      });
       // return [this.roomInfo.livePullUrl[0],this.roomInfo.livePullUrl[0]]
       else return [];
     },
@@ -714,22 +717,18 @@ export default {
             });
 
             that.readMsg(renderableMsg, msg.customEvent, null, that.sessionKey, msg);
-            // console.log("chatroom_member_join", that.roomInfo.affiliations);
           }
           break;
         }
         case "chatroom_member_video_call": {
-          // customExts:chatroom_member_video_call
-          // video_call: "rtmp://pullStreamUrl"
-          // video_call_status: "start"
-          //video_call_status: "end"
           if (msg.customExts.video_call_status == "start") {
             that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
                 for (let index = 0; index < res.data.livePullUrl.length; index++) {
-                  const element = res.data.livePullUrl[index];
-                  if (!~that.roomInfo.livePullUrl.indexOf(element)) {
-                    that.roomInfo.livePullUrl.push(element);
+                  const _url = res.data.livePullUrl[index];
+                  //遍历服务端数据源,本地数据源没有则加入推流地址push(_url)
+                  if (!~that.roomInfo.livePullUrl.indexOf(_url)) {
+                    that.roomInfo.livePullUrl.push(_url);
                   }
                 }
               }
@@ -738,10 +737,10 @@ export default {
             that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
                 for (let index = 0; index < that.roomInfo.livePullUrl.length; index++) {
-                  const element = that.roomInfo.livePullUrl[index];
-                  let curTypeCbIdx = res.data.livePullUrl.indexOf(element);
-                  if (!~curTypeCbIdx) {
-                    that.roomInfo.livePullUrl.splice(curTypeCbIdx, 1);
+                  const _url = that.roomInfo.livePullUrl[index];
+                  //遍历本地数据,服务端数据源没有推流地址(_url)则本地数据根据下标移除splice(index,1)
+                  if (!~res.data.livePullUrl.indexOf(_url)) {
+                    that.roomInfo.livePullUrl.splice(index, 1);
                   }
                 }
               }

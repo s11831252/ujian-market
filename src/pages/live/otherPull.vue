@@ -2,7 +2,7 @@
  * @Author: your name
  * @Date: 2021-01-29 09:50:53
  * @LastEditors: your name
- * @LastEditTime: 2021-01-29 10:27:27
+ * @LastEditTime: 2021-01-29 17:04:34
  * @Description: file content
 -->
 <template>
@@ -52,10 +52,10 @@ export default {
   }
   .name {
     position: absolute;
-    left: 0;
-    bottom: 0;
+    left: 0.05rem;
+    bottom: 0.05rem;
     color: #fff;
-    font-size: 0.3rem;
+    font-size: 0.36rem;
   }
 }
 </style>
