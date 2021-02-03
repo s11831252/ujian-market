@@ -2,12 +2,12 @@
   <div class="wai">
     <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)" v-if="isMP">
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-      <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <chatItem v-for="item in ChatHistory" :key="item" @delMsg="delMsg" :showCheckbox="showCheckbox" @checked="checkedMsg" @onShowCheckbox="onShowCheckbox" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scroll-view>
     <scrollContainer :scroll-to-id="toView" v-else>
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-      <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <chatItem v-for="item in ChatHistory" :key="item" @delMsg="delMsg" :showCheckbox="showCheckbox" @checked="checkedMsg" @onShowCheckbox="onShowCheckbox" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scrollContainer>
     <!-- 输入框 -->
@@ -16,13 +16,23 @@
         <!-- 引用图标，需要引用其样式 -->
         <div class="icon" v-if="isMP" :class="chattype=='audio'?'focus':''" @click="pending('audio')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
         <div class="icon" v-else :class="chattype=='audio'?'focus':''" @click="pending(null,'语音')">{{chattype=='audio'?'&#xe635;':'&#xe664;'}}</div>
-        <form action="" @submit.prevent="sendMsg">
-           <input class="msg_input"  type="text" @click="pending('chat',null)"  maxlength="1000" @confirm="sendMsg" confirm-type="send" fixed="true" v-model="msg" placeholder="输入新消息" />
-           <input class="submit_btn" type="submit" value="发送" >
+        <form action @submit.prevent="sendMsg">
+          <input class="msg_input" type="text" @click="pending('chat',null)" maxlength="1000" @confirm="sendMsg" confirm-type="send" fixed="true" v-model="msg" placeholder="输入新消息" />
+          <input class="submit_btn" type="submit" value="发送" />
         </form>
         <div class="icon" :class="chattype=='emoji'?'focus':''" @click="pending('emoji')">&#xe652;</div>
         <div v-if="isMP" class="icon" :class="chattype=='more'?'focus':''" @click="pending('more')">&#xe726;</div>
         <div v-else class="icon" :class="chattype=='more'?'focus':''" @click="pending(null,`多媒体`)">&#xe726;</div>
+      </div>
+      <div class="Checkbox-tool" :class="{show:showCheckbox}">
+        <div class="item" @click="batchDelMsg">
+          <i class="icon">&#xe612;</i>
+          <span>删除</span>
+        </div>
+        <div class="item" @click="showCheckbox=false;delMsgList=[]">
+          <i class="icon">&#xe613;</i>
+          <span>取消</span>
+        </div>
       </div>
       <div v-if="chattype=='audio'">
         <recordInput :recordSuccess="recordSuccess"></recordInput>
@@ -78,8 +88,8 @@ import chatItem from "@/pages/service/chat-item";
 import WebIM from "@/utils/hx/WebIM";
 import msgStorage from "./msgstorage";
 import msgType from "./msgtype";
-import scrollContainer from './scrollcontainer'
-import recordInput from './record' 
+import scrollContainer from "./scrollcontainer";
+import recordInput from "./record";
 export default {
   data() {
     return {
@@ -95,7 +105,9 @@ export default {
       toView: "",
       chattype: "chat",
       EmojiObj2: {},
-      desc_obj:{}
+      desc_obj: {},
+      showCheckbox: false,
+      delMsgList: []
     };
   },
   components: {
@@ -112,25 +124,20 @@ export default {
       if (this.chatRoomInfo) return this.chatRoomInfo.groupid;
       else return null;
     },
-    sessionKey(){
-      if(this.chatRoomInfo&&this.chatRoomInfo.groupid)
-        return this.chatRoomInfo.groupid + WebIM.conn.context.userId;
-      else
-        return "";
+    sessionKey() {
+      if (this.chatRoomInfo && this.chatRoomInfo.groupid) return this.chatRoomInfo.groupid + WebIM.conn.context.userId;
+      else return "";
     }
   },
   methods: {
     sendMsg(e) {
       var that = this;
-      if(!this.msg)
-        return
-      if(e&&e.keyCode)
-      {
-        if(e.keyCode!=13)
-        return 
+      if (!this.msg) return;
+      if (e && e.keyCode) {
+        if (e.keyCode != 13) return;
       }
       if (!this.to) {
-          this.toast(`群组信息获取失败,请重试`);
+        this.toast(`群组信息获取失败,请重试`);
       } else {
         let id = WebIM.conn.getUniqueId();
         let msg = new WebIM.message(msgType.TEXT, id);
@@ -142,7 +149,7 @@ export default {
           chatType: "groupchat",
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
-            console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`,msg);
+            console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`, msg);
             msgStorage.saveMsg(msg, "txt");
             that.msg = "";
             that.chattype = "chat";
@@ -153,33 +160,85 @@ export default {
         });
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
-
       }
+    },
+    /**
+     * @description: '删除消息,由子组件chatItem传出来的长按消息删除事件,在这里删除视图中的数据,本地缓存由子组件内删除'
+     * @param {*} msg 要删除的消息
+     * @return {*}
+     */
+    delMsg(msg) {
+      var msglist = utils.getItem(this.sessionKey) || [];
+      var _msg = msglist.find(item => {
+        return item.mid == msg.mid;
+      });
+      if (_msg) {
+        msglist.splice(msglist.indexOf(_msg), 1);
+        utils.setItem(this.sessionKey, msglist);
+      }
+      var _msg = this.ChatHistory.find(item => {
+        return item.mid == msg.mid;
+      });
+      this.ChatHistory.splice(this.ChatHistory.indexOf(_msg), 1);
+    },
+    /**
+     * @description: '批量删除消息数据'
+     * @param {*}
+     * @return {*}
+     */
+    batchDelMsg() {
+      while (this.delMsgList.length > 0) {
+        const element = this.delMsgList.shift();
+        this.delMsg(element);
+      }
+    },
+    /**
+     * @description: '长按消息显示消息工具框,选择多选所有消息显示选择框'
+     * @param {*}
+     * @return {*}
+     */
+    onShowCheckbox() {
+      this.showCheckbox = true;
+    },
+    checkedMsg(isChecked, msg) {
+      if (isChecked) {
+        this.delMsgList.push(msg);
+      } else {
+        var _msg = this.delMsgList.find(item => {
+          return item.mid == msg.mid;
+        });
+        if (_msg) {
+          this.delMsgList.splice(this.delMsgList.indexOf(_msg), 1);
+        }
+      }
+      console.log(this.delMsgList);
     },
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, isNew) {
       // console.log(renderableMsg,currentChatMsg)
       this.ChatHistory = currentChatMsg;
-      if (this.ChatHistory&&this.ChatHistory.length) {
+      if (this.ChatHistory && this.ChatHistory.length) {
         if (isNew) {
-          this.toView = currentChatMsg[this.ChatHistory.length - 1].mid;
+          this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
         } else {
-          this.toView = currentChatMsg[this.ChatHistory.length - 1].mid;
+          this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
         }
+        setTimeout(()=>{
+          this.toView = "";
+        },1000)
       }
     },
     pending(type, title) {
       if (this.chattype == type) this.chattype = "chat";
       else {
-        if (title) 
-        {
+        if (title) {
           this.toast(`${title}功能正在开发中`);
-          return ;
+          return;
         }
         this.chattype = type;
       }
     },
-    recordSuccess(res){
-      this.upLoadFile([res], msgType.AUDIO)
+    recordSuccess(res) {
+      this.upLoadFile([res], msgType.AUDIO);
     },
     emojiInput(emoji) {
       // console.log(item,item2)
@@ -238,9 +297,7 @@ export default {
                         msgStorage.saveMsg(msg, _msgType);
                       },
                       fail(id, serverMsgId) {
-                        console.log(
-                          `发送文件(id=${id},serverMsgId=${serverMsgId})失败`
-                        );
+                        console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
                       }
                     });
                     msg.setGroup("groupchat");
@@ -294,7 +351,7 @@ export default {
                         file_length: path.size,
                         length: path.duration * 1000,
                         thumb: _thumbUrl,
-                        thumb_secret: _thumb_secret,
+                        thumb_secret: _thumb_secret
                         // size: {
                         //   width: width,
                         //   height: height
@@ -303,9 +360,9 @@ export default {
                       file: {
                         filename: path.tempFilePath,
                         file_length: path.size,
-                        length: path.duration * 1000,
+                        length: path.duration * 1000
                       },
-                      ext:{imageBase64: _thumbUrl},
+                      ext: { imageBase64: _thumbUrl },
                       from: WebIM.conn.context.userId,
                       to: me.to,
                       // roomType: true,
@@ -316,9 +373,7 @@ export default {
                         msgStorage.saveMsg(msg, _msgType);
                       },
                       fail(id, serverMsgId) {
-                        console.log(
-                          `发送文件(id=${id},serverMsgId=${serverMsgId})失败`
-                        );
+                        console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
                       }
                     });
                     console.log(msg);
@@ -369,7 +424,7 @@ export default {
                   chatType: "groupchat",
                   success: function(argument) {
                     // disp.fire('em.chat.sendSuccess', id);
-                    console.log("audio send ok", argument,msg);
+                    console.log("audio send ok", argument, msg);
                     msgStorage.saveMsg(msg, _msgType);
                   }
                 });
@@ -476,33 +531,19 @@ export default {
     var rep = await this.$ShoppingAPI.Shop_GetDetails({ sId: this.sId });
     if (rep.ret == 0) {
       shopInfo = rep.data;
-      if(this.isMP)
-      //设置标题
+      if (this.isMP)
+        //设置标题
         wx.setNavigationBarTitle({ title: shopInfo.sName });
 
       //查询群聊列表,并尝试获取与该店铺的聊天组
       var listGroup = utils.getItem("listGroup");
-      console.log("listGroup:",listGroup)
+      console.log("listGroup:", listGroup);
       if (listGroup) {
-          this.chatRoomInfo = listGroup.find(item => {
-            return item.groupname == that.UserInfo.Phone + "_" + shopInfo.sName;
-          });
-        // if(this.isMP){
-        // }
-        // else{
-        //   this.chatRoomInfo = listGroup
-        //   // .map( item=>{
-        //   //   return {
-        //   //     name:item.groupname,
-        //   //     roomId:item.groupid
-        //   //   }
-        //   // })
-        //   .find(item => {
-        //     return item.groupname == this.UserInfo.Phone + "_" + shopInfo.sName;
-        //   });
-        // }
+        this.chatRoomInfo = listGroup.find(item => {
+          return item.groupname == that.UserInfo.Phone + "_" + shopInfo.sName;
+        });
       }
-      console.log(this.chatRoomInfo)
+      console.log(this.chatRoomInfo);
       that.desc_obj = {
         store: {
           sId: shopInfo.sId,
@@ -540,35 +581,18 @@ export default {
           _menberArr.push(this.UserInfo.UserId.replace(/-/g, ""));
           members = _menberArr.join();
           // console.log(groupname, owner, members, desc);
-          let rep2 = await that.$API2.groupChat_Create(
-            groupname,
-            owner,
-            members,
-            desc
-          );
+          let rep2 = await that.$API2.groupChat_Create(groupname, owner, members, desc);
           if (rep2.ret == 0) {
             // if(this.isMP)
             // {
-              this.chatRoomInfo = {
-                jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
-                groupname: groupname,
-                groupid: rep2.data.groupid
-              };
-              listGroup.push(this.chatRoomInfo);//微信小程序 sdk 数据结构
-            // }
-            // else//web sdk 数据结构
-            // {
-            //   this.chatRoomInfo = {
-            //     jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
-            //     groupname: groupname,
-            //     groupid: rep2.data.groupid
-            //   };
-            //   listGroup.push({
-            //     groupid: rep2.data.groupid, 
-            //     groupname: groupname
-            //     });
-            // }
-            console.log(`新建聊天室成功`,this.chatRoomInfo)
+            this.chatRoomInfo = {
+              jid: `888yuezhi-88#ubuild_${rep2.data.groupid}@conference.easemob.com`,
+              groupname: groupname,
+              groupid: rep2.data.groupid
+            };
+            listGroup.push(this.chatRoomInfo); //微信小程序 sdk 数据结构
+
+            console.log(`新建聊天室成功`, this.chatRoomInfo);
             utils.setItem("listGroup", listGroup);
           }
         }
@@ -579,40 +603,33 @@ export default {
           groupId: this.chatRoomInfo.groupid,
           success: function(resp) {
             console.log("queryRoomInfo成功", resp);
-            if(resp.data&&resp.data.length>0)
-            {
-
-              try{
-                var roominfo = resp.data[0]
+            if (resp.data && resp.data.length > 0) {
+              try {
+                var roominfo = resp.data[0];
                 var dencode_str = decodeURIComponent(roominfo.description);
-                var server_desc_obj = JSON.parse(dencode_str)
+                var server_desc_obj = JSON.parse(dencode_str);
                 server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-                server_desc_obj.buyer = that.desc_obj.buyer
-                server_desc_obj.store = that.desc_obj.store
+                server_desc_obj.buyer = that.desc_obj.buyer;
+                server_desc_obj.store = that.desc_obj.store;
                 var json_obj = JSON.stringify(server_desc_obj);
-                json_obj = json_obj.replace(" ", "") //处理空格
+                json_obj = json_obj.replace(" ", ""); //处理空格
                 that.$API2.groupChat_ModifyDescription(
                   that.chatRoomInfo.groupid,
                   json_obj.replace(/\//g, "#") //处理斜杠
                 );
-              }catch(e){
-               var desc = JSON.stringify(that.desc_obj);
+              } catch (e) {
+                var desc = JSON.stringify(that.desc_obj);
                 desc = desc.replace(/\//g, "#"); //处理斜杠
-                that.$API2.groupChat_ModifyDescription(
-                  that.chatRoomInfo.roomId,
-                  desc 
-                );
+                that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId, desc);
               }
-            }
-            else if(resp.statusCode&&resp.statusCode==200)
-            {
+            } else if (resp.statusCode && resp.statusCode == 200) {
               var dencode_str = decodeURIComponent(resp.data.data[0].description);
-              var server_desc_obj = JSON.parse(dencode_str)
+              var server_desc_obj = JSON.parse(dencode_str);
               server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-              server_desc_obj.buyer = that.desc_obj.buyer
-              server_desc_obj.store = that.desc_obj.store
+              server_desc_obj.buyer = that.desc_obj.buyer;
+              server_desc_obj.store = that.desc_obj.store;
               var json_obj = JSON.stringify(server_desc_obj);
-              json_obj = json_obj.replace(" ", "") //处理空格
+              json_obj = json_obj.replace(" ", ""); //处理空格
               that.$API2.groupChat_ModifyDescription(
                 that.chatRoomInfo.groupid,
                 json_obj.replace(/\//g, "#") //处理斜杠
@@ -628,35 +645,26 @@ export default {
       var chatMsg = utils.getItem(this.sessionKey);
       this.readMsg(null, null, chatMsg, this.sessionKey);
     }
-
     this.EmojiObj2 = WebIM.EmojiObj2;
-    msgStorage.on("newChatMsg", function(renderableMsg,type,curChatMsg,sesskey) {
+
+    msgStorage.on("newChatMsg", function(renderableMsg, type, curChatMsg, sesskey) {
       // console.log("newChatMsg:",renderableMsg, curChatMsg)
       // 判断是否属于当前会话
       if (that.chatRoomInfo.groupid && sesskey == that.sessionKey) {
-        if (
-          renderableMsg.info.from == that.chatRoomInfo.groupid ||
-          renderableMsg.info.to == that.chatRoomInfo.groupid
-        ) {
+        if (renderableMsg.info.from == that.chatRoomInfo.groupid || renderableMsg.info.to == that.chatRoomInfo.groupid) {
           //群消息或者群成员发出的消息
           that.readMsg(renderableMsg, type, curChatMsg, sesskey, true);
-        } else if (
-          renderableMsg.info.from == WebIM.conn.context.userId ||
-          renderableMsg.info.to == WebIM.conn.context.userId
-        ) {
+        } else if (renderableMsg.info.from == WebIM.conn.context.userId || renderableMsg.info.to == WebIM.conn.context.userId) {
           //我发的消息或者别人发给我的消息
           that.readMsg(renderableMsg, type, curChatMsg, sesskey);
         }
       }
     });
   },
-  created() {
-
-  }
 };
 </script>
 <style>
-page{
+page {
   height: 100%;
 }
 </style>
@@ -699,6 +707,34 @@ page{
   padding-top: 0.2rem;
   background-color: #fdfdfd;
   flex-grow: 1;
+  position: relative;
+  .Checkbox-tool {
+    position: absolute;
+    background-color: #fff;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    transform: translateY(100%);
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-in;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .item {
+      text-align: center;
+      &:not(:last-child) {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+  .Checkbox-tool.show {
+    transform: none;
+    visibility: visible;
+    opacity: 1;
+  }
 }
 .input {
   display: flex;
@@ -709,8 +745,8 @@ page{
   bottom: 0rem;
   z-index: 99; */
   /* position: fixed; */
-   form{
-    flex-grow:2;
+  form {
+    flex-grow: 2;
   }
   .msg_input {
     padding: 0 0.1rem;
@@ -728,7 +764,7 @@ page{
     margin-right: 0.2rem;
     background-color: #ffffff;
   }
-  input.submit_btn{
+  input.submit_btn {
     display: none;
   }
   .icon {
@@ -741,7 +777,6 @@ page{
   }
 }
 
-
 .emojibox {
   height: auto;
   width: auto;
@@ -751,12 +786,12 @@ page{
     background-color: #ecf0f1;
     height: 3.3rem;
   }
-  .swiper-slide{
+  .swiper-slide {
     margin-bottom: 20px;
   }
-  .swiper-pagination{
+  .swiper-pagination {
     bottom: 0;
-    z-index: 0
+    z-index: 0;
   }
   img {
     width: 0.8rem;
