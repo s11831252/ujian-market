@@ -65,7 +65,7 @@ Vue.mixin({
         },
         modal(opt) {
             console.log(opt)
-            var { title = "", content = "提示内容", confirm, cancel, confirmText = "确定", confirmColor = "#12b7f5", cancelColor = "#989898",showCancel=true } = opt;
+            var { title = "", content = "提示内容", confirm, cancel, confirmText = "确定", confirmColor = "#12b7f5",cancelText="取消", cancelColor = "#989898",showCancel=true } = opt;
             wx.showModal({
                 confirmText,
                 title,
@@ -73,6 +73,7 @@ Vue.mixin({
                 showCancel,
                 confirmColor,
                 cancelColor,
+                cancelText,
                 success(res) {
                     if (res.confirm) {
                         if (confirm)

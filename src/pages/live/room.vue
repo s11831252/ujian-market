@@ -21,7 +21,7 @@
         <i class="icon" @click="fullscreenHandler">&#xe656;</i>
       </div>
       <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" v-if="isMP">
-        <div class="top">{{welcomeMsg}}</div>
+        <div class="top chat-item">{{welcomeMsg}}</div>
         <!-- <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem> -->
         <div class="chat-item" v-for="(item,index) in ChatHistory" :key="index" :id="item.mid">
           <!-- <chatMsg :msgData="item"></chatMsg> -->
@@ -114,7 +114,7 @@
             <span class="points">{{livePoints}}</span>
             <span class="pay" @click="buy_dialog=true;">充值 〉</span>
           </span>
-          <button @click="sendGiftMsg(1);" :style="{visibility:selectGift.giftId?'visible':'hidden'}">赠送</button>
+          <button @click="sendGiftMsg(1);showGift=false" :style="{visibility:selectGift.giftId?'visible':'hidden'}">赠送</button>
         </div>
       </div>
     </div>
@@ -455,7 +455,7 @@ export default {
           roomType: true,
           ext: { nickName: this.UserInfo.UserName }, //扩展消息
           success: function(id, serverMsgId) {
-            console.log("send private text Success", msg);
+            console.log("send private text Success", id, serverMsgId,msg);
             msgStorage.saveMsg(msg, "txt");
             self.textMsg = "";
           },
@@ -582,29 +582,31 @@ export default {
       var self = this;
       if(this.roomId)
       {
-        this.$ShoppingAPI.AppServer_ConnectRoom(this.roomId, "video").then(res => {
-          console.log(res);
-          if(res&&res.ret==0&&res.data)
-          {
-            let id = WebIM.conn.getUniqueId();
-            let msg = new WebIM.message("custom", id);
-            msg.set({
-              to: self.roomId,
-              roomType: true,
-              customEvent: "chatroom_member_video_call",
-              customExts: { video_call_status: "start", video_call: res.data },
-              success: function() {
-                self.PusherUrl = res.data;
-                console.log("send video_call_start msg success", msg);
-              },
-              fail: function() {}
-            });
-            msg.setGroup("groupchat");
-            WebIM.conn.send(msg.body);
-          }
-        });
+        if(WebIM.conn.isOpened())
+        {
+          this.$ShoppingAPI.AppServer_ConnectRoom(this.roomId, "video").then(res => {
+            console.log(`connectRoom isOpened :${WebIM.conn.isOpened()}`,res);
+            if(res&&res.ret==0&&res.data)
+            {
+              let id = WebIM.conn.getUniqueId();
+              let msg = new WebIM.message("custom", id);
+              msg.set({
+                to: self.roomId,
+                roomType: true,
+                customEvent: "chatroom_member_video_call",
+                customExts: { video_call_status: "start", video_call: res.data },
+                success: function() {
+                  self.PusherUrl = res.data;
+                  console.log("send video_call_start msg success", msg);
+                },
+                fail: function() {}
+              });
+              msg.setGroup("groupchat");
+              WebIM.conn.send(msg.body);
+            }
+          });
+        }
       }
-
     },
     /**
      * @description: '挂断连麦'
@@ -615,27 +617,30 @@ export default {
       var self = this;
       if(this.roomId&&self.PusherUrl)
       {
-        this.$ShoppingAPI.AppServer_UnConnectRoom(this.roomId, self.PusherUrl).then(res => {
-          console.log(res);
-          if(res&&res.ret==0&&res.data)
-          {
-            let id = WebIM.conn.getUniqueId();
-            let msg = new WebIM.message("custom", id);
-            msg.set({
-              to: self.roomId,
-              roomType: true,
-              customEvent: "chatroom_member_video_call",
-              customExts: { video_call_status: "end" },
-              success: function() {
-                self.PusherUrl = null;
-                console.log("send video_call_end msg success", msg);
-              },
-              fail: function() {}
-            });
-            msg.setGroup("groupchat");
-            WebIM.conn.send(msg.body);
-          }
-        });
+        if(WebIM.conn.isOpened())
+        {
+          this.$ShoppingAPI.AppServer_UnConnectRoom(this.roomId, self.PusherUrl).then(res => {
+            console.log(`disconnectRoom isOpened :${WebIM.conn.isOpened()}`,res);
+            if(res&&res.ret==0&&res.data)
+            {
+              let id = WebIM.conn.getUniqueId();
+              let msg = new WebIM.message("custom", id);
+              msg.set({
+                to: self.roomId,
+                roomType: true,
+                customEvent: "chatroom_member_video_call",
+                customExts: { video_call_status: "end" },
+                success: function() {
+                  self.PusherUrl = null;
+                  console.log("send video_call_end msg success", msg);
+                },
+                fail: function() {}
+              });
+              msg.setGroup("groupchat");
+              WebIM.conn.send(msg.body);
+            }
+          });
+        }
       }
 
     },
@@ -907,6 +912,21 @@ export default {
               });
 
               that.getGoods();
+              if(that.PusherUrl)
+              {
+                that.modal({
+                  title:"网络异常",
+                  content: "检测到您正在直播连麦是否进行重连?",
+                  confirm: () => {
+                    that.connectRoom();
+                  },
+                  cancel: () => {
+                    that.disconnectRoom();
+                  },
+                  confirmText: "重新连麦",
+                  cancelText:"断开连麦"
+                });
+              }
             }
           },
           error(msg) {
@@ -959,6 +979,9 @@ export default {
         //连接已断开,正在连接服务器
         console.log("DisconnectedHanderler: 连接已断开,正在连接服务器");
         this.welcomeMsg = "正在重新连接";
+      }else if(WebIM.conn.autoReconnectNumTotal > WebIM.conn.autoReconnectNumMax)
+      {
+        this.welcomeMsg = "网络已断开";
       }
     },
     //取消关注
@@ -1122,7 +1145,7 @@ export default {
     disp.off("onPresence", this.presenceHanderler);
     disp.off("onOpened", this.initHanderler);
     disp.off("onCmdMessage", this.cmdMsgHanderler);
-    disp.off("onCmdMessage", this.DisconnectedHanderler);
+    disp.off("onSocketDisconnected", this.DisconnectedHanderler);
     that.disconnectRoom();
     WebIM.conn.quitChatRoom({
       roomId: that.roomId
@@ -1290,6 +1313,7 @@ body {
       height: 90%;
       // background: rgba(0,0,0,0.2);
       .chat-item {
+        padding: 0 0.15rem;
         .txt_praise {
           color: #497fe6;
         }

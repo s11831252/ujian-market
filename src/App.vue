@@ -136,6 +136,10 @@ export default {
         }
       }, //收到音频消息
       onCmdMessage(message) {
+        if(message.from==WebIM.conn.context.userId)
+        {
+          return;
+        }
         console.log("onCmdMessage", message);
         disp.fire('onCmdMessage',message);
         // if (message) {
@@ -198,17 +202,34 @@ export default {
           lockOnError = true;
         }
       }, //失败回调
-      onReceivedMessage: function(message) {}, //收到消息送达服务器回执
-      onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
-      onReadMessage: function(message) {}, //收到消息已读回执
+      onReceivedMessage: function(message) {
+        console.log("onReceivedMessage",message)
+
+      }, //收到消息送达服务器回执
+      onDeliveredMessage: function(message) {
+        console.log("onDeliveredMessage",message)
+      }, //收到消息送达客户端回执
+      onReadMessage: function(message) {
+        console.log("onReadMessage",message)
+      }, //收到消息已读回执
       onPresence: function(msg){
         console.log("onPresence",msg)
         disp.fire('onPresence',msg);
       },
       onCustomMessage: function(msg){
+        if(msg.from==WebIM.conn.context.userId)
+        {
+          return;
+        }
         console.log("onCustomMessage",msg)
         disp.fire('newCustomMessage',msg);
       },// 自定义消息
+      onReconnect(){
+        console.log("onReconnect 重连中",msg)
+      },
+      onSocketConnected(){
+        console.log("onSocketConnected socket连接成功",msg)
+      },
     });
   },
   mounted(){
