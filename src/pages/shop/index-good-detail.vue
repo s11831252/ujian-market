@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="shop-detail-tab-goods-logo" v-if="goodsInfo.Images&&goodsInfo.Images.length>0">
-      <img :src=" goodsInfo.Images[0].Thumbnail_url">
+    <div class="shop-detail-tab-goods-logo">
+      <img :src="goodsInfo.Images&&goodsInfo.Images.length>0?goodsInfo.Images[0].Thumbnail_url:''" mode="aspectFill">
     </div>
     <div class="shop-detail-tab-goods-info">
       <p class="shop-detail-tab-goods-title">{{goodsInfo.gName}}</p>

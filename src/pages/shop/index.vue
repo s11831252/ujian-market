@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy" @click="joinRoom(shopDetail.LiveRoomId)">
+    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
       <i class="icon rectbox">
         <span class="rect"></span>
         <span class="rect rect2"></span>
@@ -155,20 +155,6 @@ export default {
     joinRoom(id) {
       var that = this;
       that.$router.push({ path: "/pages/live/room", query: { roomId: id } });
-
-      // WebIM.conn.joinChatRoom({
-      //   roomId: id,
-      //   success: async msg => {
-      //     console.log("加入直播间成功", msg);
-      //     //保存加入人信息
-      //     var res2 = await that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
-      //     if (res2.ret == 0) {
-      //     }
-      //   },
-      //   error(msg) {
-      //     console.log("加入直播间失败", msg);
-      //   }
-      // });
     },
     openLocation() {
       var that = this;
