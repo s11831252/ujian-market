@@ -49,7 +49,6 @@ import audioMsg from "@/pages/service/audio";
 export default {
   props: {
     chatdata: Object,
-    chatRoomInfo: Object,
     desc: Object,
     showCheckbox: Boolean
   },

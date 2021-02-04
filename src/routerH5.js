@@ -376,11 +376,21 @@ var routes = [
         path:'pages/live/room',
         name:'liveroom',
         config: {
-            navigationBarTitleText: '直播间',
+            navigationBarTitleText: '在线咨询',
             enablePullDownRefresh: false
         },
         meta: { noAuth: true },
         alias: '/pages/live/room',
+        component: liveroom
+    },
+    {
+        path:'pages/web/webview',
+        name:'webview',
+        config: {
+            navigationBarTitleText: '访问网页',
+        },
+        meta: { noAuth: true },
+        alias: '/pages/web/webview',
         component: liveroom
     }
 

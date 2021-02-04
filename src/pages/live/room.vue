@@ -177,7 +177,7 @@
               </ul>
               <p class="tip">
                 充值代表已阅读并同意
-                <span>《用户充值协议》</span>
+                <span @click="go({path:'/pages/web/webview',query:{webviewUrl:'https://protocol.ujianchina.net/Protocol/live/liveProtocol.html'}})">《用户充值协议》</span>
               </p>
             </div>
           </div>

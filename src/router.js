@@ -256,6 +256,13 @@ var routes = [
             enablePullDownRefresh: false,
             disableScroll: true
         }
+    },
+    {
+        path:'pages/web/webview',
+        name:'webview',
+        config: {
+            navigationBarTitleText: '访问网页',
+        }
     }
 ]
 module.exports =routes

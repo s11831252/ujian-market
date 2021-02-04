@@ -69,22 +69,42 @@ export default {
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {
+        console.log("onOpened")
         that.showLoading({ title: "正在同步聊天记录" });
-        console.log("onOpened", message);
-        //连接成功回调
-        // 如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
-        // 手动上线指的是调用conn.setPresence(); 如果conn初始化时已将isAutoLogin设置为true
+        
         WebIM.conn.getGroup({
-          success: function(resp) {
-            utils.setItem("listGroup", resp.data);
-            utils.setItem("myUsername", WebIM.conn.context.userId);
-            that.hideLoading();
+          success: function(resp){
+            var _shopChatGroups = resp.data.filter(item=>{
+              return item.groupname.indexOf("_")>-1
+            })
+            // console.log("getGroup",_shopChatGroups)
+            var _groupids = _shopChatGroups.map(item=>item.groupid)
+            WebIM.conn.getGroupInfo({
+              groupId:_groupids,
+              success(resOfGroupInfo){
+                console.log(resOfGroupInfo)
+                var _data = resOfGroupInfo.data.map(item=>{
+                  var owner = item.affiliations.find(item2=>{
+                    return item2.owner;
+                  })
+                  return {...item,owner:owner.owner}
+                })//map把owner找出来放到对象中方便后续使用判断
+                utils.setItem("listGroup", _data);
+                utils.setItem("myUsername", WebIM.conn.context.userId);
+                disp.fire('onGetGroupSuccess',_shopChatGroups);
+                that.hideLoading();
+              },
+              error(msg){
+                console.log(msg)
+              }
+            });
+
           },
-          error: function(e) {
-            console.log("error:", e);
+          error: function(){
             that.hideLoading();
           }
         });
+        disp.fire('onOpened');
       },
       onClosed: function(message) {
         console.log("环信onClosed", message);
