@@ -167,7 +167,7 @@ export default {
               //   });
 
               //场景值scene=1037 则返回调用过来的商家小程序
-              let options = await that.launchOptions;
+              let options = this.$mp.appOptions;
               if (options && options.scene == 1037) {
                 wx.navigateBackMiniProgram({
                   extraData: {

@@ -17,6 +17,7 @@ import './components/Toast/toast.css';
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import WebIM from "@/utils/hx/WebIM";
 import md5 from "@/utils/md5";
+import disp from "./utils/hx/broadcast";
 
 let { swiper, swiperSlide } = VueAwesomeSwiper
 
@@ -41,9 +42,6 @@ Vue.mixin({
     isMP(){
         return false;
     },
-    async launchOptions(){
-      return {};
-    }
   },
   methods: {
       go: function(path) {
@@ -75,11 +73,6 @@ Vue.mixin({
       },
       //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
       wx_login(callback) {
-          var parms ={};
-          if(this.launchOptions.query&&this.launchOptions.query.InvitaId)
-          {
-              parms.InvitaId=this.launchOptions.query.InvitaId;
-          }
           
           callback && await callback()
             
@@ -103,6 +96,8 @@ Vue.mixin({
             };
             this.showLoading({title:"正在连接聊天服务器"})
             WebIM.conn.open(options);
+            disp.fire('onOpening');
+            console.log("环信Login Account or Password",hx_username, hx_psw);
         }
       }
     }

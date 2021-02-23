@@ -31,10 +31,6 @@ Vue.mixin({
         },
         isMP() {
             return true;
-        },
-        launchOptions() {
-            var options = wx.getLaunchOptionsSync();
-            return options;
         }
     },
     methods: {
@@ -85,32 +81,38 @@ Vue.mixin({
                 }
             })
         },
-        //需要从其他小程序跳转过来的,必须在页面初始事件中此函数之后再进行业务接口调用
+        //需要从其他小程序跳转过来的,必须在页面初始事件中调用此函数之后再进行业务接口调用
         extraDataHandler() {
-            //1.从其他小程序(U建+、商家独立小程序)跳转到U建行业市场小程序使用功能(微信支付、联系客服、查看商家、查看商品),通过此处获取其他小程序传递过来的用户票据SingleTicket,
-            //2.店铺传递sId,商品传递gId,订单则传递OrderId,均通过 this.$route.query.xxx获取
-            //3.可以使用次微信api单独获取 let options = wx.getLaunchOptionsSync();
-            //4.可以在onShow、onLaunch回调中获取
-            let options = this.launchOptions;
+            //1.从其他小程序(U建+、商家独立小程序)跳转到U建行业市场小程序使用功能(微信支付、联系客服、查看商家、查看商品、进入直播间),通过此处获取其他小程序传递过来的用户票据SingleTicket
+            //2.可以使用微信api`let options = wx.getEnterOptionsSync()`单独获取
+            //3.可以从vue实例中使用`let options = this.$mp.appOptions`中获取
+            //4.可以在微信的App({onShow(options){}, onLaunch(options){}})事件回调中获取
+            let options = wx.getEnterOptionsSync();
             if (options && options.referrerInfo && options.referrerInfo.extraData && options.referrerInfo.extraData.SingleTicket) {
-                console.log("isOtherApp", this.$store.state.User.UserInfo)
+                console.log("this.$mp.appOptions:",this.$mp.appOptions)
+                console.log("extraDataHandler:", options);
                 if (options.referrerInfo.extraData.SingleTicket == this.$store.state.User.SingleTicket)//跳转过来票据相同,在这里判断跳出
                     return
                 if (this.$store.state.User.UserInfo.isOtherApp)//传递过来的授权票据已失效或已过期时,会有可能重复执行,在这里判断跳出
                     return
-                console.log("extraDataHandler:", this.launchOptions);
-                console.log("logined status:", this.$store.getters.Logined);
                 this.$store.commit("Login", { Ticket: options.referrerInfo.extraData.SingleTicket }); //存入Ticket
                 this.$store.commit("SetUserInfo", { isOtherApp: true }); //清空userinfo,写入一个变量用来判断是其他小程序跳转,后续重新获取用户信息后再移除
                 utils.removeItem("myUsername");
+                utils.removeItem("listGroup");
+                console.log("isOtherApp ", this.$store.state.User.UserInfo)
+                console.log("logined status:", this.$store.getters.Logined);
             }
         },
-        //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
+        /**
+         * @description: '全局wx登录函数,调用后会使用微信号对应的U建账号或游客身份登录。请在页面初始化前调用'
+         * @param {*} callback 回调函数,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
+         * @return {*}
+         */
         async wx_login(callback) {
             var that = this;
             var parms = {};
-            if (this.launchOptions.query && this.launchOptions.query.InvitaId) {
-                parms.InvitaId = this.launchOptions.query.InvitaId;
+            if (this.$mp.appOptions.query && this.$mp.appOptions.query.InvitaId) {
+                parms.InvitaId = this.$mp.appOptions.query.InvitaId;
             }
             if (!(this.$store.state.User.SingleTicket && this.$store.state.User.SingleTicket.length > 0))//没有SingleTicket尝试登录 
             {
