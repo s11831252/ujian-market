@@ -1182,6 +1182,9 @@ export default {
     disp.on("onOpening", () => {
       that.welcomeMsg = "正在连接中";
     });
+    disp.on("onClosed", () => {
+      that.welcomeMsg = "聊天服务已断开";
+    });
 
     this.wx_login(() => {
       // if (!this.$store.getters.Logined) {
@@ -1198,6 +1201,7 @@ export default {
         // if (!this.joined)
         this.initHanderler();
       } else if (!this.Logined) {
+        this.welcomeMsg = "点击登录加入直播间聊天室";
         that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
           if (res.ret == 0 && res.data) {
             that.roomInfo = res.data;
@@ -1314,6 +1318,7 @@ body {
       // background: rgba(0,0,0,0.2);
       .chat-item {
         padding: 0 0.15rem;
+        font-size: 0.4rem;
         .txt_praise {
           color: #497fe6;
         }

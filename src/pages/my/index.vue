@@ -84,6 +84,7 @@ export default {
         this.$store.commit("Login", { Ticket: "" }); //清空Ticket
         this.$store.commit("SetUserInfo", {});//清空userinfo
         utils.removeItem("myUsername");
+        utils.removeItem("listGroup");
         if(WebIM.conn.isOpened())
             WebIM.conn.close(); //环信IM关闭
         this.$router.push("/pages/index/index"); //回到登录页

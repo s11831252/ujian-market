@@ -109,7 +109,7 @@ export default {
         {
           this.modal({
             title:"连接失败",
-            content:"聊天服务连接失败,您可重连或稍后重试",
+            content:"聊天服务还未连接,您可重连或稍后重试",
             confirm:()=>{
               that.hx_login()
             },
@@ -118,14 +118,14 @@ export default {
           return;
         }
 
-        var _myUsername = utils.getItem("myUsername");
-        if(_myUsername)
+        var _listGroup = utils.getItem("listGroup");
+        if(_listGroup)
         {
           this.go({path:'/pages/service/consult',query:{sId:this.sId,sName:this.sName}})
           return
         }else
         {
-            this.toast("请稍等,聊天服务登录中");
+            this.toast("请稍等,正在同步聊天记录");
             return;
         }
       }else

@@ -48,6 +48,36 @@ function calcUnReadSpot(message) {
   // 	getApp().globalData.unReadMessageNum = count;
   // 	disp.fire("em.xmpp.unreadspot", message);
 }
+function getGroupInfo(_groupids, count,index=0) {
+  let arr = [];
+  let _pageIndex = index,_pageSize = count>100?100:count;
+  let sum_groupids = _groupids.slice(_pageIndex, _pageIndex+_pageSize);
+  return new Promise((resolve, reject) => {
+    WebIM.conn.getGroupInfo({
+      groupId: sum_groupids,
+      async success(resOfGroupInfo) {
+        console.log(resOfGroupInfo);
+        arr = resOfGroupInfo.data.map(item => {
+          var owner = item.affiliations.find(item2 => {
+            return item2.owner;
+          });
+          return { ...item, owner: owner.owner };
+        }); //map把owner找出来放到对象中方便后续使用判断
+        let sum = count - _pageSize;
+        if(sum>0)
+        {
+         arr = arr.concat(await getGroupInfo(_groupids,sum,_pageIndex+_pageSize))
+        }
+        utils.setItem("listGroup", arr);
+        resolve(arr)
+      },
+      error(msg) {
+        console.log(msg);
+        reject(msg)
+      }
+    });
+  })
+}
 export default {
   computed:{
     Enable(){
@@ -74,31 +104,14 @@ export default {
         
         WebIM.conn.getGroup({
           success: function(resp){
-            var _shopChatGroups = resp.data.filter(item=>{
-              return item.groupname.indexOf("_")>-1
-            })
-            // console.log("getGroup",_shopChatGroups)
-            var _groupids = _shopChatGroups.map(item=>item.groupid)
-            WebIM.conn.getGroupInfo({
-              groupId:_groupids,
-              success(resOfGroupInfo){
-                console.log(resOfGroupInfo)
-                var _data = resOfGroupInfo.data.map(item=>{
-                  var owner = item.affiliations.find(item2=>{
-                    return item2.owner;
-                  })
-                  return {...item,owner:owner.owner}
-                })//map把owner找出来放到对象中方便后续使用判断
-                utils.setItem("listGroup", _data);
-                utils.setItem("myUsername", WebIM.conn.context.userId);
-                disp.fire('onGetGroupSuccess',_shopChatGroups);
-                that.hideLoading();
-              },
-              error(msg){
-                console.log(msg)
-              }
+            var _shopChatGroups = resp.data.filter(item => {
+              return item.groupname.indexOf("_") > -1;
             });
-
+            utils.setItem("myUsername", WebIM.conn.context.userId);
+            utils.setItem("listGroup", []);
+            var _groupids = _shopChatGroups.map(item => item.groupid);
+            await getGroupInfo(_groupids,_groupids.length)
+            that.hideLoading();
           },
           error: function(){
             that.hideLoading();
