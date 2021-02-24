@@ -5,6 +5,7 @@ let bmobConfig={
     applicationId:"",
     restApiKey:""
 }
+const accountInfo = wx.getAccountInfoSync();
 const net = {
   showAuthModal:true,
   get(url, data) {
@@ -22,9 +23,9 @@ const net = {
           // 'X-Bmob-Application-Id': bmobConfig.applicationId,
           // 'X-Bmob-REST-API-Key': bmobConfig.restApiKey,
           'Content-Type': 'application/json',
-          'Device':"WebApp",
-          'DisplayVersion':"2.0.11",
-          'SingleTicket':store.state.User.SingleTicket
+          'Device':"WXMP",
+          'SingleTicket':store.state.User.SingleTicket,
+          ...accountInfo.miniProgram
         }, // 设置请求的 header
         success: function (res) {
           if(res.statusCode!=200){
@@ -134,9 +135,9 @@ const net = {
         method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
         header: {
           'Content-Type': 'application/json',
-          'Device':"WebApp",
-          'DisplayVersion':"2.0.11",
-          'SingleTicket':store.state.User.SingleTicket
+          'Device':"WXMP",
+          'SingleTicket':store.state.User.SingleTicket,
+          ...accountInfo.miniProgram
         }, // 设置请求的 header
         success: function (res) {
           // success
