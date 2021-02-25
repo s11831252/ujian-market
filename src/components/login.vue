@@ -118,14 +118,15 @@ export default {
         if (this.$route.query.redirect) {
           let url = decodeURIComponent(this.$route.query.redirect);
           // 切换至redirect页面
-          this.$router.push({ path: url ,reLaunch:true},//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
+          this.$router.replace({ path: url },//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
           null,
-          msg=>{this.$router.push({path: url, isTab: true })}
+          msg=>{
+            this.$router.push({path: url, isTab: true })}
           );
         } else if (this.$route.query.back) {
-          var pages = getCurrentPages();    //获取加载的页面
-          var currentPage = pages[pages.length-2];    //获取当前页面的对象
-          console.log(pages,currentPage)
+          // var pages = getCurrentPages();    //获取加载的页面
+          // var currentPage = pages[pages.length-2];    //获取当前页面的对象
+          // console.log(pages,currentPage)
           //后退
           this.$router.back();
         } // 切换至首页页面
@@ -164,7 +165,7 @@ export default {
         if (this.$route.query.redirect) {
           let url = decodeURIComponent(this.$route.query.redirect);
           // 切换至redirect页面
-          this.$router.push({ path: url ,reLaunch:true},//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
+          this.$router.replace({ path: url},//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
           null,
           msg=>{this.$router.push({path: url, isTab: true })}
           );
