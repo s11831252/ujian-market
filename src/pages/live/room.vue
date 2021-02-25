@@ -1681,8 +1681,6 @@ body {
     //   opacity: 0;
     //   transform: scale3d(1, 1, 0);
     // }
-    .dialog_wrapper.bottom {
-    }
     .dialog_wrapper {
       position: fixed;
       z-index: 10;
