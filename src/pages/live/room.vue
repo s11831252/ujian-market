@@ -140,6 +140,23 @@
         </div>
       </div>
     </div>
+    <div class="uj_dialog" :class="closeLiverommMsg?'open':''">
+      <div class="mask"></div>
+      <div class="dialog_wrapper">
+        <div class="dialog">
+          <div class="dialog_wrapper_body">
+            <div class="closeLiveroom">{{closeLiverommMsg}}</div>
+          </div>
+          <div class="dialog_wrapper_bottom">
+            <div class="buttom-group">
+              <button class="confirm" @click="go({path:'/pages/home/index',isTab:true})">进入行业市场</button>
+              <navigator class="confirm" v-if="hasBack" open-type="navigateBack">返回</navigator>
+              <navigator class="confirm" v-else target="miniProgram" open-type="exit">退出小程序</navigator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="uj_dialog" :class="login_dialog?'open':''">
       <div class="mask" @click="login_dialog=false"></div>
       <div class="dialog_wrapper bottom" @click="login_dialog=false">
@@ -147,7 +164,7 @@
           <div class="dialog_wrapper_body">
             <div class="loginbox">
               <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信一键登录</button>
-              <button @click="go({path:'/pages/index/index',query:{redirect:redirect,mode:'PWD'}})">U建账号登录</button>
+              <button @click="replace({path:'/pages/index/index',query:{redirect:redirect,mode:'PWD'}})">U建账号登录</button>
               <button class="cancel" @click="login_dialog=false">取消</button>
             </div>
           </div>
@@ -259,7 +276,7 @@ import chatItem from "@/pages/service/chat-item";
 import chatMsg from "@/pages/service/chat-msg";
 import vaildCodeBox from "../../components/validCodeBox";
 import otherPull from "./otherPull";
-import otherPusher from  "./otherPusher"
+import otherPusher from "./otherPusher";
 
 export default {
   data() {
@@ -336,7 +353,9 @@ export default {
       showFloating: true,
       fullscreen: false,
       welcomeMsg: "",
-      PusherUrl:null
+      PusherUrl: null,
+      closeLiverommMsg: "",
+      hasBack: true
     };
   },
   components: {
@@ -366,10 +385,10 @@ export default {
       else return "";
     },
     otherPull() {
-      if (this.roomInfo && this.roomInfo.livePullUrl && this.roomInfo.livePullUrl.length > 0) 
-      return this.roomInfo.livePullUrl.slice(1).filter(item=>{
-        return item.indexOf(WebIM.conn.context.userId)<0
-      });
+      if (this.roomInfo && this.roomInfo.livePullUrl && this.roomInfo.livePullUrl.length > 0)
+        return this.roomInfo.livePullUrl.slice(1).filter(item => {
+          return item.indexOf(WebIM.conn.context.userId) < 0;
+        });
       // return [this.roomInfo.livePullUrl[0],this.roomInfo.livePullUrl[0]]
       else return [];
     },
@@ -455,7 +474,7 @@ export default {
           roomType: true,
           ext: { nickName: this.UserInfo.UserName }, //扩展消息
           success: function(id, serverMsgId) {
-            console.log("send private text Success", id, serverMsgId,msg);
+            console.log("send private text Success", id, serverMsgId, msg);
             msgStorage.saveMsg(msg, "txt");
             self.textMsg = "";
           },
@@ -565,7 +584,8 @@ export default {
       WebIM.conn.quitChatRoom({
         roomId: this.roomInfo.id,
         success: res => {
-          this.$router.back();
+          if (this.hasBack) this.$router.back();
+          else this.closeLiverommMsg = "即将退出直播间";
         },
         error: e => {
           console.log("退出失败", e);
@@ -580,14 +600,11 @@ export default {
      */
     connectRoom() {
       var self = this;
-      if(this.roomId)
-      {
-        if(WebIM.conn.isOpened())
-        {
+      if (this.roomId) {
+        if (WebIM.conn.isOpened()) {
           this.$ShoppingAPI.AppServer_ConnectRoom(this.roomId, "video").then(res => {
-            console.log(`connectRoom isOpened :${WebIM.conn.isOpened()}`,res);
-            if(res&&res.ret==0&&res.data)
-            {
+            console.log(`connectRoom isOpened :${WebIM.conn.isOpened()}`, res);
+            if (res && res.ret == 0 && res.data) {
               let id = WebIM.conn.getUniqueId();
               let msg = new WebIM.message("custom", id);
               msg.set({
@@ -615,14 +632,11 @@ export default {
      */
     disconnectRoom() {
       var self = this;
-      if(this.roomId&&self.PusherUrl)
-      {
-        if(WebIM.conn.isOpened())
-        {
+      if (this.roomId && self.PusherUrl) {
+        if (WebIM.conn.isOpened()) {
           this.$ShoppingAPI.AppServer_UnConnectRoom(this.roomId, self.PusherUrl).then(res => {
-            console.log(`disconnectRoom isOpened :${WebIM.conn.isOpened()}`,res);
-            if(res&&res.ret==0&&res.data)
-            {
+            console.log(`disconnectRoom isOpened :${WebIM.conn.isOpened()}`, res);
+            if (res && res.ret == 0 && res.data) {
               let id = WebIM.conn.getUniqueId();
               let msg = new WebIM.message("custom", id);
               msg.set({
@@ -642,7 +656,6 @@ export default {
           });
         }
       }
-
     },
     //处理自定义消息回调
     customMsgHanderler(msg) {
@@ -804,17 +817,15 @@ export default {
           console.log("leaveChatRoom", that.roomInfo.affiliations);
           if (msg.from == this.roomInfo.owner) {
             //直播间拥有者用户退出,认为是关闭直播间
-            that.modal({
-              content: "直播已结束",
-              showCancel: false,
-              confirm: () => {
-                that.$router.back();
-              },
-              cancel: () => {
-                that.$router.back();
-              },
-              confirmText: "返回"
-            });
+            // that.modal({
+            //   content: "直播已结束",
+            //   showCancel: false,
+            //   confirm: () => {
+            //     that.$router.back();
+            //   },
+            //   confirmText: "返回"
+            // });
+            that.closeLiverommMsg = "直播已结束";
           }
           var memberInfo = this.roomInfo.affiliations.find(item => {
             return item.member == msg.from;
@@ -828,11 +839,6 @@ export default {
         }
         case "removedFromGroup": {
           console.log(`${msg.type}== removedFromGroup  gId${msg.gid} ==roomId${that.roomId}`);
-          // if(msg.gId == that.roomId)
-          // {
-          //   this.joined=false;
-          //   that.initHanderler();
-          // }
           break;
         }
         case "memberJoinChatRoomSuccess": {
@@ -852,10 +858,7 @@ export default {
     //该页面特殊处理,环信连接初始化之后开始调用api
     initHanderler() {
       var that = this;
-      // this.joined = false;
       // that.EmojiObj2 = WebIM.EmojiObj2; //表情包
-      // console.log(`initHanderler,joined:${this.joined}`)
-      //&& !this.joined
       if (this.roomId) {
         this.welcomeMsg = "正在加入直播间聊天室";
         WebIM.conn.joinChatRoom({
@@ -881,8 +884,15 @@ export default {
             var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
             if (res.ret == 0 && res.data) {
               that.roomInfo = res.data;
-              if(that.isMP)
-                wx.setNavigationBarTitle({ title: `${that.roomInfo.name}直播间` });
+              var owner = that.roomInfo.affiliations.find(item => {
+                return item.owner;
+              });
+              if (!owner) {
+                //直播间拥有者不存在,认为是还未开启直播间
+                that.closeLiverommMsg = "该直播间还未开启";
+                return;
+              }
+              if (that.isMP) wx.setNavigationBarTitle({ title: `${that.roomInfo.name}直播间` });
               that.welcomeMsg = "欢迎您进入直播间聊天室";
               that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
                 if (response.ret == 0 && response.data) {
@@ -912,10 +922,9 @@ export default {
               });
 
               that.getGoods();
-              if(that.PusherUrl)
-              {
+              if (that.PusherUrl) {
                 that.modal({
-                  title:"网络异常",
+                  title: "网络异常",
                   content: "检测到您正在直播连麦是否进行重连?",
                   confirm: () => {
                     that.connectRoom();
@@ -924,7 +933,7 @@ export default {
                     that.disconnectRoom();
                   },
                   confirmText: "重新连麦",
-                  cancelText:"断开连麦"
+                  cancelText: "断开连麦"
                 });
               }
             }
@@ -979,8 +988,7 @@ export default {
         //连接已断开,正在连接服务器
         console.log("DisconnectedHanderler: 连接已断开,正在连接服务器");
         this.welcomeMsg = "正在重新连接";
-      }else if(WebIM.conn.autoReconnectNumTotal > WebIM.conn.autoReconnectNumMax)
-      {
+      } else if (WebIM.conn.autoReconnectNumTotal > WebIM.conn.autoReconnectNumMax) {
         this.welcomeMsg = "网络已断开";
       }
     },
@@ -1018,7 +1026,7 @@ export default {
               console.log(msg);
               var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
               that.$store.commit("SetUserInfo", _u);
-              this.$router.push({ path: "/pages/index/index", query: { redirect: this.redirect } });
+              this.$router.replace({ path: "/pages/index/index", query: { redirect: this.redirect } });
             } else {
               //解密失败
             }
@@ -1164,14 +1172,20 @@ export default {
       imageUrl
     };
   },
+  onShow() {
+    let pages = getCurrentPages();
+    console.log(pages);
+    this.hasBack = pages[pages.length - 2] ? true : false;
+  },
   mounted() {
     var that = this;
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
-      if(this.isMP)
+      if (this.isMP) {
         wx.setNavigationBarTitle({ title: "直播间" });
+      }
     }
-    console.log("mounted", this.Logined);
+    console.log("mounted", this);
     this.welcomeMsg = "正在初始化";
     disp.on("onOpened", that.initHanderler);
     msgStorage.on("newChatMsg", that.readMsg);
@@ -1205,6 +1219,14 @@ export default {
         that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
           if (res.ret == 0 && res.data) {
             that.roomInfo = res.data;
+            var owner = that.roomInfo.affiliations.find(item => {
+              return item.owner;
+            });
+            if (!owner) {
+              //直播间拥有者不存在,认为是还未开启直播间
+              that.closeLiverommMsg = "该直播间还未开启";
+              return;
+            }
             that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
               if (response.ret == 0 && response.data) {
                 that.giftList = response.data;
@@ -1357,7 +1379,7 @@ body {
         background-color: rgba(163, 229, 255, 0.8);
         color: #2cacfc;
       }
-      .disconnect{
+      .disconnect {
         background: #ff74af;
         color: #e60000;
       }
@@ -1659,6 +1681,8 @@ body {
     //   opacity: 0;
     //   transform: scale3d(1, 1, 0);
     // }
+    .dialog_wrapper.bottom {
+    }
     .dialog_wrapper {
       position: fixed;
       z-index: 10;
@@ -1679,10 +1703,11 @@ body {
       visibility: hidden;
       opacity: 0;
       transition: opacity 700ms ease-out, transform 300ms ease-out, visibility 700ms ease-out;
+
       .dialog {
         background-color: #fff;
         text-align: center;
-        border-radius: 5%;
+        border-radius: 0.4rem;
         overflow: hidden;
         display: -webkit-box;
         display: -webkit-flex;
@@ -1690,6 +1715,8 @@ body {
         -webkit-flex-direction: column;
         flex-direction: column;
         max-height: 12.49rem;
+        width: 65%;
+        max-width: 65%;
         .dialog_wrapper_head {
           padding: 0.3rem;
         }
@@ -1697,20 +1724,46 @@ body {
           flex: 1;
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
-          font-size: 0.4rem;
+          font-size: 0.45rem;
           overflow-wrap: break-word;
           -webkit-hyphens: auto;
           hyphens: auto;
           color: rgba(0, 0, 0, 0.5);
         }
+        .dialog_wrapper_bottom {
+          border-top: 0.02rem solid rgba(0, 0, 0, 0.5);
+          .buttom-group {
+            display: flex;
+            justify-items: center;
+            align-items: center;
+            button,
+            navigator {
+              flex-grow: 1;
+            }
+          }
+          button,
+          navigator {
+            font-size: 0.4rem;
+            padding: 0.45rem 0;
+          }
+          button.confirm,
+          navigator.confirm {
+            color: #2cacfc;
+          }
+          button.cancel,
+          navigator.cancel {
+            color: #989898;
+          }
+        }
       }
-    }
-    .dialog_wrapper.bottom {
-      align-items: flex-end;
-      transform: translateY(100%);
-      .dialog {
-        width: 100%;
-        border-radius: 0.24rem 0.24rem 0 0;
+      &.bottom {
+        align-items: flex-end;
+        transform: translateY(100%);
+        .dialog {
+          width: 100%;
+          max-width: 100%;
+          border-radius: 0.24rem 0.24rem 0 0;
+        }
       }
     }
   }
@@ -1960,6 +2013,9 @@ body {
           }
         }
       }
+    }
+    .closeLiveroom {
+      margin: 1rem 0;
     }
   }
 }

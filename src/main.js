@@ -199,6 +199,7 @@ Vue.mixin({
             }
         }
     },
+    //两个方法都可以解决mpvue 同页面不重置data中的数据问题
     onLoad() {
         if (this.$initData$) {
           Object.assign(this, JSON.parse(this.$initData$))
@@ -216,7 +217,7 @@ Vue.mixin({
     //         console.log("进入页面:" + this.$route.path);
     // }
 });
-Vue.use(MpvueRoterPatch);//在Vue实例中使用$Router访问Vuex
+Vue.use(MpvueRoterPatch);//在Vue实例中使用$route和$router进行调用路由
 Vue.config.productionTip = false
 App.mpType = 'app'
 const app = new Vue(App)
