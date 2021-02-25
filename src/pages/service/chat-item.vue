@@ -27,8 +27,8 @@
             <div class="mask" @touchstart="showTool=false"></div>
             <ul class="list">
               <li class="item" @click="$emit('delMsg',chatdata);showTool=false;">删除</li>
-              <li class="item" v-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" @click="$emit('onShowCheckbox',true);$emit('checked',checked=true,chatdata);showTool=false;">多选</li>
-              <li class="item" @click="copyMsg">复制</li>
+              <li class="item" @click="$emit('onShowCheckbox',true);$emit('checked',checked=true,chatdata);showTool=false;">多选</li>
+              <li class="item" v-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" @click="copyMsg">复制</li>
               <li class="item" @click="showTool=false">取消</li>
             </ul>
           </div>
@@ -108,17 +108,21 @@ export default {
     },
     copyMsg() {
       var that = this;
-      let copyText = "";
-      for (const item of this.chatdata.msg.data) {
-        copyText += item.data;
-      }
-      wx.setClipboardData({
-        data: copyText,
-        success(res) {
-          console.log("复制文本成功", res);
-          that.showTool = false;
+      if(this.chatdata.msg.type=='emoji' || this.chatdata.msg.type=='txt')
+      {
+        let copyText = "";
+        for (const item of this.chatdata.msg.data) {
+          copyText += item.data;
         }
-      });
+        wx.setClipboardData({
+          data: copyText,
+          success(res) {
+            console.log("复制文本成功", res);
+            that.showTool = false;
+          }
+        });
+      }else return;
+
     }
   }
 };
