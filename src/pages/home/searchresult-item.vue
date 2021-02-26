@@ -3,7 +3,7 @@
     <div class="shop_nr" @click="go({path:'/pages/shop/detail',query:{sId:sid,gId:goods.gId}})">
       <div class="dian"></div>
       <div class="nr_right">
-        <img :src="goods.Images[0].Thumbnail_url" alt>
+        <img :src="goods.Images[0]?goods.Images[0].Thumbnail_url:''" alt>
         <div class="contents">
           <p class="bt" v-html="_gName"></p>
           <div class="ft">

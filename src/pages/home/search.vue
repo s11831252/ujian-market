@@ -23,12 +23,12 @@
                     <li v-for="(item,index) in searchList" :key="index" @click="selectKeyword(item)">
                         <!-- <img src="img/history.png" class="liulan" alt="" /> -->
                         <p>{{item}}</p>
-                        <i class="icon err">&#xe603;</i>
+                        <i class="icon err" @click.stop="remove(item,index)">&#xe603;</i>
                     </li>
                 </ul>
             </div>
             <div class="btn">
-                <div class="clearbtn">
+                <div class="clearbtn" @click="removeAll">
                     <p>清除搜索历史</p>
                 </div>
             </div>
@@ -54,6 +54,27 @@ export default {
         gosearch(){
           if(this.keyword)
             this.go({path:'/pages/home/searchresult',query:{keyword:this.keyword}})
+        },
+        async remove(item,index){
+          var rep = await this.$ShoppingAPI.GoodsSearchHistory_Remove(item);
+          if(rep.ret==0)
+          {
+            this.searchList.splice(index,1)
+          }
+        },
+        async removeAll(){
+          var rep = await this.$ShoppingAPI.GoodsSearchHistory_RemoveALL();
+          if(rep.ret==0)
+          {
+            this.searchList=[];
+          }
+        }
+    },
+    async onShow(){
+        var rep2 =await this.$ShoppingAPI.GoodsSearchHistory_Get({size:10});
+        if(rep2.ret==0)
+        {
+            this.searchList = rep2.data;
         }
     },
     async mounted(){
@@ -61,12 +82,6 @@ export default {
         if(rep.ret==0)
         {
             this.hotList = rep.data;
-        }
-        
-        var rep2 =await this.$ShoppingAPI.GoodsSearchHistory_Get({size:10});
-        if(rep2.ret==0)
-        {
-            this.searchList = rep2.data;
         }
     },
     created(){

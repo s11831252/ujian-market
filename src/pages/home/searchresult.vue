@@ -152,7 +152,9 @@ export default {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
         OrderType: tab.parm.OrderType,
-        Keyword: this.keyword
+        Keyword: this.keyword,
+        isGood:false,
+        isDetail:false,
       };
       if (this.CurrentLocation && this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
         (param.Lon = this.CurrentLocation.longitude), (param.Lat = this.CurrentLocation.latitude);
@@ -204,7 +206,9 @@ export default {
     navbarSliderClass() {
       return "navbar_slider_" + this.activeIndex;
     },
+
     ...mapState({
+      Config: state => state.Global.Config,
       CurrentLocation: state => state.User.CurrentLocation
     })
   },

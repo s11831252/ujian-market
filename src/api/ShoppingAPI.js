@@ -2,7 +2,7 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.119:811/":"https://market.ujianchina.net/";
+let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.86:811/":"https://market.ujianchina.net/";
 // let BaseHost = process.env.NODE_ENV == 'development'?"http://www.luozuzhan.top:811/":"https://market.ujianchina.net/";
 
 export default {
@@ -84,13 +84,21 @@ export default {
     Goods_Search: param => {
         return http.get(BaseHost + "api/Goods/Search", param)
     },
-    //获取商品热门搜索关键字
+    //获取热门搜索关键字
     GoodsSearchHistory_GetHot: param => {
         return http.get(BaseHost + "api/GoodsSearchHistory/GetHot", param)
     },
-    //获取个人搜素商品关键字
+    //获取个人搜素关键字
     GoodsSearchHistory_Get: param => {
         return http.get(BaseHost + "api/GoodsSearchHistory/Get", param)
+    },
+    //移除个人搜素关键字
+    GoodsSearchHistory_Remove: Keyword => {
+        return http.get(BaseHost + `api/GoodsSearchHistory/Remove?Keyword=${Keyword}`)
+    },
+    //移除个人所有的搜素关键字
+    GoodsSearchHistory_RemoveALL: () => {
+        return http.get(BaseHost + `api/GoodsSearchHistory/RemoveALL`)
     },
     //获取物流
     GetLogisticsMode: param => {
