@@ -55,7 +55,7 @@
           <!-- 详细计费 -->
           <div class="money">
             <!-- 展开与隐藏 -->
-            <div class="vvv icon" v-if="show" @click="Show">&#xe614;</div>
+            <div class="vvv icon" v-if="!show" @click="Show">&#xe614;</div>
             <div class="vvv icon" v-else @click="Show">&#xe712;</div>
             <div class="moneyBox">
               <div class="moneyBox-one">
@@ -431,6 +431,9 @@ export default {
   components: {
     myDrop
   },
+  onShow(){
+    this.QueryFreight();
+  },
   async mounted() {
     if (this.$route.query && this.$route.query.sId.length > 0) {
       // 接收店铺id参数
@@ -477,6 +480,7 @@ export default {
       }); 
       if (rep3.ret == 0) {
         this.shopDetail = rep3.data;
+        this.QueryFreight();
       }
     }
   }

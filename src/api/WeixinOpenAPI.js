@@ -6,6 +6,6 @@ let BaseHost = process.env.NODE_ENV == 'production'?"https://live.ujianchina.net
 
 export default {
     WXMP_Config: () => {
-        return http.post(BaseHost + `api/WXMP/Config`)
+        return http.post(BaseHost + `api/WXMP/Config`,undefined,false)
     }
 }

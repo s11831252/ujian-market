@@ -33,9 +33,15 @@
             <span>{{item.ext.nickName}}</span>进入直播间
           </span>
           <span class="txt_gift" v-else-if="item.msg.type=='chatroom_gift'">
-            收到{{item.ext.nickName}}送出的
+            {{item.ext.nickName}}赠送了
             <img :src="item.msg.customExts.giftUrl" />
-            {{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}个
+            {{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_video_call'&&item.msg.customExts.video_call_status=='start'">
+            <span>{{item.ext.nickName}}</span>进行连麦
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_video_call'&&item.msg.customExts.video_call_status=='end'">
+            <span>{{item.ext.nickName}}</span>结束连麦
           </span>
           <div v-else>
             <span>{{item.ext.nickName}}:</span>
@@ -112,9 +118,9 @@
           <span class="txt">
             <img src="../../../static/img/ub.png" />
             <span class="points">{{livePoints}}</span>
-            <span class="pay" @click="buy_dialog=true;">充值 〉</span>
+            <span class="pay" @click="buy_dialog=true;getBalance();">充值 〉</span>
           </span>
-          <button @click="sendGiftMsg(1);showGift=false" :style="{visibility:selectGift.giftId?'visible':'hidden'}">赠送</button>
+          <button @click="sendGiftMsg(1);" :style="{visibility:selectGift.giftId?'visible':'hidden'}">赠送</button>
         </div>
       </div>
     </div>
@@ -141,9 +147,9 @@
       </div>
     </div>
     <div class="uj_dialog" :class="closeLiverommMsg?'open':''">
-      <div class="mask"></div>
-      <div class="dialog_wrapper">
-        <div class="dialog">
+      <div class="mask" @click="closeLiverommMsg=''"></div>
+      <div class="dialog_wrapper" @click="closeLiverommMsg=''">
+        <div class="dialog" @click.stop>
           <div class="dialog_wrapper_body">
             <div class="closeLiveroom">{{closeLiverommMsg}}</div>
           </div>
@@ -218,7 +224,7 @@
                 </p>
                 <p class="points">{{selectPackage.points}}U币</p>
               </div>
-              <div class="select" @click="paymode=1;getBalance();">
+              <div class="select" @click="paymode=1">
                 <img src="../../../static/img/logo108.png" />
                 <span class="txt">
                   U建钱包支付
@@ -250,7 +256,7 @@
                   <span class="name">{{item.gName}}</span>
                   <span class="price">
                     ￥
-                    <span class="txt">{{item.Price}}</span>
+                    <span class="txt">{{item.gType==1?'议价':item.Price}}</span>
                   </span>
                   <span class="btn" @click="go({path:'/pages/shop/detail',query:{gId:item.gId,sId:item.sId,sName:item.sName}})">去购买</span>
                 </div>
@@ -577,6 +583,10 @@ export default {
       var res = await this.$ShoppingAPI.AppServer_SendGift(self.roomInfo.owner, self.selectGift.giftId, giftNum);
       if (res.ret == 0 && res.data) {
         WebIM.conn.send(msg.body);
+        this.showGift=false
+      }else
+      {
+        
       }
     },
     // 退出直播间
@@ -739,6 +749,7 @@ export default {
           break;
         }
         case "chatroom_member_video_call": {
+          that.readMsg(renderableMsg, msg.customEvent, null, that.sessionKey, msg);
           if (msg.customExts.video_call_status == "start") {
             that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).then(res => {
               if (res.ret == 0 && res.data) {
@@ -943,7 +954,7 @@ export default {
             this.welcomeMsg = "加入直播间聊天室失败";
             //加入直播间失败,认为是直播间已关闭或已结束
             that.modal({
-              content: "直播间不存在",
+              content: (msg.errMsg&&msg.errMsg.replace("request:fail",""))||"直播间不存在",
               showCancel: false,
               confirm: () => {
                 that.$router.back();
@@ -1105,6 +1116,8 @@ export default {
             that.livePoints = response.data;
           }
         });
+        //更新U建钱包余额
+        that.getBalance();
         return true;
       } else {
         that.toast(ret.msg);

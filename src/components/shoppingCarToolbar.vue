@@ -1,6 +1,6 @@
 <template>
     <div class="shoppingcar" :class="{showed:showed}">
-        <div class="shoppingcar-goods" v-if="showed">
+        <div class="shoppingcar-goods">
             <span class="icon close" @click="taggle">&#xe603;</span>
             <div class="bar">
               <span>已选商品</span>
@@ -21,7 +21,7 @@
               <i class="icon service-icon">&#xe734;</i>
               <p>联系客服</p>
             </span>
-            <i class="icon car-icon" :class="{has:getShoppingCarCountBysId>0}">
+            <i class="icon car-icon" :class="{has:getShoppingCarCountBysId>0}" @click="taggle">
               &#xe600;
                <span v-if="getShoppingCarCountBysId>0" class="shoppingcar-count">{{getShoppingCarCountBysId}}</span>
               </i>
@@ -156,7 +156,7 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .shoppingcar {
   position: fixed;
   color: #bfbfbf;
@@ -176,6 +176,10 @@ export default {
     width: 100%;
     position: absolute;
     bottom: 1.45rem;
+    transform: translateY(100%);
+    transition: all 0.3s ease-in;
+    visibility: hidden;
+    z-index: 2;
     .close{
       font-size: 28px;
       position: absolute;
@@ -226,6 +230,8 @@ export default {
     width: 100%;
     position: absolute;
     bottom: 0;
+    z-index: 3;
+    background-color: #3e3e3e;
     .service{
       display: inline-block;
       font-size: 0.27rem;
@@ -293,5 +299,9 @@ export default {
 }
 .shoppingcar.showed{
   height: 100%;
+  .shoppingcar-goods{
+    transform:none;
+    visibility: visible;
+   }
 }
 </style>

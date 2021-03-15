@@ -4,14 +4,13 @@
       <span class="title">最近浏览</span>
       <div class="body">
         <ul class="list">
-          <li v-for="(item,index) in viewHistory" :key="index" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})" >
-            <img :src="item.sLogo">
+          <li v-for="(item,index) in viewHistory" :key="index" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
+            <img :src="item.sLogo" />
             <p>{{item.sName}}</p>
           </li>
         </ul>
-      <i class="icon" @click="hidehistory">&#xe613;</i>
+        <i class="icon" @click="hidehistory">&#xe613;</i>
       </div>
-
     </div>
     <div class="search">
       <div @click="go({path:'/pages/home/search'})">
@@ -21,14 +20,17 @@
     </div>
     <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
-        <swiper-item>
-          <img :src="item.ImageUrl" class="slide-image" mode="aspectFill">
+        <swiper-item >
+          <img :src="item.ImageUrl" v-if="item.JumpModel&&item.JumpModel.WebApp" class="slide-image" mode="aspectFill" @click="go({path:item.JumpModel.WebApp.Parameter.path,query:item.JumpModel.WebApp.Parameter.query})" />
+          <img :src="item.ImageUrl" v-else class="slide-image" mode="aspectFill"/>
         </swiper-item>
       </block>
     </swiper>
     <swiper v-else ref="mySwiper" :options="swiperOption">
       <swiper-slide v-for="(item, index) in Market.Banners" :index="index" :key="index">
-        <img :src="item.ImageUrl" class="slide-image">
+        <img :src="item.ImageUrl" v-if="item.JumpModel&&item.JumpModel.WebApp" class="slide-image" @click="go({path:item.JumpModel.WebApp.Parameter.path,query:item.JumpModel.WebApp.Parameter.query})" />
+        <img :src="item.ImageUrl" v-else class="slide-image" />
+
       </swiper-slide>
       <!-- Optional controls -->
       <div class="swiper-pagination" slot="pagination"></div>
@@ -37,12 +39,8 @@
       <p v-text="Market.News.title"></p>
     </div>
     <ul class="box category">
-      <li
-        v-for="(item,index) in Market.Category"
-        :key="index"
-        @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})"
-      >
-        <img :src="item.ImageUrl" :title="item.Title">
+      <li v-for="(item,index) in Market.Category" :key="index" @click="go({path:'/pages/home/subject', query:{title:item.ActionParameter.WebApp.Parameter.title,MainType:item.ActionParameter.WebApp.Parameter.MainType}})">
+        <img :src="item.ImageUrl" :title="item.Title" />
       </li>
     </ul>
     <div class="box service" v-if="false">
@@ -55,12 +53,12 @@
       <div class="box-body">
         <ul class="Primary">
           <li v-for="(item,index) in Market.Service.Primary" :key="index">
-            <img :src="item.ImageUrl" :title="item.Title">
+            <img :src="item.ImageUrl" :title="item.Title" />
           </li>
         </ul>
         <ul class="Secondary">
           <li v-for="(item,index) in Market.Service.Secondary" :key="index">
-            <img :src="item.ImageUrl" :title="item.Title">
+            <img :src="item.ImageUrl" :title="item.Title" />
           </li>
         </ul>
       </div>
@@ -74,9 +72,7 @@
       </div>
       <div class="box-body">
         <div class="nearby-location" @click="openLocation">
-          <p>
-            我的定位:{{CurrentLocation.LocationAddress}}
-          </p>
+          <p>我的定位:{{CurrentLocation.LocationAddress}}</p>
           <span class="icon">&#xe65e;</span>
           <span class="icon Right">&#xe601;</span>
         </div>
@@ -93,11 +89,12 @@
                 <li v-for="(item,index) in ShopList" :key="index">
                   <div class="shop-item" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
                     <div class="shop-item-logo">
-                      <img :src="item.sLogo">
+                      <img :src="item.sLogo" />
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
-                        <span class="txt">{{item.sName}}
+                        <span class="txt">
+                          {{item.sName}}
                           <span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
                             <i class="icon rectbox">
                               <span class="rect"></span>
@@ -199,7 +196,7 @@
                   </div>
                 </li>
               </ul>
-            </div> -->
+            </div>-->
           </div>
           <!-- <div class="box_bottom">DUANG~已经到底了哦</div> -->
         </div>
@@ -217,7 +214,7 @@ export default {
           el: ".swiper-pagination"
         }
       },
-      hideStyle:"animation-play-state:paused;animation-direction:reverse",
+      hideStyle: "animation-play-state:paused;animation-direction:reverse",
       Market: {
         Banners: [],
         Category: [],
@@ -284,14 +281,14 @@ export default {
     navbarSliderClass() {
       return "navbar_slider_" + this.activeIndex;
     },
-    viewHistory(){
-      var _arr = this.$store.state.User.viewHistory.slice(0,4)//只显示4个店铺
+    viewHistory() {
+      var _arr = this.$store.state.User.viewHistory.slice(0, 4); //只显示4个店铺
       return _arr;
     },
     ...mapState({
       CurrentLocation: state => state.User.CurrentLocation,
       Config: state => state.Global.Config,
-      showHistory(state){
+      showHistory(state) {
         return state.User.showHistory;
       }
     })
@@ -315,10 +312,10 @@ export default {
       }
       return rep;
     },
-    hidehistory(){
+    hidehistory() {
       //启动隐藏浏览记录动画
-      this.hideStyle="animation-play-state:running;animation-direction:normal";
-      this.setshowHistory(false)
+      this.hideStyle = "animation-play-state:running;animation-direction:normal";
+      this.setshowHistory(false);
     },
     openLocation() {
       var that = this;
@@ -350,16 +347,12 @@ export default {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
         OrderType: tab.parm.OrderType,
-        isGood:false,
-        isDetail:false,
-        isLive:true
+        isGood: false,
+        isDetail: false,
+        isLive: true
       };
       //赋值用户当前定位
-      if (
-        this.CurrentLocation &&
-        this.CurrentLocation.longitude &&
-        this.CurrentLocation.latitude
-      ) {
+      if (this.CurrentLocation && this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
         param.Lon = this.CurrentLocation.longitude;
         param.Lat = this.CurrentLocation.latitude;
       }
@@ -394,25 +387,25 @@ export default {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
         OrderType: tab.parm.OrderType,
-        isGood:false,
-        isDetail:false,
-        isLive:true
+        isGood: false,
+        isDetail: false,
+        isLive: true
       };
       if (this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
-        (param.Lon = this.CurrentLocation.longitude),
-          (param.Lat = this.CurrentLocation.latitude);
+        (param.Lon = this.CurrentLocation.longitude), (param.Lat = this.CurrentLocation.latitude);
       }
-      this.unit(param).then((rep)=>{
-        if (rep.ret==0 &&rep.data && rep.data.length) {
-          this.ShopList.push.apply(this.ShopList, rep.data);
-        } else {
+      this.unit(param)
+        .then(rep => {
+          if (rep.ret == 0 && rep.data && rep.data.length) {
+            this.ShopList.push.apply(this.ShopList, rep.data);
+          } else {
+            tab.parm.hasPage = false;
+          }
+        })
+        .catch(() => {
           tab.parm.hasPage = false;
-        }
-      }).catch(()=>{
-        tab.parm.hasPage = false;
-        console.log("异常")
-      });
-
+          console.log("异常");
+        });
     }
   },
   created() {
@@ -428,11 +421,11 @@ export default {
     });
     // console.log("page index onLoad", this);
   },
-  onShareAppMessage(){
+  onShareAppMessage() {
     return {
-      title: 'U建行业市场',
-      imageUrl: '/static/img/homeshare.jpg',
-    }
+      title: "U建行业市场",
+      imageUrl: "/static/img/homeshare.jpg"
+    };
   },
   onReady() {
     // console.log("page index onReady", this);
@@ -448,22 +441,20 @@ export default {
         success(res) {
           that.gcj02.latitude = res.latitude;
           that.gcj02.longitude = res.longitude;
-          that.$ShoppingAPI
-            .baidu_geocoder({ location: `${res.latitude},${res.longitude}` })
-            .then(rep2 => {
-              if (rep2.status == 0) {
-                // that.LocationAddress = rep2.result.formatted_address;
-                // that.latitude = rep2.result.location.lat;
-                // that.longitude = rep2.result.location.lng;
+          that.$ShoppingAPI.baidu_geocoder({ location: `${res.latitude},${res.longitude}` }).then(rep2 => {
+            if (rep2.status == 0) {
+              // that.LocationAddress = rep2.result.formatted_address;
+              // that.latitude = rep2.result.location.lat;
+              // that.longitude = rep2.result.location.lng;
 
-                that.UpdateLocation({
-                  LocationAddress: rep2.result.formatted_address,
-                  latitude: rep2.result.location.lat,
-                  longitude: rep2.result.location.lng
-                });
-                that.tabClick(that.Tabs[0]);
-              }
-            });
+              that.UpdateLocation({
+                LocationAddress: rep2.result.formatted_address,
+                latitude: rep2.result.location.lat,
+                longitude: rep2.result.location.lng
+              });
+              that.tabClick(that.Tabs[0]);
+            }
+          });
         },
         fail() {},
         complete() {}
@@ -483,33 +474,25 @@ export default {
             // {
             // }
             const myGeo = new BMap.Geocoder();
-            myGeo.getLocation(
-              new BMap.Point(r.point.lng, r.point.lat),
-              data => {
-                if (data.addressComponents) {
-                  const result = data.addressComponents;
-                  const location = {
-                    creditLongitude: r.point.lat, // 经度
-                    creditLatitude: r.point.lng, // 纬度
-                    creditProvince: result.province || "", // 省
-                    creditCity: result.city || "", // 市
-                    creditArea: result.district || "", // 区
-                    creditStreet:
-                      (result.street || "") + (result.streetNumber || "") // 街道
-                  };
-                  // console.log(location);
-                  that.UpdateLocation({
-                    LocationAddress:
-                      location.creditProvince +
-                      location.creditCity +
-                      location.creditArea +
-                      location.creditStreet,
-                    latitude: location.creditLongitude,
-                    longitude: location.creditLatitude
-                  });
-                }
+            myGeo.getLocation(new BMap.Point(r.point.lng, r.point.lat), data => {
+              if (data.addressComponents) {
+                const result = data.addressComponents;
+                const location = {
+                  creditLongitude: r.point.lat, // 经度
+                  creditLatitude: r.point.lng, // 纬度
+                  creditProvince: result.province || "", // 省
+                  creditCity: result.city || "", // 市
+                  creditArea: result.district || "", // 区
+                  creditStreet: (result.street || "") + (result.streetNumber || "") // 街道
+                };
+                // console.log(location);
+                that.UpdateLocation({
+                  LocationAddress: location.creditProvince + location.creditCity + location.creditArea + location.creditStreet,
+                  latitude: location.creditLongitude,
+                  longitude: location.creditLatitude
+                });
               }
-            );
+            });
           }
         });
       });
@@ -528,14 +511,12 @@ export default {
   padding-top: 1.27rem;
 }
 
-
-.viewhistory{
-  
+.viewhistory {
   width: 100%;
   display: flex;
   align-items: center;
 
-  .title{
+  .title {
     font-size: 0.27rem;
     width: 0.26rem;
     line-height: 0.27rem;
@@ -544,23 +525,23 @@ export default {
     color: #197fa5;
     line-height: 0.4rem;
   }
-  .body{
+  .body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    .list {
       display: flex;
-      align-items: center;
-      justify-content:space-between;
-      width: 100%;
-    .list{
-      display: flex;
-      li{
+      li {
         display: flex;
-        align-items:center;
+        align-items: center;
         margin-left: 0.23rem;
         overflow: hidden;
-        img{
+        img {
           width: 0.66rem;
           height: 0.66rem;
         }
-        p{
+        p {
           margin-left: 0.1rem;
           width: 1.3rem;
           letter-spacing: -0.01rem;
@@ -572,18 +553,16 @@ export default {
           display: -webkit-box;
           word-break: break-all;
           -webkit-box-orient: vertical;
-          -webkit-line-clamp: 2; 
+          -webkit-line-clamp: 2;
         }
       }
     }
-    i.icon{
-          font-size: 0.35rem;
-          color: #4d4d4d;
-          padding: 0 0.4rem;
-      }
+    i.icon {
+      font-size: 0.35rem;
+      color: #4d4d4d;
+      padding: 0 0.4rem;
+    }
   }
-
-  
 }
 // .hide2{
 //     animation: hidehistory 1s;
@@ -592,24 +571,23 @@ export default {
 //     animation-fill-mod:forwards;
 //     -webkit-animation-fill-mode:forwards;
 // }
-.hide{
-    animation: hidehistory 1s;
-    animation-fill-mod:forwards;
-    -webkit-animation-fill-mode:forwards;
+.hide {
+  animation: hidehistory 1s;
+  animation-fill-mod: forwards;
+  -webkit-animation-fill-mode: forwards;
 }
 
-@keyframes hidehistory
-{
-0% {	
-   opacity: 1;
+@keyframes hidehistory {
+  0% {
+    opacity: 1;
     transform: translateX(0);
     height: auto;
-    }
-100% {		
+  }
+  100% {
     opacity: 0;
     transform: translateX(-10.8rem);
     height: 0;
-    }
+  }
 }
 .search {
   background-color: #12b7f5;
@@ -774,7 +752,6 @@ $borderColor: #ecf0f1;
     p {
       display: inline;
       line-height: 0.5rem;
-
     }
     .Right {
       padding-left: 0.16rem;
@@ -806,26 +783,26 @@ $borderColor: #ecf0f1;
         .shop-item-info {
           padding-left: 0.33rem;
           // width: 66%;
-          flex-grow:2;
+          flex-grow: 2;
           .shop-item-info-name {
             display: flex;
             justify-content: space-between;
-            align-items:center;
+            align-items: center;
             width: 100%;
             margin-bottom: 0.35rem;
 
-            .txt{
+            .txt {
               font-size: 0.44rem;
               color: #021218;
               // overflow-x: hidden;
               // text-overflow: ellipsis;
               // white-space: nowrap;
-              flex-grow:1;
-              .liveroom{
+              flex-grow: 1;
+              .liveroom {
                 font-size: 0.32rem;
                 border-radius: 0.23rem;
                 text-align: center;
-                .icon{
+                .icon {
                   display: inline-block;
                   width: 0.46rem;
                   line-height: 0.46rem;
@@ -840,7 +817,7 @@ $borderColor: #ecf0f1;
               }
             }
             .shop-item-info-distance {
-              flex-shrink:0;
+              flex-shrink: 0;
               font-size: 0.36rem;
               // position: absolute;
               // right: 0;

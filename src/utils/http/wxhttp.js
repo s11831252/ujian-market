@@ -8,7 +8,14 @@ let bmobConfig={
 const accountInfo = wx.getAccountInfoSync();
 const net = {
   showAuthModal:true,
-  get(url, data) {
+    /**
+   * @description: 'get请求'
+   * @param {*} url 请求url地址
+   * @param {*} data uri参数,get请求会将data拼接在url中
+   * @param {*} SingleTicket 请求是否携带u建的SingleTicket(默认true)
+   * @return {*} 返回Promise的请求结果
+   */
+  get(url, data,SingleTicket=true) {
     var that = this;
     wx.showLoading({
       title: '加载中',//数据请求前loading，提高用户体验
@@ -24,10 +31,12 @@ const net = {
           // 'X-Bmob-REST-API-Key': bmobConfig.restApiKey,
           'Content-Type': 'application/json',
           'Device':"WXMP",
-          'SingleTicket':store.state.User.SingleTicket,
+          'DisplayVersion':"2.0.11",
+          'SingleTicket':SingleTicket?store.state.User.SingleTicket:'',
           ...accountInfo.miniProgram
         }, // 设置请求的 header
         success: function (res) {
+          wx.hideLoading();
           if(res.statusCode!=200){
             wx.showToast({
               title: "网络出错，稍后再试",
@@ -50,9 +59,10 @@ const net = {
               // store.commit("SetUserInfo", {});//清空userinfo
 
               wx.showModal({
-                confirmText:"去登陆",
+                confirmText:"重新登陆",
+                cancelText:"刷新",
                 title:"登录授权已失效",
-                content:"您当前的登录授权信息已失效或已过期,请尝试重新登录",
+                content:"您当前的登录授权信息已失效或已过期",
                 success (res2) {
                   if (res2.confirm) {
                     var pages = getCurrentPages();    //获取加载的页面
@@ -112,17 +122,22 @@ const net = {
         },
         fail: function (error) {
           // fail
-          wx.hideLoading();
+          // wx.hideLoading();
           reject(error);//请求失败
         },
         complete: function () {
-          wx.hideLoading();
-          // complete
         }
       })
     })
   },
-  post(url, data) {
+  /**
+   * @description: 'post请求'
+   * @param {*} url 请求url地址
+   * @param {*} data post请求中的body,如需携带uri参数请拼接在url中
+   * @param {*} SingleTicket 请求是否携带u建的SingleTicket(默认true)
+   * @return {*} 返回Promise的请求结果
+   */
+  post(url, data,SingleTicket=true) {
     var that = this;
     wx.showLoading({
       title: '加载中',
@@ -136,7 +151,8 @@ const net = {
         header: {
           'Content-Type': 'application/json',
           'Device':"WXMP",
-          'SingleTicket':store.state.User.SingleTicket,
+          'DisplayVersion':"2.0.11",
+          'SingleTicket':SingleTicket?store.state.User.SingleTicket:'',
           ...accountInfo.miniProgram
         }, // 设置请求的 header
         success: function (res) {
@@ -163,9 +179,10 @@ const net = {
             store.commit("SetUserInfo", {});//清空userinfo
 
             wx.showModal({
-              confirmText:"去登陆",
+              confirmText:"重新登陆",
+              cancelText:"刷新",
               title:"登录授权已失效",
-              content:"您当前的登录授权信息已失效或已过期,请尝试重新登录",
+              content:"您当前的登录授权信息已失效或已过期",
               success (res2) {
                 if (res2.confirm) {
                   var pages = getCurrentPages();    //获取加载的页面
@@ -221,12 +238,10 @@ const net = {
         },
         fail: function (error) {
           // fail
-          wx.hideLoading();
+          // wx.hideLoading();
           reject(error);
         },
         complete: function () {
-          // complete
-          wx.hideLoading();
         }
       })
     })

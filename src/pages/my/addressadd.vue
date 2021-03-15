@@ -2,11 +2,11 @@
   <form>
     <div class="form-group">
       <label>联系人:</label>
-      <input type="text" v-model="AddressInfo.Name" placeholder="请填写联系人姓名">
+      <input type="text" v-model="AddressInfo.Name" placeholder="请填写联系人姓名" />
     </div>
     <div class="form-group">
       <label>联系电话:</label>
-      <input type="text" v-model="AddressInfo.Phone" maxlength="11" minlength="11" placeholder="请填写联系人手机号码">
+      <input type="text" v-model="AddressInfo.Phone" maxlength="11" minlength="11" placeholder="请填写联系人手机号码" />
     </div>
     <div class="form-group" @click="chooseLocation">
       <label>联系地址:</label>
@@ -18,7 +18,7 @@
     </div>
     <div class="form-group">
       <label>详细地址:</label>
-      <input type="text" v-model="AddressInfo.Address" placeholder="如:街道、小区、单元楼、门牌号等">
+      <input type="text" v-model="AddressInfo.Address" placeholder="如:街道、小区、单元楼、门牌号等" />
     </div>
     <div class="bottom">
       <a v-if="!AddressInfo.Order_Address_Id" @click="Add">确定添加</a>
@@ -28,44 +28,56 @@
 </template>
 <script>
 import { mapMutations, mapGetters } from "vuex";
+import utils  from '../../utils/'
 export default {
   data() {
     return {
-    //   AddressInfo: {
-    //     Order_Address_Id: "",
-    //     Phone: "",
-    //     Name: "",
-    //     Address: "",
-    //     Latitude: 0,
-    //     Longitude: 0
-    //   },
-      id:null,
+      AddressInfo: {
+        Order_Address_Id: "",
+        Phone: "",
+        Name: "",
+        Address: "",
+        Latitude: 0,
+        Longitude: 0
+      },
+      id: null,
       Area: "点击选择位置"
     };
-  },
-  computed: {
-    AddressInfo() {
-      if (this.id)
-        return this.$store.getters.UserAddressBysId(this.$route.query.id);
-      else
-        return {
-          Order_Address_Id: "",
-          Phone: "",
-          Name: "",
-          Address: "",
-          Latitude: 0,
-          Longitude: 0
-        };
-    }
   },
   methods: {
     chooseLocation() {
       var that = this;
-      wx.chooseLocation({
+      wx.getSetting({
         success(res) {
-          that.AddressInfo.Latitude = res.latitude;
-          that.AddressInfo.Longitude = res.longitude;
-          that.Area = res.address;
+          const writePhotosAlbum = res.authSetting["scope.userLocation"];
+          if (!writePhotosAlbum) {
+            //检查用户是否授权使用定位权限
+            wx.openSetting({
+              success(res) {
+                wx.chooseLocation({
+                  success(res) {
+                    that.AddressInfo.Latitude = res.latitude;
+                    that.AddressInfo.Longitude = res.longitude;
+                    that.Area = res.address;
+                  },
+                  fail(msg) {
+                    console.log(msg);
+                  }
+                });
+              }
+            });
+          } else {
+            wx.chooseLocation({
+              success(res) {
+                that.AddressInfo.Latitude = res.latitude;
+                that.AddressInfo.Longitude = res.longitude;
+                that.Area = res.address;
+              },
+              fail(msg) {
+                console.log(msg);
+              }
+            });
+          }
         }
       });
     },
@@ -74,17 +86,17 @@ export default {
         this.toast("请选择位置");
         return;
       }
-      if (
-        !this.AddressInfo.Phone ||
-        !this.AddressInfo.Name ||
-        !this.AddressInfo.Address
-      ) {
+      if (!this.AddressInfo.Phone || !this.AddressInfo.Name || !this.AddressInfo.Address) {
         this.toast("请填写完整信息");
+        return;
+      }
+      if (!utils.regexp.phone(this.AddressInfo.Phone)) {
+        this.toast("手机号码格式有误");
         return;
       }
       // console.log(this.AddressInfo);
       // debugger;
-      this.AddressInfo.Address = (this.Area=='点击选择位置'?'':this.Area) + this.AddressInfo.Address;
+      this.AddressInfo.Address = (this.Area == "点击选择位置" ? "" : this.Area) + this.AddressInfo.Address;
       var rep = await this.$ShoppingAPI.OrderAddress_Edit(this.AddressInfo);
       if (rep.ret == 0) {
         // this.EditUserAddress(this.AddressInfo);
@@ -96,14 +108,16 @@ export default {
         this.toast("请选择位置");
         return;
       }
-      if (
-        !this.AddressInfo.Phone ||
-        !this.AddressInfo.Name ||
-        !this.AddressInfo.Address
-      ) {
+      if (!this.AddressInfo.Phone || !this.AddressInfo.Name || !this.AddressInfo.Address) {
         this.toast("请填写完整信息");
         return;
       }
+
+      if (!utils.regexp.phone(this.AddressInfo.Phone)) {
+        this.toast("手机号码格式有误");
+        return;
+      }
+
       this.AddressInfo.Address = this.Area + this.AddressInfo.Address;
       var rep = await this.$ShoppingAPI.OrderAddress_Add({
         Phone: this.AddressInfo.Phone,
@@ -121,10 +135,10 @@ export default {
     ...mapMutations([
       "AddUserAddress" //`this.$store.commit('AddUserAddress')`
     ])
-  },mounted(){
-    if(this.$route.query&& this.$route.query.id)
-    {
-      this.id=this.$route.query.id;
+  },
+  mounted() {
+    if (this.$route.query && this.$route.query.id) {
+      this.AddressInfo = this.$store.getters.UserAddressBysId(this.$route.query.id);
     }
   }
 };

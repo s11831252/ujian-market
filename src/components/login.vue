@@ -48,6 +48,7 @@
 <script>
 import $toast from "@/utils/toast";
 import { mapState } from "vuex";
+import utils from '../utils/index'
 export default {
   data() {
     return {
@@ -74,10 +75,10 @@ export default {
       UserInfo: state => state.User.UserInfo
     }),
     codeAction() {
-      return this.model.Account && this.model.Account.length == 11;
+      return utils.regexp.phone(this.model.Account)
     },
     loginAction() {
-      return this.VerificationCode && this.VerificationCode.length > 0;
+      return this.VerificationCode && this.VerificationCode.length >=4;
     }
   },
   methods: {
@@ -139,7 +140,7 @@ export default {
     },
     async login() {
       if (!this.codeAction) {
-        this.toast("请输入手机号码");
+        this.toast("请输入正确的手机号码");
         return;
       }
       if (!this.loginAction) {
@@ -153,7 +154,6 @@ export default {
         UserName: this.UserInfo.nickName && this.UserInfo.nickName.slice(0, 16),
         VerificationCode: this.VerificationCode
       });
-
       if (req.ret == 0) {
         this.$store.commit("Login", { Ticket: req.data }); //存入Ticket
         var res = await this.$ShoppingAPI.User_Get();
@@ -186,7 +186,7 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .index .nr {
   margin-top: 1.5rem;
   /*input提示文字颜色*/
@@ -285,11 +285,15 @@ export default {
 }
 
 .index .nr .message .yzm {
-  color: #3396fe;
   font-size: 0.4rem;
   margin-left: 0.52rem;
   float: left;
   line-height: 1.4rem;
+  color: #999999;
+}
+
+.index .nr .message .yzm.action {
+  color: #3396fe;
 }
 
 .index .nr .btn {
@@ -297,16 +301,19 @@ export default {
   height: 1.21rem;
   margin-top: 1.04rem;
   margin-left: 1.4rem;
-  background-image: linear-gradient(-20deg, #3396fe 0%, #65c1fd 100%), linear-gradient(#ffffff, #ffffff);
-  background-blend-mode: normal, normal;
-  box-shadow: 0 0.03rem 0.21rem 0 rgba(51, 150, 254, 0.35);
+  background-color:  #999999;
+  // background-blend-mode: normal, normal;
+  // box-shadow: 0 0.03rem 0.21rem 0 rgba(51, 150, 254, 0.35);
   border-radius: 0.6rem;
   font-size: 0.5rem;
   line-height: 1.21rem;
   color: #ffffff;
   text-align: center;
 }
-
+.index .nr .btn.action{
+  background-image: linear-gradient(-20deg, #3396fe 0%, #65c1fd 100%), linear-gradient(#ffffff, #ffffff);
+  color: #ffffff;
+}
 .index .nr .btn p {
   font-size: 0.5rem;
   line-height: 1.21rem;
