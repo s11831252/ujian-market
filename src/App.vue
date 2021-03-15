@@ -97,8 +97,15 @@ export default {
             var _shopChatGroups = resp.data.filter(item => {
               return item.groupname.indexOf("_") > -1;
             });
-            var _groupids = _shopChatGroups.map(item => item.groupid);
-            await getGroupInfo(_groupids,_groupids.length)
+            if(_shopChatGroups&&_shopChatGroups.length>0)
+            {
+              var _groupids = _shopChatGroups.map(item => item.groupid);
+              await getGroupInfo(_groupids,_groupids.length)
+            }else
+            {
+              utils.setItem("listGroup", []);
+            }
+
             that.hideLoading();
           },
           error: function() {
