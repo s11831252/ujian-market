@@ -655,13 +655,38 @@ export default {
                 customEvent: "chatroom_member_video_call",
                 customExts: { video_call_status: "end" },
                 success: function() {
-                  self.PusherUrl = null;
                   console.log("send video_call_end msg success", msg);
+                  self.PusherUrl = null;
                 },
                 fail: function() {}
               });
               msg.setGroup("groupchat");
               WebIM.conn.send(msg.body);
+            }else //这种情况断网很久之后主播端主动挂断用户连麦,此时用户请求挂断连麦服务端会返回失败,通过获取直播间详情比较推流是否还有当前用户的连麦,尝试用该方式挂断连
+            {
+              self.$ShoppingAPI.AppServer_LiveRoomsDetail(self.roomId).then(res2 => {
+                if (res2.ret == 0 && res2.data) {
+                  if(res2.data.livePullUrl.indexOf(WebIM.conn.context.userId) < 0)
+                  {
+                    console.log("断网很久之后用户才发起的挂断连麦操作")
+                    let id = WebIM.conn.getUniqueId();
+                    let msg = new WebIM.message("custom", id);
+                    msg.set({
+                      to: self.roomId,
+                      roomType: true,
+                      customEvent: "chatroom_member_video_call",
+                      customExts: { video_call_status: "end" },
+                      success: function() {
+                        console.log("send video_call_end msg success", msg);
+                        self.PusherUrl = null;
+                      },
+                      fail: function() {}
+                    });
+                    msg.setGroup("groupchat");
+                    WebIM.conn.send(msg.body);
+                  }
+                }
+              });
             }
           });
         }
@@ -998,9 +1023,9 @@ export default {
       if (WebIM.conn.autoReconnectNumTotal > 0 && WebIM.conn.autoReconnectNumTotal <= WebIM.conn.autoReconnectNumMax) {
         //连接已断开,正在连接服务器
         console.log("DisconnectedHanderler: 连接已断开,正在连接服务器");
-        this.welcomeMsg = "正在重新连接";
+        this.welcomeMsg = "网络连接已断开,正在尝试重新连接";
       } else if (WebIM.conn.autoReconnectNumTotal > WebIM.conn.autoReconnectNumMax) {
-        this.welcomeMsg = "网络已断开";
+        this.welcomeMsg = "网络连接已断开";
       }
     },
     //取消关注
@@ -1029,7 +1054,6 @@ export default {
           .Account_wxAESDecrypt({
             encryptedData: e.mp.detail.encryptedData,
             iv: e.mp.detail.iv,
-            session_key: that.UserInfo.session_key
           })
           .then(res => {
             if (res.ret == 0) {
@@ -1253,6 +1277,9 @@ export default {
             });
           }
         });
+      }else
+      {
+        console.log(`环信open:${WebIM.conn.isOpened()},登录状态${this.Logined}`)
       }
     });
   }

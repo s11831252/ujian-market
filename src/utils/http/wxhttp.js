@@ -122,7 +122,7 @@ const net = {
         },
         fail: function (error) {
           // fail
-          // wx.hideLoading();
+          wx.hideLoading();
           reject(error);//请求失败
         },
         complete: function () {
@@ -238,7 +238,8 @@ const net = {
         },
         fail: function (error) {
           // fail
-          // wx.hideLoading();
+          wx.hideLoading();
+          console.log(error)
           reject(error);
         },
         complete: function () {

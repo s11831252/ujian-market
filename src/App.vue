@@ -209,24 +209,17 @@ export default {
       }, //本机网络掉线
       onError: function(message) {
         console.log("环信Error:", message);
-        that.$UJAPI.Error_upload({
-          ApplicationName: "U建行业市场小程序",
-          ErrorThread: "环信ERROR",
-          ErrorClassName: "App.VUE",
-          ErrorMsg: JSON.stringify(message),
-          ErrorType: message.type
-        });
 
         if (message.type == 16) {
           console.log(`环信 autoReconnectNum:${WebIM.conn.autoReconnectNumTotal} , autoReconnectNumMax:${WebIM.conn.autoReconnectNumMax}`);
           disp.fire("onSocketDisconnected", message);
-        }
-        if (message.type == 206 || message.type == 8) {
+        }else if (message.type == 206 || message.type == 8) {
           if (!lockOnError) {
             that.modal({
               title: "连接失败",
               content: "账号已在其他设备登录,您可尝试重连",
               confirm: () => {
+                WebIM.conn.close(); //环信IM关闭
                 that.hx_login();
                 lockOnError = false;
               },
@@ -238,6 +231,14 @@ export default {
           }
           lockOnError = true;
         }
+        // that.$UJAPI.Error_upload({
+        //   ApplicationName: "U建行业市场小程序",
+        //   ErrorThread: "环信ERROR",
+        //   ErrorClassName: "App.VUE",
+        //   ErrorMsg: JSON.stringify(message),
+        //   ErrorType: message.type
+        // });
+
       }, //失败回调
       onReceivedMessage: function(message) {
         console.log("onReceivedMessage", message);
