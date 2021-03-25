@@ -150,14 +150,14 @@ export default {
           success(id, serverMsgId) {
             // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`, msg);
-            msgStorage.saveMsg(msg, "txt");
-            that.msg = "";
-            that.chattype = "chat";
           },
           fail(id, serverMsgId) {
             console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
           }
         });
+        msgStorage.saveMsg(msg, "txt");
+        that.msg = "";
+        that.chattype = "chat";
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
       }
@@ -214,8 +214,8 @@ export default {
       console.log(this.delMsgList);
     },
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, isNew) {
-      // console.log(renderableMsg,currentChatMsg)
       this.ChatHistory = currentChatMsg;
+      console.log(this.ChatHistory)
       if (this.ChatHistory && this.ChatHistory.length) {
         if (isNew) {
           this.toView = this.ChatHistory[this.ChatHistory.length - 1].mid;
@@ -294,12 +294,12 @@ export default {
                       success: function(argument) {
                         // disp.fire('em.chat.sendSuccess', id);
                         console.log("files send ok", argument);
-                        msgStorage.saveMsg(msg, _msgType);
                       },
                       fail(id, serverMsgId) {
                         console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
                       }
                     });
+                    msgStorage.saveMsg(msg, _msgType);
                     msg.setGroup("groupchat");
                     WebIM.conn.send(msg.body);
                   });
@@ -370,13 +370,12 @@ export default {
                       success: function(argument) {
                         // disp.fire('em.chat.sendSuccess', id);
                         console.log("files send ok", argument);
-                        msgStorage.saveMsg(msg, _msgType);
                       },
                       fail(id, serverMsgId) {
                         console.log(`发送文件(id=${id},serverMsgId=${serverMsgId})失败`);
                       }
                     });
-                    console.log(msg);
+                    msgStorage.saveMsg(msg, _msgType);
                     msg.setGroup("groupchat");
                     WebIM.conn.send(msg.body);
                   });
@@ -425,9 +424,9 @@ export default {
                   success: function(argument) {
                     // disp.fire('em.chat.sendSuccess', id);
                     console.log("audio send ok", argument, msg);
-                    msgStorage.saveMsg(msg, _msgType);
                   }
                 });
+                msgStorage.saveMsg(msg, _msgType);
                 msg.setGroup("groupchat");
                 WebIM.conn.send(msg.body);
               });
@@ -515,9 +514,9 @@ export default {
             success(argument) {
               // disp.fire('em.chat.sendSuccess', id);
               console.log("location send ok", argument);
-              msgStorage.saveMsg(msg, msgType.LOCATION);
             }
           });
+          msgStorage.saveMsg(msg,  msgType.LOCATION);
           msg.setGroup("groupchat");
           WebIM.conn.send(msg.body);
         }
@@ -539,13 +538,13 @@ export default {
       var owner = shopInfo.sId.replace(/-/g, "").toLowerCase() + "_"; //需要根据owner获取当前店铺客服聊天组
       //查询聊天组列表,并尝试获取与该店铺的聊天组
       var listGroup = utils.getItem("listGroup");
-      console.log("listGroup:", listGroup);
+      // console.log("listGroup:", listGroup);
       if (listGroup) {
         this.chatRoomInfo = listGroup.find(item => {
           return item.owner == owner;
         });
       }
-      console.log(this.chatRoomInfo);
+      // console.log(this.chatRoomInfo);
       that.desc_obj = {
         store: {
           sId: shopInfo.sId,
@@ -608,48 +607,6 @@ export default {
         }
       } else {
         // //更新聊天室备注
-        // console.log(WebIM.conn)
-        // WebIM.conn.getGroupInfo({
-        //   groupId: this.chatRoomInfo.id,
-        //   success: function(resp) {
-        //     console.log("queryRoomInfo成功", resp);
-        //     if (resp.data && resp.data.length > 0) {
-        //       try {
-        //         var roominfo = resp.data[0];
-        //         var dencode_str = decodeURIComponent(roominfo.description);
-        //         var server_desc_obj = JSON.parse(dencode_str);
-        //         server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-        //         server_desc_obj.buyer = that.desc_obj.buyer;
-        //         server_desc_obj.store = that.desc_obj.store;
-        //         var json_obj = JSON.stringify(server_desc_obj);
-        //         json_obj = json_obj.replace(" ", ""); //处理空格
-        //         that.$API2.groupChat_ModifyDescription(
-        //           that.chatRoomInfo.id,
-        //           json_obj.replace(/\//g, "#") //处理斜杠
-        //         );
-        //       } catch (e) {
-        //         var desc = JSON.stringify(that.desc_obj);
-        //         desc = desc.replace(/\//g, "#"); //处理斜杠
-        //         that.$API2.groupChat_ModifyDescription(that.chatRoomInfo.roomId, desc);
-        //       }
-        //     } else if (resp.statusCode && resp.statusCode == 200) {
-        //       var dencode_str = decodeURIComponent(resp.data.data[0].description);
-        //       var server_desc_obj = JSON.parse(dencode_str);
-        //       server_desc_obj.lastTime = Math.round(new Date().getTime() / 1000);
-        //       server_desc_obj.buyer = that.desc_obj.buyer;
-        //       server_desc_obj.store = that.desc_obj.store;
-        //       var json_obj = JSON.stringify(server_desc_obj);
-        //       json_obj = json_obj.replace(" ", ""); //处理空格
-        //       that.$API2.groupChat_ModifyDescription(
-        //         that.chatRoomInfo.id,
-        //         json_obj.replace(/\//g, "#") //处理斜杠
-        //       );
-        //     }
-        //   },
-        //   error: function(msg) {
-        //     console.log(msg);
-        //   }
-        // });
         try {
           var dencode_str = decodeURIComponent(this.chatRoomInfo.description);
           var server_desc_obj = JSON.parse(dencode_str);
@@ -685,6 +642,13 @@ export default {
           //我发的消息或者别人发给我的消息
           that.readMsg(renderableMsg, type, curChatMsg, sesskey);
         }
+      }
+    });
+    msgStorage.on("updateChatMsg",function(curChatMsg,sesskey)
+    {
+      if (that.chatRoomInfo.id && sesskey == that.sessionKey)
+      {
+          that.readMsg(null, null, curChatMsg, sesskey);
       }
     });
   }

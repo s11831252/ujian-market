@@ -195,7 +195,7 @@ export default new Vuex.Store({//store对象
           {
             shoppingcar.Logistics=payload.Logistics;
             var index = state.List.indexOf(shoppingcar);
-            state.List.splice(index, 1,shoppingcar);//清除该店铺购物清单
+            state.List.splice(index, 1,shoppingcar);//修改该店铺购物订单的物流配送方式
           }
         }
       }

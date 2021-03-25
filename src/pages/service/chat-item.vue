@@ -11,6 +11,17 @@
         <p v-if="chatdata.info.from==myUsername" class="username">{{UserInfo.UserName}}</p>
         <p v-else class="username">{{(desc&&desc.store)?desc.store.sNm:""}}</p>
         <!-- <span class="read">已读</span> -->
+        <div class="m-load2" v-if="chatdata.msg.sending">
+          <div class="line">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+          <div class="circlebg"></div>
+        </div>
         <div v-if="chatdata.msg.data" class="chatdata" @longpress="editmsg">
           <div v-if="chatdata.msg.type=='emoji' || chatdata.msg.type=='txt'" class="chatmsgarr">
             <chatMsg v-for="(item,index) in chatdata.msg.data" :key="index" :msgdata="item"></chatMsg>
@@ -392,5 +403,10 @@ video {
       left: 40%;
     }
   }
+}
+
+.m-load2{
+  top: 0.5rem;
+  left: -1rem;
 }
 </style>

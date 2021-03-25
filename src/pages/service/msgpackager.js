@@ -16,10 +16,12 @@ export default function(sendableMsg, type, myName){
 		msg: {
 			type: type,
 			data: getMsgData(sendableMsg, type),
-			ext: sendableMsg.body.ext
+			ext: sendableMsg.body.ext,
+			sending:sendableMsg.body.sending
 		},
 		style: sendableMsg.body.from == myName ? "self" : "",
 		time: time,
+		id:sendableMsg.id,
 		mid: sendableMsg.type + sendableMsg.id,
 		chatType: sendableMsg.body.chatType,
 		ext: sendableMsg.body.ext

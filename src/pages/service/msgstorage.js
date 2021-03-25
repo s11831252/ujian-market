@@ -146,6 +146,10 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 			? sendableMsg.body.to + myName
 			: sendableMsg.body.from + myName;
 	}
+	if(!receiveMsg)
+	{
+		sendableMsg.body.sending = true;
+	}
 	let curChatMsg = utils.getItem(sessionKey) || [];
 	let renderableMsg = msgPackager(sendableMsg, type, myName);
 	if(type == msgType.AUDIO) {
@@ -191,5 +195,21 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 		me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey,receiveMsg);
 	}
 };
-
+//修改聊天消息的sending为false
+msgStorage.sendOk = function(id,sessionKey)
+{
+	let curChatMsg = utils.getItem(sessionKey) || []
+	let _filterItem = curChatMsg.filter(item=>{
+		return item.id == id
+	})
+	if(_filterItem&&_filterItem.length>0)
+	{
+		let _updateItem = _filterItem[0];
+		let _index = curChatMsg.indexOf(_updateItem);
+		_updateItem.msg.sending = false;
+		curChatMsg.splice(_index, 1,_updateItem);
+		utils.setItem(sessionKey,curChatMsg)
+		this.fire("updateChatMsg", curChatMsg,sessionKey);
+	}
+}
 module.exports = msgStorage;

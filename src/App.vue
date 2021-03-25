@@ -242,6 +242,9 @@ export default {
       }, //失败回调
       onReceivedMessage: function(message) {
         console.log("onReceivedMessage", message);
+        //如果是自己发送的消息则更新发送中状态sendOK=false
+        msgStorage.sendOk(message.id, message.to + WebIM.conn.context.userId)
+
       }, //收到消息送达服务器回执
       onDeliveredMessage: function(message) {
         console.log("onDeliveredMessage", message);
