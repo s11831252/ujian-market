@@ -62,7 +62,7 @@
         </div>
         <i class="icon exit" @click="exitLiveRoom">&#xe609;</i>
         <i class="icon disconnect" v-if="PusherUrl" @click="disconnectRoom">&#xe658;</i>
-        <i class="icon connect" v-else @click="connectRoom">&#xe657;</i>
+        <i class="icon connect" v-else @click="connectRoom">&#xe8e8;</i>
         <i class="icon goods" hover-class="goods-hover" @click="showgoods=true;">&#xe639;</i>
         <i class="icon praise" hover-class="goods-hover" @click="giveLike">&#xe619;</i>
         <i class="icon gift" @click="showGift=true">&#xe651;</i>
@@ -926,6 +926,7 @@ export default {
               if (!owner) {
                 //直播间拥有者不存在,认为是还未开启直播间
                 that.closeLiverommMsg = "该直播间还未开启";
+                that.roomInfo.livePullUrl = [];
                 return;
               }
               if (that.isMP) wx.setNavigationBarTitle({ title: `${that.roomInfo.name}直播间` });
@@ -1054,6 +1055,7 @@ export default {
           .Account_wxAESDecrypt({
             encryptedData: e.mp.detail.encryptedData,
             iv: e.mp.detail.iv,
+            openid:that.UserInfo.openid
           })
           .then(res => {
             if (res.ret == 0) {
@@ -1191,13 +1193,13 @@ export default {
     disp.off("onOpened", this.initHanderler);
     disp.off("onCmdMessage", this.cmdMsgHanderler);
     disp.off("onSocketDisconnected", this.DisconnectedHanderler);
-    that.disconnectRoom();
-    WebIM.conn.quitChatRoom({
-      roomId: that.roomId
-    });
-    // .then(res=>{
-    //   that.joined = false;
-    // });
+    if(WebIM.conn.isOpened())
+    {
+      that.disconnectRoom();
+      WebIM.conn.quitChatRoom({
+        roomId: that.roomId
+      });
+    }
   },
   onShareAppMessage(result) {
     let title = `【${this.roomInfo.name}】正在直播中`;
@@ -1416,8 +1418,9 @@ body {
         background-color: rgba(105, 16, 16, 0.8);
       }
       .connect {
-        background-color: rgba(163, 229, 255, 0.8);
-        color: #2cacfc;
+        background-color: rgb(230, 248, 255);
+        color: rgb(97,197,255);
+        font-size: 0.7rem;
       }
       .disconnect {
         background: #ff74af;
