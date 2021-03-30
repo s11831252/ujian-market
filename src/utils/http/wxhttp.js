@@ -228,10 +228,11 @@ const net = {
             return false;
           }else if(res.data.ret!=0){
             if(res.data.msg)
-            wx.showToast({
-              title: res.data.msg,
-              icon: "none"
-            });
+              wx.showToast({
+                title: res.data.msg,
+                icon: "none"
+              });
+            reject(res.data.msg)
             return false;
           }
           resolve(res.data);
