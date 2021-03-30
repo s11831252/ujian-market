@@ -20,9 +20,9 @@
     </div>
     <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in Market.Banners" :index="index" :key="index">
-        <swiper-item >
+        <swiper-item>
           <img :src="item.ImageUrl" v-if="item.JumpModel&&item.JumpModel.WebApp" class="slide-image" mode="aspectFill" @click="go({path:item.JumpModel.WebApp.Parameter.path,query:item.JumpModel.WebApp.Parameter.query})" />
-          <img :src="item.ImageUrl" v-else class="slide-image" mode="aspectFill"/>
+          <img :src="item.ImageUrl" v-else class="slide-image" mode="aspectFill" />
         </swiper-item>
       </block>
     </swiper>
@@ -30,7 +30,6 @@
       <swiper-slide v-for="(item, index) in Market.Banners" :index="index" :key="index">
         <img :src="item.ImageUrl" v-if="item.JumpModel&&item.JumpModel.WebApp" class="slide-image" @click="go({path:item.JumpModel.WebApp.Parameter.path,query:item.JumpModel.WebApp.Parameter.query})" />
         <img :src="item.ImageUrl" v-else class="slide-image" />
-
       </swiper-slide>
       <!-- Optional controls -->
       <div class="swiper-pagination" slot="pagination"></div>
@@ -93,16 +92,14 @@
                     </div>
                     <div class="shop-item-info">
                       <p class="shop-item-info-name">
-                        <span class="txt">
-                          {{item.sName}}
-                          <span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
-                            <i class="icon rectbox">
-                              <span class="rect"></span>
-                              <span class="rect rect2"></span>
-                              <span class="rect rect3"></span>
-                            </i>
-                            <span>直播中</span>
-                          </span>
+                        <span class="txt">{{item.sName}}</span>
+                        <span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
+                          <i class="icon rectbox">
+                            <span class="rect"></span>
+                            <span class="rect rect2"></span>
+                            <span class="rect rect3"></span>
+                          </i>
+                          <span>直播中</span>
                         </span>
                         <span class="shop-item-info-distance">{{item.Distance}}</span>
                       </p>
@@ -793,28 +790,29 @@ $borderColor: #ecf0f1;
 
             .txt {
               font-size: 0.44rem;
+              max-width: 4.5rem;
               color: #021218;
-              // overflow-x: hidden;
-              // text-overflow: ellipsis;
-              // white-space: nowrap;
+              overflow-x: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
               flex-grow: 1;
-              .liveroom {
-                font-size: 0.32rem;
-                border-radius: 0.23rem;
-                text-align: center;
-                .icon {
-                  display: inline-block;
-                  width: 0.46rem;
-                  line-height: 0.46rem;
-                  border-radius: 50%;
-                  background-color: #fc8749;
-                  color: #fff0ee;
-                }
-                padding-right: 0.23rem;
-                color: #fff;
-                background-color: #f85d4a;
+            }
+            .liveroom {
+              font-size: 0.32rem;
+              border-radius: 0.23rem;
+              text-align: center;
+              .icon {
                 display: inline-block;
+                width: 0.46rem;
+                line-height: 0.46rem;
+                border-radius: 50%;
+                background-color: #fc8749;
+                color: #fff0ee;
               }
+              padding-right: 0.23rem;
+              color: #fff;
+              background-color: #f85d4a;
+              display: inline-block;
             }
             .shop-item-info-distance {
               flex-shrink: 0;
