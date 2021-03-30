@@ -47,6 +47,13 @@ function calcUnReadSpot(message) {
   // 	getApp().globalData.unReadMessageNum = count;
   // 	disp.fire("em.xmpp.unreadspot", message);
 }
+/**
+ * @description: '分页递归获取环信获取聊天组详情信息'
+ * @param {*} _groupids 需要获取的聊天组id数组
+ * @param {*} count 获取的数量
+ * @param {*} index 从下标开始获取,默认0
+ * @return {*}
+ */
 function getGroupInfo(_groupids, count,index=0) {
   let arr = [];
   let _pageIndex = index,_pageSize = count>100?100:count;
@@ -55,7 +62,7 @@ function getGroupInfo(_groupids, count,index=0) {
     WebIM.conn.getGroupInfo({
       groupId: sum_groupids,
       async success(resOfGroupInfo) {
-        console.log(resOfGroupInfo);
+        // console.log(resOfGroupInfo);
         arr = resOfGroupInfo.data.map(item => {
           var owner = item.affiliations.find(item2 => {
             return item2.owner;
