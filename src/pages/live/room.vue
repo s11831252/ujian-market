@@ -580,13 +580,14 @@ export default {
         ext: { nickName: self.UserInfo.UserName }
       });
       msg.setGroup("groupchat");
-      var res = await this.$ShoppingAPI.AppServer_SendGift(self.roomInfo.owner, self.selectGift.giftId, giftNum);
+      var res = await this.$ShoppingAPI.AppServer_SendGift(self.roomInfo.owner, self.selectGift.giftId, giftNum).catch(msg => {
+        this.toast(msg);
+      });
       if (res.ret == 0 && res.data) {
         WebIM.conn.send(msg.body);
-        this.showGift=false
-      }else
-      {
-        
+        this.showGift = false;
+      } else {
+        this.toast("发送礼物失败");
       }
     },
     // 退出直播间
@@ -611,7 +612,7 @@ export default {
     connectRoom() {
       var self = this;
       if (this.roomId) {
-        if (WebIM.conn.isOpened()) {
+        if (WebIM.conn.isOpened() && this.roomInfo.status == "ongoing") {
           this.$ShoppingAPI.AppServer_ConnectRoom(this.roomId, "video").then(res => {
             console.log(`connectRoom isOpened :${WebIM.conn.isOpened()}`, res);
             if (res && res.ret == 0 && res.data) {
@@ -662,13 +663,12 @@ export default {
               });
               msg.setGroup("groupchat");
               WebIM.conn.send(msg.body);
-            }else //这种情况断网很久之后主播端主动挂断用户连麦,此时用户请求挂断连麦服务端会返回失败,通过获取直播间详情比较推流是否还有当前用户的连麦,尝试用该方式挂断连
-            {
+            } //这种情况断网很久之后主播端主动挂断用户连麦,此时用户请求挂断连麦服务端会返回失败,通过获取直播间详情比较推流是否还有当前用户的连麦,尝试用该方式挂断连
+            else {
               self.$ShoppingAPI.AppServer_LiveRoomsDetail(self.roomId).then(res2 => {
                 if (res2.ret == 0 && res2.data) {
-                  if(res2.data.livePullUrl.indexOf(WebIM.conn.context.userId) < 0)
-                  {
-                    console.log("断网很久之后用户才发起的挂断连麦操作")
+                  if (res2.data.livePullUrl.indexOf(WebIM.conn.context.userId) < 0) {
+                    console.log("断网很久之后用户才发起的挂断连麦操作");
                     let id = WebIM.conn.getUniqueId();
                     let msg = new WebIM.message("custom", id);
                     msg.set({
@@ -892,106 +892,120 @@ export default {
       }
     },
     //该页面特殊处理,环信连接初始化之后开始调用api
-    initHanderler() {
+    async initHanderler() {
       var that = this;
       // that.EmojiObj2 = WebIM.EmojiObj2; //表情包
       if (this.roomId) {
         this.welcomeMsg = "正在加入直播间聊天室";
-        WebIM.conn.joinChatRoom({
-          roomId: that.roomId,
-          success: async r => {
-            console.log("加入直播间成功", r);
+        var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId).catch(msg => {
+          this.welcomeMsg = msg;
+        });
+        if (res.ret == 0 && res.data) {
+          that.roomInfo = res.data;
+          var owner = that.roomInfo.affiliations.find(item => {
+            return item.owner;
+          });
+          if (!owner || that.roomInfo.status == "offline") {
+            //直播间拥有者不存在或者status=="offline",认为是还未开启直播间
+            that.closeLiverommMsg = that.welcomeMsg = "直播间还未开启";
+            that.roomInfo.livePullUrl = [];
+            return;
+          }
+          if (that.isMP) wx.setNavigationBarTitle({ title: `${that.roomInfo.name}直播间` });
 
-            let id = WebIM.conn.getUniqueId();
-            var msg = new WebIM.message("custom", id);
-            msg.set({
-              to: that.roomId,
-              roomType: true,
-              customEvent: "chatroom_member_join",
-              customExts: { nick: that.UserInfo.UserName, avatar: that.UserInfo.Portrait },
-              success: () => {
-                console.log("send member join message Success", msg);
-              },
-              fail: function() {}
-            });
-            msg.setGroup("groupchat");
-            WebIM.conn.send(msg.body);
-
-            var res = await that.$ShoppingAPI.AppServer_LiveRoomsDetail(that.roomId);
-            if (res.ret == 0 && res.data) {
-              that.roomInfo = res.data;
-              var owner = that.roomInfo.affiliations.find(item => {
-                return item.owner;
+          WebIM.conn.joinChatRoom({
+            roomId: that.roomId,
+            success: r => {
+              console.log("加入直播间成功", r);
+              let id = WebIM.conn.getUniqueId();
+              var msg = new WebIM.message("custom", id);
+              msg.set({
+                to: that.roomId,
+                roomType: true,
+                customEvent: "chatroom_member_join",
+                customExts: { nick: that.UserInfo.UserName, avatar: that.UserInfo.Portrait },
+                success: () => {
+                  console.log("send member join message Success", msg);
+                  that.welcomeMsg = "欢迎您进入直播间聊天室";
+                  var my = that.roomInfo.affiliations.find(item => {
+                    return item.member == that.UserInfo.UserId.replace(/-/g, "");
+                  });
+                  if (!my)
+                    that.roomInfo.affiliations.push({
+                      Portrait: that.UserInfo.Portrait,
+                      UserName: that.UserInfo.UserName,
+                      member: that.UserInfo.UserId
+                    });
+                },
+                fail: function() {}
               });
-              if (!owner) {
-                //直播间拥有者不存在,认为是还未开启直播间
-                that.closeLiverommMsg = "该直播间还未开启";
-                that.roomInfo.livePullUrl = [];
-                return;
-              }
-              if (that.isMP) wx.setNavigationBarTitle({ title: `${that.roomInfo.name}直播间` });
-              that.welcomeMsg = "欢迎您进入直播间聊天室";
-              that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
-                if (response.ret == 0 && response.data) {
-                  that.giftList = response.data;
-                }
+              msg.setGroup("groupchat");
+              WebIM.conn.send(msg.body);
+            },
+            error(msg) {
+              console.log("加入直播间失败", msg);
+              this.welcomeMsg = "加入直播间聊天室失败";
+              //加入直播间失败,认为是直播间已关闭或已结束
+              that.modal({
+                content: (msg.errMsg && msg.errMsg.replace("request:fail", "")) || "直播间不存在",
+                showCancel: false,
+                confirm: () => {
+                  that.$router.back();
+                },
+                cancel: () => {
+                  that.$router.back();
+                },
+                confirmText: "返回"
               });
-              //当前关注人数
-              that.$ShoppingAPI.AppServer_MyFollowCount(that.roomInfo.owner).then(res => {
-                if (res.ret == 0 && res.data) {
-                  that.followCount = res.data;
-                }
-              });
-              //服务端保存加入人信息
-              that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
-              //积分
-              that.$ShoppingAPI.AppServer_GetPoints().then(response => {
-                if (response.ret == 0 && response.data) {
-                  that.livePoints = response.data;
-                }
-              });
-
-              //当前用户是否关注
-              that.$ShoppingAPI.AppServer_IsFollow(that.roomInfo.owner).then(res => {
-                if (res.ret == 0 && res.data) {
-                  that.isFollow = res.data;
-                }
-              });
-
-              that.getGoods();
-              if (that.PusherUrl) {
-                that.modal({
-                  title: "网络异常",
-                  content: "检测到您正在直播连麦是否进行重连?",
-                  confirm: () => {
-                    that.connectRoom();
-                  },
-                  cancel: () => {
-                    that.disconnectRoom();
-                  },
-                  confirmText: "重新连麦",
-                  cancelText: "断开连麦"
-                });
-              }
             }
-          },
-          error(msg) {
-            console.log("加入直播间失败", msg);
-            this.welcomeMsg = "加入直播间聊天室失败";
-            //加入直播间失败,认为是直播间已关闭或已结束
+          });
+          //服务端保存加入人信息
+          that.$ShoppingAPI.AppServer_JoinRoom(that.UserInfo.UserName, that.UserInfo.Portrait);
+          //礼物列表
+          that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
+            if (response.ret == 0 && response.data) {
+              that.giftList = response.data;
+            }
+          });
+          //当前关注人数
+          that.$ShoppingAPI.AppServer_MyFollowCount(that.roomInfo.owner).then(res => {
+            if (res.ret == 0 && res.data) {
+              that.followCount = res.data;
+            }
+          });
+
+          //积分
+          that.$ShoppingAPI.AppServer_GetPoints().then(response => {
+            if (response.ret == 0 && response.data) {
+              that.livePoints = response.data;
+            }
+          });
+
+          //当前用户是否关注直播间
+          that.$ShoppingAPI.AppServer_IsFollow(that.roomInfo.owner).then(res => {
+            if (res.ret == 0 && res.data) {
+              that.isFollow = res.data;
+            }
+          });
+          //直播间关联的店铺商品列表
+          that.getGoods();
+          if (that.PusherUrl) {
             that.modal({
-              content: (msg.errMsg&&msg.errMsg.replace("request:fail",""))||"直播间不存在",
-              showCancel: false,
+              title: "网络异常",
+              content: "检测到您正在直播连麦是否进行重连?",
               confirm: () => {
-                that.$router.back();
+                that.connectRoom();
               },
               cancel: () => {
-                that.$router.back();
+                that.disconnectRoom();
               },
-              confirmText: "返回"
+              confirmText: "重新连麦",
+              cancelText: "断开连麦"
             });
           }
-        });
+        } else {
+          that.closeLiverommMsg = "直播间不存在";
+        }
       }
     },
     //环信命令消息处理
@@ -1050,27 +1064,62 @@ export default {
     //获取微信用户手机号
     getPhoneNumber(e) {
       var that = this;
-      if (e.mp.detail.errMsg == "getPhoneNumber:ok") {
-        that.$ShoppingAPI
-          .Account_wxAESDecrypt({
-            encryptedData: e.mp.detail.encryptedData,
-            iv: e.mp.detail.iv,
-            openid:that.UserInfo.openid
-          })
-          .then(res => {
-            if (res.ret == 0) {
-              var msg = JSON.parse(res.data);
-              console.log(msg);
-              var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
-              that.$store.commit("SetUserInfo", _u);
-              this.$router.replace({ path: "/pages/index/index", query: { redirect: this.redirect } });
-            } else {
-              //解密失败
+      wx.checkSession({
+        success() {
+          console.log("session_key 有效");
+          //session_key 未过期，并且在本生命周期一直有效
+          if (e.mp.detail.errMsg == "getPhoneNumber:ok") {
+            that.$ShoppingAPI
+              .Account_wxAESDecrypt({
+                encryptedData: e.mp.detail.encryptedData,
+                iv: e.mp.detail.iv,
+                openid: that.UserInfo.openid
+              })
+              .then(res => {
+                if (res.ret == 0) {
+                  var msg = JSON.parse(res.data);
+                  console.log(msg);
+                  var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
+                  that.$store.commit("SetUserInfo", _u);
+                  this.$router.replace({ path: "/pages/index/index", query: { redirect: this.redirect } });
+                } else {
+                  //解密失败
+                }
+              });
+          } else {
+            that.toast("拒绝授权访问用户信息,将无法继续下一步");
+          }
+        },
+        fail() {
+          console.log("session_key 已经失效");
+          // session_key 已经失效，需要重新执行登录流程
+          that.modal({
+            confirmText: "登录",
+            title: "登录session_key已失效",
+            content: "您当前的登录session_key已失效或已过期,需要重新登录",
+            confirm: () => {
+              that.$store.commit("Login", { Ticket: "" }); //清空Ticket
+              that.$store.commit("SetUserInfo", {}); //清空userinfo
+              var pages = getCurrentPages(); //获取加载的页面
+              var currentPage = pages[pages.length - 1]; //获取当前页面的对象
+              var url = `/${currentPage.route}`; //当前页面url
+
+              //拼接页面参数
+              var parms = [];
+              for (var key in currentPage.options) {
+                parms.push(`${key}=${currentPage.options[key]}`);
+              }
+              if (parms.length > 0) {
+                //url转码
+                var parmsStr = parms.join("&");
+                let encodeparms = `?${parmsStr}`;
+                url = url + encodeparms;
+              }
+              this.$router.replace({ url: `${url}` });
             }
           });
-      } else {
-        that.toast("拒绝授权访问用户信息,将无法继续下一步");
-      }
+        }
+      });
     },
     //购买U币套餐
     payPackage() {
@@ -1193,8 +1242,7 @@ export default {
     disp.off("onOpened", this.initHanderler);
     disp.off("onCmdMessage", this.cmdMsgHanderler);
     disp.off("onSocketDisconnected", this.DisconnectedHanderler);
-    if(WebIM.conn.isOpened())
-    {
+    if (WebIM.conn.isOpened()) {
       that.disconnectRoom();
       WebIM.conn.quitChatRoom({
         roomId: that.roomId
@@ -1213,18 +1261,19 @@ export default {
   },
   onShow() {
     let pages = getCurrentPages();
-    console.log(pages);
+    // console.log(pages);
     this.hasBack = pages[pages.length - 2] ? true : false;
   },
   mounted() {
     var that = this;
+    console.log("mounted", this);
+    this.extraDataHandler();
     if (this.$route.query.roomId) {
       this.roomId = this.$route.query.roomId;
       if (this.isMP) {
         wx.setNavigationBarTitle({ title: "直播间" });
       }
     }
-    console.log("mounted", this);
     this.welcomeMsg = "正在初始化";
     disp.on("onOpened", that.initHanderler);
     msgStorage.on("newChatMsg", that.readMsg);
@@ -1240,16 +1289,6 @@ export default {
     });
 
     this.wx_login(() => {
-      // if (!this.$store.getters.Logined) {
-      //   this.modal({
-      //     title: "未登录",
-      //     content: "请您登录后使用直播功能",
-      //     confirm: () => {
-      //       that.$router.push({ path: `/pages/index/index`, query: { back: 1 } });
-      //     },
-      //     confirmText: "去登录"
-      //   });
-      // }else
       if (WebIM.conn.isOpened()) {
         // if (!this.joined)
         this.initHanderler();
@@ -1261,9 +1300,10 @@ export default {
             var owner = that.roomInfo.affiliations.find(item => {
               return item.owner;
             });
-            if (!owner) {
-              //直播间拥有者不存在,认为是还未开启直播间
-              that.closeLiverommMsg = "该直播间还未开启";
+            if (!owner || that.roomInfo.status == "offline") {
+              //直播间拥有者不存在或者status=="offline",认为是还未开启直播间
+              that.closeLiverommMsg = that.welcomeMsg = "直播间还未开启";
+              that.roomInfo.livePullUrl = [];
               return;
             }
             that.$ShoppingAPI.AppServer_GetGiftList().then(response => {
@@ -1279,9 +1319,8 @@ export default {
             });
           }
         });
-      }else
-      {
-        console.log(`环信open:${WebIM.conn.isOpened()},登录状态${this.Logined}`)
+      } else {
+        console.log(`环信open:${WebIM.conn.isOpened()},登录状态${this.Logined}`);
       }
     });
   }
@@ -1419,7 +1458,7 @@ body {
       }
       .connect {
         background-color: rgb(230, 248, 255);
-        color: rgb(97,197,255);
+        color: rgb(97, 197, 255);
         font-size: 0.7rem;
       }
       .disconnect {
