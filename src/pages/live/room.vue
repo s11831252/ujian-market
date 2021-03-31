@@ -1081,7 +1081,7 @@ export default {
                   console.log(msg);
                   var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
                   that.$store.commit("SetUserInfo", _u);
-                  this.$router.replace({ path: "/pages/index/index", query: { redirect: this.redirect } });
+                  that.$router.replace({ path: "/pages/index/index", query: { redirect: that.redirect } });
                 } else {
                   //解密失败
                 }
@@ -1115,7 +1115,7 @@ export default {
                 let encodeparms = `?${parmsStr}`;
                 url = url + encodeparms;
               }
-              this.$router.replace({ url: `${url}` });
+              that.$router.replace({ url: `${url}` });
             }
           });
         }
