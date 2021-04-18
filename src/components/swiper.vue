@@ -15,7 +15,7 @@
     <swiper v-if="isMP" class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
       <block v-for="(item, index) in swiperData" :index="index" :key="index">
         <swiper-item>
-          <img :src="item" class="slide-image" mode="widthFix" @click="previewImage(item,swiperData)">
+          <img :src="item" class="slide-image" mode="aspectFill" @click="previewImage(item,swiperData)">
         </swiper-item>
       </block>
     </swiper>
