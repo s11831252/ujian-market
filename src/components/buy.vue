@@ -1,6 +1,6 @@
 <template>
   <div class="buy" @click.stop>
-    <div v-if="goods.Stock>0&&getShoppingCarNumberByItemId>0">
+    <div v-if="goods.Stock>0&&getShoppingCarNumberByItemId>0" class="buy-container" >
       <span class="icon buy-minus" :class="{'action':getShoppingCarNumberByItemId>0}" @click="Minus">&#xe64a;</span>
       <input class="buy-number" @change="Change" v-model="getShoppingCarNumberByItemId"  type="number">
       <span class="icon buy-plus" :class="{'action':getShoppingCarNumberByItemId<goods.Stock}" @click="Plus">&#xe64b;</span>
@@ -104,20 +104,28 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .buy {
   float: right;
   display: inline-block;
   // display: inline-block;
   font-size: 17px;
-  .buy-minus,
-  .buy-plus,
-  .noStock{
-    display: inline-block;
-    width: 20px;
-    vertical-align: top;
-    font-size: 0.45rem;
-    margin: 0;
+  .buy-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .buy-minus,
+    .buy-plus,
+    .noStock{
+      display: inline-block;
+      // width: 20px;
+      padding: 0 0.15rem;
+      vertical-align: top;
+      font-size: 0.45rem;
+      margin: 0;
+      height: 0.5rem;
+      line-height: 0.5rem;
+    }
   }
 
   .action {
@@ -144,7 +152,6 @@ export default {
     height: 0.5rem;
     min-height: 0.5rem;
     text-align: center;
-    vertical-align: top;
   }
 }
 </style>
