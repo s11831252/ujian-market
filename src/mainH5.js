@@ -102,6 +102,7 @@ Vue.mixin({
       }
     }
 });
+Vue.config.ignoredElements = ['wx-open-launch-weapp']
 Vue.config.productionTip = false
 
 const app =new Vue({

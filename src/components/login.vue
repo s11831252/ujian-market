@@ -184,7 +184,6 @@ export default {
     }
   },
   mounted(){
-    console.log("mounted",this.account, this.model)
   }
 };
 </script>

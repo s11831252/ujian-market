@@ -8,7 +8,7 @@
 <script>
 import mynav from '@/components/mynav.vue'
 import { mapActions  } from "vuex";
-import utils from "@/utils/index.js";
+import utils from "./utils/index";
 import WebIM from "@/utils/hx/WebIM";
 import disp from "./utils/hx/broadcast";
 import msgStorage from "./pages/service/msgstorage";
@@ -212,6 +212,29 @@ export default {
       // ......
     });
     this.hx_login();
+      wx.ready(() => {
+        console.log('wx.ready');
+      });
+
+      wx.error(function (res) {
+        console.log('wx err', res);
+        //可以更新签名
+      });
+    var timestamp = new Date().getTime(),
+    nonceStr = utils.Guid.NewGuid().toString('N');
+    this.$UJAPI.BusinessCard_GetJSapi_ticket(encodeURIComponent(document.URL),timestamp,nonceStr).then(res=>{
+      wx.config({
+        debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印
+        appId: 'wx94cd3f526b2cf2c5', // 必填，公众号的唯一标识
+        timestamp, // 必填，生成签名的时间戳
+        nonceStr, // 必填，生成签名的随机串
+        signature: res.data,// 必填，签名
+        jsApiList: [], // 必填，需要使用的JS接口列表
+        openTagList: ['wx-open-launch-weapp'] // 可选，需要使用的开放标签列表，例如['wx-open-launch-app']
+      });
+
+    })
+
   }
 };
 </script>

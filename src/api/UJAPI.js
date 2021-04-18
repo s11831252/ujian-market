@@ -1,8 +1,15 @@
+/*
+ * @Author: your name
+ * @Date: 2018-10-27 14:03:35
+ * @LastEditors: your name
+ * @LastEditTime: 2021-04-18 17:52:24
+ * @Description: file content
+ */
 import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost = process.env.NODE_ENV == 'development'?"http://192.168.0.119:801/":"https://app.ujianchina.net/";
+let BaseHost = process.env.NODE_ENV != 'development'?"http://192.168.0.119:801/":"https://app.ujianchina.net/";
 // let BaseHost = process.env.NODE_ENV == 'development'?"http://www.luozuzhan.top:801/":"https://app.ujianchina.net/";
 
 export default {
@@ -20,5 +27,8 @@ export default {
     },
      Error_upload:param=>{
         return http.post(BaseHost+ "api/Error/upload",param) 
+    },
+    BusinessCard_GetJSapi_ticket:(url,timespan,noncestr)=>{
+        return http.get(BaseHost+ `api/BusinessCard/GetJSapi_ticket?url=${url}&timespan=${timespan}&noncestr=${noncestr}`) 
     }
 }

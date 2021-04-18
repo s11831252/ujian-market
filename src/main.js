@@ -219,6 +219,8 @@ Vue.mixin({
 });
 Vue.use(MpvueRoterPatch);//在Vue实例中使用$route和$router进行调用路由
 Vue.config.productionTip = false
+Vue.config.ignoredElements = ['wx-open-launch-weapp']
+
 App.mpType = 'app'
 const app = new Vue(App)
 

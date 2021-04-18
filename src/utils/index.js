@@ -1,3 +1,5 @@
+import Guid from './guid.js'
+
 function setCookie(c_name, value, expire) {
   var date = new Date()
   date.setSeconds(date.getSeconds() + expire)
@@ -98,6 +100,7 @@ var regexp = {
 
 export default {
   regexp,
+  Guid,
   formatNumber,
   formatTime,
   setCookie,

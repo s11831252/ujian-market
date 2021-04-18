@@ -87,13 +87,27 @@
         </div>
       </div>
     </div>
-    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
-      <i class="icon rectbox">
-        <span class="rect"></span>
-        <span class="rect rect2"></span>
-        <span class="rect rect3"></span>
-      </i>
-      <span class="txt">直播中</span>
+    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy&&isMP" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
+      <div>
+        <i class="icon rectbox">
+          <span class="rect"></span>
+          <span class="rect rect2"></span>
+          <span class="rect rect3"></span>
+        </i>
+        <span class="txt">直播中</span>
+      </div>
+    </div>
+    <div  class="live-room" v-else-if="shopDetail.LiveRoomId&&Config.showBuy&&!isMP">
+          <i class="icon rectbox">
+            <span class="rect"></span>
+            <span class="rect rect2"></span>
+            <span class="rect rect3"></span>
+          </i>
+      <wx-open-launch-weapp id="launch-btn" username="gh_184a8a3c83da" :path="`pages/live/room?roomId=${shopDetail.LiveRoomId}`">
+        <script type="text/wxtag-template">
+          <span class="txt">直播中</span>
+        </script>
+      </wx-open-launch-weapp>
     </div>
     <shoppingCar :sId="sId" :sName="shopDetail.sName"></shoppingCar>
   </div>
