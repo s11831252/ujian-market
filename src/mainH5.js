@@ -72,7 +72,7 @@ Vue.mixin({
 
       },
       //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
-      wx_login(callback) {
+      async wx_login(callback) {
           
           callback && await callback()
             

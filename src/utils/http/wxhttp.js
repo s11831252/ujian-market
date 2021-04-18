@@ -5,7 +5,7 @@ let bmobConfig={
     applicationId:"",
     restApiKey:""
 }
-const accountInfo = wx.getAccountInfoSync();
+const accountInfo = mpvue_Mode === 'WX' ? wx.getAccountInfoSync() : {}
 const net = {
   showAuthModal:true,
     /**

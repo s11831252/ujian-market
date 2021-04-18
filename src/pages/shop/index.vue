@@ -197,10 +197,14 @@ export default {
     changeGoodsType(typeid) {
       this.activeType = typeid;
       if (this.shopGoods)
+      {
         this.goodList = this.shopGoods.filter(item => {
-          if (typeid > 1) return item.TypeId.indexOf(typeid) > -1;
-          else return item.TypeId.length == 0;
+          if (typeid > 1) 
+            return item.TypeId.indexOf(typeid) > -1;
+          else 
+            return item.TypeId.length == 0;
         });
+      }
     },
     ...mapMutations(["viewHistory_push"])
   },
@@ -327,6 +331,7 @@ export default {
     .shop-detail-tab-goods {
       height: 100%;
       min-height: 400px;
+      display: flex;
       .shop-detail-tab-goods-types {
         width: 23%;
         // background-color: rgb(173, 173, 173);
@@ -403,12 +408,18 @@ export default {
     background-color: rgba(160, 227, 251, 0.3);
     text-align: center;
     padding: 0.21rem 0.24rem 0.29rem 0.21rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     .icon {
       width: 0.62rem;
       height: 0.62rem;
       line-height: 0.62rem;
       border-radius: 50%;
-      display: inline-block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       background-color: #fc8749;
       color: #fff0ee;
       margin-bottom: 0.27rem;

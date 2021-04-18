@@ -67,11 +67,11 @@
   .lx-load-box {
     position: fixed;
     z-index: 3;
-    width: 7.6em;
-    min-height: 7.6em;
-    top: 180px;
-    left: 50%;
-    margin-left: -3.8em;
+    width: 40%;
+    min-height: 4em;
+    top: 25%;
+    left: 30%;
+    /* margin-left: -3.8em; */
     background: rgba(0, 0, 0, 0.7);
     text-align: center;
     border-radius: 5px;

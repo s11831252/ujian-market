@@ -19,22 +19,20 @@
       </div>
       <div class="navbar_slider" :class="navbarSliderClass"></div>
       <div class="demo" v-for="(item,index) in GoodList" :key="index">
-        <div class="shop">
-          <img :src="item.sLogo" alt />
+        <div class="shop" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})" >
+          <img :src="item.sLogo" alt @ />
           <div class="name">
             <div class="title">
               <p class="shopname">
-                <span class="txt">{{item.sName}}<span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
+                <span class="txt">{{item.sName}}</span>
+                <span class="liveroom" v-if="item.LiveRoomId&&Config.showBuy" @click.stop="go({ path: '/pages/live/room', query: {roomId: item.LiveRoomId} })">
                     <i class="icon rectbox">
                       <span class="rect"></span>
                       <span class="rect rect2"></span>
                       <span class="rect rect3"></span>
                     </i>
                     <span>直播中</span>
-                  </span>
                 </span>
-              </p>
-
               <p class="space">{{item.Distance}}米</p>
             </div>
             <div class="intruduce">
@@ -261,6 +259,7 @@ input::-webkit-input-placeholder {
 .search .top .sousuo .ss {
   width: 0.58rem;
   height: 0.58rem;
+  font-size: 0.58rem;
   margin-top: 0.21rem;
   margin-left: 0.52rem;
   float: left;
@@ -379,14 +378,24 @@ input::-webkit-input-placeholder {
   font-size: 0.44rem;
   font-family: "MicrosoftYaHei";
   float: left;
+  display: flex;
+  justify-content: space-between;
   .txt {
     display: inline-block;
-    .liveroom {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-grow: 1;
+    width: 5.8rem;
+  }
+  .liveroom {
       font-size: 0.32rem;
       border-radius: 0.23rem;
       text-align: center;
       .icon {
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 0.46rem;
         line-height: 0.46rem;
         border-radius: 50%;
@@ -396,9 +405,10 @@ input::-webkit-input-placeholder {
       padding-right: 0.23rem;
       color: #fff;
       background-color: #f85d4a;
-      display: inline-block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-  }
 }
 
 .search .main .demo .shop .name .title .space {

@@ -10,6 +10,7 @@ import mynav from '@/components/mynav.vue'
 import { mapActions  } from "vuex";
 import utils from "@/utils/index.js";
 import WebIM from "@/utils/hx/WebIM";
+import disp from "./utils/hx/broadcast";
 import msgStorage from "./pages/service/msgstorage";
 import msgType from "./pages/service/msgtype";
 function ack(receiveMsg) {
@@ -103,7 +104,7 @@ export default {
         that.showLoading({ title: "正在同步聊天记录" });
         
         WebIM.conn.getGroup({
-          success: function(resp){
+          success: async function(resp){
             var _shopChatGroups = resp.data.filter(item => {
               return item.groupname.indexOf("_") > -1;
             });

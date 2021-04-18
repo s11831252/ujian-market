@@ -802,7 +802,9 @@ $borderColor: #ecf0f1;
               border-radius: 0.23rem;
               text-align: center;
               .icon {
-                display: inline-block;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 width: 0.46rem;
                 line-height: 0.46rem;
                 border-radius: 50%;
@@ -812,7 +814,7 @@ $borderColor: #ecf0f1;
               padding-right: 0.23rem;
               color: #fff;
               background-color: #f85d4a;
-              display: inline-block;
+              display: flex;
             }
             .shop-item-info-distance {
               flex-shrink: 0;
