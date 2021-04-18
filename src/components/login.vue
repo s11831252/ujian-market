@@ -35,7 +35,7 @@
           <input type="password" placeholder="请输入密码" v-model="model.PassWord" />
         </div>
         <!-- 登录按钮 -->
-        <div class="btn" :class="{action:loginAction}" @click="login2">立即登录</div>
+        <div class="btn" :class="{action:model.Account&&model.PassWord}" @click="login2">立即登录</div>
         <!-- 底部提示文字 -->
         <div class="fttext">
           <p>欢迎使用U建行业市场,</p>
@@ -64,9 +64,11 @@ export default {
     },
     model:{
       type:Object,
-      default:{
+      default: function(){
+        return {
         Account:"",
         PassWord: ""
+        }
       }
     }
   },
