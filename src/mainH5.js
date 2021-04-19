@@ -70,7 +70,10 @@ Vue.mixin({
       toast(title){
         this.$toast.center(title);
       },
-      modal(title,content,confirm,cancel){
+      modal(opt){
+        console.log(opt)
+        var { title = "", content = "提示内容", confirm, cancel, confirmText = "确定", confirmColor = "#12b7f5",cancelText="取消", cancelColor = "#989898",showCancel=true } = opt;
+
         if(window.confirm(content)){
           if(confirm)
             confirm();
