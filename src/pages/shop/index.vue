@@ -88,27 +88,35 @@
       </div>
     </div>
     <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy&&isMP" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
-      <div>
         <i class="icon rectbox">
           <span class="rect"></span>
           <span class="rect rect2"></span>
           <span class="rect rect3"></span>
         </i>
         <span class="txt">直播中</span>
-      </div>
     </div>
-    <div  class="live-room" v-else-if="shopDetail.LiveRoomId&&Config.showBuy&&!isMP">
-          <i class="icon rectbox">
-            <span class="rect"></span>
-            <span class="rect rect2"></span>
-            <span class="rect rect3"></span>
-          </i>
-      <wx-open-launch-weapp id="launch-btn" username="gh_184a8a3c83da" :path="`pages/live/room?roomId=${shopDetail.LiveRoomId}`">
-        <script type="text/wxtag-template">
-          <span class="txt">直播中</span>
-        </script>
-      </wx-open-launch-weapp>
+    <div class="live-room" v-else-if="shopDetail.LiveRoomId&&Config.showBuy&&isWeiXin">
+        <i class="icon rectbox">
+          <span class="rect"></span>
+          <span class="rect rect2"></span>
+          <span class="rect rect3"></span>
+        </i>
+        <span class="txt">
+          <wx-open-launch-weapp style="font-size:0.36rem" username="gh_184a8a3c83da" :path="`pages/live/room?roomId=${shopDetail.LiveRoomId}`">
+            <script type="text/wxtag-template">
+              <div class="d">直播中</div>
+            </script>
+          </wx-open-launch-weapp>
+        </span>
     </div>
+    <a class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy&&!isWeiXin" href="weixin://dl/business/?t=GGFS9P88YVu">
+        <i class="icon rectbox">
+          <span class="rect"></span>
+          <span class="rect rect2"></span>
+          <span class="rect rect3"></span>
+        </i>
+        <span class="txt">直播中</span>
+    </a>
     <shoppingCar :sId="sId" :sName="shopDetail.sName"></shoppingCar>
   </div>
 </template>
@@ -162,7 +170,7 @@ export default {
     },
     ...mapState({
       UserInfo: state => state.User.UserInfo,
-      Config: state => state.Global.Config,
+      Config: state => state.Global.Config
     })
   },
   methods: {
@@ -210,13 +218,10 @@ export default {
     },
     changeGoodsType(typeid) {
       this.activeType = typeid;
-      if (this.shopGoods)
-      {
+      if (this.shopGoods) {
         this.goodList = this.shopGoods.filter(item => {
-          if (typeid > 1) 
-            return item.TypeId.indexOf(typeid) > -1;
-          else 
-            return item.TypeId.length == 0;
+          if (typeid > 1) return item.TypeId.indexOf(typeid) > -1;
+          else return item.TypeId.length == 0;
         });
       }
     },

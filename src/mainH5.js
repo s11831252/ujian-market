@@ -39,9 +39,29 @@ Vue.mixin({
     swiperSlide
   },
   computed: {
+    
     isMP(){
         return false;
     },
+    /**
+     * @description: '判断是否是微信浏览器的函数'
+     * @param {*}
+     * @return {*} true/false
+     */
+    isWeiXin(){
+        //window.navigator.userAgent属性包含了浏览器类型、版本、操作系统类型、浏览器引擎类型等信息，这个属性可以用来判断浏览器类型
+        var ua = window.navigator.userAgent.toLowerCase();
+        // alert(JSON.stringify(ua))
+        //通过正则表达式匹配ua中是否含有MicroMessenger字符串
+        if(ua.match(/MicroMessenger/i) == 'micromessenger'){
+          console.log("isWeiXin:true")
+          return true;
+        } else{
+          console.log("isWeiXin:false")
+          return false;
+        }
+    }
+
   },
   methods: {
       go: function(path) {
@@ -86,7 +106,6 @@ Vue.mixin({
         if (this.$store.state.User.UserInfo && this.$store.state.User.UserInfo.UserId) {
             var hx_username = this.$store.state.User.UserInfo.UserId.replace(/-/g, "");
             var hx_psw = md5.hex_md5(hx_username);
-            console.log(hx_username, hx_psw);
             let options = {
               grant_type: "password",
               apiUrl: WebIM.conn.apiUrl,

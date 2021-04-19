@@ -31,6 +31,9 @@ Vue.mixin({
         },
         isMP() {
             return true;
+        },
+        isWeiXin(){
+            return true;
         }
     },
     methods: {
