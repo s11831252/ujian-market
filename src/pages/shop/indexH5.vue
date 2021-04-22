@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
+    <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy&&isMP" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
         <i class="icon rectbox">
           <span class="rect"></span>
           <span class="rect rect2"></span>
@@ -95,6 +95,28 @@
         </i>
         <span class="txt">直播中</span>
     </div>
+    <div class="live-room" v-else-if="shopDetail.LiveRoomId&&Config.showBuy&&isWeiXin">
+        <i class="icon rectbox">
+          <span class="rect"></span>
+          <span class="rect rect2"></span>
+          <span class="rect rect3"></span>
+        </i>
+        <span class="txt">
+          <wx-open-launch-weapp style="font-size:0.36rem" username="gh_184a8a3c83da" :path="`pages/live/room?roomId=${shopDetail.LiveRoomId}`">
+            <script type="text/wxtag-template">
+              <div class="d">直播中</div>
+            </script>
+          </wx-open-launch-weapp>
+        </span>
+    </div>
+    <a class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy&&!isWeiXin" href="weixin://dl/business/?t=GGFS9P88YVu">
+        <i class="icon rectbox">
+          <span class="rect"></span>
+          <span class="rect rect2"></span>
+          <span class="rect rect3"></span>
+        </i>
+        <span class="txt">直播中</span>
+    </a>
     <shoppingCar :sId="sId" :sName="shopDetail.sName"></shoppingCar>
   </div>
 </template>
