@@ -10,7 +10,8 @@
     </div>
     <div v-if="!UserInfo.nickName" class="authorize">
       <p>申请获得你的公开信息(昵称、头像等)</p>
-      <button open-type="getUserInfo" @getuserinfo="getUserInfoData">授权登录</button>
+      <!-- <button open-type="getUserInfo" @getuserinfo="getUserInfoData">授权登录</button> -->
+      <button @click="getUserProfile">授权登录</button>
     </div>
     <!-- <button v-if="userInfo.nickName" @click="opensetting">打开授权设置</button> -->
     <login v-else :mode="$route.query.mode||'SMS'" :model="model"></login>
@@ -42,37 +43,73 @@ export default {
     opensetting() {
       wx.openSetting();
     },
-    getUserInfoData(obj) {
+    // getUserInfoData(obj) {
+    //   var that = this;
+    //   if (obj.mp.detail.errMsg.indexOf("getUserInfo:ok") != -1) {
+    //     // this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
+    //     // this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
+    //     var _u = {...obj.mp.detail.userInfo, ...that.UserInfo}
+    //     if(!that.UserInfo.openid)
+    //     {
+    //       wx.login({
+    //         success: obj => {
+    //           if (obj.errMsg.indexOf("login:ok") > -1) {
+    //             this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+    //               if (rep.ret == 0) {
+    //                 // console.log(rep);
+    //                 _u = {..._u , ...rep.data.result}
+    //                 this.$store.commit("SetUserInfo", _u);//清空userinfo
+    //                 this.logoHide = true;
+    //               }
+    //             });
+    //           }
+    //         }
+    //       });
+    //     }else
+    //     {
+    //       this.$store.commit("SetUserInfo", _u);
+    //       this.logoHide = true;
+    //     }
+    //   } else {
+    //     this.$router.back();
+    //   }
+    // },
+    getUserProfile(e) {
       var that = this;
-      if (obj.mp.detail.errMsg.indexOf("getUserInfo:ok") != -1) {
-        // this.userInfo.nickName = obj.mp.detail.userInfo.nickName;
-        // this.userInfo.avatarUrl = obj.mp.detail.userInfo.avatarUrl;
-        var _u = {...obj.mp.detail.userInfo, ...that.UserInfo}
-        if(!that.UserInfo.openid)
-        {
-          wx.login({
-            success: obj => {
-              if (obj.errMsg.indexOf("login:ok") > -1) {
-                this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
-                  if (rep.ret == 0) {
-                    // console.log(rep);
-                    _u = {..._u , ...rep.data.result}
-                    this.$store.commit("SetUserInfo", _u);//清空userinfo
-                    this.logoHide = true;
-                  }
-                });
+      // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认
+      // 开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
+      wx.getUserProfile({
+        desc: '用于完善用户资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+        success: (res) => {
+          var _u = {...res.userInfo, ...that.UserInfo}
+          if(!that.UserInfo.openid)
+          {
+            wx.login({
+              success: obj => {
+                if (obj.errMsg.indexOf("login:ok") > -1) {
+                  this.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                    if (rep.ret == 0) {
+                      // console.log(rep);
+                      _u = {..._u , ...rep.data.result}
+                      this.$store.commit("SetUserInfo", _u);//清空userinfo
+                      this.logoHide = true;
+                    }
+                  });
+                }
               }
-            }
-          });
-        }else
-        {
-          this.$store.commit("SetUserInfo", _u);
-          this.logoHide = true;
+            });
+          }else
+          {
+            this.$store.commit("SetUserInfo", _u);
+            this.logoHide = true;
+          }
+        },
+        fail(){
+          // console.log("getUserProfile fail")
+          that.toast("拒绝授权访问用户信息,将无法继续下一步");
         }
-      } else {
-        this.$router.back();
-      }
-    }
+      })
+    },
   },
   mounted() {
     console.log("mounted",this.UserInfo)
