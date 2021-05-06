@@ -147,8 +147,8 @@ Vue.mixin({
                         callback && await callback()
                         that.hx_login();
                     },
-                    fail() {
-                        callback && callback()
+                    async fail() {
+                        callback && await callback()
                     }
                 });
             } else if (this.$store.state.User.UserInfo.isOtherApp && !this.$store.state.User.UserInfo.openid) {
@@ -170,14 +170,51 @@ Vue.mixin({
                             WebIM.conn.close(); //环信IM关闭
                         that.hx_login();
                     },
-                    fail() {
-                        callback && callback()
+                    async fail() {
+                        callback && await callback()
                     }
                 });
             } else {
                 console.log("logined action wxlogin")
-                callback && await callback()
-                this.hx_login();
+                wx.checkSession({
+                    async success () {
+                      //session_key 未过期，并且在本生命周期一直有效
+                      callback && await callback()
+                      this.hx_login();
+                    },
+                    fail (){
+                        // session_key 已经失效，需要重新执行登录流程
+                        console.log("session_key 已经失效,重新执行登录")
+                        wx.login({
+                            success: async (obj) => {
+                                if (obj.errMsg.indexOf("login:ok") > -1) {
+                                    var rep = await that.$ShoppingAPI.Account_wxLogin(obj.code, parms.InvitaId)
+                                    if (rep.ret == 0) {
+                                        if (rep.data.ticket) {
+                                            that.$store.commit("Login", { Ticket: rep.data.ticket }); //存入Ticket
+                                            if (rep.data.result.errcode == 0)//0表示系统用户 -1游客
+                                            {
+                                                var res = await that.$ShoppingAPI.User_Get()
+                                                if (res.ret == 0) {
+                                                    var userinfo = res.data;
+                                                    var _u = { ...rep.data.result, ...userinfo }
+                                                    that.$store.commit("SetUserInfo", _u);
+                                                }
+                                            } else {
+                                                that.$store.commit("SetUserInfo", rep.data.result);
+                                            }
+                                        }
+                                    }
+                                }
+                                callback && await callback()
+                                that.hx_login();
+                            },
+                            async fail() {
+                                callback && await callback()
+                            }
+                        });
+                    }
+                });
             }
         },
         hx_login() {

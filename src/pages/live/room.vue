@@ -1076,15 +1076,30 @@ export default {
                 openid: that.UserInfo.openid
               })
               .then(res => {
-                if (res.ret == 0) {
+                // if (res.ret == 0) {
                   var msg = JSON.parse(res.data);
                   console.log(msg);
                   var _u = { Phone: msg.phoneNumber, ...that.UserInfo };
                   that.$store.commit("SetUserInfo", _u);
                   that.$router.replace({ path: "/pages/index/index", query: { redirect: that.redirect } });
-                } else {
-                  //解密失败
-                }
+                // } else {
+                // }
+              }).catch(msg=>{
+                  console.log(msg);
+                  that.modal({
+                    confirmText: "重新登录",
+                    title: "获取微信解密数据失败",
+                    content: "获取微信解密数据失败,session_key可能已失效,尝试重新登录获取",
+                    confirm: () => {
+                      that.$store.commit("Login", { Ticket: "" }); //清空Ticket
+                      that.$store.commit("SetUserInfo", {}); //清空userinfo
+                      var pages = getCurrentPages(); //获取加载的页面
+                      var currentPage = pages[pages.length - 1]; //获取当前页面的对象
+                      var url = `/${currentPage.route}`; //当前页面url
+
+                      that.$router.replace({ path: `${url}`,query:currentPage.options});
+                    }
+                  });
               });
           } else {
             that.toast("拒绝授权访问用户信息,将无法继续下一步");
@@ -1094,7 +1109,7 @@ export default {
           console.log("session_key 已经失效");
           // session_key 已经失效，需要重新执行登录流程
           that.modal({
-            confirmText: "登录",
+            confirmText: "重新登录",
             title: "登录session_key已失效",
             content: "您当前的登录session_key已失效或已过期,需要重新登录",
             confirm: () => {
@@ -1103,19 +1118,8 @@ export default {
               var pages = getCurrentPages(); //获取加载的页面
               var currentPage = pages[pages.length - 1]; //获取当前页面的对象
               var url = `/${currentPage.route}`; //当前页面url
-
-              //拼接页面参数
-              var parms = [];
-              for (var key in currentPage.options) {
-                parms.push(`${key}=${currentPage.options[key]}`);
-              }
-              if (parms.length > 0) {
-                //url转码
-                var parmsStr = parms.join("&");
-                let encodeparms = `?${parmsStr}`;
-                url = url + encodeparms;
-              }
-              that.$router.replace({ url: `${url}` });
+              console.log(url,currentPage.options)
+              that.$router.replace({ path: `${url}` ,query:currentPage.options});
             }
           });
         }
