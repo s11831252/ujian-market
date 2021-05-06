@@ -258,13 +258,20 @@ export default new Vuex.Store({//store对象
     Global:{
       state:{
         Config:{
-          showBuy:true
-        }
+          showBuy:true,
+          //jssdk 调用config是否成功
+        },
+        // wx_jssdk_config:{
+        //   Enable:false,
+        // },
       },
       mutations:{
         setConfig(state,Config){
           state.Config=Config;
-        }
+        },
+        // wx_jssdk_config_result(state,result){
+        //   state.wx_jssdk_config.Enable=result;
+        // }
       },
       actions:{
         async GetConfig (context) {
@@ -281,6 +288,12 @@ export default new Vuex.Store({//store对象
         setItem: (key, value) => wx.setStorageSync(key, value),
         removeItem: key => { }
       }
-    }) : createPersistedState()
+    }) : createPersistedState({
+      // reducer(obj) {
+      //   // 选择需要持久化存储的 vuex module
+      //   const { User, ShoppingCar, UserAddress} = obj;
+      //   return {User,ShoppingCar,UserAddress}
+      // }
+    })
   ]
 })

@@ -25,6 +25,7 @@ import "swiper/dist/css/swiper.css";
 
 Vue.use(Toast);
 Vue.use(VueAwesomeSwiper, /* { default global options } */)
+// var vConsole = new VConsole();
 
 //在实例中用this.$xxx调用封装好的RestAPI
 Vue.prototype.$UJAPI = UJAPI; 
