@@ -1291,7 +1291,6 @@ export default {
     disp.on("onClosed", () => {
       that.welcomeMsg = "聊天服务已断开";
     });
-
     this.wx_login(() => {
       if (WebIM.conn.isOpened()) {
         // if (!this.joined)

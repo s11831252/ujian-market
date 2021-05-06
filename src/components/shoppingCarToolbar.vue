@@ -120,7 +120,7 @@ export default {
             title: "连接失败",
             content: "聊天服务还未连接,您可重连或稍后重试",
             confirm: () => {
-              WebIM.conn.close(); //环信IM关闭
+              WebIM.conn&&WebIM.conn.close&&WebIM.conn.close(); //环信IM关闭
               that.hx_login();
             },
             confirmText: "重连"
