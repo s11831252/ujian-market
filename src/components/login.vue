@@ -49,6 +49,8 @@
 import $toast from "@/utils/toast";
 import { mapState } from "vuex";
 import utils from '../utils/index'
+import disp from "../utils/hx/broadcast";
+
 export default {
   data() {
     return {
@@ -117,25 +119,7 @@ export default {
           var _u = { ...res.data, ...this.UserInfo };
           this.$store.commit("SetUserInfo", _u);
         }
-        // this.hx_login();
-        if (this.$route.query.redirect) {
-          let url = decodeURIComponent(this.$route.query.redirect);
-          // 切换至redirect页面
-          this.$router.replace({ path: url },//跳转失败回调,失败了可以认为是tabBar页面,尝试使用isTab
-          null,
-          msg=>{
-            this.$router.push({path: url, isTab: true })}
-          );
-        } else if (this.$route.query.back) {
-          // var pages = getCurrentPages();    //获取加载的页面
-          // var currentPage = pages[pages.length-2];    //获取当前页面的对象
-          // console.log(pages,currentPage)
-          //后退
-          this.$router.back();
-        } // 切换至首页页面
-        else {
-          this.$router.push({ path: "/pages/home/index", isTab: true });
-        }
+        this.hx_login();
       } else {
         this.toast("登录失败");
       }
@@ -163,7 +147,12 @@ export default {
           var _u = { ...res.data, ...this.UserInfo };
           this.$store.commit("SetUserInfo", _u);
         }
-        // this.hx_login();
+        this.hx_login();
+      } else {
+        this.toast("登录失败");
+      }
+    },
+    loginOK_Redirect(){
         if (this.$route.query.redirect) {
           let url = decodeURIComponent(this.$route.query.redirect);
           // 切换至redirect页面
@@ -178,12 +167,13 @@ export default {
         else {
           this.$router.push({ path: "/pages/home/index", isTab: true });
         }
-      } else {
-        this.toast("登录失败");
-      }
     }
   },
+  onUnload() {
+    disp.off("onOpened", this.loginOK_Redirect);
+  },
   mounted(){
+    disp.on("onOpened",this.loginOK_Redirect);
   }
 };
 </script>

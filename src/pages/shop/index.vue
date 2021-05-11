@@ -261,7 +261,8 @@ export default {
         if (rep2.ret == 0) {
           this.GoodsType = rep2.data;
           this.GoodsType.push({ Sort: "0", TypeId: "-1", TypeName: "其他" });
-          this.changeGoodsType(this.GoodsType[0].TypeId);
+          if(this.$GoodsType!=null)
+          this.changeGoodsType(this.$GoodsType[0].TypeId);
         }
       }
     });
