@@ -184,10 +184,10 @@ export default {
         }
       }, //收到音频消息
       onCmdMessage(message) {
-        if (message.from == WebIM.conn.context.userId) {
-          return;
-        }
         console.log("onCmdMessage", message);
+        // if (message.from == WebIM.conn.context.userId) {
+        //   return;
+        // }
         disp.fire("onCmdMessage", message);
         // if (message) {
         //   if (onMessageError(message)) {
@@ -264,10 +264,10 @@ export default {
         disp.fire("onPresence", msg);
       },
       onCustomMessage: function(msg) {
-        if (msg.from == WebIM.conn.context.userId) {
-          return;
-        }
         console.log("onCustomMessage", msg);
+        // if (msg.from == WebIM.conn.context.userId) {
+        //   return;
+        // }
         disp.fire("newCustomMessage", msg);
       }, // 自定义消息
       onReconnect() {

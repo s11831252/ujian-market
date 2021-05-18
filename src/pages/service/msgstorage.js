@@ -9,10 +9,10 @@ let msgStorage = new Disp();
 msgStorage.saveReceiveMsg = function(receiveMsg, type){
 	let sendableMsg;
 	let myName = utils.getItem("myUsername");
-	if(receiveMsg.from==myName)
-	{
-	  return;
-	}
+	// if(receiveMsg.from==myName)
+	// {
+	//   return;
+	// }
 	if(type == msgType.IMAGE){
 		sendableMsg = {
 			id: receiveMsg.id,

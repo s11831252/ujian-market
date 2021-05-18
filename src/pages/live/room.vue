@@ -44,7 +44,7 @@
             <span>{{item.ext.nickName}}</span>结束连麦
           </span>
           <div v-else>
-            <span>{{item.ext.nickName}}:</span>
+            <span>{{item.ext.nickName}}：</span>
             <chatMsg v-for="(item,index2) in item.msg.data" :key="index2" :msgdata="item"></chatMsg>
           </div>
         </div>
@@ -695,6 +695,11 @@ export default {
     //处理自定义消息回调
     customMsgHanderler(msg) {
       var that = this;
+      if(msg.to!=that.roomInfo.id)
+      {
+        console.log("多端登录非当前直播间数据")
+        return;
+      }
       var renderableMsg = {
         info: {
           from: msg.from,
@@ -755,12 +760,9 @@ export default {
           break;
         }
         case "chatroom_member_join": {
-          // if(msg.to!=that.roomInfo.id)
-          //   break;
           var memberInfo = this.roomInfo.affiliations.find(item => {
             return item.member == msg.from || item.owner == msg.from;
           });
-
           if (!memberInfo) {
             that.roomInfo.affiliations.push({
               Portrait: msg.customExts.avatar,
@@ -768,7 +770,7 @@ export default {
               member: msg.from,
               owner: null
             });
-
+            console.log(memberInfo,that.roomInfo.affiliations);
             that.readMsg(renderableMsg, msg.customEvent, null, that.sessionKey, msg);
           }
           break;
@@ -853,14 +855,6 @@ export default {
           console.log("leaveChatRoom", that.roomInfo.affiliations);
           if (msg.from == this.roomInfo.owner) {
             //直播间拥有者用户退出,认为是关闭直播间
-            // that.modal({
-            //   content: "直播已结束",
-            //   showCancel: false,
-            //   confirm: () => {
-            //     that.$router.back();
-            //   },
-            //   confirmText: "返回"
-            // });
             that.closeLiverommMsg = "直播已结束";
           }
           var memberInfo = this.roomInfo.affiliations.find(item => {
@@ -934,7 +928,7 @@ export default {
                     that.roomInfo.affiliations.push({
                       Portrait: that.UserInfo.Portrait,
                       UserName: that.UserInfo.UserName,
-                      member: that.UserInfo.UserId
+                      member: that.UserInfo.UserId.replace(/-/g, "")
                     });
                 },
                 fail: function() {}
@@ -1011,6 +1005,11 @@ export default {
     //环信命令消息处理
     cmdMsgHanderler(msg) {
       var that = this;
+      if(msg.from!=this.roomInfo.owner)
+      {
+        console.log("多端登录,非当前直播间owner用户发送的消息")
+        return;
+      }
       try {
         let msgData = JSON.parse(msg.action);
         if (msgData.action) {
