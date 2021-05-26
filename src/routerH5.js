@@ -33,6 +33,7 @@ import dialogBox from './pages/store/dialogBox'
 import distribution from './pages/order/distribution'
 import live from './pages/live/index'
 import liveroom from './pages/live/room'
+import liveroom from './pages/my/about'
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -392,6 +393,16 @@ var routes = [
         meta: { noAuth: true },
         alias: '/pages/web/webview',
         component: liveroom
+    },
+    {
+        path:'pages/my/about',
+        name:'about',
+        config: {
+            navigationBarTitleText: '关于U建行业市场',
+        },
+        meta: { noAuth: true },
+        alias: '/pages/my/about',
+        component: about
     }
 
 ]

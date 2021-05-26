@@ -263,6 +263,13 @@ var routes = [
         config: {
             navigationBarTitleText: '访问网页',
         }
+    },
+    {
+        path:'pages/my/about',
+        name:'about',
+        config: {
+            navigationBarTitleText: '关于U建行业市场',
+        }
     }
 ]
 module.exports =routes

@@ -49,6 +49,11 @@
                         <p class="myInfo_p">入驻商城</p>
                         <img class="next" src="../../../static/img/next.png" alt="" />
                     </div>
+                    <div class="myInfo_demo" @click="go({path:'/pages/my/about'})">
+                        <i class="icon">&#xe6c2;</i>
+                        <p class="myInfo_p">关于U建商城</p>
+                        <img class="next" src="../../../static/img/next.png" alt="" />
+                    </div>
                 </div>
                 <div v-if="Logined" class="myesc" @click="exit">退出登录</div>
             </div>
