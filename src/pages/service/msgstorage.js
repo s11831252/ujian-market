@@ -184,14 +184,15 @@ msgStorage.saveMsg = function(sendableMsg, type, receiveMsg){
 	// else{
 	// 	save();
 	// }
-
 	save();
 	function save(){
+		
 		if(!sendableMsg.body.roomType)
 			utils.setItem(sessionKey,curChatMsg)
 		if (type == msgType.AUDIO || type == msgType.VIDEO) {
 			disp.fire('em.chat.audio.fileLoaded');
 		}
+		console.log("msg save")
 		me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey,receiveMsg);
 	}
 };

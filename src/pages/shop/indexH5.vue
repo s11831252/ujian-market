@@ -88,6 +88,14 @@
       </div>
     </div>
     <!--  某些机型无法使用wx-open标签,如 :华为Nova4 -->
+    <!-- <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy" @click="go({ path: '/pages/live/room', query: {roomId: shopDetail.LiveRoomId}})">
+        <i class="icon rectbox">
+          <span class="rect"></span>
+          <span class="rect rect2"></span>
+          <span class="rect rect3"></span>
+        </i>
+        <span class="txt">直播中</span>
+    </div> -->
     <!-- <div class="live-room" v-if="shopDetail.LiveRoomId&&Config.showBuy&&isWeiXin&&isWeiXin&&wx_jssdk_config.Enable">
         <i class="icon rectbox">
           <span class="rect"></span>

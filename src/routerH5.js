@@ -33,7 +33,7 @@ import dialogBox from './pages/store/dialogBox'
 import distribution from './pages/order/distribution'
 import live from './pages/live/index'
 import liveroom from './pages/live/room'
-import liveroom from './pages/my/about'
+import about from './pages/my/about'
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -317,6 +317,7 @@ var routes = [
         name:'consult',
         config: {
             navigationBarTitleText: '商家名称',
+            disableScroll: true,
             enablePullDownRefresh: false
         },
         alias: '/pages/service/consult',
@@ -378,6 +379,7 @@ var routes = [
         name:'liveroom',
         config: {
             navigationBarTitleText: '在线咨询',
+            disableScroll: true,
             enablePullDownRefresh: false
         },
         meta: { noAuth: true },
@@ -412,10 +414,10 @@ router.beforeEach((to, from, next) => {
     if (!to.matched.some(record => record.meta.noAuth)) {
         //这里判断用户是否登录，验证store中的token是否已登录
         if (!store.getters.Logined) { // 判断当前的token是否存在
-            next({
-                path: '/pages/index/index',
-                query: { redirect: to.fullPath }
-            })
+            // router.replace({
+            //     path: '/pages/index/index',
+            //     query: { redirect: to.fullPath }
+            // })
         } else {
             next()
         }
@@ -423,4 +425,20 @@ router.beforeEach((to, from, next) => {
         next() // 确保一定要调用 next()
     }
   })
+router.afterEach(function(to, from){
+    var nowRoute= router.options.routes.find((item)=>{
+        return  item.alias==to.path;
+    });
+    //此处判断当前route是否隐藏页面滚动条
+    if(nowRoute&&nowRoute.config&&nowRoute.config.disableScroll)
+    {
+        var _body =  document.getElementsByTagName("body")[0];
+        _body.scrollTop=document.documentElement.scrollTop=0
+        _body.style.setProperty("overflow","hidden");
+    }else
+    {
+        var _body =  document.getElementsByTagName("body")[0];
+        _body.style.setProperty("overflow","auto");
+    }
+})
 export default router

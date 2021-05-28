@@ -1,8 +1,11 @@
 <template>
   <div v-if="roomInfo" class="root">
-    <live-player id="myPlayer" :src="mainPull" mode="live" autoplay @fullscreenchange="fullscreenchange" class="live-play">
+    <live-player id="myPlayer" v-if="isMP" :src="mainPull" mode="live" autoplay @fullscreenchange="fullscreenchange" class="live-play">
       <cover-view class="player-tool" v-if="fullscreen" @click="fullscreenHandler">退出全屏</cover-view>
     </live-player>
+    <div class="live-play" v-else >
+
+    </div>
     <ul class="otherPull">
       <li v-if="PusherUrl">
         <otherPusher :url="PusherUrl"></otherPusher>
@@ -51,14 +54,41 @@
         <div id="end"></div>
       </scroll-view>
       <scrollContainer :scroll-to-id="toView" v-else>
-        <div class="top">{{welcomeMsg}}</div>
-        <chatItem v-for="(item,index) in ChatHistory" :key="index" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
+        <div class="top chat-item">{{welcomeMsg}}</div>
+        <div class="chat-item" v-for="(item,index) in ChatHistory" :key="index" :id="item.mid">
+          <!-- <chatMsg :msgData="item"></chatMsg> -->
+          <span class="txt_praise" v-if="item.msg.type=='chatroom_praise'">
+            <span>{{item.ext.nickName}}</span>
+            给主播点了{{item.msg.customExts.num}}个赞
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_join'">
+            <span>{{item.ext.nickName}}</span>进入直播间
+          </span>
+          <span class="txt_gift" v-else-if="item.msg.type=='chatroom_gift'">
+            {{item.ext.nickName}}赠送了
+            <img :src="item.msg.customExts.giftUrl" />
+            {{item.msg.customExts.giftName}}×{{item.msg.customExts.num}}
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_video_call'&&item.msg.customExts.video_call_status=='start'">
+            <span>{{item.ext.nickName}}</span>进行连麦
+          </span>
+          <span class="txt_joinRoom" v-else-if="item.msg.type=='chatroom_member_video_call'&&item.msg.customExts.video_call_status=='end'">
+            <span>{{item.ext.nickName}}</span>结束连麦
+          </span>
+          <div v-else>
+            <span>{{item.ext.nickName}}：</span>
+            <chatMsg v-for="(item,index2) in item.msg.data" :key="index2" :msgdata="item"></chatMsg>
+          </div>
+        </div>
         <div id="end"></div>
       </scrollContainer>
       <div class="chat-tool" v-if="roomInfo.id">
         <div class="input-box">
           <i class="icon">&#xe637;</i>
-          <input placeholder="说点什么..." type="text" v-model="textMsg" maxlength="200" @confirm="sendMsg" confirm-type="send" fixed="true" />
+          <form  @submit.prevent="sendMsg">
+            <input placeholder="说点什么..." type="text" v-model="textMsg" maxlength="200" @confirm="sendMsg" confirm-type="send" fixed="true" />
+            <input type="submit">
+          </form>
         </div>
         <i class="icon exit" @click="exitLiveRoom">&#xe609;</i>
         <i class="icon disconnect" v-if="PusherUrl" @click="disconnectRoom">&#xe658;</i>
@@ -91,13 +121,20 @@
       <div class="mask" @click.stop="showMember=false"></div>
       <div class="modal-wrap">
         <span class="title">观众</span>
-        <scroll-view scroll-y="true" enable-flex="true" class="member-list">
+        <scroll-view scroll-y="true" enable-flex="true" class="member-list" v-if="isMP">
           <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
             <img :src="item.Portrait" />
             <span class="txt">{{item.UserName}}</span>
             <span class="owner" v-if="item.owner">主播</span>
           </div>
         </scroll-view>
+        <div class="member-list" v-else>
+            <div class="item" v-for="(item,index) in roomInfo.affiliations" :key="index">
+              <img :src="item.Portrait" />
+              <span class="txt">{{item.UserName}}</span>
+              <span class="owner" v-if="item.owner">主播</span>
+            </div>
+        </div>
       </div>
     </div>
     <div class="modal" :class="showGift?'open':''">
@@ -107,13 +144,20 @@
           <span class="txt">礼物</span>
           <span class="close icon" @click="showGift=false">&#xe613;</span>
         </span>
-        <scroll-view class="gift-list" enable-flex="true" scroll-y="true">
+        <scroll-view class="gift-list" enable-flex="true" scroll-y="true" v-if="isMP">
           <div class="item" :class="{action:item.giftId==selectGift.giftId}" v-for="(item,index) in giftList" :key="index" @click="selectGift=item">
             <img :src="item.giftUrl" />
             <div class="giftname">{{item.giftName}}</div>
             <div>{{item.giftPoints}}U币</div>
           </div>
         </scroll-view>
+        <div class="gift-list" v-else>
+            <div class="item" :class="{action:item.giftId==selectGift.giftId}" v-for="(item,index) in giftList" :key="index" @click="selectGift=item">
+              <img :src="item.giftUrl" />
+              <div class="giftname">{{item.giftName}}</div>
+              <div>{{item.giftPoints}}U币</div>
+            </div>
+        </div>
         <div class="bottom-box">
           <span class="txt">
             <img src="../../../static/img/ub.png" />
@@ -156,8 +200,8 @@
           <div class="dialog_wrapper_bottom">
             <div class="buttom-group">
               <button class="confirm" @click="go({path:'/pages/home/index',isTab:true})">进入行业市场</button>
-              <navigator class="confirm" v-if="hasBack" open-type="navigateBack">返回</navigator>
-              <navigator class="confirm" v-else target="miniProgram" open-type="exit">退出小程序</navigator>
+              <navigator class="confirm" v-if="hasBack&&isMP" open-type="navigateBack">返回</navigator>
+              <navigator class="confirm" v-else-if="isMP" target="miniProgram" open-type="exit">退出小程序</navigator>
             </div>
           </div>
         </div>
@@ -262,6 +306,19 @@
                 </div>
               </div>
             </scroll-view>
+            <div class="goodsbox" v-else>
+              <div class="item" v-for="(item,index) in shopGoods" :key="index">
+                <img :src="item.Images.length>0?item.Images[0].Thumbnail_url:''" />
+                <div class="info">
+                  <span class="name">{{item.gName}}</span>
+                  <span class="price">
+                    ￥
+                    <span class="txt">{{item.gType==1?'议价':item.Price}}</span>
+                  </span>
+                  <span class="btn" @click="go({path:'/pages/shop/detail',query:{gId:item.gId,sId:item.sId,sName:item.sName}})">去购买</span>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="dialog_wrapper_bottom"></div>
         </div>
@@ -449,7 +506,6 @@ export default {
     //读取消息
     readMsg(renderableMsg, type, currentChatMsg, sessionKey, msg) {
       // console.log(renderableMsg, type, currentChatMsg, sessionKey,msg)
-
       if (sessionKey == this.sessionKey) {
         if (msg) {
           var memberInfo = this.roomInfo.affiliations.find(item => {
@@ -491,6 +547,7 @@ export default {
         msg.setGroup("groupchat");
         WebIM.conn.send(msg.body);
       }
+      return false
     },
     // 发点赞消息
     giveLike() {
@@ -1238,7 +1295,7 @@ export default {
   },
   onUnload() {
     var that = this;
-    console.log("onUnload exit liveroom :", that.roomId);
+    console.log("onUnload exit liveroom : "+that.roomId);
     msgStorage.off("newChatMsg", this.readMsg);
     disp.off("newCustomMessage", this.customMsgHanderler);
     disp.off("onPresence", this.presenceHanderler);
@@ -1266,6 +1323,23 @@ export default {
     let pages = getCurrentPages();
     // console.log(pages);
     this.hasBack = pages[pages.length - 2] ? true : false;
+  },
+  beforeDestroy(){
+
+    var that = this;
+    console.log("beforeDestroy exit liveroom : " +that.roomId)
+    msgStorage.off("newChatMsg", this.readMsg);
+    disp.off("newCustomMessage", this.customMsgHanderler);
+    disp.off("onPresence", this.presenceHanderler);
+    disp.off("onOpened", this.initHanderler);
+    disp.off("onCmdMessage", this.cmdMsgHanderler);
+    disp.off("onSocketDisconnected", this.DisconnectedHanderler);
+    if (WebIM.conn.isOpened()) {
+      that.disconnectRoom();
+      WebIM.conn.quitChatRoom({
+        roomId: that.roomId
+      });
+    }
   },
   mounted() {
     var that = this;
@@ -1334,14 +1408,19 @@ body {
 }
 </style>
 <style lang="scss" scoped>
+button{
+  border: 0;
+}
 .root {
   height: 100%;
   overflow: hidden;
+  font-size: 0.44rem;
   .live-play {
     width: 100%;
     height: 35%;
     z-index: 1;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 1);
+    display: block;
     .player-tool {
       position: absolute;
       z-index: 4;
@@ -1453,7 +1532,7 @@ body {
         line-height: 0.9rem;
         text-align: center;
         border-radius: 50%;
-        margin-right: 2%;
+        margin-right: 0.1rem;
       }
       .exit {
         background-color: rgba(105, 16, 16, 0.8);
@@ -1487,6 +1566,7 @@ body {
         flex-grow: 2;
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         .icon {
           background: rgba(0, 0, 0, 0.4);
         }
@@ -1495,6 +1575,9 @@ body {
           font-size: 0.4rem;
           width: auto;
           color: #000;
+        }
+        input[type='submit']{
+          display: none;
         }
       }
     }
@@ -1637,6 +1720,7 @@ body {
       height: 89%;
       // display: flex;
       // flex-direction: column;
+      overflow: scroll;
       .item {
         display: flex;
         align-items: center;
@@ -1673,9 +1757,10 @@ body {
       flex-wrap: wrap;
       margin-left: 0.3rem;
       height: 71%;
+      overflow: scroll;
       .item {
         // margin: 0.1rem 0.36rem;
-        padding: 0.2rem 0.42rem 0.2rem 0.42rem;
+        padding: 0.2rem 0.35rem 0.2rem 0.35rem;
         text-align: center;
         border: solid 0.04rem transparent;
         border-radius: 0.4rem;
@@ -1684,7 +1769,7 @@ body {
           font-size: 0.36rem;
         }
         img {
-          width: 1.68rem;
+          width: 1.84rem;
           height: 1.65rem;
           display: block;
         }
@@ -1888,6 +1973,7 @@ body {
         font-size: 0.4rem;
         width: 3rem;
         border-radius: 0.4rem;
+        border: 0;
         line-height: 0.8rem;
         color: #fff;
         background-color: #717070;
@@ -2050,6 +2136,7 @@ body {
     }
     .goodsbox {
       padding-bottom: 0.47rem;
+      overflow: scroll;
       .item {
         display: flex;
         margin: 0.47rem 0.38rem 0 0.36rem;

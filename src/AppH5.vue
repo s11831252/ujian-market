@@ -184,15 +184,26 @@ export default {
       }, //收到音频消息
       onCmdMessage(message) {
         console.log("onCmdMessage", message);
-        if (message) {
-          if (onMessageError(message)) {
-            msgStorage.saveReceiveMsg(message, msgType.CMD);
-          }
-          // calcUnReadSpot(message);
-          ack(message);
-        }
+        disp.fire("onCmdMessage", message);
+
+        // if (message) {
+        //   if (onMessageError(message)) {
+        //     msgStorage.saveReceiveMsg(message, msgType.CMD);
+        //   }
+        //   // calcUnReadSpot(message);
+        //   ack(message);
+        // }
       }, //收到命令消息
-      onFileMessage: function(message) {}, //收到文件消息
+      onCustomMessage: function(msg) {
+        console.log("onCustomMessage", msg);
+        // if (msg.from == WebIM.conn.context.userId) {
+        //   return;
+        // }
+        disp.fire("newCustomMessage", msg);
+      }, // 自定义消息
+      onFileMessage: function(message) {
+        console.log("onFileMessage", message);
+      }, //收到文件消息
       onLocationMessage: function(message) {
         console.log("onLocationMessage", message);
         if (onMessageError(message)) {
@@ -201,14 +212,38 @@ export default {
         // calcUnReadSpot(message);
         ack(message);
       }, //收到位置消息
-      onRoster: function(message) {}, //处理好友申请
-      onInviteMessage: function(message) {}, //处理群组邀请
-      onOnline: function() {}, //本机网络连接成功
-      onOffline: function() {}, //本机网络掉线
-      onError: function(message) {}, //失败回调
-      onReceivedMessage: function(message) {}, //收到消息送达服务器回执
-      onDeliveredMessage: function(message) {}, //收到消息送达客户端回执
-      onReadMessage: function(message) {} //收到消息已读回执
+      onRoster: function(message) {
+        console.log("onRoster", message);
+      }, //处理好友申请
+      onInviteMessage: function(message) {
+        console.log("onInviteMessage", message);
+      }, //处理群组邀请
+      onOnline: function(message) {
+        console.log("onOnline", message);
+      }, //本机网络连接成功
+      onOffline: function(message) {
+        console.log("onOffline", message);
+      }, //本机网络掉线
+      onError: function(message) {
+        console.log("onError", message);
+      }, //失败回调
+      onReceivedMessage: function(message) {
+        console.log("onReceivedMessage", message);
+        //如果是自己发送的消息则更新发送中状态sendOK=false
+        msgStorage.sendOk(message.id, message.to + WebIM.conn.context.userId)
+
+      }, //收到消息送达服务器回执
+      onPresence: function(msg) {
+        console.log("onPresence", msg);
+        disp.fire("onPresence", msg);
+      },
+      onDeliveredMessage: function(message) {
+        console.log("onDeliveredMessage", message);
+      }, //收到消息送达客户端回执
+      onReadMessage: function(message) {
+        console.log("onReadMessage", message);
+      } //收到消息已读回执
+      
       // ......
     });
     this.hx_login();

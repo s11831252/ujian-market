@@ -15,8 +15,9 @@ export default {
     },
     watch:{
         scrollToId(newQuestion, oldQuestion) {
-            console.log("watch:"+newQuestion, oldQuestion)
-            this.scroll(newQuestion)
+            // console.log("watch:"+newQuestion, oldQuestion)
+            if(newQuestion)
+                this.scroll(newQuestion)
         }
     },
     methods:{
@@ -25,9 +26,9 @@ export default {
                 var target = document.getElementById(id);
                 this.containerEL.scrollTop = target.offsetTop
 
-                console.log("scrollTop:"+ this.containerEL.scrollTop)
-                console.log(target,"scroll:#"+id)
-                console.log("targer scrollTop:"+target.scrollTop)
+                // console.log("scrollTop:"+ this.containerEL.scrollTop)
+                // console.log(target,"scroll:#"+id)
+                // console.log("targer scrollTop:"+target.scrollTop)
             })
         }
     },
@@ -51,7 +52,6 @@ export default {
 .chatbox {
   height: 90%;
   flex-grow: 2;
-  padding-bottom: 2%;
   overflow: hidden;
   overflow-y: scroll;
 }

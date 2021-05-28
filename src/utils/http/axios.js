@@ -28,7 +28,7 @@ axios.interceptors.response.use(response => {
     {
       store.commit("Login", { Ticket: "" }); //清空Ticket
       store.commit("SetUserInfo", {});//清空userinfo
-      router.push({path:"/pages/index/index"})
+      router.replace({path:"/pages/index/index",query:{redirect: router.history.current.fullPath}})
     }
   }
     return response

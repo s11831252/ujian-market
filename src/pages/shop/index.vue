@@ -223,7 +223,7 @@ export default {
     });
   },
   async mounted() {
-    console.log("mounted", this.$route.query);
+    console.log("mounted", this.$route);
     let that = this;
     this.extraDataHandler();
     this.wx_login(async () => {

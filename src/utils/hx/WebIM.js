@@ -6,7 +6,7 @@
 console.group = console.group || {};
 console.groupEnd = console.groupEnd || {};
 let config =  mpvue_Mode === 'WX'?require("./MPIMConfig.js").default:require("./WebIMConfig.js").default;
-var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/wxsdk").default:require("./web-sdk/websdk.js").default;
+var websdk =  mpvue_Mode === 'WX'? require("./weixin-sdk/wxsdk").default:require("./web-sdk/websdk3.5.2.js").default;
 
 // if(!window)  window = {};
 

@@ -2,12 +2,12 @@
   <div class="wai">
     <scroll-view :scroll-into-view="toView" enable-flex="true" scroll-y="true" class="chatbox" @click="pending('chat',null)" v-if="isMP">
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-      <chatItem v-for="item in ChatHistory" :key="item" @delMsg="delMsg" :showCheckbox="showCheckbox" @checked="checkedMsg" @onShowCheckbox="onShowCheckbox" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <chatItem v-for="item in ChatHistory" :key="item.mid" @delMsg="delMsg" :showCheckbox="showCheckbox" @checked="checkedMsg" @onShowCheckbox="onShowCheckbox" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scroll-view>
     <scrollContainer :scroll-to-id="toView" v-else>
       <div class="top">欢迎您光临本店，请问有什么能帮助您？</div>
-      <chatItem v-for="item in ChatHistory" :key="item" @delMsg="delMsg" :showCheckbox="showCheckbox" @checked="checkedMsg" @onShowCheckbox="onShowCheckbox" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
+      <chatItem v-for="item in ChatHistory" :key="item.mid" @delMsg="delMsg" :showCheckbox="showCheckbox" @checked="checkedMsg" @onShowCheckbox="onShowCheckbox" :chatdata="item" :desc="desc_obj" :chatRoomInfo="chatRoomInfo"></chatItem>
       <div id="end"></div>
     </scrollContainer>
     <!-- 输入框 -->
@@ -744,7 +744,7 @@ page {
     // height: fit-content;
     min-height: 1rem;
     max-height: 2rem;
-    width: auto;
+    width: 7.5rem;
     font-size: 0.4rem;
     /* 允许长单词换行到下一行 */
     word-wrap: break-word;

@@ -1,47 +1,53 @@
 <template>
   <div style="width: 100%;">
     <div class="index">
-      <div v-if="isMP&&mode=='SMS'" class="nr">
-        <!-- 输入手机号码 -->
-        <div class="tel">
-          <i class="icon">&#xe60d;</i>
-          <input type="tel" placeholder="请输入手机号码" v-model="model.Account" />
+        <div v-if="isMP&&mode=='SMS'" class="nr">
+          <form @submit.prevent="login" class="index">
+            <!-- 输入手机号码 -->
+            <div class="tel">
+              <i class="icon">&#xe60d;</i>
+              <input type="tel" placeholder="请输入手机号码" v-model="model.Account" />
+            </div>
+            <!-- 输入验证码 -->
+            <div class="message">
+              <div class="emal">
+                <i class="icon">&#xe60b;</i>
+                <input type="number" placeholder="请输入验证码" v-model="VerificationCode" />
+              </div>
+              <p class="yzm" :class="{action:codeAction}" @click="countDown">{{countDownStr}}</p>
+            </div>
+            <!-- 登录按钮 -->
+            <div class="btn" :class="{action:loginAction}" @click="login">立即登录</div>
+            <!-- 底部提示文字 -->
+            <div class="fttext">
+              <p>欢迎使用U建行业市场,</p>
+              <p>请您输入手机号码进入下步购物环节</p>
+            </div>
+            <input type="submit">
+          </form>
         </div>
-        <!-- 输入验证码 -->
-        <div class="message">
-          <div class="emal">
-            <i class="icon">&#xe60b;</i>
-            <input type="number" placeholder="请输入验证码" v-model="VerificationCode" />
-          </div>
-          <p class="yzm" :class="{action:codeAction}" @click="countDown">{{countDownStr}}</p>
+        <div v-else-if="!isMP||(mode=='PWD')" class="nr">
+          <form @submit.prevent="login2" class="index">
+            <!-- 输入手机号码 -->
+            <div class="tel">
+              <i class="icon">&#xe60d;</i>
+              <input type="tel" placeholder="请输入手机号码" v-model="model.Account" />
+            </div>
+            <!-- 输入密码 -->
+            <div class="pwd">
+              <i class="icon">&#xe75c;</i>
+              <input type="password" placeholder="请输入密码" v-model="model.PassWord" />
+            </div>
+            <!-- 登录按钮 -->
+            <div class="btn" :class="{action:model.Account&&model.PassWord}" @click="login2">立即登录</div>
+            <!-- 底部提示文字 -->
+            <div class="fttext">
+              <p>欢迎使用U建行业市场,</p>
+              <p>请您登录后进入下步购物环节</p>
+            </div>
+            <input type="submit">
+          </form>
         </div>
-        <!-- 登录按钮 -->
-        <div class="btn" :class="{action:loginAction}" @click="login">立即登录</div>
-        <!-- 底部提示文字 -->
-        <div class="fttext">
-          <p>欢迎使用U建行业市场,</p>
-          <p>请您输入手机号码进入下步购物环节</p>
-        </div>
-      </div>
-      <div v-else-if="!isMP||(mode=='PWD')" class="nr">
-        <!-- 输入手机号码 -->
-        <div class="tel">
-          <i class="icon">&#xe60d;</i>
-          <input type="tel" placeholder="请输入手机号码" v-model="model.Account" />
-        </div>
-        <!-- 输入密码 -->
-        <div class="pwd">
-          <i class="icon">&#xe75c;</i>
-          <input type="password" placeholder="请输入密码" v-model="model.PassWord" />
-        </div>
-        <!-- 登录按钮 -->
-        <div class="btn" :class="{action:model.Account&&model.PassWord}" @click="login2">立即登录</div>
-        <!-- 底部提示文字 -->
-        <div class="fttext">
-          <p>欢迎使用U建行业市场,</p>
-          <p>请您登录后进入下步购物环节</p>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -178,6 +184,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.index{
+  input[type='submit']{
+    display: none;
+  }
+}
 .index .nr {
   margin-top: 1.5rem;
   /*input提示文字颜色*/
