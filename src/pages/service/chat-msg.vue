@@ -1,10 +1,3 @@
-<!--
- * @Author: your name
- * @Date: 2020-12-14 18:22:03
- * @LastEditors: your name
- * @LastEditTime: 2021-02-01 16:14:22
- * @Description: file content
--->
 <template>
     <span class="chatmsg" v-if="msgdata">
         <img :src="emojiPath+msgdata.data" v-if="msgdata.type=='emoji'">

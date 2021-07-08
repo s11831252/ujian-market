@@ -414,10 +414,10 @@ router.beforeEach((to, from, next) => {
     if (!to.matched.some(record => record.meta.noAuth)) {
         //这里判断用户是否登录，验证store中的token是否已登录
         if (!store.getters.Logined) { // 判断当前的token是否存在
-            // router.replace({
-            //     path: '/pages/index/index',
-            //     query: { redirect: to.fullPath }
-            // })
+            router.replace({
+                path: '/pages/index/index',
+                query: { redirect: to.fullPath }
+            })
         } else {
             next()
         }
