@@ -109,7 +109,7 @@ export default {
                     break;
                 }
                 case 1:{
-                    this.go({path:'/pages/store/storePage',query:{sId:this.ShoppingInfo.sId}})
+                    this.go({path:'/pages/store/storehome',query:{sId:this.ShoppingInfo.sId}})
                     break;
                 }
                 case 2:{

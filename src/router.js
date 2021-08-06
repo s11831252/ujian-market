@@ -217,8 +217,8 @@ var routes = [
         },
     },
     {
-        path:'pages/store/storePage',
-        name:'storePage',
+        path:'pages/store/storehome',
+        name:'storehome',
         config: {
             navigationBarTitleText: '商家中心',
             enablePullDownRefresh: false

@@ -7,24 +7,21 @@
         <div class="icon">&#xe6f1;</div>
         <div class="icon">&#xe60f;</div>
       </div>
-      <div class="two">
-        <img
-          src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2601702678,2203031457&fm=26&gp=0.jpg"
-          alt
-        />
+      <div class="two" v-if="ShoppingInfo">
+        <img :src="ShoppingInfo.sLogo" alt />
         <div class="information">
           <ul class="informationNr">
             <li>
-              <span>店铺的名称</span>
+              <span>{{ShoppingInfo.sName}}</span>
               <span class="icon">&#xe642;</span>
             </li>
             <li>
               <span>主营类目：</span>
-              <span>主材</span>
+              <span>{{ShoppingInfo.MainTypeName}}</span>
             </li>
             <li>
               <span>当前身份：</span>
-              <span class="jinru">超级管理员</span>
+              <span class="jinru">{{ShoppingInfo.Role==99?'店铺负责人':'店员'}}</span>
               <span>进入店铺</span>
               <span class="icon">&#xe629;</span>
             </li>
@@ -33,47 +30,47 @@
       </div>
     </div>
     <!-- 店铺数据 -->
-    <div class="data">
+    <div class="data" v-if="ShoppingInfo">
       <div class="chunk">
-        <span class="number" style="color: #ee6575;">748</span>
+        <span class="number" style="color: #ee6575">{{ShoppingInfo.Today_OrderAmount}}</span>
         <span class="unit">元</span>
         <p>今日成交</p>
       </div>
       <div class="chunk">
-        <span class="number" style="color: #72b0f7;">6</span>
+        <span class="number" style="color: #72b0f7">{{ShoppingInfo.Today_OrderVolume}}</span>
         <span class="unit">单</span>
         <p>成交单数</p>
       </div>
       <div class="chunk">
-        <span class="number" style="color: #63d3bd;">86</span>
+        <span class="number" style="color: #63d3bd">{{ShoppingInfo.Today_UserViewCount}}</span>
         <span class="unit">人</span>
         <p>今日访客</p>
       </div>
     </div>
     <!--数据评分 -->
     <div class="middle">
-      <div class="middleNr">
+      <div class="middleNr" v-if="CommentInfo">
         <div>
           <span class="dianpu">店铺综合评分:</span>
-          <span class="shuzi" style="color:#46b7ff;">4.5</span>
+          <span class="shuzi" style="color: #46b7ff">{{CommentInfo.TotalAvg}}</span>
         </div>
         <div>
           <span class="particulars">查看详情</span>
           <span class="particulars">&gt;</span>
         </div>
       </div>
-      <div class="quality">
+      <div class="quality" v-if="CommentInfo">
         <div class="grade">
           <span>质量 :</span>
-          <span style="color:#ff8533;">4.4</span>
+          <span style="color: #ff8533">{{CommentInfo.QualityAvg}}</span>
         </div>
         <div class="grade">
           <span>速度 ：</span>
-          <span style="color:#63c230;">4.8</span>
+          <span style="color: #63c230">{{CommentInfo.SpeedAvg}}</span>
         </div>
         <div class="grade">
           <span>服务 ：</span>
-          <span style="color:#f96268;">4.1</span>
+          <span style="color: #f96268">{{CommentInfo.ServiceAvg}}</span>
         </div>
       </div>
     </div>
@@ -81,47 +78,69 @@
     <div>
       <div class="window">
         <div class="windowNr">
-          <div class="icon" style="color: #f96268;background-color: #ffeef3;">&#xe675;</div>
+          <div class="icon" style="color: #f96268; background-color: #ffeef3">&#xe675;</div>
           <span>商品管理</span>
         </div>
         <div class="windowNr">
-          <div class="icon" style="color: #f96268;background-color: #ffeef3;">&#xe653;</div>
+          <div class="icon" style="color: #f96268; background-color: #ffeef3">&#xe653;</div>
           <span>订单管理</span>
         </div>
       </div>
-       <div class="window">
+      <div class="window">
         <div class="windowNr">
-          <div class="icon" style="color: #ffecdf;background-color:  #ff8533;">&#xe611;</div>
+          <div class="icon" style="color: #ffecdf; background-color: #ff8533">&#xe611;</div>
           <span>运营</span>
         </div>
         <div class="windowNr">
-          <div class="icon" style="color: #ffecdf;background-color:  #ff8533;">&#xe667;</div>
+          <div class="icon" style="color: #ffecdf; background-color: #ff8533">&#xe667;</div>
           <span>提现</span>
         </div>
       </div>
       <div class="window">
-        <div class="windowNr" @click="go({path:'/pages/store/service'})">
-          <div class="icon" style="color: #e3f4ff;background-color:#4cb8fd;">&#xe622;</div>
+        <div class="windowNr" @click="go({ path: '/pages/store/service' })">
+          <div class="icon" style="color: #e3f4ff; background-color: #4cb8fd">&#xe622;</div>
           <span>客服管理</span>
         </div>
         <div class="windowNr">
-          <div class="icon" style="color: #e3f4ff;background-color:#4cb8fd;">&#xe62f;</div>
+          <div class="icon" style="color: #e3f4ff; background-color: #4cb8fd">&#xe62f;</div>
           <span>物流管理</span>
         </div>
       </div>
-       <div class="window">
+      <div class="window">
         <div class="windowNr">
-          <div class="icon" style="color: #ddffca;background-color:#63c230;">&#xe669;</div>
+          <div class="icon" style="color: #ddffca; background-color: #63c230">&#xe669;</div>
           <span>数据统计</span>
         </div>
         <div class="windowNr">
-          <div class="icon" style="color: #ddffca;background-color:#63c230;">&#xe66f;</div>
+          <div class="icon" style="color: #ddffca; background-color: #63c230">&#xe66f;</div>
           <span>店铺管理</span>
         </div>
       </div>
     </div>
   </div>
 </template>
+<script>
+export default {
+  data(){
+    return {
+      ShoppingInfo:null,
+      CommentInfo:null
+    }
+  },
+  async mounted() {
+    var rep = await this.$ShoppingAPI.Shop_GetDetails({sId:this.$route.query.sId});
+
+    if (rep.ret == 0) {
+      this.ShoppingInfo = rep.data;
+      var rep2 = await this.$ShoppingAPI.OrderComment_GetList({sId:this.$route.query.sId,PageIndex:1,PageSize:1})
+      if(rep2.ret==0)
+      {
+        this.CommentInfo = rep2.data;
+      }
+    }
+  },
+};
+</script>
 <style scoped>
 .top {
   background-image: url("http://img.sccnn.com/bimg/337/31661.jpg");
@@ -264,7 +283,7 @@
   margin-right: 0.32rem;
 }
 .windowNr span {
-    font-size: 0.4rem;
-    color: #000000;
+  font-size: 0.4rem;
+  color: #000000;
 }
 </style>

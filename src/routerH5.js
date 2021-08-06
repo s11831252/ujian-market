@@ -27,7 +27,7 @@ import applyresult from './pages/my/applyresult'
 import applyresult_detail from './pages/my/applyresult_detail'
 import information from './pages/service/information'
 import consult from './pages/service/consult'
-import storePage from './pages/store/storePage'
+import storehome from './pages/store/storehome'
 import service from './pages/store/service'
 import dialogBox from './pages/store/dialogBox'
 import distribution from './pages/order/distribution'
@@ -324,14 +324,14 @@ var routes = [
         component: consult
     },
     {
-        path:'pages/store/storePage',
-        name:'storePage',
+        path:'pages/store/storehome',
+        name:'storehome',
         config: {
             navigationBarTitleText: '商家中心',
             enablePullDownRefresh: false
         },
-        alias: '/pages/store/storePage',
-        component: storePage
+        alias: '/pages/store/storehome',
+        component: storehome
     },
     {
         path:'pages/store/service',
