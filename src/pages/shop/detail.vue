@@ -23,7 +23,7 @@
                 <div class="goods-items-buy" v-if="goods_detail.gType==0">
                     <span>数量：</span>
                     <span v-for="(item,index) in goods_detail.Goods_Items" :key="index" >
-                      <buy :goods="item" :image="goods_detail.Images.Length>0?goods_detail.Images[0].Thumbnail_url:''" :sName="sName" v-if="index==selectItem_index" ></buy>
+                      <buy :goods="item" :image="goods_detail.Images.length>0?goods_detail.Images[0].Thumbnail_url:''" :sName="sName" v-if="index==selectItem_index" ></buy>
                     </span>
                 </div>
                 <div class="goods-items-show" v-if="HasItems">
@@ -120,8 +120,9 @@ export default {
   },
     onShareAppMessage(result) {
     let title = this.goods_detail.gName;
-    let path = `/pages/shop/detail?gId=${this.gId}&InvitaId=${this.UserInfo.UserId}`;
+    let path = `/pages/shop/detail?gId=${this.gId}&sId=${this.sId}&sName=${this.sName}&InvitaId=${this.UserInfo.UserId}`;
     let imageUrl = ''
+    console.log(path)
     return {
       title,
       path,

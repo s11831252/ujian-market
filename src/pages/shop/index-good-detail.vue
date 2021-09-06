@@ -6,7 +6,7 @@
     <div class="shop-detail-tab-goods-info">
       <p class="shop-detail-tab-goods-title">{{goodsInfo.gName}}</p>
       <p class="shop-detail-tab-goods-statistics">
-        <span>月售{{goodsInfo.Sales}}</span>
+        <span>月售{{goodsInfo.Month_Sales}}</span>
         <span>评论{{goodsInfo.CommentCount}}</span>
       </p>
       <div class="shop-detail-tab-goods-Price">

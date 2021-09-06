@@ -23,7 +23,7 @@
             <div class="orderinfo-item">商品金额
                 <span>￥{{getShoppingCarAmountBysId}}</span>
             </div>
-            <div class="orderinfo-item" @click="go({path:'/pages/order/distribution',query:{sId:sId}})">配送方式
+            <div class="orderinfo-item" @click="go({path:'/pages/order/distribution',query:{sId:sId,XQ:XQ}})">配送方式
                 <span v-if="!Logistics.Name" >请选择<span class="icon">&#xe601;</span></span>
                 <span v-else >{{Logistics.LogisticsId==1?Logistics.Name+"："+Logistics.DistributionMode.DistributionModeText:Logistics.Name}} <span class="icon">&#xe601;</span></span>
             </div>
@@ -115,6 +115,12 @@ export default {
       if (shopCar && shopCar.goods) return shopCar.goods;
       else return [];
     },
+    //漏点设备只显示尊享配送
+    XQ() {
+      var i = this.getShoppingCarGoods.find(item=>item.gId=="4db86c71-5d0f-4f2c-839b-e4e2e7bc79ae");
+      console.log(i!=null)
+      return i!=null;
+    },
     getShoppingCarAmountBysId() {
       return this.$store.getters.getShoppingCarAmountBysId(this.sId).toFixed(2);
     },
@@ -195,6 +201,9 @@ export default {
     padding: 5px 0;
     border-bottom: 1px solid #ecf0f1;
     line-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     span {
       float: right;
       line-height: 28px;

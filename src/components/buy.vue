@@ -102,6 +102,9 @@ export default {
         this.getShoppingCarNumberByItemId=n;
     }
   },
+  mounted(){
+    console.log("image",this.image)
+  }
 };
 </script>
 <style lang="scss" scoped>

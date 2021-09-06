@@ -82,7 +82,7 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState,mapActions} from "vuex";
 import utils from "@/utils/index.js";
 import chatItem from "@/pages/service/chat-item";
 import WebIM from "@/utils/hx/WebIM";
@@ -139,27 +139,37 @@ export default {
       if (!this.to) {
         this.toast(`群组信息获取失败,请重试`);
       } else {
-        let id = WebIM.conn.getUniqueId();
-        let msg = new WebIM.message(msgType.TEXT, id);
-        msg.set({
-          msg: this.msg,
-          from: WebIM.conn.context.userId,
-          to: this.to,
-          // roomType: true,
-          chatType: "groupchat",
-          success(id, serverMsgId) {
-            // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
-            console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`, msg);
-          },
-          fail(id, serverMsgId) {
-            console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
+        this.chcekSensitiveWords(this.msg).then(words=>{
+          console.log("checked:",words)
+          if(!words)
+          {
+            let id = WebIM.conn.getUniqueId();
+            let msg = new WebIM.message(msgType.TEXT, id);
+            msg.set({
+              msg: that.msg,
+              from: WebIM.conn.context.userId,
+              to: that.to,
+              // roomType: true,
+              chatType: "groupchat",
+              success(id, serverMsgId) {
+                // disp.fire('em.chat.sendSuccess', id, me.data.userMessage);
+                console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})成功为`, msg);
+              },
+              fail(id, serverMsgId) {
+                console.log(`发送消息(id=${id},serverMsgId=${serverMsgId})失败`);
+              }
+            });
+            msgStorage.saveMsg(msg, "txt");
+            that.msg = "";
+            that.chattype = "chat";
+            msg.setGroup("groupchat");
+            WebIM.conn.send(msg.body);
+          }else
+          {
+            that.modal({title:"发送失败",content:"内容包涵敏感词:"+`[${words.join("][")}]`,showCancel:false})
           }
-        });
-        msgStorage.saveMsg(msg, "txt");
-        that.msg = "";
-        that.chattype = "chat";
-        msg.setGroup("groupchat");
-        WebIM.conn.send(msg.body);
+        })
+
       }
     },
     /**
@@ -521,7 +531,8 @@ export default {
           WebIM.conn.send(msg.body);
         }
       });
-    }
+    },
+    ...mapActions(["chcekSensitiveWords"])
   },
   async mounted() {
     var that = this;

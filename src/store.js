@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
+import UJAPI from "./api/UJAPI"
+
 
 Vue.use(Vuex);
 export default new Vuex.Store({//store对象
@@ -261,6 +263,7 @@ export default new Vuex.Store({//store对象
           showBuy:true,
           //jssdk 调用config是否成功
         },
+        SensitiveWords:"",
         // wx_jssdk_config:{
         //   Enable:false,
         // },
@@ -268,6 +271,9 @@ export default new Vuex.Store({//store对象
       mutations:{
         setConfig(state,Config){
           state.Config=Config;
+        },
+        setSensitiveWords(state,data){
+          state.SensitiveWords=data;
         },
         // wx_jssdk_config_result(state,result){
         //   state.wx_jssdk_config.Enable=result;
@@ -278,7 +284,40 @@ export default new Vuex.Store({//store对象
           var rep = await WeixinOpenAPI.WXMP_Config();
           if(rep.ret==0)
             context.commit('setConfig',rep.data);
-        }
+        },
+        async GetSensitiveWords (context) {
+          var rep = await UJAPI.SensitiveWords_GetWords();
+          if(rep.ret==0)
+            context.commit('setSensitiveWords',rep.data);
+        },
+        async chcekSensitiveWords(context,str){
+          var words =[];
+          var result;
+          
+          if(!context.state.SensitiveWords)
+          {
+            await context.dispatch('GetSensitiveWords')
+          }
+            var patt1 = new RegExp(context.state.SensitiveWords,"gi");
+            while ((result = patt1.exec(str)) != null)  {
+              words.push(result[0]);
+            }
+            //todo Update SensitiveWords
+            var obj = {
+              "Url": "U建商城微信小程序",
+              "UserId": context.rootState.User.UserInfo.UserId,
+              "sensitiveWords": str,
+              "originalText": `[${words.join("][")}]`,
+            };
+            if(words.length>0)
+            {
+              UJAPI.SensitiveWords_SaveData(obj);
+              return words
+            }else
+            {
+              return null;
+            }
+        },
       }
     }
   }, plugins: [//vuex持久化

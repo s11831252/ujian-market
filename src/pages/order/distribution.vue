@@ -2,7 +2,7 @@
   <div>
     <div class="top-one">
       <span v-if="LogisticsMode&&LogisticsMode.length>0" :class="[LogisticsId==1||LogisticsId==2?'pitchOn':'']" @click="checktab(LogisticsMode[0].LogisticsId)">{{LogisticsMode[0].Name}}</span>
-      <span v-if="LogisticsMode&&LogisticsMode.length>1" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
+      <span v-if="LogisticsMode&&LogisticsMode.length>1&&XQ=='false'" :class="{pitchOn:LogisticsId==0}" @click="checktab(LogisticsMode[1].LogisticsId)">{{LogisticsMode[1].Name}}</span>
     </div>
     <div v-show="LogisticsId==1||LogisticsId==2">
       <div class="top-two" v-if="DistributionMode2.length>0">
@@ -36,7 +36,7 @@
         </div>
       </div>
       <!-- 计费配送 -->
-      <div class="top-three">
+      <div class="top-three" v-if="XQ=='false'" >
         <div class="charging" @click="checktab(1)">
           <!--选中  -->
           <img class="bb" v-if="LogisticsId==1" src="/static/img/check.png" alt>
@@ -204,6 +204,7 @@ export default {
       Freight: null,
       show: false,
       beforeSite: false,
+      XQ:"false",
       // 联系人信息
       contact: {
         Order_Address_Id: "",
@@ -438,7 +439,8 @@ export default {
     if (this.$route.query && this.$route.query.sId.length > 0) {
       // 接收店铺id参数
       this.sId = this.$route.query.sId;
-
+      this.XQ = this.$route.query.XQ;
+      console.log("XQ",this.XQ)
       // 物流参数接口
       var rep = await this.$ShoppingAPI.GetLogisticsMode({ sId: this.sId });
       this.LogisticsMode = rep.data;

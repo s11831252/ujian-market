@@ -86,7 +86,7 @@ function getGroupInfo(_groupids, count,index=0) {
 }
 export default {
   methods: {
-    ...mapActions(["GetConfig"])
+    ...mapActions(["GetConfig"]),
   },
   created() {
     //debugger

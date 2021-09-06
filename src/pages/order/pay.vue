@@ -2,16 +2,16 @@
   <div class="pay">
     <div class="pay-info">
       <div class="pay-info-title">交易金额</div>
-      <div class="pay-money">￥{{money}}</div>
+      <div class="pay-money">￥{{ money }}</div>
     </div>
     <ul class="pay-mode">
-      <li :class="{action:PayMode==0}" @click="PayMode=0">
+      <li :class="{ action: PayMode == 0 }" @click="PayMode = 0">
         <i class="icon icon-ye">&#xe62a;</i>余额支付
-        <i class="icon right" v-if="PayMode==0">&#xe633;</i>
+        <i class="icon right" v-if="PayMode == 0">&#xe633;</i>
       </li>
-      <li :class="{action:PayMode==1}" @click="PayMode=1">
+      <li :class="{ action: PayMode == 1 }" @click="PayMode = 1">
         <img class="wx" src="/static/img/wx.png" mode="aspectFit" />
-        <i class="icon right" v-if="PayMode==1">&#xe633;</i>
+        <i class="icon right" v-if="PayMode == 1">&#xe633;</i>
       </li>
       <!-- <li :class="{action:PayMode==2}" @click="selectPayMode(2)">
         <img class="zfb" src="/static/img/zhifubao.png" mode="aspectFit" />
@@ -20,9 +20,9 @@
     </ul>
     <div class="pay-confirm">
       <button class="btn-ok" @click="pay">确定支付</button>
-      <button class="btn-no" @click="$router.back();">稍后付款</button>
+      <button class="btn-no" @click="$router.back()">稍后付款</button>
     </div>
-    <vaildCodeBox :openModal="modalOpen" @close="modalOpen=false" v-if="OrderInfo" :price="money" :inputBefore="codeBefore" :inputComplete="codeComplete"></vaildCodeBox>
+    <vaildCodeBox :openModal="modalOpen" @close="modalOpen = false" v-if="OrderInfo" :price="money" :inputBefore="codeBefore" :inputComplete="codeComplete"></vaildCodeBox>
 
     <!-- <div class="modal pay-validCodeBox" v-if="modalOpen" @click="openModal">
       <div class="modal-container" @click.stop>
@@ -67,7 +67,7 @@ import vaildCodeBox from "../../components/validCodeBox";
 
 export default {
   components: {
-    vaildCodeBox
+    vaildCodeBox,
   },
   data() {
     return {
@@ -76,7 +76,7 @@ export default {
         PayAmount: 0.0,
         GoodsAmount: 0.0,
         DifferenceAmount: 0.0,
-        State: 0
+        State: 0,
       },
       PayMode: 0,
       OrderId: "",
@@ -85,13 +85,22 @@ export default {
   },
   methods: {
     async codeComplete(code) {
+      var that = this;
       var rep = await this.$ShoppingAPI.Order_Pay({
         OrderId: this.OrderId,
-        VerificationCode: code
+        VerificationCode: code,
       });
 
       if (rep.ret == 0) {
-        that.go({ path: "/pages/order/index", reLaunch: true });
+        //弹出提示框
+        that.modal({
+          title: "支付成功",
+          content: "您已支付成功,请稍后检查订单状态。",
+          showCancel: false,
+          confirm: () => {
+            that.go({ path: "/pages/order/index", reLaunch: true });
+          },
+        });
       }
     },
     // openModal() {
@@ -99,7 +108,7 @@ export default {
     //   this.code = "";
     // },
     async codeBefore() {
-      console.log("codeBefore")
+      console.log("codeBefore");
       var rep = await this.$ShoppingAPI.Order_ValidationCode();
       if (rep.ret == 0) {
         return true;
@@ -124,9 +133,9 @@ export default {
             content: "您还未使用微信登录，请登录后再使用微信支付",
             confirm: () => {
               wx.login({
-                success: obj => {
+                success: (obj) => {
                   if (obj.errMsg.indexOf("login:ok") > -1) {
-                    that.$ShoppingAPI.Account_wxLogin(obj.code).then(rep => {
+                    that.$ShoppingAPI.Account_wxLogin(obj.code).then((rep) => {
                       if (rep.ret == 0) {
                         // console.log(rep);
                         var _u = { ...this.UserInfo, ...rep.data.result };
@@ -134,10 +143,10 @@ export default {
                       }
                     });
                   }
-                }
+                },
               });
             },
-            confirmText: "微信登录"
+            confirmText: "微信登录",
           });
           return false;
         }
@@ -147,14 +156,14 @@ export default {
           Type: 1,
           UserId: this.UserInfo.UserId,
           appiId: "wx443ed32fe34ba2f0",
-          OpenId: this.UserInfo.openid
+          OpenId: this.UserInfo.openid,
         });
         if (rep.ret == 0) {
           var payData = JSON.parse(rep.data);
           var payData = {
             ...payData,
             async success(res) {
-              // console.log(res);
+              console.log(res);
               // that.$ShoppingAPI
               //   .Order_UpdatePayState({
               //     OrderId: that.OrderId,
@@ -167,51 +176,49 @@ export default {
               //   });
 
               //场景值scene=1037 则返回调用过来的商家小程序
-              let options = this.$mp.appOptions;
+              let options = that.$mp.appOptions;
               if (options && options.scene == 1037) {
                 wx.navigateBackMiniProgram({
                   extraData: {
                     OrderId: this.OrderId,
                     success: "true",
-                    msg: "支付成功"
+                    msg: "支付成功",
                   },
                   success(res2) {
                     // 返回成功
                     console.log(res2);
-                  }
+                  },
                 });
               } else {
                 //弹出提示框
                 that.modal({
                   title: "支付成功",
                   content: "您已支付成功,请稍后检查订单状态。",
+                  showCancel: false,
                   confirm: () => {
                     that.go({ path: "/pages/order/index", reLaunch: true });
                   },
-                  cancel: () => {
-                    that.go({ path: "/pages/order/index", reLaunch: true });
-                  }
                 });
               }
             },
-            fail: function(res) {
+            fail: function (res) {
               if (res.errMsg == "requestPayment:fail cancel") return;
               else that.toast(res.errMsg || res.err_desc || "支付失败");
-            }
+            },
           };
           // console.log(payData);
           wx.requestPayment(payData);
         }
       }
-    }
+    },
   },
   computed: {
     money() {
       return (this.OrderInfo.TotalAmount - this.OrderInfo.PayAmount).toFixed(2);
     },
     ...mapState({
-      UserInfo: state => state.User.UserInfo
-    })
+      UserInfo: (state) => state.User.UserInfo,
+    }),
   },
   async mounted() {
     this.extraDataHandler();
@@ -224,7 +231,7 @@ export default {
         }
       }
     });
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
