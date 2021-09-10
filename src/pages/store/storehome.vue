@@ -3,9 +3,9 @@
     <!-- 头部 -->
     <div class="top">
       <div class="tubiao">
-        <div class="icon">&#xe616;</div>
+        <!-- <div class="icon">&#xe616;</div>
         <div class="icon">&#xe6f1;</div>
-        <div class="icon">&#xe60f;</div>
+        <div class="icon">&#xe60f;</div> -->
       </div>
       <div class="two" v-if="ShoppingInfo">
         <img :src="ShoppingInfo.sLogo" alt />
@@ -88,15 +88,15 @@
       </div>
       <div class="window">
         <div class="windowNr">
-          <div class="icon" style="color: #ffecdf; background-color: #ff8533">&#xe611;</div>
+          <div class="icon" style="color: #ff8533; background-color: #ffecdf">&#xe611;</div>
           <span>运营</span>
         </div>
         <div class="windowNr">
-          <div class="icon" style="color: #ffecdf; background-color: #ff8533">&#xe667;</div>
-          <span>提现</span>
+          <div class="icon" style="color: #ff8533; background-color: #ffecdf">&#xe667;</div>
+          <span>结算</span>
         </div>
       </div>
-      <div class="window">
+      <!-- <div class="window">
         <div class="windowNr" @click="go({ path: '/pages/store/service' })">
           <div class="icon" style="color: #e3f4ff; background-color: #4cb8fd">&#xe622;</div>
           <span>客服管理</span>
@@ -105,14 +105,14 @@
           <div class="icon" style="color: #e3f4ff; background-color: #4cb8fd">&#xe62f;</div>
           <span>物流管理</span>
         </div>
-      </div>
+      </div> -->
       <div class="window">
         <div class="windowNr">
-          <div class="icon" style="color: #ddffca; background-color: #63c230">&#xe669;</div>
+          <div class="icon" style="color: #63c230; background-color: #ddffca">&#xe669;</div>
           <span>数据统计</span>
         </div>
         <div class="windowNr">
-          <div class="icon" style="color: #ddffca; background-color: #63c230">&#xe66f;</div>
+          <div class="icon" style="color: #63c230; background-color: #ddffca">&#xe66f;</div>
           <span>店铺管理</span>
         </div>
       </div>
