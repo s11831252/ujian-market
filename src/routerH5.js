@@ -28,6 +28,7 @@ import applyresult_detail from './pages/my/applyresult_detail'
 import information from './pages/service/information'
 import consult from './pages/service/consult'
 import storehome from './pages/store/storehome'
+import storemanage from './pages/store/manage'
 import service from './pages/store/service'
 import dialogBox from './pages/store/dialogBox'
 import distribution from './pages/order/distribution'
@@ -332,6 +333,16 @@ var routes = [
         },
         alias: '/pages/store/storehome',
         component: storehome
+    },
+    {
+        path:'pages/store/manage',
+        name:'storemanage',
+        config: {
+            navigationBarTitleText: '店铺管理',
+            enablePullDownRefresh: false
+        },
+        alias: '/pages/store/manage',
+        component: storemanage
     },
     {
         path:'pages/store/service',

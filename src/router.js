@@ -225,6 +225,14 @@ var routes = [
         },
     },
     {
+        path:'pages/store/manage',
+        name:'storemanage',
+        config: {
+            navigationBarTitleText: '店铺管理',
+            enablePullDownRefresh: false
+        },
+    },
+    {
         path:'pages/store/service',
         name:'service',
         config: {

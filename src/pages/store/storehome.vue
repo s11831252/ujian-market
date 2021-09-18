@@ -111,7 +111,7 @@
           <div class="icon" style="color: #63c230; background-color: #ddffca">&#xe669;</div>
           <span>数据统计</span>
         </div>
-        <div class="windowNr">
+        <div class="windowNr" @click="go({path:'/pages/store/manage',query:{sId:$route.query.sId}})">
           <div class="icon" style="color: #63c230; background-color: #ddffca">&#xe66f;</div>
           <span>店铺管理</span>
         </div>

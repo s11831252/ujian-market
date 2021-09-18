@@ -86,7 +86,7 @@ export default {
           parm: {
             PageIndex: 1,
             PageSize: 20,
-            OrderType: "",
+            OrderType: "DEFAULT",
             hasPage: true
           },
           checked: true
@@ -180,7 +180,10 @@ export default {
       var param = {
         PageIndex: tab.parm.PageIndex,
         PageSize: tab.parm.PageSize,
-        OrderType: tab.parm.OrderType
+        OrderType: tab.parm.OrderType,
+        Keyword: this.keyword,
+        isGood:false,
+        isDetail:false,
       };
       if (this.CurrentLocation && this.CurrentLocation.longitude && this.CurrentLocation.latitude) {
         (param.Lon = this.CurrentLocation.longitude), (param.Lat = this.CurrentLocation.latitude);
