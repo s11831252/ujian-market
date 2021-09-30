@@ -278,6 +278,31 @@ var routes = [
         config: {
             navigationBarTitleText: '关于U建行业市场',
         }
+    },
+    {
+        path:'pages/supply-demand/home',
+        name:'sd_home',
+        config: {
+            navigationBarTitleText: '供求大厅',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
+        path:'pages/supply-demand/release',
+        name:'sd_release',
+        config: {
+            navigationBarTitleText: '发布供求',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
+        path:'pages/supply-demand/release-form',
+        name:'sd_release_form',
+        config: {
+            navigationBarTitleText: '发布需求表单',
+            enablePullDownRefresh: false,
+        }
     }
+    
 ]
 module.exports =routes

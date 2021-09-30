@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-07-20 11:46:11
- * @LastEditTime: 2021-09-18 17:40:02
+ * @LastEditTime: 2021-09-23 11:55:49
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\store\manage.vue
@@ -57,7 +57,7 @@
             <i class="icon" style="color:#777777">&#xe601;</i>
         </li>
         <li>
-            <i class="icon" style="color: #72b0f7">&#xe654;</i>
+            <i class="icon" style="color: #72b0f7">&#xe64d;</i>
             <span class="title">店铺地址</span>
             <span class="value">{{ShoppingInfo.Address}}</span>
             <i class="icon" style="color:#777777">&#xe601;</i>

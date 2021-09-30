@@ -409,6 +409,8 @@ export default {
     // console.log("page index created", this);
   },
   onLoad(query) {
+      // this.sId = decodeURIComponent(query.scene);
+
     // scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
     if (query.scene) {
       // this.sId = decodeURIComponent(query.scene);
@@ -431,6 +433,8 @@ export default {
   mounted() {
     var that = this;
     that.marketGet();
+    console.log(that);
+    
     // wx.authorize({scope: "scope.userLocation"});
     if (this.isMP) {
       wx.getLocation({

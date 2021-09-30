@@ -2,7 +2,7 @@ import http_axios from '../utils/http/axios'
 import http_wx from '../utils/http/wxhttp'
 const http = mpvue_Mode === 'WX' ? http_wx : http_axios;
 
-let BaseHost =process.env.NODE_ENV == 'development'? "http://192.168.0.168:8065/":"https://money.ujianchina.net/"; 
+let BaseHost =process.env.NODE_ENV != 'development'? "http://192.168.0.168:8065/":"https://money.ujianchina.net/"; 
 
 export default {
     BaseHost,

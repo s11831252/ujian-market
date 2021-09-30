@@ -35,6 +35,9 @@ import distribution from './pages/order/distribution'
 import live from './pages/live/index'
 import liveroom from './pages/live/room'
 import about from './pages/my/about'
+import sd_home from './pages/supply-demand/home'
+import sd_release from './pages/supply-demand/release'
+
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -416,6 +419,27 @@ var routes = [
         meta: { noAuth: true },
         alias: '/pages/my/about',
         component: about
+    },
+    {
+        path:'pages/supply-demand/home',
+        name:'sd_home',
+        config: {
+            navigationBarTitleText: '供求大厅',
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/home',
+        component: sd_home
+    },
+    {
+        path:'pages/supply-demand/release',
+        name:'sd_release',
+        config: {
+            navigationBarTitleText: '发布供求',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/release',
+        component: sd_release
     }
 
 ]
