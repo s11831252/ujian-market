@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-09-30 18:46:17
+ * @LastEditTime: 2021-10-09 15:26:12
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -31,6 +31,41 @@
         </div>
       </div>
     </div>
+    <div class="group project">
+      <div class="info">
+        <i class="icon">&#xe66f;</i>
+        <span class="label">项目</span>
+        <input v-model="title" />
+        <i class="icon go">&#xe601;</i>
+      </div>
+      <ul class="item">
+        <li>
+          <i>·</i>
+          <span class="label">项目规模</span>
+          <span>9852.24㎡</span>
+        </li>
+        <li>
+          <i>·</i>
+          <span class="label">总投资</span>
+          <span>3258万</span>
+        </li>
+        <li>
+          <i>·</i>
+          <span class="label">计划工期</span>
+          <span>13个月</span>
+        </li>
+        <li>
+          <i>·</i>
+          <span class="label">建设单位</span>
+          <span>广西建工</span>
+        </li>
+        <li>
+          <i>·</i>
+          <span class="label">设计单位</span>
+          <span>南都设计院</span>
+        </li>
+      </ul>
+    </div>
     <div class="group">
       <i class="icon">&#xe66f;</i>
       <span class="label">公司</span>
@@ -38,19 +73,19 @@
       <i class="icon go">&#xe601;</i>
     </div>
     <div class="group">
-      <i class="icon">&#xe66f;</i>
+      <i class="icon">&#xe64d;</i>
       <span class="label">地址</span>
       <input v-model="title" />
       <i class="icon go">&#xe601;</i>
     </div>
     <div class="group">
-      <i class="icon">&#xe66f;</i>
+      <i class="icon">&#xe66a;</i>
       <span class="label">姓名</span>
       <input v-model="title" />
       <i class="icon go">&#xe601;</i>
     </div>
     <div class="group">
-      <i class="icon">&#xe66f;</i>
+      <i class="icon">&#xe60a;</i>
       <span class="label">联系方式</span>
       <input v-model="title" />
       <i class="icon go">&#xe601;</i>
@@ -88,7 +123,7 @@ export default {
           {
             extId: 1,
             extTitle: "图片1",
-            extContent: "/static/img/homeshare.jpg",
+            extContent: `/static/img/homeshare.jpg`,
             extOrder: 0,
             extType: 1,
             extPublic: true,
@@ -130,6 +165,7 @@ export default {
     color: #333333;
     input {
       font-size: 0.48rem;
+      width: 5.18rem;
     }
     ::-webkit-input-placeholder {
       /* Edge */
@@ -180,7 +216,8 @@ export default {
         }
       }
     }
-    &.icon {
+
+    &>.icon, &.project> .info .icon {
       color: #fff;
       background-color: #bfbfbf;
       border-radius: 50%;
@@ -190,7 +227,12 @@ export default {
       font-size: 0.3rem;
       text-align: center;
     }
-    &.icon.go {
+    
+    >.label,&.project> .info .label{
+      margin-left: 0.2rem;
+      width: 4.08rem;
+    }
+    &>.icon.go, &.project> .info .icon.go {
       background-color: transparent;
       color: #e6e6e6;
       font-size: 0.7rem;
@@ -207,7 +249,7 @@ export default {
         align-items: center;
         justify-content: center;
         background-color: #f4f5f9;
-	    border-radius: 0.32rem;
+	      border-radius: 0.32rem;
         text-align: center;
         width: 2.4rem;
         height: 0.64rem;
@@ -225,6 +267,45 @@ export default {
       }
 
     }
+  }
+  .group.project{
+      display: block;
+      border-bottom: 0;
+      padding-bottom: 0;
+      > .info{
+        display: flex;
+        align-items: center;
+
+      }
+      > .item{
+        li{
+          display: flex;
+          align-items: center;
+          padding:0.58rem 0;
+          border-bottom: 0.02rem solid #ebebeb;
+          font-size: 0.4rem;
+          i{
+            margin-left: 0.58rem;
+            color: #8c8c8c;
+            font-size: 0.6rem;
+          }
+          span{
+            flex-grow:2;
+            text-align: right;
+            color: #333333;
+            margin-right: 0.86rem;
+          }
+          span.label{
+            margin-left: 0.26rem;
+            margin-right:0;
+            text-align: left;
+            flex-grow:0;
+            color: #8c8c8c;
+          }
+
+        }
+
+      }
   }
 }
 </style>
