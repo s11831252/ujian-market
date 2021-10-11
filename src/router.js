@@ -302,6 +302,14 @@ var routes = [
             navigationBarTitleText: '发布需求表单',
             enablePullDownRefresh: false,
         }
+    },
+    {
+        path:'pages/supply-demand/select',
+        name:'sd_select',
+        config: {
+            navigationBarTitleText: '选取项目',
+            enablePullDownRefresh: false,
+        }
     }
     
 ]

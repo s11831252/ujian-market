@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-10-09 15:26:12
+ * @LastEditTime: 2021-10-11 18:13:52
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -32,7 +32,7 @@
       </div>
     </div>
     <div class="group project">
-      <div class="info">
+      <div class="info" @click="go({path:'/pages/supply-demand/select',query:{type:'project'}})">
         <i class="icon">&#xe66f;</i>
         <span class="label">项目</span>
         <input v-model="title" />
