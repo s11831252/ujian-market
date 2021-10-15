@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-24 14:10:37
- * @LastEditTime: 2021-09-27 17:01:44
+ * @LastEditTime: 2021-10-13 15:44:29
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release.vue
@@ -21,7 +21,7 @@
         <span>我要供应</span>
       </div>
     </div>
-    <div class="block buy">
+    <div class="block buy" @click="go({path:'/pages/supply-demand/buy'})">
       <span class="label">购买服务</span>
       <span class="remarks">发布成功每条将消耗一个点数<i class="icon">&#xe638;</i></span>
     </div>

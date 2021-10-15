@@ -50,6 +50,7 @@ export default {
         margin-top: 0.56rem;
         .item{
             padding: 0.61rem;
+            color: #333333;
             border-bottom: 0.02rem solid  #ebebeb;
         }
     }

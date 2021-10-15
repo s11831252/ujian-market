@@ -310,6 +310,22 @@ var routes = [
             navigationBarTitleText: '选取项目',
             enablePullDownRefresh: false,
         }
+    },
+    {
+        path:'pages/supply-demand/buy',
+        name:'sd_buy',
+        config: {
+            navigationBarTitleText: '购买服务',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
+        path:'pages/supply-demand/discount-code',
+        name:'sd_discount',
+        config: {
+            navigationBarTitleText: '优惠码',
+            enablePullDownRefresh: false,
+        }
     }
     
 ]
