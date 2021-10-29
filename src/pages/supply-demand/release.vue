@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-24 14:10:37
- * @LastEditTime: 2021-10-13 15:44:29
+ * @LastEditTime: 2021-10-20 11:47:42
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release.vue
@@ -16,9 +16,11 @@
     <div class="block action">
       <div class="btn blue" @click="demandBox_open=true">
         <span>我有需求</span>
+        <img src="../../../static/img/release_img1.png">
       </div>
       <div class="btn green" @click="supplyBox_open = true">
         <span>我要供应</span>
+        <img src="../../../static/img/release_img2.png">
       </div>
     </div>
     <div class="block buy" @click="go({path:'/pages/supply-demand/buy'})">
@@ -105,12 +107,24 @@ export default {
     justify-content: space-between;
     .btn {
       line-height: 1.7rem;
-      text-align: center;
+      text-align: left;
       width: 4.76rem;
       height: 1.7rem;
       border-radius: 0.3rem;
       color: #fff;
       font-size: 0.44rem;
+      position: relative;
+      overflow: hidden;
+      span{
+        margin-left: 0.44rem;
+      }
+      img{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 1.51rem;
+        height: 1.32rem;
+      }
     }
     .btn.blue {
       background-color: #0166ff;

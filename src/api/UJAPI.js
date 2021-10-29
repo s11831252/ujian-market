@@ -19,7 +19,7 @@ export default {
     GetKeyword:param=>{
         return http.get(BaseHost+ "api/CommonInfo/GetKeyword",param) 
     },
-     Error_upload:param=>{
+    Error_upload:param=>{
         return http.post(BaseHost+ "api/Error/upload",param) 
     },
     BusinessCard_GetJSapi_ticket:(url,timespan,noncestr)=>{
@@ -30,6 +30,12 @@ export default {
     },
     SensitiveWords_SaveData:param=>{
         return http.post(BaseHost+ "api/SensitiveWords/SaveData",param) 
+    },
+    Enterprise_Get:param=>{
+        return http.get(BaseHost+ "api/Enterprise/Get") 
+    },
+    Project_GetList:param=>{
+        return http.get(BaseHost+ "api/Project/GetList",param) 
     },
     
     

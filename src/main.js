@@ -8,6 +8,7 @@ import WeixinOpenAPI from "./api/WeixinOpenAPI"
 import API2 from "./api/API2"
 import HXAPI from "./api/HXAPI"
 import MoneyAPI from "./api/MoneyAPI"
+import AssembleAPI from "./api/AssembleAPI"
 
 import { debug } from 'util';
 import WebIM from "@/utils/hx/WebIM";
@@ -22,6 +23,7 @@ Vue.prototype.$WeixinOpenAPI = WeixinOpenAPI;
 Vue.prototype.$API2 = API2;
 Vue.prototype.$HXAPI = HXAPI;
 Vue.prototype.$MoneyAPI = MoneyAPI;
+Vue.prototype.$AssembleAPI = AssembleAPI;
 
 Vue.prototype.$store = store;
 Vue.mixin({
@@ -238,7 +240,38 @@ Vue.mixin({
                 disp.fire('onOpening');
                 console.log("环信Login Account or Password",hx_username, hx_psw);
             }
-        }
+        },
+        // 微信小程序获取本地照片上传
+        AddImage(callback,opt) {
+            var that = this;
+
+            var {count=1,sizeType=["original", "compressed"],sourceType=["album", "camera"]} = opt||{};
+            console.log(count)
+            if(count<=0)
+            {
+                this.toast("图片已达上限")
+                return;
+            }
+            wx.chooseImage({
+                count, //照片数量
+                sizeType,
+                sourceType,
+                //接口调用成功的回调函数
+                success(res) {
+                    // 每次向图片里增加一张图片用push    
+                    // var dataURIScheme = res.tempFilePaths[0];
+                    for (let index = 0; index < res.tempFilePaths.length&&index<count; index++) {
+                        const dataURIScheme = res.tempFilePaths[index];
+                        let FileSystemManager = wx.getFileSystemManager();
+                        var filebase64 = FileSystemManager.readFileSync(
+                            res.tempFilePaths[0],
+                            "base64"
+                        );
+                        callback(filebase64, dataURIScheme)
+                    }
+                },
+            });
+        },
     },
     //两个方法都可以解决mpvue 同页面不重置data中的数据问题
     onLoad() {

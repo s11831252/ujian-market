@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-10-13 10:28:51
- * @LastEditTime: 2021-10-15 16:00:07
+ * @LastEditTime: 2021-10-19 18:19:11
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\buy.vue
@@ -10,26 +10,35 @@
     <div class="root">
         <div class="top"><i class="icon">&#xe651;</i><span>当前剩余个人发布点 35 </span><span> 企业发布点 40</span></div>
         <div class="tab-select">
-            <div class="item action">企业发布点</div>
-            <div class="item">个人发布点</div>
+            <div class="item action">企业发布点
+                <img src="../../../static/img/buy_tab1.png">
+            </div>
+            <div class="item">
+                个人发布点
+                <img src="../../../static/img/buy_tab2.png">
+            </div>
         </div>
         <img class="fenjie" src="../../../static/img/fenjie.png">
         <div class="grade-list">
             <div class="item" :class="{action:GradePrice==300}" @click="selectGrade(300)">
                 <div class="price"><i>￥</i><span>300</span></div>
                 <div class="tip">4点企业发布点</div>
+                <div class="label">享受0折特惠</div>
             </div>
             <div class="item" :class="{action:GradePrice==600}" @click="selectGrade(600)">
                 <div class="price"><i>￥</i><span>600</span></div>
                 <div class="tip">10点企业发布点</div>
+                <div class="label">享受0折特惠</div>
             </div>
             <div class="item" :class="{action:GradePrice==1200}" @click="selectGrade(1200)">
                 <div class="price"><i>￥</i><span>1200</span></div>
                 <div class="tip">20点企业发布点</div>
+                <div class="label">享受0折特惠</div>
             </div>
             <div class="item" :class="{action:GradePrice==2800}" @click="selectGrade(2800)">
                 <div class="price"><i>￥</i><span>2800</span></div>
                 <div class="tip">50点企业发布点</div>
+                <div class="label">享受0折特惠</div>
             </div>
         </div>
         <div class="getcode" @click="go({path:'/pages/supply-demand/discount-code'})"><span>获取推荐码</span><i class="icon">&#xe638;</i></div>
@@ -43,7 +52,6 @@
             </div>
         </div>
         <div class="break"></div>
-        
         <div class="bottom">
             <div class="total">
                 <p class="price">
@@ -52,11 +60,26 @@
                 </p>
                 <p class="tip">购买50点企业发布点</p>
             </div>
-            <div class="detai">
+            <div class="detail" :class="{ open: openDetail }" @click="openDetail=true">
                 <span>明细</span>
                 <i class="icon">&#xe712;</i>
             </div>
-            <button>确认支付</button>
+            <button @click="go({path:'/pages/supply-demand/pay-ok'})">确认支付</button>
+        </div>
+        <div class="detail-box" :class="{ open: openDetail }">
+            <div class="mask" ></div>
+            <div class="wrapper" @click="openDetail = false">
+                <div class="wrapper_body" @click.stop>
+                    <div class="box-top"><span>支付明细</span><i class="icon" @click="openDetail = false">&#xe613;</i></div>
+                    <div class="box-bottom">
+                        <div class="title">套餐明细</div>
+                        <div class="detail-info">
+                            <span class="name">50点企业发布点</span>
+                            <span class="price"><small>￥2800</small>￥0.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -64,7 +87,8 @@
 export default {
     data(){
         return {
-            GradePrice:0
+            GradePrice:0,
+            openDetail:false
         }
     },
     methods:{
@@ -96,13 +120,24 @@ export default {
         align-items: center;
         justify-content:space-around;
         margin-bottom: 0.58rem;
+        color: #75430e;
+        font-size: 0.48rem;
         .item{
+            position: relative;
             width: 4.64rem;
             height: 1.6rem;
             line-height: 1.6rem;
             text-align: center;
             border-radius: 0.3rem;
 	        border: solid 0.03rem #dbdad8;
+            img{
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 1.57rem;
+                height: 0.92rem;
+                opacity: 0.25;
+            }
         }
         .item.action{
             background-image: linear-gradient(-25deg, 
@@ -126,6 +161,7 @@ export default {
         .item{
             width: 4.22rem;
             height: 2.51rem;
+            position: relative;
             display: flex;
             align-items: center;
             align-content:center;
@@ -158,6 +194,23 @@ export default {
                 color: #666666;
                 font-size: 0.32rem;
             }
+            .label{
+                display: none;
+                position: absolute;
+                left: 0;
+                top:-0.24rem;
+                width: 2.75rem;
+                height: 0.7rem;
+                font-size: 0.38rem;
+                text-align: center;
+                line-height: 0.7rem;
+                color: #fff;
+                background-image: linear-gradient(65deg, 
+                    #f84a4c 0%, 
+                    #fe663f 54%, 
+                    #fe2724 100%);
+                border-radius: 0.3rem 0rem 0.3rem 0rem;
+            }
         }
         .item.action{
             width: 4.16rem;
@@ -165,6 +218,9 @@ export default {
             background-color: #fff9ef;
             border-color: rgba(197, 131, 45, 0.2);
             border-width: 0.06rem;
+            .label{
+                display: block;
+            }
         }
     }
     .break{
@@ -265,13 +321,22 @@ export default {
                 color: #989898;
             }
         }
-        .detai{
+        .detail{
             display: flex;
             align-items: center;
             width: 1.64rem;
             font-size: 0.42rem;
             color: #bf822f;
             padding-bottom: 0.3rem;
+            i{
+                transition: transform 300ms ease-out;
+                transform:rotate(0deg);
+            }
+        }
+        .detail.open{
+           i.icon{
+               transform:rotate(180deg);
+           }  
         }
         button{
             width: 3.67rem;
@@ -285,5 +350,97 @@ export default {
             color: #ecc187;
         }
     }
+  .detail-box{
+    .mask {
+      position: fixed;
+      z-index: 10;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      opacity: 0;
+      transform: scale3d(1, 1, 0);
+      transition: all 0.3s ease-in;
+    }
+    .wrapper {
+      position: fixed;
+      z-index: 10;
+      top:0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      text-align: center;
+      font-size: 0;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      align-items: flex-end;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      transform: translateY(100%);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 700ms ease-out, transform 300ms ease-out, visibility 700ms ease-out;
+      .wrapper_body {
+        width: 100%;
+        background-color: #fff;
+        .box-top{
+            font-size: 0.48rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding:0.48rem;
+            border-bottom:0.02rem solid #dbdad8
+        }
+        .box-bottom{
+            font-size: 0.48rem;
+            padding:0.48rem;
+            padding-bottom: 1.6rem;
+            .title{
+                text-align: left;
+                font-size: 0.48rem;
+                font-weight: 500;
+                margin-bottom: 0.4rem;
+            }
+            .detail-info{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                .name{
+                    font-size: 0.4rem;
+                }
+                .price{
+                    font-size: 0.38rem;
+                    color: #999;
+                    display: flex;
+                    align-items: center;
+                    small{
+                        color: #dbdad8;
+                        font-size: 0.35rem;
+                        text-decoration: line-through
+                    }
+                }
+
+            }
+        }
+      }
+    }
+  }
+  .detail-box.open {
+    .mask {
+      display: block;
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+    .wrapper {
+      transform: none;
+      visibility: visible;
+      opacity: 1;
+    }
+  }
 }
 </style>

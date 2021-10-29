@@ -319,6 +319,24 @@ export default new Vuex.Store({//store对象
             }
         },
       }
+    },
+    SupplyDemand:{
+      state:{
+        selectProject:null,
+        selectCorp:null,
+        selectShop:null,
+      },
+      mutations:{
+        setSelectProject(state,item){
+          state.selectProject=item;
+        },
+        setSelectCorp(state,item){
+          state.selectCorp=item;
+        },
+        setSelectShop(state,item){
+          state.selectShop=item;
+        },
+      }
     }
   }, plugins: [//vuex持久化
     mpvue_Mode === 'WX' ? createPersistedState({

@@ -326,6 +326,14 @@ var routes = [
             navigationBarTitleText: '优惠码',
             enablePullDownRefresh: false,
         }
+    },
+    {
+        path:'pages/supply-demand/pay-ok',
+        name:'sd_payok',
+        config: {
+            navigationBarTitleText: '支付成功',
+            enablePullDownRefresh: false,
+        }
     }
     
 ]

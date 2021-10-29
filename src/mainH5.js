@@ -7,6 +7,8 @@ import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
 import API2 from "./api/API2"
 import HXAPI from "./api/HXAPI"
+import MoneyAPI from "./api/MoneyAPI"
+import AssembleAPI from "./api/AssembleAPI"
 
 import fts from './utils/autorem'
 import Toast from './components/Toast';
@@ -33,6 +35,8 @@ Vue.prototype.$ShoppingAPI = ShoppingAPI;
 Vue.prototype.$WeiXinOpenAPI = WeixinOpenAPI; 
 Vue.prototype.$API2=API2;
 Vue.prototype.$HXAPI=HXAPI;
+Vue.prototype.$MoneyAPI = MoneyAPI;
+Vue.prototype.$AssembleAPI = AssembleAPI;
 
 Vue.mixin({
   components: {
@@ -94,6 +98,32 @@ Vue.mixin({
       },
       extraDataHandler(){
 
+      },
+      //Web获取本地照片上传,使用时请将该方法绑定到input type=file 控件上
+      AddImage(e,callback) {
+        let that = this;
+        // //e.target指本身 ,e.dataTransfer.files拖拽上传图片
+        var files = e.target.files || e.dataTransfer.files;
+
+        if (!files.length) return; //if(!false) return 条件成立的时候返回
+        // 使用HTML5的FileReader接口，即可完全在页面里读取文件了
+        // FileReader专门用于读取文件 判断你的浏览器是否支持FileReader接口
+        if (typeof FileReader === "undefined") {
+          alert("您的浏览器不支持图片上传，请升级您的浏览器");
+          return false;
+        }
+        var reader = new FileReader();
+        for (var i = 0; i < files.length; i++) {
+          // FileReader接口中的readAsDataURL()方法可以获取API异步读取的文件数据，另存为数据URL;
+          //将该URL绑定到img标签的src属性上，就可以实现图片的上传预览效果了
+          reader.onload = function(e) {
+            var dataURIScheme = e.target.result
+            var strarr = e.target.result.split(",");
+            var filebase64 = strarr[1];//切割Data URI scheme。获得的图片文件的base64字符串用于上传
+            callback(filebase64,dataURIScheme)
+          };
+          reader.readAsDataURL(files[i]);
+        }
       },
       //全局wx登录函数,vue生命周期执行时,对于需要登录票据才可进行访问请求的异步操作可以放置到获取登录之后执行
       async wx_login(callback) {
