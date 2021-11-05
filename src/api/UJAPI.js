@@ -37,6 +37,11 @@ export default {
     Project_GetList:param=>{
         return http.get(BaseHost+ "api/Project/GetList",param) 
     },
-    
+    Project_GetDetailed:ProjectId=>{
+        return http.get(BaseHost+ `api/Project/GetDetailed?Projectid=${ProjectId}`) 
+    },
+    Enterprise_GetDetailed:eId=>{
+        return http.get(BaseHost+ `api/Enterprise/GetDetailed?eId=${eId}`) 
+    },
     
 }

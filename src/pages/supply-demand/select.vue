@@ -9,7 +9,7 @@
             <li class="item" @click="doubleTap($event,item)" @touchstart="touchStart" @touchend="touchEnd" v-for="(item,index) in projectListFilter" :key="index">{{item.ProjectName}}</li>
         </ul>
         <ul class="list" v-else-if="$route.query.type=='corp'">
-            <li class="item" v-for="(item,index) in corpListFilter" :key="index">{{item.eName}}</li>
+            <li class="item" @click="doubleTap($event,item)" @touchstart="touchStart" @touchend="touchEnd" v-for="(item,index) in corpListFilter" :key="index">{{item.eName}}</li>
         </ul>
         
     </div>
@@ -34,16 +34,16 @@ export default {
         ...mapMutations(["setSelectProject","setSelectCorp","setSelectShop"]),
         /// 按钮触摸开始触发的事件
         touchStart: function(e) {
-            console.log(e)
+            // console.log(e)
             this.touchStartTime = e.timeStamp
         },
 
         /// 按钮触摸结束触发的事件
         touchEnd: function(e) {
-            console.log(e)
+            // console.log(e)
             this.touchEndTime = e.timeStamp
         },
-        doubleTap(e,item){
+        async doubleTap(e,item){
             var that = this
             // 控制点击事件在350ms内触发，加这层判断是为了防止长按时会触发点击事件
             if (that.touchEndTime - that.touchStartTime < 350) {
@@ -55,18 +55,23 @@ export default {
 
                 // 如果两次点击时间在300毫秒内，则认为是双击事件
                 if (currentTime - lastTapTime < 300) {
-                    console.log("double tap")
                     if(that.$route.query.type=="project")
                     {
-                        that.setSelectProject(item)
-                        that.setSelectCorp(null);
-
+                        var rep = await this.$UJAPI.Project_GetDetailed(item.ProjectId)
+                        if(rep.ret==0&&rep.data){
+                            that.setSelectProject(rep.data)
+                            that.setSelectCorp(null);
+                            that.$router.back();
+                        }
                     }else if(this.$route.query.type=="corp")
                     {
-                        that.setSelectCorp(item);
-                        that.setSelectProject(null)
+                         var rep = await this.$UJAPI.Enterprise_GetDetailed(item.eId)
+                        if(rep.ret==0&&rep.data){
+                            that.setSelectCorp(rep.data);
+                            that.setSelectProject(null)
+                            that.$router.back();
+                        }
                     }
-                    that.$router.back();
                 }
             }
         }
@@ -86,14 +91,14 @@ export default {
         }
     },
     async mounted(){
-        console.log(this.$route.query.type)
+        // console.log(this.$route.query.type)
         if(this.$route.query.type=="project")
         {
            var rep = await this.$UJAPI.Project_GetList({OrderType:"last",PageIndex:1,PageSize:9999});
            if(rep.ret==0)
            {
                this.projectList=rep.data;
-                console.log(this.projectList)
+                // console.log(this.projectList)
            }
         }else if(this.$route.query.type=="corp")
         {
@@ -101,7 +106,7 @@ export default {
            if(rep.ret==0)
            {
                this.corpList=rep.data;
-                console.log(this.corpList)
+                // console.log(this.corpList)
            }
         }
     }

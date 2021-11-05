@@ -9,6 +9,7 @@ import API2 from "./api/API2"
 import HXAPI from "./api/HXAPI"
 import MoneyAPI from "./api/MoneyAPI"
 import AssembleAPI from "./api/AssembleAPI"
+import SupplyAndDemandAPI from "./api/SupplyAndDemandAPI"
 
 import { debug } from 'util';
 import WebIM from "@/utils/hx/WebIM";
@@ -24,6 +25,7 @@ Vue.prototype.$API2 = API2;
 Vue.prototype.$HXAPI = HXAPI;
 Vue.prototype.$MoneyAPI = MoneyAPI;
 Vue.prototype.$AssembleAPI = AssembleAPI;
+Vue.prototype.$SupplyAndDemandAPI = SupplyAndDemandAPI;
 
 Vue.prototype.$store = store;
 Vue.mixin({

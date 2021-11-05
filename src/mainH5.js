@@ -9,6 +9,7 @@ import API2 from "./api/API2"
 import HXAPI from "./api/HXAPI"
 import MoneyAPI from "./api/MoneyAPI"
 import AssembleAPI from "./api/AssembleAPI"
+import SupplyAndDemandAPI from "./api/SupplyAndDemandAPI"
 
 import fts from './utils/autorem'
 import Toast from './components/Toast';
@@ -20,7 +21,6 @@ import VueAwesomeSwiper from 'vue-awesome-swiper'
 import WebIM from "@/utils/hx/WebIM";
 import md5 from "@/utils/md5";
 import disp from "./utils/hx/broadcast";
-
 let { swiper, swiperSlide } = VueAwesomeSwiper
 
 import "swiper/dist/css/swiper.css";
@@ -37,6 +37,7 @@ Vue.prototype.$API2=API2;
 Vue.prototype.$HXAPI=HXAPI;
 Vue.prototype.$MoneyAPI = MoneyAPI;
 Vue.prototype.$AssembleAPI = AssembleAPI;
+Vue.prototype.$SupplyAndDemandAPI = SupplyAndDemandAPI;
 
 Vue.mixin({
   components: {
