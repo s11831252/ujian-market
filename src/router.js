@@ -334,6 +334,14 @@ var routes = [
             navigationBarTitleText: '支付成功',
             enablePullDownRefresh: false,
         }
+    },
+    {
+        path:'pages/supply-demand/post',
+        name:'sd_post',
+        config: {
+            navigationBarTitleText: '发布',
+            enablePullDownRefresh: false,
+        }
     }
     
 ]

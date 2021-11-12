@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-11-05 19:21:55
+ * @LastEditTime: 2021-11-12 18:32:26
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -29,7 +29,7 @@
           <p><i>·</i>供应产品的外观、尺寸、型号等</p>
           <p><i>·</i>预算、到货时间、运输方式、区域限定等</p>
         </div>
-        <textarea class="content" placeholder="请在此填写详细介绍资料"></textarea>
+        <textarea class="content" v-model="supplyModel.info.content" placeholder="请在此填写详细介绍资料"></textarea>
         <div class="imgList">
           <div class="item" v-for="(item, index) in imageList" :key="index">
             <img :src="item.extContent" />
@@ -206,7 +206,7 @@ export default {
       if (!this.supplyModel.ext || this.supplyModel.ext.length == 0) return [];
 
       return this.supplyModel.ext.filter((item) => {
-        return (item.extType = 1);
+        return (item.extType == 1);
       });
     },
   },
@@ -235,25 +235,32 @@ export default {
         console.log(this.addImage);
       }
     },
-    async post(){
-      this.supplyModel.ext.push(this.name);
-      this.supplyModel.ext.push(this.address);
-      this.supplyModel.ext.push(this.contact);
-      this.supplyModel.ext.contact(this.addImage);
-      if(this.supplyModel.info.listType==2)
-      {
-        this.supplyModel.ext.push(this.ptext1);
-        this.supplyModel.ext.push(this.ptext2);
-        this.supplyModel.ext.push(this.ptext3);
-        this.supplyModel.ext.push(this.ptext4);
-        this.supplyModel.ext.push(this.ptext5);
-      }
-      
-     var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(this.supplyModel)
-      if(rep.ret==0)
-      {
-        
-      }
+    post(){
+      this.$router.push({path:"/pages/supply-demand/post"})
+      // var postData= {
+      //   info:this.supplyModel.info,
+      //   ext:[]
+      // };
+      // postData.ext.push(this.name);
+      // postData.ext.push(this.address);
+      // postData.ext.push(this.contact);
+      // postData.ext = postData.ext.concat(this.imageList);
+      // postData.ext = postData.ext.concat(this.addImage);
+      // if(postData.info.listType==2)
+      // {
+      //   postData.ext.push(this.ptext1);
+      //   postData.ext.push(this.ptext2);
+      //   postData.ext.push(this.ptext3);
+      //   postData.ext.push(this.ptext4);
+      //   postData.ext.push(this.ptext5);
+      // }
+      // console.log(postData)
+
+      // var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData)
+      // if(rep.ret==0)
+      // {
+      //   this.toast("发布成功");
+      // }
     }
   },
   onShow(){
@@ -262,7 +269,7 @@ export default {
       this.name.extContent = this.userInfo.UserName;
       this.supplyModel.info.bindId = this.userInfo.UserId;
       this.address.extContent = (this.selectProject && this.selectProject.Address) || (this.selectCorp && this.selectCorp.Address)
-      this.supplyModel.info.cityCode=(this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.AreaId)
+      this.supplyModel.info.cityCode=(this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.Area)
       this.supplyModel.info.gps_lng=(this.selectProject && this.selectProject.Longitude) || (this.selectCorp && this.selectCorp.Longitude) 
       this.supplyModel.info.gps_lat=(this.selectProject && this.selectProject.Latitude) || (this.selectCorp && this.selectCorp.Latitude)
   },

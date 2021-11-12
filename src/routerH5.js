@@ -37,7 +37,7 @@ import liveroom from './pages/live/room'
 import about from './pages/my/about'
 import sd_home from './pages/supply-demand/home'
 import sd_release from './pages/supply-demand/release'
-
+import sd_post from './pages/supply-demand/post'
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -440,6 +440,17 @@ var routes = [
         meta: { noAuth: true },
         alias: '/pages/supply-demand/release',
         component: sd_release
+    },
+    {
+        path:'pages/supply-demand/post',
+        name:'sd_post',
+        config: {
+            navigationBarTitleText: '发布',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/post',
+        component: sd_post
     }
 
 ]
