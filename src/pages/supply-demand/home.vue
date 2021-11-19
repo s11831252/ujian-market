@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-18 18:20:32
- * @LastEditTime: 2021-10-13 12:09:06
+ * @LastEditTime: 2021-11-17 17:23:08
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\home.vue
@@ -9,8 +9,14 @@
 <template>
   <div class="root">
     <div class="head">
-      <i class="icon">&#xe64d;</i>
-      <span>南宁市行业市场</span>
+      <div class="position">
+        <i class="icon">&#xe64d;</i>
+        <span>南宁市行业市场</span>
+      </div>
+      <div class="menu">
+        <i class="icon" @click="go({path:'/pages/supply-demand/manage'})">&#xe66c;</i>
+        <i class="icon">&#xe6f1;</i>
+      </div>
     </div>
     <button class="post" @click="go({path:'/pages/supply-demand/release'})">发布供求</button>
     <div class="demand-box">
@@ -152,14 +158,27 @@ export default {};
     background-color: #12b7f5;
     height: 1.16rem;
     display: flex;
-    // justify-content: center;
     align-items: center;
     padding-left: 1.07rem;
     font-size: 0.43rem;
     color: #fff;
-    i {
-      margin-right: 0.15rem;
+    .position{
+      width: 85%;
+      display: flex;
+      align-items: center;
+      i {
+        margin-right: 0.15rem;
+      }
     }
+    .menu{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      i{
+        margin-right: 0.43rem;
+      }
+    }
+
   }
   button.post {
     margin: 0.38rem 0.35rem;

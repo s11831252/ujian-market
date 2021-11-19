@@ -342,6 +342,14 @@ var routes = [
             navigationBarTitleText: '发布',
             enablePullDownRefresh: false,
         }
+    },
+    {
+        path:'pages/supply-demand/manage',
+        name:'sd_manage',
+        config: {
+            navigationBarTitleText: '供求管理',
+            enablePullDownRefresh: false,
+        }
     }
     
 ]

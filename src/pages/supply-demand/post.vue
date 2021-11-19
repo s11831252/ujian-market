@@ -1,15 +1,45 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-11-10 18:05:10
- * @LastEditTime: 2021-11-12 18:27:09
+ * @LastEditTime: 2021-11-16 18:09:55
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\post.vue
 -->
 <template>
     <div class="root">
-        <div class="info"></div>
-        <div></div>
+        <div class="main">
+            <div class="img-box">
+                <img class="img" src="../../../static/img/homeshare.jpg">
+                <span class="lab supply">供应</span>
+            </div>
+            <div class="info">
+                <div class="title">
+                    <small>项目</small>
+                    <span>大量供应各种钢材用品</span>
+                </div>
+                <div class="content">大量出售钢筋，便宜而且实惠，便宜...</div>
+                <div class="position"><i class="icon">&#xe65e;</i>南宁西乡塘</div>
+            </div>
+        </div>
+        <div class="tip">
+            <p>发布费用为 <span>5元</span>或<span>1个企业发布点</span>，信息展示时间为<span>7天</span></p>
+        </div>
+        <div class="break"></div>
+        <div class="pay-list">
+            <div class="item action">
+                <i class="icon left">&#xe66b;</i>
+                <span>U建钱包支付</span>
+                <small>（钱包余额 ¥3412）</small>
+                <i class="icon right">&#xe633;</i>
+            </div>
+            <div class="item">
+                <i class="icon left">&#xe66b;</i>
+                <span>发布点支付</span>
+                <small>（企业发布点40）</small>
+                <i class="icon right">&#xe633;</i>
+            </div>
+        </div>
         <div class="bottom">
             <div class="total">
                 <p class="price">
@@ -41,12 +71,141 @@
         </div>
     </div>
 </template>
+<script>
+export default {
+    data(){
+        return{
+            openDetail:false,
+        }
+    }
+}
+</script>
 <style lang="scss" scoped>
 .root{
+    .main{
+        display: flex;
+        justify-items: center;
+        align-items: center;
+        margin:0.55rem 0.37rem 0 0.37rem;
+        padding-bottom: 0.7rem;
+        border-bottom: 0.03rem solid #e4e4e4;
+        .img-box{
+            position: relative;
+            margin-right: 0.42rem;
+            img{
+                width: 2.08rem;
+                height: 2.08rem;
+            }
+            .lab{
+                position: absolute;
+                right:-0.1rem;
+                top: -0.1rem;
+                border-radius: 0.1rem;
+                color: #fff;
+                font-size: 0.3rem;
+                width: 0.82rem;
+                height: 0.48rem;
+                line-height: 0.48rem;
+                text-align: center;
+            }
+            .lab.supply{
+                background-color:#0166ff;
+            }
+            .lab.demand{
+                background-color:#37cba7;
+            }
+        }
+        .info{
+            flex-grow:1;
+            width: 7.39rem;
+            .title{
+                color: #333333;
+                font-size: 0.44rem;
+                display: flex;
+                justify-items: center;
+                align-items: center;
+                margin-bottom: 0.31rem;
+            }
+            .content{
+                font-size: 0.42rem;
+                color: #1a1a1a;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                word-break: break-all;
+                margin-bottom: 0.39rem;
+            }
+            .position{
+                display: flex;
+                justify-items: center;
+                align-items: center;
+                font-size: 0.4rem;
+                color: #888888;
+                .icon{
+                    margin-right: 0.13rem;
+                    color: #08bb91;
+                }
+            }
+        }
+    }
+    &>.tip{
+        text-align: center;
+        width: 100%;
+        margin: 0.62rem 0 0.76rem 0;
+        font-size: 0.35rem;
+        color: #8c8c8c;
+        span{
+            color: #666666;
+        }
+    }
     .break{
         width: 100%;
         height: 0.19rem;
         background-color: #eff3f6;
+    }
+    .pay-list{
+        .item{
+            display: flex;
+            align-items: center;
+            margin: 0.65rem 0;
+            i.left{
+                width: 0.69rem;
+                height: 0.69rem;
+                line-height: 0.69rem;
+                margin-left: 0.48rem;
+                margin-right: 0.4rem;
+                font-size: 0.69rem;
+                background-color:#3b88f2;
+                color: #fff;
+                border-radius: 0.08rem;
+            }
+            i.right{
+                background-image: #fff;
+                color: #fff;
+                border-radius: 50%;
+                width: 0.61rem;
+                height: 0.61rem;
+                line-height: 0.61rem;
+                text-align: center;
+            }
+            span{
+                font-size: 0.42rem;
+                color: #000000;
+            }
+            small{
+                width: 50%;
+                font-size: 0.35rem;
+                color: #666666;
+            }
+
+        }
+        .item.action{
+            i.right{
+                background-image: linear-gradient(174deg, 
+                #f5cb95 0%, 
+                #cb9952 100%);
+            }
+        }
     }
     .bottom{
         display: flex;

@@ -1,7 +1,7 @@
 /*
  * @Author: SuChonghua
  * @Date: 2021-11-05 19:05:33
- * @LastEditTime: 2021-11-05 19:08:22
+ * @LastEditTime: 2021-11-19 18:31:33
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\api\SupplyAndDemandAPI.js
@@ -15,5 +15,8 @@ let BaseHost = process.env.NODE_ENV == 'development'?"http://test.yz.com/SupplyA
 export default{
     SupplyAndDemand_Create:param=>{
         return http.post(BaseHost + "/api/SupplyAndDemand/Create", param)
+    },
+    SupplyAndDemand_GetList:param=>{
+        return http.get(BaseHost + "/api/SupplyAndDemand/GetList", param)
     }
 }
