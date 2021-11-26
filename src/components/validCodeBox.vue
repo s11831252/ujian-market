@@ -7,7 +7,9 @@
       </div>
       <div class="box-body">
         <p class="txt">商城付款</p>
-        <p class="pay-money">￥{{price}}</p>
+        <p class="pay-money" v-if="priceStr">{{priceStr}}</p>
+        <p class="pay-money" v-else>￥{{price}}</p>
+        
         <a class="countDown" @click="countDown">{{countDownStr}}</a>
         <div class="blocks">
           <input type="number" maxlength="4" v-model="code" focus="’true’" auto-focus="’true’" />
@@ -51,6 +53,10 @@ export default {
     },
     //支付的额
     price: {
+      type: String
+    },
+    //支付的文本,有文本显示文本,没有文本限制默认的price格式
+    priceStr:{
       type: String
     }
   },

@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-11-17 17:12:21
- * @LastEditTime: 2021-11-19 19:23:31
+ * @LastEditTime: 2021-11-25 18:22:19
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\manage.vue
@@ -33,20 +33,20 @@
           </div>
           <div class="context">
             <span class="txt">{{item.content}}</span>
-            <span class="time">剩余1天12时23分</span>
+            <span class="time">剩余{{item.timeStr}}</span>
           </div>
         </div>
         <div class="bottom">
           <div class="more">···</div>
           <div class="btn-group" v-if="item.status==1">
-            <button>编辑</button>
-            <button>刷新</button>
+            <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">编辑</button>
+            <button @click="RefreshTime(item.listId)">刷新</button>
             <button>延长展示</button>
           </div>
           <div class="btn-group" v-else-if="item.status==0">
             <button @click="del(item)">删除草稿</button>
             <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">继续编辑</button>
-            <button @click="go({path:'/pages/supply-demand/post'})">发布</button>
+            <button @click="go({path:'/pages/supply-demand/post',query:{listId:item.listId}})">发布</button>
           </div>
         </div>
       </li>
@@ -54,7 +54,7 @@
     <ul class="data-list" v-else>
       <li class="not404">
         <img src="../../../static/img/sd404.png">
-        <button>立即发布</button>
+        <button @click="go({path:'/pages/supply-demand/release'})">立即发布</button>
       </li>
     </ul>
   </div>
@@ -127,6 +127,20 @@ export default {
     del(item){
       
     },
+    // 秒数 转为 XX时XX分XX秒   time = 传入的秒数
+    formatTime(time) {
+      var day =  Math.floor(time / (3600*24))
+      var hours = Math.floor(Math.floor(time % (3600*24))/3600)
+      var minute = Math.floor(Math.floor(time % 3600) / 60)
+      var second = time % 60
+      var hours =
+        hours.toString().length === 1 ? `0${hours}` : hours
+      minute =
+        minute.toString().length === 1 ? `0${minute}` : minute
+      second =
+        second.toString().length === 1 ? `0${second}` : second
+      return day +'天'+ hours + '时' + minute + '分'
+    },
     tabClick(item, event) {
       this.activeIndex = item.index;
       if(item.index==0)
@@ -146,13 +160,27 @@ export default {
         this.search.type=0;
         this.search.status=0;
       }
+      this.datalist=[];
       this.searchData();
+    },
+    async RefreshTime(listId){
+      var rep  = await this.$SupplyAndDemandAPI.SupplyAndDemand_RefreshTime(listId);
+      if(rep.ret == 0&&rep.data )
+      {
+        this.toast("刷新成功")
+      }
     },
     async searchData(){
       var rep =  await this.$SupplyAndDemandAPI.SupplyAndDemand_GetList(this.search)
       if(rep.ret==0)
       {
-        this.datalist = rep.data;
+        for (let index = 0; index < rep.data.length; index++) {
+          const element = rep.data[index];
+          // element.time()
+          element.timeStr = this.formatTime(element.timeRemaining);
+          this.datalist.push(element)
+        }
+        console.log(this.datalist)
       }
     }
   },
@@ -181,7 +209,7 @@ body {
         align-items: center;
         margin-bottom: 0.57rem;
         i {
-          font-size: 0.2rem;
+          font-size: 0.26rem;
           margin-right: 0.08rem;
           width: 0.42rem;
           height: 0.42rem;

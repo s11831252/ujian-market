@@ -96,5 +96,26 @@ export default {
             resolve(res.data);
         })
       })
+     },
+     put (url,param) {
+      return new Promise((resolve,reject) => {
+        axios({
+          method: 'put',
+          headers:{
+            'X-Requested-With': 'XMLHttpRequest',
+            'Device':"WebApp",
+            'DisplayVersion':"2.0.11",
+            'SingleTicket':store.state.User.SingleTicket
+          },
+          url,
+          data: param,
+          cancelToken: new CancelToken(c => {
+            cancel = c
+          })
+        }).then(res => {
+          if(res)
+            resolve(res.data);
+        })
+      })
      }
   }

@@ -38,6 +38,16 @@ import about from './pages/my/about'
 import sd_home from './pages/supply-demand/home'
 import sd_release from './pages/supply-demand/release'
 import sd_post from './pages/supply-demand/post'
+import sd_manage from './pages/supply-demand/manage'
+import sd_postok from './pages/supply-demand/post-ok'
+import sd_payok from './pages/supply-demand/pay-ok'
+import sd_buy from './pages/supply-demand/buy'
+import sd_select from './pages/supply-demand/select'
+import sd_release_form from './pages/supply-demand/release-form'
+import sd_discount from './pages/supply-demand/discount-code'
+
+
+
 
 import store from './store'
 Vue.use(Router)//使用/注册路由
@@ -431,6 +441,61 @@ var routes = [
         component: sd_home
     },
     {
+        path:'pages/supply-demand/release-form',
+        name:'sd_release_form',
+        config: {
+            navigationBarTitleText: '发布需求表单',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/release-form',
+        component: sd_release_form
+    },
+    {
+        path:'pages/supply-demand/select',
+        name:'sd_select',
+        config: {
+            navigationBarTitleText: '选取项目',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/select',
+        component: sd_select
+    },
+    {
+        path:'pages/supply-demand/buy',
+        name:'sd_buy',
+        config: {
+            navigationBarTitleText: '购买服务',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/buy',
+        component: sd_buy
+    },
+    {
+        path:'pages/supply-demand/discount-code',
+        name:'sd_discount',
+        config: {
+            navigationBarTitleText: '优惠码',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/discount-code',
+        component: sd_discount
+    },
+    {
+        path:'pages/supply-demand/pay-ok',
+        name:'sd_payok',
+        config: {
+            navigationBarTitleText: '支付成功',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/pay-ok',
+        component: sd_payok
+    },
+    {
         path:'pages/supply-demand/release',
         name:'sd_release',
         config: {
@@ -451,8 +516,29 @@ var routes = [
         meta: { noAuth: true },
         alias: '/pages/supply-demand/post',
         component: sd_post
+    },
+    {
+        path:'pages/supply-demand/post-ok',
+        name:'sd_postok',
+        config: {
+            navigationBarTitleText: '发布成功',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/post-ok',
+        component: sd_postok
+    },
+    {
+        path:'pages/supply-demand/manage',
+        name:'sd_manage',
+        config: {
+            navigationBarTitleText: '供求管理',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/manage',
+        component: sd_manage
     }
-
 ]
 
 let router =new Router({routes:routes})

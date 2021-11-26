@@ -344,6 +344,14 @@ var routes = [
         }
     },
     {
+        path:'pages/supply-demand/post-ok',
+        name:'sd_payok',
+        config: {
+            navigationBarTitleText: '发布成功',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
         path:'pages/supply-demand/manage',
         name:'sd_manage',
         config: {

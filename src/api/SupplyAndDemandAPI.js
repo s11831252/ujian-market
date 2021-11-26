@@ -1,7 +1,7 @@
 /*
  * @Author: SuChonghua
  * @Date: 2021-11-05 19:05:33
- * @LastEditTime: 2021-11-19 18:31:33
+ * @LastEditTime: 2021-11-25 18:14:35
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\api\SupplyAndDemandAPI.js
@@ -18,5 +18,24 @@ export default{
     },
     SupplyAndDemand_GetList:param=>{
         return http.get(BaseHost + "/api/SupplyAndDemand/GetList", param)
+    },
+    SupplyAndDemand_Detail:listId=>{
+        return http.get(BaseHost + `/api/SupplyAndDemand/Detail?listId=${listId}`)
+    },
+    SupplyAndDemand_SendPayCode:()=>{
+        return http.get(BaseHost + "/api/SupplyAndDemand/SendPayCode")
+    },
+    HallMoney_Balance:()=>{
+        return http.get(BaseHost + "/api/HallMoney/Balance")
+    },
+    SupplyAndDemand_Pay:param=>{
+        return http.post(BaseHost + "/api/SupplyAndDemand/Pay",param)
+    },
+    SupplyAndDemand_RefreshTime:listId=>{
+        return http.put(BaseHost + `/api/SupplyAndDemand/RefreshTime?listId=${listId}`)
+    },
+    SupplyAndDemand_AddShowDays:(listId,days)=>{
+        return http.post(BaseHost + `/api/SupplyAndDemand/AddShowDays?listId=${listId}&days=${days}`)
     }
+    
 }

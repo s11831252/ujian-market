@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-10-13 10:28:51
- * @LastEditTime: 2021-10-19 18:19:11
+ * @LastEditTime: 2021-11-22 18:02:14
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\buy.vue
@@ -84,7 +84,12 @@
     </div>
 </template>
 <script>
+import vaildCodeBox from "../../components/validCodeBox";
+
 export default {
+    components:{
+        vaildCodeBox
+    },
     data(){
         return {
             GradePrice:0,
