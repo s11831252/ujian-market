@@ -2,7 +2,7 @@
   <div class="modal pay-validCodeBox" v-if="openModal" @click="$emit('close',false)">
     <div class="modal-container" @click.stop>
       <div class="box-title">
-        <i class="icon" @click="$emit('close',false)">&#xe613;</i>
+        <i class="icon" @click="('close',false)">&#xe613;</i>
         <span>请输入验证码</span>
       </div>
       <div class="box-body">

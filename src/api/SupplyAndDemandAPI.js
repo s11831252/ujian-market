@@ -1,7 +1,7 @@
 /*
  * @Author: SuChonghua
  * @Date: 2021-11-05 19:05:33
- * @LastEditTime: 2021-11-25 18:14:35
+ * @LastEditTime: 2021-12-02 15:26:10
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\api\SupplyAndDemandAPI.js
@@ -16,6 +16,10 @@ export default{
     SupplyAndDemand_Create:param=>{
         return http.post(BaseHost + "/api/SupplyAndDemand/Create", param)
     },
+    SupplyAndDemand_Modify:param=>{
+        return http.put(BaseHost + "/api/SupplyAndDemand/Modify", param)
+    },
+    
     SupplyAndDemand_GetList:param=>{
         return http.get(BaseHost + "/api/SupplyAndDemand/GetList", param)
     },
@@ -36,6 +40,10 @@ export default{
     },
     SupplyAndDemand_AddShowDays:(listId,days)=>{
         return http.post(BaseHost + `/api/SupplyAndDemand/AddShowDays?listId=${listId}&days=${days}`)
+    },
+    SupplyAndDemand_Stop:(listId,isStop,sendUserId)=>{
+        return http.put(BaseHost + `/api/SupplyAndDemand/Stop?listId=${listId}&isStop=${isStop}&sendUserId=${sendUserId}`)
     }
+    
     
 }

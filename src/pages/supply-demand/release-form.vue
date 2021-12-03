@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-11-12 18:32:26
+ * @LastEditTime: 2021-12-03 16:27:37
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -13,7 +13,7 @@
       <span class="length">{{ (supplyModel.info.title && supplyModel.info.title.length) || 0 }}/{{ titleLenghtLimit }}</span>
     </div>
     <div class="group">
-      <div>
+      <div class="block">
         <div class="tip" v-if="supplyModel.info.listType == 1 || supplyModel.info.listType == 2">
           <p class="txt"><i class="icon">&#xe6b3;</i>详细描述您所需要的产品</p>
           <p><i>·</i>需求产品的类型</p>
@@ -261,23 +261,9 @@ export default {
       // {
       //   this.toast("发布成功");
       // }
-    }
-  },
-  onShow(){
-      // console.log("onShow",this.supplyModel.info.listType)
-      this.contact.extContent = this.userInfo.Phone;
-      this.name.extContent = this.userInfo.UserName;
-      this.supplyModel.info.bindId = this.userInfo.UserId;
-      this.address.extContent = (this.selectProject && this.selectProject.Address) || (this.selectCorp && this.selectCorp.Address)
-      this.supplyModel.info.cityCode=(this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.Area)
-      this.supplyModel.info.gps_lng=(this.selectProject && this.selectProject.Longitude) || (this.selectCorp && this.selectCorp.Longitude) 
-      this.supplyModel.info.gps_lat=(this.selectProject && this.selectProject.Latitude) || (this.selectCorp && this.selectCorp.Latitude)
-  },
-  mounted() {
-    if (this.$route.query.listType) {
-      this.supplyModel.info.listType = parseInt(this.$route.query.listType);
+    },
+    setTitle(){
       if (this.isMP) {
-        console.log(this.supplyModel.info.listType);
         switch (this.supplyModel.info.listType) {
           case 1: {
             wx.setNavigationBarTitle({ title: `发布企业需求` });
@@ -303,6 +289,27 @@ export default {
       }
     }
   },
+  onShow(){
+      // console.log("onShow",this.supplyModel.info.listType)
+        this.contact.extContent = this.contact.extContent||this.userInfo.Phone;
+        this.name.extContent = this.name.extContent||this.userInfo.UserName;
+        this.supplyModel.info.bindId =this.supplyModel.info.bindId|| this.userInfo.UserId;
+        this.address.extContent =this.address.extContent|| (this.selectProject && this.selectProject.Address) || (this.selectCorp && this.selectCorp.Address)
+        this.supplyModel.info.cityCode=this.supplyModel.info.cityCode||(this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.Area)
+        this.supplyModel.info.gps_lng=this.supplyModel.info.gps_lng||(this.selectProject && this.selectProject.Longitude) || (this.selectCorp && this.selectCorp.Longitude) 
+        this.supplyModel.info.gps_lat=this.supplyModel.info.gps_lat||(this.selectProject && this.selectProject.Latitude) || (this.selectCorp && this.selectCorp.Latitude)
+
+  },
+  async mounted() {
+    if (this.$route.query.listType) {
+      this.supplyModel.info.listType = parseInt(this.$route.query.listType);
+      this.setTitle();
+    }
+    if(this.$route.query.listId)
+    {
+      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Detail(this.$route.query.listId)
+    }
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -315,6 +322,9 @@ export default {
     padding: 0.6rem 0;
     border-bottom: 0.02rem solid #ebebeb;
     color: #333333;
+    .block{
+      flex-grow: 1;
+    }
     input {
       font-size: 0.48rem;
       overflow: hidden;

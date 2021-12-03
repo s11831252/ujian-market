@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-11-17 17:12:21
- * @LastEditTime: 2021-11-25 18:22:19
+ * @LastEditTime: 2021-12-03 16:01:21
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\manage.vue
@@ -15,41 +15,7 @@
     </ul>
     <div class="navbar_slider" :class="navbarSliderClass"></div>
     <ul class="data-list" v-if="datalist&&datalist.length>0">
-      <li v-for="(item,index) in datalist" :key="index" class="data-item">
-        <div class="title">
-          <i v-if="item.listType==1||item.listType==5" class="corp">企</i>
-          <i v-if="item.listType==2" class="pro">项</i>
-          <i v-if="item.listType==4" class="shop">商</i>
-          <i v-if="item.listType==3" class="personal">个</i>
-          <span class="txt">{{item.title}}</span>
-          <span class="status stop" v-if="item.status == 1000">暂停中</span>
-          <span class="status" v-else>展示中</span>
-        </div>
-        <div class="body">
-          <div class="img">
-            <img :src="item.logoImage" />
-            <span class="type supply" v-if="item.listType==3||item.listType==4||item.listType==5">供应</span>
-            <span class="type demand" v-else>需求</span>
-          </div>
-          <div class="context">
-            <span class="txt">{{item.content}}</span>
-            <span class="time">剩余{{item.timeStr}}</span>
-          </div>
-        </div>
-        <div class="bottom">
-          <div class="more">···</div>
-          <div class="btn-group" v-if="item.status==1">
-            <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">编辑</button>
-            <button @click="RefreshTime(item.listId)">刷新</button>
-            <button>延长展示</button>
-          </div>
-          <div class="btn-group" v-else-if="item.status==0">
-            <button @click="del(item)">删除草稿</button>
-            <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">继续编辑</button>
-            <button @click="go({path:'/pages/supply-demand/post',query:{listId:item.listId}})">发布</button>
-          </div>
-        </div>
-      </li>
+      <manageItem v-for="(item,index) in datalist" :key="index" :item="item" @del="del" @refreshTime="RefreshTime" @addShowDays="AddShowDays" @stop="stop" @more="more"></manageItem>
     </ul>
     <ul class="data-list" v-else>
       <li class="not404">
@@ -57,10 +23,26 @@
         <button @click="go({path:'/pages/supply-demand/release'})">立即发布</button>
       </li>
     </ul>
+    <div class="more-box" :class="{ open: moreBox_open }">
+      <div class="mask"></div>
+      <div class="wrapper" @click="moreBox_open = false;">
+        <div class="wrapper_body">
+          <div class="menu">
+            <div class="item" @click="stop(action_more_Item,true)">停止展示</div>
+            <div class="item" @click="del(action_more_Item)">删除供需</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
+import manageItem from './manage-item.vue'
+import { mapState } from "vuex";
 export default {
+  components:{
+    manageItem
+  },
   data() {
     return {
       Tabs: [
@@ -109,24 +91,25 @@ export default {
       search:{
         type:0,//返回类型,0表示返回所有,1表示供应,2表示需求
         isSelf:1,//是否获取公开的,0表示公开的,1表示自己创建的,2表示后台获取全部
-        status:1,//查询状态,0B0000_0000表示草稿,0B0000_0001表示能正常发布,0B0000_0100表示系统禁停,0B0000_1000表示发布人停止
         bindId:"",//返回相关供求，如想返回企业，就传企业ID，店铺就传店铺Id，项目就传项目Id
         pageIndex:1,//当前分页
         pageSize:10,//分页大小
         searchValue:"",//搜索关键词
       },
-      datalist:[]
+      datalist:[],
+      moreBox_open:false,
+      action_more_Item:null
     };
   },
   computed: {
     navbarSliderClass() {
       return "navbar_slider_" + this.activeIndex;
     },
+    ...mapState({
+        userInfo: (state) => state.User.UserInfo,
+    }),
   },
   methods: {
-    del(item){
-      
-    },
     // 秒数 转为 XX时XX分XX秒   time = 传入的秒数
     formatTime(time) {
       var day =  Math.floor(time / (3600*24))
@@ -146,15 +129,17 @@ export default {
       if(item.index==0)
       {
         this.search.type=0;
-        this.search.status=1;
+        delete this.search.status;
       }else if(item.index==1)
       {
         this.search.type=1;
-        this.search.status=1;
+        delete this.search.status;
+        // this.search.status=undefined;
       }else if(item.index==2)
       {
         this.search.type=2;
-        this.search.status=1;
+        delete this.search.status;
+        // this.search.status=undefined;
       }else if(item.index==3)
       {
         this.search.type=0;
@@ -163,11 +148,81 @@ export default {
       this.datalist=[];
       this.searchData();
     },
-    async RefreshTime(listId){
-      var rep  = await this.$SupplyAndDemandAPI.SupplyAndDemand_RefreshTime(listId);
-      if(rep.ret == 0&&rep.data )
+    more(item){
+      var that = this;
+      that.action_more_Item=item;
+      that.moreBox_open=true;
+    },
+    del(item){
+      var that =this;
+      if(item)
+      {
+        this.modal({
+          content : "确定删除这条供需信息吗？", 
+          confirm:async function(){
+            var {content,title,status,bindId,cityCode,gps_lat,gps_lng,listId,sendUserId} = item;
+            var rep = await that.$SupplyAndDemandAPI.SupplyAndDemand_Modify({info:{content,title,status:status|0b10000,bindId,cityCode,gps_lat,gps_lng,listId,sendUserId}});
+            if(rep.ret==0)
+            {
+              that.toast("删除成功");
+            }
+            that.action_more_Item=null;
+            that.moreBox_open=false;
+          }, 
+          cancel(){
+            that.action_more_Item=null;
+            that.moreBox_open=false;
+          }, 
+          confirmText : "确定", 
+          confirmColor : "#12b7f5",
+          cancelText : "取消", 
+          cancelColor : "#989898",
+          showCancel : true 
+        })
+      }
+
+    },
+    stop(item,isstop){
+      var that = this;
+      if(item)
+      {
+        that.modal({
+          content : `确定${isstop?'停止':'恢复'}展示这条供需信息吗？`, 
+          confirm:async function(){
+            var {content,title,status,bindId,cityCode,gps_lat,gps_lng,listId,sendUserId} = item;
+            var rep = await that.$SupplyAndDemandAPI.SupplyAndDemand_Modify({info:{content,title,status:isstop?status|0b1000:status^0b1000,bindId,cityCode,gps_lat,gps_lng,listId,sendUserId}});
+              if(rep.ret == 0&&rep.data)
+              {
+                that.toast(`${isstop?'停止':'恢复'}展示成功`);
+              }
+              that.action_more_Item=null;
+              that.moreBox_open=false;
+          }, 
+          cancel(){
+            that.action_more_Item=null;
+            that.moreBox_open=false;
+          }, 
+          confirmText : "确定", 
+          confirmColor : "#12b7f5",
+          cancelText : "取消", 
+          cancelColor : "#989898",
+          showCancel : true 
+        })
+      }
+
+    },
+    async RefreshTime(item){
+      var rep  = await this.$SupplyAndDemandAPI.SupplyAndDemand_RefreshTime(item.listId);
+      if(rep.ret == 0&&rep.data)
       {
         this.toast("刷新成功")
+      }
+    },
+    async AddShowDays(item){
+      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_AddShowDays(item.listId,7);
+      if(rep.ret == 0&&rep.data )
+      {
+        this.toast("延长展示成功")
       }
     },
     async searchData(){
@@ -180,7 +235,6 @@ export default {
           element.timeStr = this.formatTime(element.timeRemaining);
           this.datalist.push(element)
         }
-        console.log(this.datalist)
       }
     }
   },
@@ -199,156 +253,7 @@ body {
   .data-list {
     margin: 0 0.35rem;
     margin-top: 0.51rem;
-    .data-item {
-      margin-bottom: 0.27rem;
-      background-color: #ffffff;
-      border-radius: 0.41rem;
-      padding: 0.56rem 0.35rem 0.35rem 0.35rem;
-      .title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.57rem;
-        i {
-          font-size: 0.26rem;
-          margin-right: 0.08rem;
-          width: 0.42rem;
-          height: 0.42rem;
-          border-radius: 0.05rem;
-          line-height: 0.42rem;
-          text-align: center;
-        }
-        i.corp {
-          color: #ffffff;
-          box-shadow: 0rem 0.01rem 0.01rem 0rem rgba(204, 35, 55, 0.59);
-          background-image: linear-gradient(86deg, #fe475d 0%, #ff6f88 100%);
-        }
-        i.pro {
-          color: #ffffff;
-          background-image: linear-gradient(85deg, 
-            #138df5 0%, 
-            #13b6f5 100%);
-          border-radius: 0.07rem;
-        }
-        i.shop {
-          color: #ffffff;
-          background-image: linear-gradient(85deg, 
-            #fe7a1f 0%, 
-            #ffa22b 100%);
-          border-radius: 0.07rem;
-        }
-        i.personal {
-          color: #ffffff;
-          background-image: linear-gradient(85deg, 
-            #02c869 0%, 
-            #27e07c 100%);
-          border-radius: 0.07rem;
-        }
-        .txt {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          width: 7.36rem;
-          font-size: 0.44rem;
-          color: #333333;
-          margin-right: 0.5rem;
-        }
-        .status {
-          font-size: 0.39rem;
-          color: #00b7ee;
-        }
-        .status.stop{
-          color: #ec362b;
-        }
-      }
-      .body {
-        display: flex;
-        padding-bottom: 0.48rem;
-        border-bottom: 0.03rem solid #f2f2f2;
-        margin-bottom: 0.37rem;
-        .img {
-          margin-right: 0.26rem;
-          img {
-            width: 2.08rem;
-            height: 2.08rem;
-            border-radius: 0.09rem;
-          }
-          position: relative;
-          .type {
-            position: absolute;
-            top: -0.09rem;
-            right: -0.09rem;
-            border-radius: 0.09rem 0.09rem 0 0.09rem;
-            width: 0.82rem;
-            height: 0.42rem;
-            line-height: 0.42rem;
-            color: #fff;
-            text-align: center;
-            font-size: 0.28rem;
-            border-radius: 0.12rem 0.12rem 0rem 0.12rem;
-          }
-          .type.supply{
-            background-image: linear-gradient(-31deg, #4d77ff 0%, #4da9ff 100%);
-          }
-          .type.demand{
-          	background-image: linear-gradient(-31deg, 
-		#ff7f4d 0%, 
-		#ffa54d 100%);
-          }
 
-
-	border-radius: 0.12rem 0.12rem 0rem 0.12rem;
-        }
-        .context {
-          .txt {
-            width: 7.11rem;
-            font-size: 0.42rem;
-            line-height: 0.55rem;
-            color: #1a1a1a;
-            margin-bottom: 0.29rem;
-            text-overflow: -o-ellipsis-lastline;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-          }
-          .time {
-            // height: 0.58rem;
-            background-color: #fee0e0;
-            border-radius: 0.1rem;
-            font-size: 0.37rem;
-            // line-height: 0.58rem;
-            padding: 0.12rem 0.25rem;
-            color: #ec362b;
-          }
-        }
-      }
-      .bottom {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        .more {
-          font-size: 0.8rem;
-          color: #bfbfbf;
-        }
-        .btn-group {
-          display: flex;
-          align-items: center;
-          button {
-            width: 2.3rem;
-            height: 0.86rem;
-            border-radius: 0.43rem;
-            border: solid 0.02rem #dddddd;
-            font-size: 0.4rem;
-            text-align: center;
-            line-height: 0.86rem;
-            color: #1a1a1a;
-            margin-right: 0.19rem;
-          }
-        }
-      }
-    }
     .not404{
       img{
         margin:0 auto;
@@ -419,6 +324,79 @@ body {
   }
   .navbar_slider_3 {
     transform: translateX(300%);
+  }
+  .more-box{
+    .mask {
+      position: fixed;
+      z-index: 10;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      opacity: 0;
+      transform: scale3d(1, 1, 0);
+      transition: all 0.3s ease-in;
+    }
+    .wrapper {
+      position: fixed;
+      z-index: 10;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      text-align: center;
+      font-size: 0;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      align-items: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      transform: translateY(-100%);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 700ms ease-out, transform 300ms ease-out, visibility 700ms ease-out;
+      .wrapper_body {
+        width: 9.18rem;
+        // border-radius: 0.5rem;
+        .menu {
+          background-color: #fff;
+          border-radius: 0.4rem;
+            // padding: 0 0.35rem;
+          .item {
+            font-size: 0.42rem;
+            color: #000;
+            padding: 0.4rem;
+            text-align: left;
+          }
+          .item:first-child{
+            border-bottom: 0.02rem solid #f2f2f2;
+          }
+        }
+        // button{
+        //     margin-top: 0.36rem;
+        //     padding: 0.6rem 0;
+        //     background-color: #fff;
+        //     color: #808080;
+        //     border-radius: 0.2rem;
+        // }
+      }
+    }
+  }
+  .more-box.open{
+    .mask {
+      display: block;
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+    .wrapper {
+      transform: none;
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 </style>
