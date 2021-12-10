@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-12-03 16:27:37
+ * @LastEditTime: 2021-12-08 11:25:20
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -235,32 +235,31 @@ export default {
         console.log(this.addImage);
       }
     },
-    post(){
-      this.$router.push({path:"/pages/supply-demand/post"})
-      // var postData= {
-      //   info:this.supplyModel.info,
-      //   ext:[]
-      // };
-      // postData.ext.push(this.name);
-      // postData.ext.push(this.address);
-      // postData.ext.push(this.contact);
-      // postData.ext = postData.ext.concat(this.imageList);
-      // postData.ext = postData.ext.concat(this.addImage);
-      // if(postData.info.listType==2)
-      // {
-      //   postData.ext.push(this.ptext1);
-      //   postData.ext.push(this.ptext2);
-      //   postData.ext.push(this.ptext3);
-      //   postData.ext.push(this.ptext4);
-      //   postData.ext.push(this.ptext5);
-      // }
-      // console.log(postData)
+    async post(){
+      var postData= {
+        info:this.supplyModel.info,
+        ext:[]
+      };
+      postData.ext.push(this.name);
+      postData.ext.push(this.address);
+      postData.ext.push(this.contact);
+      postData.ext = postData.ext.concat(this.imageList);
+      postData.ext = postData.ext.concat(this.addImage);
+      if(postData.info.listType==2)
+      {
+        postData.ext.push(this.ptext1);
+        postData.ext.push(this.ptext2);
+        postData.ext.push(this.ptext3);
+        postData.ext.push(this.ptext4);
+        postData.ext.push(this.ptext5);
+      }
 
-      // var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData)
-      // if(rep.ret==0)
-      // {
-      //   this.toast("发布成功");
-      // }
+      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData)
+      if(rep.ret==0)
+      {
+        this.toast("发布成功");
+        this.$router.push({path:"/pages/supply-demand/post",query:{listId:rep.data}})
+      }
     },
     setTitle(){
       if (this.isMP) {
