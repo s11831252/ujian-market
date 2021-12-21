@@ -449,6 +449,10 @@ export default {
               // that.longitude = rep2.result.location.lng;
 
               that.UpdateLocation({
+                country:rep2.result.addressComponent.country,
+                province:rep2.result.addressComponent.province,
+                city:result.addressComponent.city,
+                district:result.addressComponent.district,
                 LocationAddress: rep2.result.formatted_address,
                 latitude: rep2.result.location.lat,
                 longitude: rep2.result.location.lng
@@ -488,6 +492,10 @@ export default {
                 };
                 // console.log(location);
                 that.UpdateLocation({
+                  country:"",
+                  province:location.creditProvince,
+                  city:creditCity.creditCity,
+                  district:location.creditArea,
                   LocationAddress: location.creditProvince + location.creditCity + location.creditArea + location.creditStreet,
                   latitude: location.creditLongitude,
                   longitude: location.creditLatitude

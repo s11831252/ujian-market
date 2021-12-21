@@ -1,7 +1,7 @@
 /*
  * @Author: SuChonghua
  * @Date: 2021-11-05 19:05:33
- * @LastEditTime: 2021-12-02 15:26:10
+ * @LastEditTime: 2021-12-13 16:18:45
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\api\SupplyAndDemandAPI.js
@@ -43,7 +43,11 @@ export default{
     },
     SupplyAndDemand_Stop:(listId,isStop,sendUserId)=>{
         return http.put(BaseHost + `/api/SupplyAndDemand/Stop?listId=${listId}&isStop=${isStop}&sendUserId=${sendUserId}`)
+    },
+    Home_GetBanner:()=>{
+        return http.get(BaseHost + `/api/Home/GetBanner`)
+    },
+    Home_GetShop:()=>{
+        return http.get(BaseHost + `/api/Home/GetShop`)
     }
-    
-    
 }

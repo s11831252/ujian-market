@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-24 14:10:37
- * @LastEditTime: 2021-10-20 11:47:42
+ * @LastEditTime: 2021-12-14 17:47:25
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release.vue
@@ -40,7 +40,7 @@
         <div class="wrapper_body">
           <div class="menu">
             <div class="item" @click="go({path:'/pages/supply-demand/release-form',query:{listType:5}})">发布企业供应</div>
-            <div class="item" @click="go({path:'/pages/supply-demand/release-form',query:{listType:4}})">发布店铺供应</div>
+            <div v-if="myShop" class="item" @click="go({path:'/pages/supply-demand/release-form',query:{listType:4}})">发布店铺供应</div>
             <div class="item" @click="go({path:'/pages/supply-demand/release-form',query:{listType:3}})">发布个人供应</div>
           </div>
           <button @click="supplyBox_open = false">取消</button>
@@ -62,13 +62,25 @@
   </div>
 </template>
 <script>
+import {mapState,mapActions} from "vuex"
 export default {
+  computed:{
+    ...mapState({
+      myShop: (state) => state.User.myShop,
+    })
+  },
+  methods:{
+    ...mapActions(["getMyShop"])
+  },
   data() {
     return {
       supplyBox_open: false,
       demandBox_open: false,
     };
   },
+  mounted(){
+    this.getMyShop();
+  }
 };
 </script>
 <style; lang="scss" scoped>

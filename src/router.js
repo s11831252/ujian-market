@@ -312,6 +312,14 @@ var routes = [
         }
     },
     {
+        path:'pages/supply-demand/selectGoods',
+        name:'sd_selectGoods',
+        config: {
+            navigationBarTitleText: '选取商品',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
         path:'pages/supply-demand/buy',
         name:'sd_buy',
         config: {

@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-12-08 11:25:20
+ * @LastEditTime: 2021-12-14 17:39:33
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -84,6 +84,12 @@
       <input readonly disabled placeholder="请选择项目" :value="selectCorp && selectCorp.eName" />
       <i class="icon go">&#xe601;</i>
     </div>
+    <div class="group" v-if="supplyModel.info.listType == '4'" @click="go({ path: '/pages/supply-demand/selectGoods', query: { sId: myShop.sId } })">
+      <i class="icon">&#xe628;</i>
+      <span class="label">店铺名</span>
+      <input readonly disabled placeholder="请选择店铺" :value="selectCorp && selectCorp.eName" />
+      <i class="icon go">&#xe601;</i>
+    </div>
     <div class="group">
       <i class="icon">&#xe64d;</i>
       <span class="label">地址</span>
@@ -99,12 +105,12 @@
     <div class="group">
       <i class="icon">&#xe60a;</i>
       <span class="label">联系方式</span>
-      <input placeholder="请输入联系方式"  v-model="contact.extContent" />
+      <input placeholder="请输入联系方式" v-model="contact.extContent" />
       <i class="icon go"></i>
     </div>
-      <div class="public" :class="{action:contact.extPublic}" >
-        <span @click="contact.extPublic=!contact.extPublic"><i class="icon">&#xe633;</i>公开信息</span>
-      </div>
+    <div class="public" :class="{ action: contact.extPublic }">
+      <span @click="contact.extPublic = !contact.extPublic"><i class="icon">&#xe633;</i>公开信息</span>
+    </div>
     <button class="post" @click="post">发布</button>
   </div>
 </template>
@@ -138,35 +144,63 @@ export default {
         ext: [],
       },
       addImage: [],
-      ptext1:{
+      corp_ext: {
+        extTitle: "企业",
+        extContent: "",
+        extOrder: 0,
+        extType: 4,
+        extPublic: true,
+      },
+      shop_ext: {
+        extTitle: "店铺",
+        extContent: "",
+        extOrder: 0,
+        extType: 5,
+        extPublic: true,
+      },
+      goods_ext: {
+        extTitle: "产品",
+        extContent: "",
+        extOrder: 0,
+        extType: 6,
+        extPublic: true,
+      },
+      ptext0: {
+        extTitle: "项目名称",
+        extContent: "",
+        extOrder: 0,
+        extType: 7,
+        extPublic: true,
+      },
+      ptext1: {
         extTitle: "项目规模",
         extContent: "",
         extOrder: 0,
         extType: 7,
         extPublic: true,
       },
-      ptext2:{
+      ptext2: {
         extTitle: "总投资",
         extContent: "",
         extOrder: 0,
         extType: 7,
         extPublic: true,
       },
-      ptext3:{
+      ptext3: {
         extTitle: "计划工期",
         extContent: "",
         extOrder: 0,
         extType: 7,
         extPublic: true,
       },
-      ptext4:{
+      ptext4: {
         extTitle: "建设单位",
         extContent: "",
         extOrder: 0,
         extType: 7,
         extPublic: true,
       },
-      ptext5:{
+      ptext5: {
         extTitle: "设计单位",
         extContent: "",
         extOrder: 0,
@@ -180,7 +214,7 @@ export default {
         extType: 2,
         extPublic: true,
       },
-      address:{
+      address: {
         extTitle: "地址",
         extContent: "",
         extOrder: 0,
@@ -200,13 +234,15 @@ export default {
     ...mapState({
       selectProject: (state) => state.SupplyDemand.selectProject,
       selectCorp: (state) => state.SupplyDemand.selectCorp,
+      selectShop: (state) => state.SupplyDemand.selectShop,
       userInfo: (state) => state.User.UserInfo,
+      myShop: (state) => state.User.myShop,
     }),
     imageList() {
       if (!this.supplyModel.ext || this.supplyModel.ext.length == 0) return [];
 
       return this.supplyModel.ext.filter((item) => {
-        return (item.extType == 1);
+        return item.extType == 1;
       });
     },
   },
@@ -235,33 +271,52 @@ export default {
         console.log(this.addImage);
       }
     },
-    async post(){
-      var postData= {
-        info:this.supplyModel.info,
-        ext:[]
+    async post() {
+      var postData = {
+        info: this.supplyModel.info,
+        ext: [],
       };
       postData.ext.push(this.name);
       postData.ext.push(this.address);
       postData.ext.push(this.contact);
       postData.ext = postData.ext.concat(this.imageList);
       postData.ext = postData.ext.concat(this.addImage);
-      if(postData.info.listType==2)
-      {
+      if (postData.info.listType == 2) {
+        postData.ext.push(this.ptext0);
         postData.ext.push(this.ptext1);
         postData.ext.push(this.ptext2);
         postData.ext.push(this.ptext3);
         postData.ext.push(this.ptext4);
         postData.ext.push(this.ptext5);
-      }
-
-      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData)
-      if(rep.ret==0)
+      } else if (postData.info.listType == 1 ||postData.info.listType == 5) {
+        postData.ext.push({
+          extId: 0,
+          extTitle: selectCorp.eName,
+          extContent: selectCorp.eId,
+          extOrder: 0,
+          extType: 0,
+          extPublic: true,
+          listId: 4,
+        });
+      }else if(postData.info.listType ==4 )
       {
+        postData.ext.push({
+          extId: 0,
+          extTitle: selectShop.sName,
+          extContent: selectShop.sId,
+          extOrder: 0,
+          extType: 0,
+          extPublic: true,
+          listId: 4,
+        });
+      }
+      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData);
+      if (rep.ret == 0) {
         this.toast("发布成功");
-        this.$router.push({path:"/pages/supply-demand/post",query:{listId:rep.data}})
+        this.$router.push({ path: "/pages/supply-demand/post", query: { listId: rep.data } });
       }
     },
-    setTitle(){
+    setTitle() {
       if (this.isMP) {
         switch (this.supplyModel.info.listType) {
           case 1: {
@@ -286,27 +341,61 @@ export default {
           }
         }
       }
-    }
+    },
   },
-  onShow(){
-      // console.log("onShow",this.supplyModel.info.listType)
-        this.contact.extContent = this.contact.extContent||this.userInfo.Phone;
-        this.name.extContent = this.name.extContent||this.userInfo.UserName;
-        this.supplyModel.info.bindId =this.supplyModel.info.bindId|| this.userInfo.UserId;
-        this.address.extContent =this.address.extContent|| (this.selectProject && this.selectProject.Address) || (this.selectCorp && this.selectCorp.Address)
-        this.supplyModel.info.cityCode=this.supplyModel.info.cityCode||(this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.Area)
-        this.supplyModel.info.gps_lng=this.supplyModel.info.gps_lng||(this.selectProject && this.selectProject.Longitude) || (this.selectCorp && this.selectCorp.Longitude) 
-        this.supplyModel.info.gps_lat=this.supplyModel.info.gps_lat||(this.selectProject && this.selectProject.Latitude) || (this.selectCorp && this.selectCorp.Latitude)
-
+  onShow() {
+    // console.log("onShow",this.supplyModel.info.listType)
+    this.contact.extContent = this.contact.extContent || this.userInfo.Phone;
+    this.name.extContent = this.name.extContent || this.userInfo.UserName;
+    this.supplyModel.info.bindId = this.supplyModel.info.bindId || this.userInfo.UserId;
+    this.address.extContent = this.address.extContent || (this.selectProject && this.selectProject.Address) || (this.selectCorp && this.selectCorp.Address);
+    this.ptext0.extContent =  this.ptext0.extContent||(this.selectProject&&this.selectProject.ProjectName);
+    this.supplyModel.info.cityCode = this.supplyModel.info.cityCode || (this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.Area);
+    this.supplyModel.info.gps_lng = this.supplyModel.info.gps_lng || (this.selectProject && this.selectProject.Longitude) || (this.selectCorp && this.selectCorp.Longitude);
+    this.supplyModel.info.gps_lat = this.supplyModel.info.gps_lat || (this.selectProject && this.selectProject.Latitude) || (this.selectCorp && this.selectCorp.Latitude);
+  
   },
   async mounted() {
     if (this.$route.query.listType) {
       this.supplyModel.info.listType = parseInt(this.$route.query.listType);
       this.setTitle();
     }
-    if(this.$route.query.listId)
-    {
-      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Detail(this.$route.query.listId)
+    if (this.$route.query.listId) {
+      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Detail(this.$route.query.listId);
+      if (rep.ret == 0) {
+        this.supplyModel.info = rep.data.info;
+        var extList = rep.data.ext.map((item) => {
+          return item.ext;
+        });
+        this.contact = extList.find((item) => {
+          return item.extType == 3;
+        });
+        this.name = extList.find((item) => {
+          return item.extType == 2;
+        });
+        this.supplyModel.ext = extList.filter((item) => {
+          return item.extType == 1;
+        });
+        this.address = extList.find((item) => {
+          return item.extType == 7 && item.extTitle == "地址";
+        });
+        this.ptext1 = extList.find((item) => {
+          return item.extType == 7 && item.extTitle == "项目规模";
+        });
+        this.ptext2 = extList.find((item) => {
+          return item.extType == 7 && item.extTitle == "总投资";
+        });
+        this.ptext3 = extList.find((item) => {
+          return item.extType == 7 && item.extTitle == "计划工期";
+        });
+        this.ptext4 = extList.find((item) => {
+          return item.extType == 7 && item.extTitle == "建设单位";
+        });
+        this.ptext5 = extList.find((item) => {
+          return item.extType == 7 && item.extTitle == "设计单位";
+        });
+        console.log(this.supplyModel);
+      }
     }
   },
 };
@@ -321,7 +410,7 @@ export default {
     padding: 0.6rem 0;
     border-bottom: 0.02rem solid #ebebeb;
     color: #333333;
-    .block{
+    .block {
       flex-grow: 1;
     }
     input {
@@ -413,7 +502,6 @@ export default {
       font-size: 0.7rem;
       font-weight: 800;
     }
-
   }
   .group.project {
     display: block;
@@ -457,45 +545,45 @@ export default {
       }
     }
   }
-    .public {
-      font-size: 0.35rem;
-      color: #8e98ac;
+  .public {
+    font-size: 0.35rem;
+    color: #8e98ac;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0.6rem 0;
+    width: 100%;
+    span {
       display: flex;
-      justify-content: flex-end;
-      margin: 0.6rem 0;
-      width: 100%;
-      span {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #f4f5f9;
-        border-radius: 0.32rem;
-        text-align: center;
-        width: 2.4rem;
-        height: 0.64rem;
-        .icon {
-          width: 0.32rem;
-          height: 0.32rem;
-          border-radius: 0.05rem;
-          background-color: #f4f5f9;
-          color: #f4f5f9;
-          text-align: center;
-          line-height: 0.32rem;
-          font-size: 0.3rem;
-          margin-right: 0.1rem;
-          border: 0.01rem solid #8e98ac;
-        }
-      }
-    }
-    .public.action {
-      color: #0c64ea;
+      align-items: center;
+      justify-content: center;
+      background-color: #f4f5f9;
+      border-radius: 0.32rem;
+      text-align: center;
+      width: 2.4rem;
+      height: 0.64rem;
       .icon {
-        background-color: #0c64ea;
-        color: #fff;
-        border: 0.01rem solid #f4f5f9;
+        width: 0.32rem;
+        height: 0.32rem;
+        border-radius: 0.05rem;
+        background-color: #f4f5f9;
+        color: #f4f5f9;
+        text-align: center;
+        line-height: 0.32rem;
+        font-size: 0.3rem;
+        margin-right: 0.1rem;
+        border: 0.01rem solid #8e98ac;
       }
     }
-  button.post{
+  }
+  .public.action {
+    color: #0c64ea;
+    .icon {
+      background-color: #0c64ea;
+      color: #fff;
+      border: 0.01rem solid #f4f5f9;
+    }
+  }
+  button.post {
     width: 9.89rem;
     height: 1.21rem;
     line-height: 1.21rem;

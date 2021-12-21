@@ -16,6 +16,7 @@ export default new Vuex.Store({//store对象
         CurrentLocation:{},
         viewHistory:[],//店铺浏览记录
         showHistory:true,
+        myShop:{},
       },
       getters:{
         Logined: state =>{
@@ -71,6 +72,19 @@ export default new Vuex.Store({//store对象
         setshowHistory(state,isshow)
         {
           state.showHistory=isshow;
+        },
+        setMyShop(state,shopinfo)
+        {
+          state.myShop=shopinfo;
+        }
+      },
+      actions:{
+        async getMyShop(context){
+          var rep = await ShoppingAPI.Shop_GetMy();
+          if(rep.ret==0)
+          {
+            context.commit('setMyShop',rep.data.length>0?rep.data[0]:null);
+          }
         }
       }
     },
@@ -325,6 +339,7 @@ export default new Vuex.Store({//store对象
         selectProject:null,
         selectCorp:null,
         selectShop:null,
+        selectGoods:[],
       },
       mutations:{
         setSelectProject(state,item){
@@ -335,6 +350,17 @@ export default new Vuex.Store({//store对象
         },
         setSelectShop(state,item){
           state.selectShop=item;
+        },
+        setSelecGoods(state,goods){
+          var nowItem = state.selectGoods.filter(item => item.gId == goods.gId)[0];//先查找该店铺的购物车
+          if(nowItem)
+          {
+            var index = state.selectGoods.indexOf(nowItem)
+            state.selectGoods.splice(index, 1);//数量0移除该商品
+          }else
+          {
+            state.selectGoods.push(goods)
+          }
         },
       }
     }

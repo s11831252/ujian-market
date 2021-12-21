@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-18 18:20:32
- * @LastEditTime: 2021-12-10 18:11:34
+ * @LastEditTime: 2021-12-13 16:24:38
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\home.vue
@@ -11,7 +11,7 @@
     <div class="head">
       <div class="position">
         <i class="icon">&#xe64d;</i>
-        <span>南宁市行业市场</span>
+        <span>{{currentLocation.city}}行业市场</span>
       </div>
       <div class="menu">
         <i class="icon" @click="go({ path: '/pages/supply-demand/manage' })">&#xe66c;</i>
@@ -33,17 +33,9 @@
       </div>
     </div>
     <ul class="banner">
-      <li>
-        <img src="../../../static/img/homeshare.jpg" />
-        <span class="title">广西工程建设质量管理监督责任有限公...</span>
-      </li>
-      <li>
-        <img src="../../../static/img/homeshare.jpg" />
-        <span class="title">广西工程建设质量管理监督责任有限公...</span>
-      </li>
-      <li>
-        <img src="../../../static/img/homeshare.jpg" />
-        <span class="title">广西工程建设质量管理监督责任有限公...</span>
+      <li v-for="(item,index) in BannerList" :key="index">
+        <img :src="item.imageUrl" />
+        <span class="title">{{item.title}}</span>
       </li>
     </ul>
     <div class="demand-box">
@@ -62,43 +54,13 @@
     <div class="recommend-box">
       <div class="title">好店推荐</div>
       <ul class="recommend-list">
-        <li>
-          <div class="logo"><img src="../../../static/img/homeshare.jpg" /></div>
+        <li v-for="(item,index) in ShopList" :key="index" @click="go({path:'/pages/shop/index',query:{sId:item.sId}})">
+          <div class="logo"><img :src="item.sLogo" /></div>
           <div class="info">
-            <span class="name">广西铭祥南宁旗舰店</span>
+            <span class="name">{{item.sName}}</span>
             <span class="maintype">
               <span class="label">主营：</span>
-              <span>消防设备</span>
-            </span>
-          </div>
-        </li>
-        <li>
-          <div class="logo"><img src="../../../static/img/homeshare.jpg" /></div>
-          <div class="info">
-            <span class="name">广西铭祥南宁旗舰店</span>
-            <span class="maintype">
-              <span class="label">主营：</span>
-              <span>消防设备</span>
-            </span>
-          </div>
-        </li>
-        <li>
-          <div class="logo"><img src="../../../static/img/homeshare.jpg" /></div>
-          <div class="info">
-            <span class="name">广西铭祥南宁旗舰店</span>
-            <span class="maintype">
-              <span class="label">主营：</span>
-              <span>消防设备</span>
-            </span>
-          </div>
-        </li>
-        <li>
-          <div class="logo"><img src="../../../static/img/homeshare.jpg" /></div>
-          <div class="info">
-            <span class="name">广西铭祥南宁旗舰店</span>
-            <span class="maintype">
-              <span class="label">主营：</span>
-              <span>消防设备</span>
+              <span>{{item.mainTypeName}}</span>
             </span>
           </div>
         </li>
@@ -107,7 +69,7 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState,mapMutations } from "vuex";
 import homeItem from './home-item.vue'
 export default {
   components:{
@@ -119,7 +81,84 @@ export default {
       supplyCount:0,
       demandList:[],
       demandCount:0,
+      BannerList:[],
+      ShopList:[]
     }
+  },
+  methods:{
+    getLocation(){
+      var that = this;
+      if (this.isMP) {
+        wx.getLocation({
+          type: "gcj02",
+          success(res) {
+            console.log(res)
+            that.$ShoppingAPI.baidu_geocoder({ location: `${res.latitude},${res.longitude}` }).then(rep2 => {
+              if (rep2.status == 0) {
+                // that.LocationAddress = rep2.result.formatted_address;
+                // that.latitude = rep2.result.location.lat;
+                // that.longitude = rep2.result.location.lng;
+                that.UpdateLocation({
+                  country:rep2.result.addressComponent.country,
+                  province:rep2.result.addressComponent.province,
+                  city:rep2.result.addressComponent.city,
+                  district:rep2.result.addressComponent.district,
+                  LocationAddress: rep2.result.formatted_address,
+                  latitude: rep2.result.location.lat,
+                  longitude: rep2.result.location.lng
+                });
+              }
+            });
+          },
+          fail() {},
+          complete() {}
+        });
+      } else {
+        var mapjs = require("../../utils/map").default;
+        mapjs.init("yCCZ5HnYGnUoRQNfd0YkTHg8lluFGQRZ").then(Bmap => {
+          // console.log(Bmap);
+          var geolocation = new Bmap.Geolocation();
+          geolocation.getCurrentPosition(function(r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+              // if (r.accuracy != null) {
+              //   that.toast("您已拒绝地理位置授权");
+              //   //用户决绝地理位置授权
+              //   return;
+              // } else
+              // {
+              // }
+              const myGeo = new BMap.Geocoder();
+              myGeo.getLocation(new BMap.Point(r.point.lng, r.point.lat), data => {
+                if (data.addressComponents) {
+                  const result = data.addressComponents;
+                  const location = {
+                    creditLongitude: r.point.lat, // 经度
+                    creditLatitude: r.point.lng, // 纬度
+                    creditProvince: result.province || "", // 省
+                    creditCity: result.city || "", // 市
+                    creditArea: result.district || "", // 区
+                    creditStreet: (result.street || "") + (result.streetNumber || "") // 街道
+                  };
+                  // console.log(location);
+                  that.UpdateLocation({
+                    country:"",
+                    province:location.creditProvince,
+                    city:creditCity.creditCity,
+                    district:location.creditArea,
+                    LocationAddress: location.creditProvince + location.creditCity + location.creditArea + location.creditStreet,
+                    latitude: location.creditLongitude,
+                    longitude: location.creditLatitude
+                  });
+                }
+              });
+            }
+          });
+        });
+      }
+    },
+    ...mapMutations([
+      "UpdateLocation", //`this.$store.commit('UpdateLocation')`
+    ])
   },
   computed: {
     ...mapState({
@@ -128,6 +167,7 @@ export default {
     }),
   },
   async mounted() {
+    this.getLocation();
     var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_GetList({
       lng: this.currentLocation.longitude,
       lat: this.currentLocation.latitude,
@@ -153,7 +193,16 @@ export default {
     if (rep.ret == 0) {
       this.supplyList=rep.data;
       this.supplyCount= rep.count;
-
+    }
+    var rep = await this.$SupplyAndDemandAPI.Home_GetBanner();
+    if(rep.ret==0)
+    {
+      this.BannerList=rep.data;
+    }
+    var rep = await this.$SupplyAndDemandAPI.Home_GetShop();
+    if(rep.ret==0)
+    {
+      this.ShopList=rep.data;
     }
   },
 };
