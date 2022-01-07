@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-27 10:04:33
- * @LastEditTime: 2021-12-14 17:39:33
+ * @LastEditTime: 2021-12-28 17:52:43
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release-form.vue
@@ -32,9 +32,11 @@
         <textarea class="content" v-model="supplyModel.info.content" placeholder="请在此填写详细介绍资料"></textarea>
         <div class="imgList">
           <div class="item" v-for="(item, index) in imageList" :key="index">
+            <i class="icon" @click="removeOld(item)">&#xe613;</i>
             <img :src="item.extContent" />
           </div>
           <div class="item" v-for="(item, index) in addImage" :key="index">
+            <i class="icon" @click="deleteNew(item)">&#xe613;</i>
             <img :src="item.url" />
           </div>
           <div class="item add" v-if="imageList.length + addImage.length < imageCountLimit" @click="AddImage(addImageCallback, { count: imageCountLimit - imageList.length - addImage.length })">
@@ -78,17 +80,41 @@
         </li>
       </ul>
     </div>
-    <div class="group" v-if="supplyModel.info.listType == '1'" @click="go({ path: '/pages/supply-demand/select', query: { type: 'corp' } })">
+    <div class="group" v-if="supplyModel.info.listType == '1' ||supplyModel.info.listType == '5' " @click="go({ path: '/pages/supply-demand/select', query: { type: 'corp' } })">
       <i class="icon">&#xe66f;</i>
       <span class="label">公司</span>
-      <input readonly disabled placeholder="请选择项目" :value="selectCorp && selectCorp.eName" />
+      <input readonly disabled placeholder="请选择公司" :value="selectCorp && selectCorp.eName" />
       <i class="icon go">&#xe601;</i>
     </div>
-    <div class="group" v-if="supplyModel.info.listType == '4'" @click="go({ path: '/pages/supply-demand/selectGoods', query: { sId: myShop.sId } })">
+    <div class="group" v-if="supplyModel.info.listType == '4'">
       <i class="icon">&#xe628;</i>
       <span class="label">店铺名</span>
-      <input readonly disabled placeholder="请选择店铺" :value="selectCorp && selectCorp.eName" />
-      <i class="icon go">&#xe601;</i>
+      <input readonly disabled :value="myShop.sName" />
+      <i class="icon go"></i>
+    </div>
+    <div class="group" v-if="supplyModel.info.listType == '4'">
+      <i class="icon">&#xe661;</i>
+      <span class="label">身份</span>
+      <input readonly disabled :value="myShop.Role == 99 ? '管理员' : '店员'" />
+      <i class="icon go"></i>
+    </div>
+    <div class="group goods" v-if="supplyModel.info.listType == '4'">
+      <div class="info">
+        <i class="icon">&#xe655;</i>
+        <span class="label">推荐商品</span>
+        <i class="icon go" @click="go({ path: '/pages/supply-demand/selectGoods', query: { sId: myShop.sId } })"
+          ><span>添加商品({{ selectGoods.length }}/3)</span>&#xe601;</i>
+      </div>
+
+      <ul class="selected-goods">
+        <li v-for="(item, index) in selectGoods" :key="index">
+          <i class="icon" @click="setSelecGoods(item)">&#xe613;</i>
+          <img :src="item.Images && item.Images.length > 0 ? item.Images[0].Thumbnail_url : ''" />
+          <div class="title">{{ item.gName }}</div>
+          <div class="num">已售{{ item.Sales }}件</div>
+          <div class="price">¥{{ item.gType==1?'议价商品':item.Price  }}</div>
+        </li>
+      </ul>
     </div>
     <div class="group">
       <i class="icon">&#xe64d;</i>
@@ -115,7 +141,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
 
 export default {
   data() {
@@ -125,7 +151,7 @@ export default {
 
       supplyModel: {
         info: {
-          listId: 1,
+          listId: 0,
           title: "",
           sendUserId: "",
           bindId: "",
@@ -158,13 +184,7 @@ export default {
         extType: 5,
         extPublic: true,
       },
-      goods_ext: {
-        extTitle: "产品",
-        extContent: "",
-        extOrder: 0,
-        extType: 6,
-        extPublic: true,
-      },
+      delExt:[],
       ptext0: {
         extTitle: "项目名称",
         extContent: "",
@@ -228,13 +248,14 @@ export default {
         extType: 3,
         extPublic: true,
       },
+      goods_ext:[],
     };
   },
   computed: {
     ...mapState({
       selectProject: (state) => state.SupplyDemand.selectProject,
       selectCorp: (state) => state.SupplyDemand.selectCorp,
-      selectShop: (state) => state.SupplyDemand.selectShop,
+      selectGoods: (state) => state.SupplyDemand.selectGoods,
       userInfo: (state) => state.User.UserInfo,
       myShop: (state) => state.User.myShop,
     }),
@@ -268,53 +289,124 @@ export default {
           extPublic: true,
           listId: 0,
         });
-        console.log(this.addImage);
       }
     },
+    removeOld(olditem)
+    {
+      var old = this.supplyModel.ext.find(item=>item.listId==olditem.listId);
+      var index =  this.supplyModel.ext.indexOf(old);
+      this.supplyModel.ext.splice(index,1);
+      this.delExt.push(old)
+    },
+    deleteNew(newItem)
+    {
+      var index =  this.addImage.indexOf(newItem);
+      this.addImage.splice(index,1);
+      console.log(this.addImage)
+    },
     async post() {
+      var that = this;
       var postData = {
         info: this.supplyModel.info,
         ext: [],
       };
-      postData.ext.push(this.name);
-      postData.ext.push(this.address);
-      postData.ext.push(this.contact);
-      postData.ext = postData.ext.concat(this.imageList);
-      postData.ext = postData.ext.concat(this.addImage);
+      if (!postData.info.title) {
+        that.toast("请输入标题");
+        return;
+      }
+      if (!postData.info.content) {
+        that.toast("请输入内容");
+        return;
+      }
+      postData.ext.push(that.name);
+      postData.ext.push(that.address);
+      postData.ext.push(that.contact);
+
       if (postData.info.listType == 2) {
-        postData.ext.push(this.ptext0);
-        postData.ext.push(this.ptext1);
-        postData.ext.push(this.ptext2);
-        postData.ext.push(this.ptext3);
-        postData.ext.push(this.ptext4);
-        postData.ext.push(this.ptext5);
-      } else if (postData.info.listType == 1 ||postData.info.listType == 5) {
+        if (!that.ptext0.extContent) {
+          that.toast("请选择项目");
+          return;
+        }
+        if(!that.ptext1.extContent||!that.ptext2.extContent||!that.ptext3.extContent||!that.ptext4.extContent||!that.ptext4.extContent)
+        {
+          that.toast("请完善项目信息");
+          return;
+        }
+        postData.ext.push(that.ptext0);
+        postData.ext.push(that.ptext1);
+        postData.ext.push(that.ptext2);
+        postData.ext.push(that.ptext3);
+        postData.ext.push(that.ptext4);
+        postData.ext.push(that.ptext5);
+      } else if (postData.info.listType == 1 || postData.info.listType == 5) {
+        if (!that.selectCorp) {
+          that.toast("请选择企业");
+          return;
+        }
         postData.ext.push({
-          extId: 0,
-          extTitle: selectCorp.eName,
-          extContent: selectCorp.eId,
+          extId: that.selectCorp.extId||0,
+          extTitle: that.selectCorp.eName,
+          extContent: that.selectCorp.eId,
           extOrder: 0,
-          extType: 0,
+          extType: 4,
           extPublic: true,
-          listId: 4,
+          listId: that.selectCorp.listId||0,
         });
-      }else if(postData.info.listType ==4 )
+      } else if (postData.info.listType == 4) {
+
+        this.shop_ext.extTitle = that.myShop.sName;
+        this.shop_ext.extContent = that.myShop.sId;
+
+        if (!that.selectGoods || that.selectGoods.length < 1) {
+          that.toast("请选择商品");
+          return;
+        }
+        for (let index = 0; index < that.selectGoods.length; index++) {
+          const element = that.selectGoods[index];
+          postData.ext.push({
+            extId: element.extId||0,
+            extTitle: element.gName,
+            extContent: element.gId,
+            extOrder: 0,
+            extType: 6,
+            extPublic: true,
+            listId: element.listId||0,
+          });
+        }
+        that.goods_ext.forEach(item=>{
+          if(!that.selectGoods.find(i=>item.extId==i.extId)){
+            that.delExt.push(item);
+          }
+        })
+      }
+      // // console.log(postData);
+      if(postData.info.listId>0)//编辑
       {
-        postData.ext.push({
-          extId: 0,
-          extTitle: selectShop.sName,
-          extContent: selectShop.sId,
-          extOrder: 0,
-          extType: 0,
-          extPublic: true,
-          listId: 4,
-        });
+        postData.modifyExt = postData.ext.filter(item=>item.extId>0);
+        postData.delExt = this.delExt;
+        postData.ext= postData.ext.filter(item=>item.extId==0);
+        postData.ext = postData.ext.concat(this.addImage);
+        // console.log(postData)
+        var rep = await that.$SupplyAndDemandAPI.SupplyAndDemand_Modify(postData);
+        if (rep.ret == 0&&rep.data) {
+          that.toast("编辑成功");
+          that.$router.replace({ path: "/pages/supply-demand/post", query: { listId: postData.info.listId } });
+        }else
+        {
+          that.toast(rep.msg);
+        }
+      }else{//新发布
+        postData.ext = postData.ext.concat(that.addImage);
+        var rep = await that.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData);
+        if (rep.ret == 0&&rep.data) {
+          that.toast("发布成功");
+          that.$router.replace({ path: "/pages/supply-demand/post", query: { listId: rep.data } });
+        }else
+        {
+          that.toast(rep.msg);
+        }
       }
-      var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_Create(postData);
-      if (rep.ret == 0) {
-        this.toast("发布成功");
-        this.$router.push({ path: "/pages/supply-demand/post", query: { listId: rep.data } });
-      }
+
     },
     setTitle() {
       if (this.isMP) {
@@ -342,18 +434,69 @@ export default {
         }
       }
     },
+    setSelecGoods(item){
+      if(this.supplyModel.info.listId>0)
+      {
+        this.delExt.push({
+            extId: item.extId||0,
+            extTitle: item.gName,
+            extContent: item.gId,
+            extOrder: 0,
+            extType: 6,
+            extPublic: true,
+            listId: item.listId||0,
+          })
+      }
+      this.setgoods(item)
+    },
+    ...mapActions({setgoods:"setSelecGoods"}),
+    ...mapMutations(["setSelectProject", "setSelectCorp", "clearSelecGoods"]),
+  },
+  onUnload() {
+    this.setSelectProject(null);
+    this.setSelectCorp(null);
+    this.clearSelecGoods();
   },
   onShow() {
     // console.log("onShow",this.supplyModel.info.listType)
+
+    switch (this.$route.query.listType) {
+      case "1": {
+        this.address.extContent = this.address.extContent || (this.selectCorp && this.selectCorp.Address);
+        this.supplyModel.info.cityCode = this.supplyModel.info.cityCode || (this.selectCorp && this.$store.getters.getAreaCodeInfoById(this.selectCorp.Area));
+        this.supplyModel.info.gps_lng = this.supplyModel.info.gps_lng || (this.selectCorp && this.selectCorp.Longitude);
+        this.supplyModel.info.gps_lat = this.supplyModel.info.gps_lat || (this.selectCorp && this.selectCorp.Latitude);
+        break;
+      }
+      case "2": {
+        this.ptext0.extContent = (this.selectProject && this.selectProject.ProjectName)
+        this.address.extContent = this.address.extContent || (this.selectProject && this.selectProject.Address);
+        this.supplyModel.info.cityCode = this.supplyModel.info.cityCode || (this.selectProject && this.$store.getters.getAreaCodeInfoById(this.selectProject.AreaId));
+        this.supplyModel.info.gps_lng = this.supplyModel.info.gps_lng || (this.selectProject && this.selectProject.Longitude);
+        this.supplyModel.info.gps_lat = this.supplyModel.info.gps_lat || (this.selectProject && this.selectProject.Latitude);
+        break;
+      }
+      case "3": {
+        break;
+      }
+      case "4": {
+        this.address.extContent = this.address.extContent || (this.myShop && this.myShop.Address);
+        this.supplyModel.info.cityCode = this.supplyModel.info.cityCode || (this.myShop && this.$store.getters.getAreaCodeInfoById(this.myShop.AreaId));
+        this.supplyModel.info.gps_lng = this.supplyModel.info.gps_lng || (this.myShop && this.myShop.Longitude);
+        this.supplyModel.info.gps_lat = this.supplyModel.info.gps_lat || (this.myShop && this.myShop.Latitude);
+        break;
+      }
+      case "5": {
+        this.address.extContent = this.address.extContent || (this.selectCorp && this.selectCorp.Address);
+        this.supplyModel.info.cityCode = this.supplyModel.info.cityCode || (this.selectCorp && this.$store.getters.getAreaCodeInfoById(this.selectCorp.Area));
+        this.supplyModel.info.gps_lng = this.supplyModel.info.gps_lng || (this.selectCorp && this.selectCorp.Longitude);
+        this.supplyModel.info.gps_lat = this.supplyModel.info.gps_lat || (this.selectCorp && this.selectCorp.Latitude);
+        break;
+      }
+    }
     this.contact.extContent = this.contact.extContent || this.userInfo.Phone;
     this.name.extContent = this.name.extContent || this.userInfo.UserName;
     this.supplyModel.info.bindId = this.supplyModel.info.bindId || this.userInfo.UserId;
-    this.address.extContent = this.address.extContent || (this.selectProject && this.selectProject.Address) || (this.selectCorp && this.selectCorp.Address);
-    this.ptext0.extContent =  this.ptext0.extContent||(this.selectProject&&this.selectProject.ProjectName);
-    this.supplyModel.info.cityCode = this.supplyModel.info.cityCode || (this.selectProject && this.selectProject.AreaId) || (this.selectCorp && this.selectCorp.Area);
-    this.supplyModel.info.gps_lng = this.supplyModel.info.gps_lng || (this.selectProject && this.selectProject.Longitude) || (this.selectCorp && this.selectCorp.Longitude);
-    this.supplyModel.info.gps_lat = this.supplyModel.info.gps_lat || (this.selectProject && this.selectProject.Latitude) || (this.selectCorp && this.selectCorp.Latitude);
-  
   },
   async mounted() {
     if (this.$route.query.listType) {
@@ -367,6 +510,56 @@ export default {
         var extList = rep.data.ext.map((item) => {
           return item.ext;
         });
+        if(this.supplyModel.info.listType==1||this.supplyModel.info.listType==5)
+        {
+          var _corp = rep.data.ext.find((item) => {
+            return item.ext.extType==4
+          });
+          if(_corp)
+          {
+            this.setSelectCorp({..._corp.enterprise,extId:_corp.ext.extId,listId:_corp.ext.listId})
+          }
+        }
+        else if(this.supplyModel.info.listType==2)
+        {
+          var _project = extList.find((item) => {
+            return item.extType==7&&item.extTitle=='项目名称'
+          });
+          if(_project)
+          {
+            this.ptext0=_project;
+          }
+        }else if(this.supplyModel.info.listType==4)
+        {
+          var _shop = extList.find((item) => {
+            return item.extType==5
+          });
+          if(_shop)
+          {
+            this.shop_ext = _shop;
+          }
+          
+          var _goodslist = rep.data.ext.filter((item) => {
+            return item.ext.extType==6
+          });
+          this.clearSelecGoods();
+          for (let index = 0; index < _goodslist.length; index++) {
+            const element = _goodslist[index];
+            var {sId,gId,sales,price_min,gName,imageLogo} = element.goods
+            var goods = {
+              extId:element.ext.extId,
+              listId:element.ext.listId,
+              sId,
+              gId,
+              Sales:sales,
+              Price:price_min,
+              gName,Images:[{Thumbnail_url:imageLogo}]
+            };
+            this.setgoods(goods);
+            this.goods_ext.push(goods)
+          }
+        }
+        
         this.contact = extList.find((item) => {
           return item.extType == 3;
         });
@@ -394,7 +587,6 @@ export default {
         this.ptext5 = extList.find((item) => {
           return item.extType == 7 && item.extTitle == "设计单位";
         });
-        console.log(this.supplyModel);
       }
     }
   },
@@ -470,6 +662,21 @@ export default {
       .item {
         margin-left: 0.23rem;
         margin-bottom: 0.2rem;
+        position: relative;
+        border-radius: 0.2rem;
+        i.icon{
+          border-radius: 0.2rem;
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 0.47rem;
+          height: 0.47rem;
+          text-align: center;
+          line-height: 0.47rem;
+          font-size: 0.3rem;
+          color:#fff;
+          background-color: rgba(121,121,121,0.7);
+        }
         img {
           width: 2.94rem;
           height: 2.93rem;
@@ -479,7 +686,8 @@ export default {
     }
 
     & > .icon,
-    &.project > .info .icon {
+    &.project > .info .icon,
+    &.goods > .info .icon {
       color: #fff;
       background-color: #bfbfbf;
       border-radius: 50%;
@@ -491,16 +699,29 @@ export default {
     }
 
     > .label,
-    &.project > .info .label {
+    &.project > .info .label,
+    &.goods > .info .label {
       margin-left: 0.2rem;
       width: 3.08rem;
     }
     & > .icon.go,
-    &.project > .info .icon.go {
+    &.project > .info .icon.go,
+    &.goods > .info .icon.go {
       background-color: transparent;
       color: #e6e6e6;
       font-size: 0.7rem;
       font-weight: 800;
+    }
+    &.goods > .info .icon.go {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      span {
+        font-size: 0.4rem;
+        margin-right: 0.4rem;
+        color: #b3b3b3;
+      }
+      flex-grow: 1;
     }
   }
   .group.project {
@@ -542,6 +763,75 @@ export default {
           flex-grow: 0;
           color: #8c8c8c;
         }
+      }
+    }
+  }
+  .group.goods {
+    display: block;
+    border-bottom: 0;
+    padding-bottom: 0;
+    .info {
+      display: flex;
+      align-items: center;
+      input {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+    .selected-goods {
+      display: flex;
+      align-items: center;
+      margin-top: 0.46rem;
+      li {
+        width: 2.82rem;
+        background-color: #f5faff;
+        border-radius: 0.15rem;
+        padding: 0 0.18rem;
+        position: relative;
+        i.icon {
+          position: absolute;
+          width: 0.47rem;
+          height: 0.47rem;
+          line-height: 0.47rem;
+          border-radius: 0.06rem;
+          border-top-right-radius: 0.11rem;
+          background-color: #7a7d7f;
+          color: #fff;
+          font-size: 0.25rem;
+          text-align: center;
+          top: 0;
+          right: 0;
+        }
+        img {
+          margin-top: 0.56rem;
+          display: block;
+          margin-top: 0.59rem;
+          width: 2.82rem;
+          height: 2.55rem;
+        }
+        .title {
+          margin-top: 0.15rem;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 0.33rem;
+          color: #111111;
+        }
+        .num {
+          margin-top: 0.22rem;
+          color: #999999;
+          font-size: 0.25rem;
+        }
+        .price {
+          margin-top: 0.22rem;
+          color: #f19149;
+          font-size: 0.42rem;
+          margin-bottom: 0.33rem;
+        }
+      }
+      li:nth-of-type(1n + 2) {
+        margin-left: 0.2rem;
       }
     }
   }

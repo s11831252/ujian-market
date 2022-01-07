@@ -1,13 +1,13 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-12-02 16:45:54
- * @LastEditTime: 2021-12-03 16:05:57
+ * @LastEditTime: 2021-12-27 17:56:12
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\manage-item.vue
 -->
 <template>
-    <li class="data-item">
+    <li class="data-item" @click="go({path:'/pages/supply-demand/detail',query:{listId:item.listId}})">
         <div class="title">
           <i v-if="item.listType==1||item.listType==5" class="corp">企</i>
           <i v-if="item.listType==2" class="pro">项</i>
@@ -16,6 +16,7 @@
           <span class="txt">{{item.title}}</span>
           <span class="status invalid" v-if="statusClass=='invalid'">已失效</span>
           <span class="status stop" v-else-if="statusClass=='stop'">暂停中</span>
+          <span class="status " v-else-if="statusClass=='draft'"></span>
           <span class="status" v-else>展示中</span>
         </div>
         <div class="body">
@@ -26,10 +27,11 @@
           </div>
           <div class="context" :class="statusClass">
             <span class="txt">{{item.content}}</span>
-            <span class="time">剩余{{item.timeStr}}</span>
+            <span class="time" v-if="statusClass=='draft'">待发布</span>
+            <span class="time" v-else>剩余{{item.timeStr}}</span>
           </div>
         </div>
-        <div class="bottom" v-if="statusClass==''">
+        <div class="bottom" v-if="statusClass==''" @click.stop>
           <div class="more" @click="more">···</div>
           <div class="btn-group" >
             <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">编辑</button>
@@ -37,7 +39,7 @@
             <button @click="AddShowDays">延长展示</button>
           </div>
         </div>
-        <div class="bottom" v-else-if="statusClass=='draft'">
+        <div class="bottom" v-else-if="statusClass=='draft'" @click.stop>
           <div class="more"></div>
           <div class="btn-group">
             <button @click="del">删除草稿</button>
@@ -45,7 +47,7 @@
             <button @click="go({path:'/pages/supply-demand/post',query:{listId:item.listId}})">发布</button>
           </div>
         </div>
-        <div class="bottom" v-else-if="statusClass=='stop'">
+        <div class="bottom" v-else-if="statusClass=='stop'" @click.stop>
           <div class="more"></div>
           <div class="btn-group">
             <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">编辑</button>
@@ -53,7 +55,7 @@
             <button @click="go({path:'/pages/supply-demand/post',query:{listId:item.listId}})">发布</button>
           </div>
         </div>
-        <div class="bottom" v-else-if="statusClass=='invalid'">
+        <div class="bottom" v-else-if="statusClass=='invalid'" @click.stop>
           <div class="more"></div>
           <div class="btn-group">
             <button @click="go({path:'/pages/supply-demand/release-form',query:{listId:item.listId}})">编辑</button>

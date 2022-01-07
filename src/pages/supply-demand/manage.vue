@@ -1,13 +1,23 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-11-17 17:12:21
- * @LastEditTime: 2021-12-03 16:01:21
+ * @LastEditTime: 2021-12-31 17:04:51
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\manage.vue
 -->
 <template>
   <div class="root">
+    <div class="head">
+      <div class="position">
+        <i class="icon"></i>
+        <span></span>
+      </div>
+      <div class="menu">
+        <i class="icon" @click="go({ path: '/pages/supply-demand/message' })">&#xe637;</i>
+        <i class="icon" @click="go({ path: '/pages/supply-demand/publish-points' })">&#xe8b7;</i>
+      </div>
+    </div>
     <ul class="navbar">
       <li v-for="(item, index) in Tabs" :key="index" :id="index" :class="{ navbar_item_on: activeIndex == index }" class="navbar_item" @click="tabClick(item, $event)">
         <div class="navbar_title">{{ item.name }}</div>
@@ -250,6 +260,31 @@ body {
 </style>
 <style lang="scss" scoped>
 .root {
+  .head {
+    background-color: #12b7f5;
+    height: 1.16rem;
+    display: flex;
+    align-items: center;
+    padding-left: 1.07rem;
+    font-size: 0.43rem;
+    color: #fff;
+    .position {
+      width: 85%;
+      display: flex;
+      align-items: center;
+      i {
+        margin-right: 0.15rem;
+      }
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      i {
+        margin-right: 0.43rem;
+      }
+    }
+  }
   .data-list {
     margin: 0 0.35rem;
     margin-top: 0.51rem;

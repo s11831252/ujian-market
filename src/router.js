@@ -366,6 +366,39 @@ var routes = [
             navigationBarTitleText: '供求管理',
             enablePullDownRefresh: false,
         }
+    },
+    {
+        path:'pages/supply-demand/detail',
+        name:'sd_detail',
+        config: {
+            navigationBarTitleText: '供求详情',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
+        path:'pages/supply-demand/list',
+        name:'sd_list',
+        config: {
+            navigationBarTitleText: '市场需求',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
+        path:'pages/supply-demand/message',
+        name:'sd_message',
+        config: {
+            navigationBarTitleText: '消息管理',
+            enablePullDownRefresh: false,
+        }
+    },
+    {
+        path:'pages/supply-demand/publish-points',
+        name:'sd_publish_points',
+        config: {
+            navigationBarTitleText: '发布点管理',
+            enablePullDownRefresh: false,
+            onReachBottomDistance: 50
+        }
     }
     
 ]

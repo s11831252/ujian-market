@@ -447,12 +447,11 @@ export default {
               // that.LocationAddress = rep2.result.formatted_address;
               // that.latitude = rep2.result.location.lat;
               // that.longitude = rep2.result.location.lng;
-
               that.UpdateLocation({
                 country:rep2.result.addressComponent.country,
                 province:rep2.result.addressComponent.province,
-                city:result.addressComponent.city,
-                district:result.addressComponent.district,
+                city:rep2.result.addressComponent.city,
+                district:rep2.result.addressComponent.district,
                 LocationAddress: rep2.result.formatted_address,
                 latitude: rep2.result.location.lat,
                 longitude: rep2.result.location.lng

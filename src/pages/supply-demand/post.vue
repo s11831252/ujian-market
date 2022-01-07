@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-11-10 18:05:10
- * @LastEditTime: 2021-12-08 11:19:59
+ * @LastEditTime: 2022-01-06 17:30:56
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\post.vue
@@ -145,9 +145,12 @@ export default {
     async codeComplete(code){
       this.postData.verificationCode = code;
       var rep  = await this.$SupplyAndDemandAPI.SupplyAndDemand_Pay(this.postData);
-      if(rep.ret == 0&&rep.data )
+      if(rep.ret == 0&&rep.data)
       {
         this.$router.push({path:'/pages/supply-demand/post-ok',query:{listId:this.postData.listId}})
+      }else
+      {
+        this.toast(rep.msg)
       }
     }
   },
@@ -161,24 +164,27 @@ export default {
       {
         this.detail = rep.data;
         //设置默认支付方式
-        if(this.detail.info.listType==1||detail.info.listType==2)
+        if(this.detail.info.listType==1||this.detail.info.listType==2)
         {
           this.postData.type=4
-        }else if(this.detail.info.listType==3||detail.info.listType==4||detail.info.listType==5)
+        }else if(this.detail.info.listType==3||this.detail.info.listType==4||this.detail.info.listType==5)
         {
           this.postData.type=3
         }
       }
-      // console.log(this.detail,this.postData)
-      var rep1 = await this.$SupplyAndDemandAPI.HallMoney_Balance();
-      if (rep1.ret == 0) {
-        this.pointBalance= rep1.data.selfMoney;
-        this.ent_pointBalance = rep1.data.enterpriseMoney
-      }
-      var rep2 = await this.$UJAPI.Balance_Purse();
-      if (rep2.ret == 0) {
-        this.balance = rep2.data
-      }
+      this.$SupplyAndDemandAPI.HallMoney_Balance().then(rep1=>{
+        if (rep1.ret == 0) {
+          this.pointBalance= rep1.data.selfMoney;
+          this.ent_pointBalance = rep1.data.enterpriseMoney
+        }
+      });
+
+      this.$UJAPI.Balance_Purse().then(rep2=>{
+        if (rep2.ret == 0) {
+          this.balance = rep2.data
+        }
+      });
+
     }
 
   },

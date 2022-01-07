@@ -1,13 +1,13 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-12-07 11:24:16
- * @LastEditTime: 2021-12-10 18:53:08
+ * @LastEditTime: 2021-12-27 16:48:50
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\home-item.vue
 -->
 <template>
-    <li>
+    <li @click="go({path:'/pages/supply-demand/detail',query:{listId:item.listId}})">
           <span class="time">{{time_fmt}}</span>
           <span class="type e" v-if="item.listType==1||item.listType==5">企</span>
           <span class="type p" v-else-if="item.listType==2">项</span>

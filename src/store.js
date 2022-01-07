@@ -4,6 +4,7 @@ import createPersistedState from 'vuex-persistedstate'
 import ShoppingAPI from "./api/ShoppingAPI"
 import WeixinOpenAPI from "./api/WeixinOpenAPI"
 import UJAPI from "./api/UJAPI"
+import SupplyAndDemandAPI from "./api/SupplyAndDemandAPI"
 
 
 Vue.use(Vuex);
@@ -277,10 +278,25 @@ export default new Vuex.Store({//store对象
           showBuy:true,
           //jssdk 调用config是否成功
         },
+        Area:[],
         SensitiveWords:"",
         // wx_jssdk_config:{
         //   Enable:false,
         // },
+      },
+      getters:{
+        getAreaCodeInfoById(state){
+          return function(areaId){
+            var _area= state.Area.find(item=>item.KeywordId==areaId);
+            if(_area)
+            {
+              return _area.code
+            }else
+            {
+              return 0;
+            }
+          }
+        },
       },
       mutations:{
         setConfig(state,Config){
@@ -289,6 +305,9 @@ export default new Vuex.Store({//store对象
         setSensitiveWords(state,data){
           state.SensitiveWords=data;
         },
+        setArea(state,data){
+          state.Area=data;
+        }
         // wx_jssdk_config_result(state,result){
         //   state.wx_jssdk_config.Enable=result;
         // }
@@ -332,14 +351,25 @@ export default new Vuex.Store({//store对象
               return null;
             }
         },
+        async getArea(context){
+          if(context.state.Area.length<=0)
+          {
+            var rep = await UJAPI.GetKeyword({TypeId:4});
+            if(rep.ret==0)
+            {
+              context.commit("setArea",rep.data);
+            }
+          }
+        }
       }
     },
     SupplyDemand:{
       state:{
         selectProject:null,
         selectCorp:null,
-        selectShop:null,
         selectGoods:[],
+        PointsPrice:0,
+        showTip:true,
       },
       mutations:{
         setSelectProject(state,item){
@@ -348,20 +378,50 @@ export default new Vuex.Store({//store对象
         setSelectCorp(state,item){
           state.selectCorp=item;
         },
-        setSelectShop(state,item){
-          state.selectShop=item;
+        addSelecGoods(state,goods)
+        {
+          state.selectGoods.push(goods)
         },
-        setSelecGoods(state,goods){
-          var nowItem = state.selectGoods.filter(item => item.gId == goods.gId)[0];//先查找该店铺的购物车
-          if(nowItem)
+        clearSelecGoods(state){
+          state.selectGoods=[];
+        },
+        deleteSelecGoods(state,goods)
+        {
+          var index = state.selectGoods.indexOf(goods)
+          state.selectGoods.splice(index, 1);
+        },
+        setPointsPrice(state,Price){
+          state.PointsPrice=Price;
+        },
+        setShowTip(state,isShow){
+          state.showTip=isShow;
+        }
+      },
+      actions:{
+        setSelecGoods(context,goods){
+          var nowItem = context.state.selectGoods.filter(item => item.gId == goods.gId)[0];//先查找该店铺的购物车
+          if(nowItem)//已有则移除
           {
-            var index = state.selectGoods.indexOf(nowItem)
-            state.selectGoods.splice(index, 1);//数量0移除该商品
-          }else
-          {
-            state.selectGoods.push(goods)
+            context.commit('deleteSelecGoods',nowItem);
+            return true;
+          }else{
+            if(context.state.selectGoods.length>=3)//功能限制只能选择3个商品
+              return false
+            else
+            {
+              context.commit('addSelecGoods',goods);
+              return true;
+            }
           }
         },
+        getPointsPrice(_point){
+          SupplyAndDemandAPI.HallMoney_GetPrice({point:_point}).then(rep=>{
+            if(rep.ret==0)
+            {
+              context.commit('setPointsPrice',rep.data);
+            }
+          })
+        }
       }
     }
   }, plugins: [//vuex持久化

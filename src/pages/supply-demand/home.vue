@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-18 18:20:32
- * @LastEditTime: 2021-12-13 16:24:38
+ * @LastEditTime: 2022-01-04 14:57:05
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\home.vue
@@ -22,7 +22,7 @@
     <div class="demand-box">
       <div class="demand-head">
         <span class="title">市场需求 ({{demandCount>99?demandCount+'+':demandCount}})</span>
-        <span class="all">全部<i class="icon">&#xe601;</i></span>
+        <span class="all" @click="go({path:'/pages/supply-demand/list',query:{type:'demand'}})">全部<i class="icon">&#xe601;</i></span>
       </div>
       <ul class="demand-list" v-if="demandList&&demandList.length>0">
         <homeItem v-for="(item,index) in demandList" :key="index" :item="item"></homeItem>
@@ -41,7 +41,7 @@
     <div class="demand-box">
       <div class="demand-head">
         <span class="title">今日供应 ({{supplyCount>99?supplyCount+'+':supplyCount}})</span>
-        <span class="all">全部<i class="icon">&#xe601;</i></span>
+        <span class="all" @click="go({path:'/pages/supply-demand/list',query:{type:'supply'}})">全部<i class="icon">&#xe601;</i></span>
       </div>
       <ul class="demand-list" v-if="supplyList&&supplyList.length>0">
         <homeItem v-for="(item,index) in supplyList" :key="index" :item="item"></homeItem>
@@ -92,7 +92,6 @@ export default {
         wx.getLocation({
           type: "gcj02",
           success(res) {
-            console.log(res)
             that.$ShoppingAPI.baidu_geocoder({ location: `${res.latitude},${res.longitude}` }).then(rep2 => {
               if (rep2.status == 0) {
                 // that.LocationAddress = rep2.result.formatted_address;
@@ -107,6 +106,7 @@ export default {
                   latitude: rep2.result.location.lat,
                   longitude: rep2.result.location.lng
                 });
+                that.init();
               }
             });
           },
@@ -149,12 +149,46 @@ export default {
                     latitude: location.creditLongitude,
                     longitude: location.creditLatitude
                   });
+                  that.init();
                 }
               });
             }
           });
         });
       }
+    },
+    init(){
+      var that = this;
+      this.$SupplyAndDemandAPI.SupplyAndDemand_GetList({
+        lng: this.currentLocation.longitude,
+        lat: this.currentLocation.latitude,
+        pageIndex: 1,
+        pageSize: 5,
+        type: 2,
+        isSelf: 0,
+        status: 1,
+      }).then(rep=>{
+        if (rep.ret == 0) {
+          this.demandList=rep.data;
+          this.demandCount= rep.count;
+        }
+      });
+
+      this.$SupplyAndDemandAPI.SupplyAndDemand_GetList({
+        lng: this.currentLocation.longitude,
+        lat: this.currentLocation.latitude,
+        pageIndex: 1,
+        pageSize: 5,
+        type: 1,
+        isSelf: 0,
+        status: 1,
+      }).then(rep=>{
+        if (rep.ret == 0) {
+          this.supplyList=rep.data;
+          this.supplyCount= rep.count;
+        }
+      });
+
     },
     ...mapMutations([
       "UpdateLocation", //`this.$store.commit('UpdateLocation')`
@@ -167,43 +201,24 @@ export default {
     }),
   },
   async mounted() {
-    this.getLocation();
-    var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_GetList({
-      lng: this.currentLocation.longitude,
-      lat: this.currentLocation.latitude,
-      pageIndex: 1,
-      pageSize: 5,
-      type: 2,
-      isSelf: 0,
-      status: 1,
-    });
-    if (rep.ret == 0) {
-      this.demandList=rep.data;
-      this.demandCount= rep.count;
-    }
-    var rep = await this.$SupplyAndDemandAPI.SupplyAndDemand_GetList({
-      lng: this.currentLocation.longitude,
-      lat: this.currentLocation.latitude,
-      pageIndex: 1,
-      pageSize: 5,
-      type: 1,
-      isSelf: 0,
-      status: 1,
-    });
-    if (rep.ret == 0) {
-      this.supplyList=rep.data;
-      this.supplyCount= rep.count;
-    }
-    var rep = await this.$SupplyAndDemandAPI.Home_GetBanner();
-    if(rep.ret==0)
-    {
-      this.BannerList=rep.data;
-    }
-    var rep = await this.$SupplyAndDemandAPI.Home_GetShop();
-    if(rep.ret==0)
-    {
-      this.ShopList=rep.data;
-    }
+    let that = this;
+    that.$SupplyAndDemandAPI.Home_GetBanner().then(rep=>{
+        if(rep.ret==0)
+        {
+          that.BannerList=rep.data;
+        }
+      });
+
+    that.$SupplyAndDemandAPI.Home_GetShop().then(rep=>{
+        if(rep.ret==0)
+        {
+          that.ShopList=rep.data;
+        }
+      });
+    this.extraDataHandler();
+    this.wx_login(async () => {
+      that.getLocation();
+    })
   },
 };
 </script>
@@ -271,59 +286,6 @@ export default {
         color: #999999;
       }
     }
-    // .demand-list {
-    //   li {
-    //     display: flex;
-    //     align-items: center;
-    //     padding: 0.45rem 0;
-    //     border-bottom: 0.02rem solid #f2f2f2;
-    //     span {
-    //       flex-grow: 1;
-    //       flex-shrink: 0;
-    //     }
-    //     .time {
-    //       width: 1.08rem;
-    //       height: 0.47rem;
-    //       line-height: 0.47rem;
-    //       background-color: #f3f8fe;
-    //       color: #75aefb;
-    //       border-radius: 0.06rem;
-    //       margin-right: 0.28rem;
-    //       font-size: 0.29rem;
-    //     }
-    //     .type {
-    //       width: 0.42rem;
-    //       height: 0.42rem;
-    //       font-size: 0.29rem;
-    //       border-radius: 0.07rem;
-    //       margin-right: 0.12rem;
-    //       display: flex;
-    //       justify-content: center;
-    //       align-items: center;
-    //       color: #fff;
-    //     }
-    //     .type.e {
-    //       background-image: linear-gradient(86deg, #fe475d 0%, #ff6f88 100%);
-    //     }
-    //     .type.p {
-    //       background-image: linear-gradient(85deg, #138df5 0%, #13b6f5 100%);
-    //     }
-    //     .type.s {
-    //       background-image: linear-gradient(85deg, #fe7b20 0%, #ff9f29 100%);
-    //     }
-    //     .type.g {
-    //       background-image: linear-gradient(85deg, #09cc6c 0%, #22dd7a 100%);
-    //     }
-    //     .title {
-    //       overflow: hidden;
-    //       text-overflow: ellipsis;
-    //       white-space: nowrap;
-    //       flex-shrink: 1;
-    //       font-size: 0.43rem;
-    //       color: #4d4d4d;
-    //     }
-    //   }
-    // }
     div.demand-list{
         text-align: center;
         img{

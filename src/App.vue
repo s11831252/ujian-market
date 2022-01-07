@@ -86,7 +86,7 @@ function getGroupInfo(_groupids, count,index=0) {
 }
 export default {
   methods: {
-    ...mapActions(["GetConfig"]),
+    ...mapActions(["GetConfig","getArea"]),
   },
   created() {
     //debugger
@@ -322,6 +322,9 @@ export default {
       });
     }
     this.GetConfig();
+    this.getArea();
+
+    
   }
 };
 </script>

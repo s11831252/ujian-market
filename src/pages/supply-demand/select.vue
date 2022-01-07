@@ -31,7 +31,7 @@ export default {
         }
     },
     methods:{
-        ...mapMutations(["setSelectProject","setSelectCorp","setSelectShop"]),
+        ...mapMutations(["setSelectProject","setSelectCorp"]),
         /// 按钮触摸开始触发的事件
         touchStart: function(e) {
             // console.log(e)

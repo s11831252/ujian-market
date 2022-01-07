@@ -45,8 +45,10 @@ import sd_buy from './pages/supply-demand/buy'
 import sd_select from './pages/supply-demand/select'
 import sd_release_form from './pages/supply-demand/release-form'
 import sd_discount from './pages/supply-demand/discount-code'
-
-
+import sd_detail from './pages/supply-demand/detail'
+import sd_list from './pages/supply-demand/list'
+import sd_message from './pages/supply-demand/message'
+import sd_publish_points from './pages/supply-demand/publish-points'
 
 
 import store from './store'
@@ -538,6 +540,50 @@ var routes = [
         meta: { noAuth: true },
         alias: '/pages/supply-demand/manage',
         component: sd_manage
+    },
+    {
+        path:'pages/supply-demand/detail',
+        name:'sd_detail',
+        config: {
+            navigationBarTitleText: '供求详情',
+            enablePullDownRefresh: false,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/detail',
+        component: sd_detail
+    },
+    {
+        path:'pages/supply-demand/list',
+        name:'sd_list',
+        config: {
+            navigationBarTitleText: '市场需求',
+            enablePullDownRefresh: true,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/list',
+        component: sd_list
+    },
+    {
+        path:'pages/supply-demand/message',
+        name:'sd_message',
+        config: {
+            navigationBarTitleText: '消息管理',
+            enablePullDownRefresh: true,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/message',
+        component: sd_message
+    },
+    {
+        path:'pages/supply-demand/publish-points',
+        name:'sd_publish_points',
+        config: {
+            navigationBarTitleText: '发布点管理',
+            enablePullDownRefresh: true,
+        },
+        meta: { noAuth: true },
+        alias: '/pages/supply-demand/publish-points',
+        component: sd_publish_points
     }
 ]
 

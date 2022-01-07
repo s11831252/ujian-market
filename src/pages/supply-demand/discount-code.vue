@@ -6,19 +6,76 @@
             <span class="title_txt">发送短信 获取福利</span>
             <span class="tip">输入推荐人手机号，获取推荐码</span>
             <div class="group">
-                <input class="" placeholder="输入号码">
+                <input class="" v-model="phone" placeholder="输入号码"  maxlength="11">
             </div>
             <div class="group">
-                <input class="" placeholder="输入推荐码">
-                <span class="txt">已发送短信</span>
+                <input class="" v-model="code" placeholder="输入推荐码">
+                <span v-if="code_key" class="txt disable" >已发送短信</span>
+                <span class="txt disable" v-else-if="disableSend">获取推荐码</span>
+                <span class="txt" @click="sendCode" v-else>获取推荐码</span>
             </div>
-            <button class="post">确 认</button>
+            <button class="post" @click="GetDiscount" :class="{disable:!code_key||code.length<4}">确 认</button>
         </div>
     </div>
 </template>
 <script>
 export default {
-    
+    data(){
+        return {
+            code:"",
+            code_key:"",
+            phone:"",
+            points:""
+        }
+    },
+    computed:{
+        disableSend(){
+            return !this.phone||this.phone.length!=11;
+        }
+    },
+    methods:{
+        sendCode(){
+            if(this.phone&&this.phone.length==11)
+            {
+                this.$SupplyAndDemandAPI.Rank_SendCode(this.phone,this.points).then(rep=>{
+                    if(rep.ret==0)
+                    {
+                        this.code_key = rep.data;
+                        this.toast("推荐码发送成功");
+                    }
+                })
+            }else
+            {
+                this.toast("请输入手机号码")
+            }
+        },
+        GetDiscount(){
+            if(this.code_key&&this.code.length>=4)
+            {
+                this.$SupplyAndDemandAPI.Rank_GetDiscountMoney(this.code_key,this.code).then(rep=>{
+                    if(rep.ret==0)
+                    {
+                        this.toast(`成功获得${rep.data*10}折优惠`);
+                        var queryObj ={key:this.code_key,code:this.code,type:this.type,points:this.points};
+                        console.log(queryObj)
+                        this.$router.replace({path:"/pages/supply-demand/buy",query:queryObj})
+                    }
+                })
+            }else
+            {
+                this.toast("请输入推荐码")
+            }
+
+        }
+    },
+    mounted(){
+        console.log(this.$route.query)
+        if(this.$route.query.points)
+        {
+            this.points = this.$route.query.points;
+            this.type = this.$route.query.type
+        }
+    }
 }
 </script>
 <style>
@@ -80,7 +137,7 @@ export default {
                 margin-left: 0.52rem;
             }
             .txt{
-                color: #939393;
+                color:#5284b9;
                 font-size: 0.39rem;
                 width: 2.62rem;
                 height: 0.79rem;
@@ -88,6 +145,9 @@ export default {
                 border-radius: 0.4rem;
                 border: solid 0.01rem #b2b2b2;
                 margin-right: 0.34rem;
+            }
+            .txt.disable{
+                color: #939393;
             }
         }
         .post{
@@ -101,6 +161,10 @@ export default {
             font-size: 0.5rem;
             letter-spacing: 0.04rem;
             color: #9d3800;
+        }
+        .post.disable{
+           background-color:  #b2b2b2;
+           background-image:none;
         }
         margin: 0 0.35rem;
         text-align:center; 

@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-09-24 14:10:37
- * @LastEditTime: 2021-12-14 17:47:25
+ * @LastEditTime: 2022-01-06 15:44:51
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\release.vue
@@ -10,8 +10,8 @@
   <div class="root">
     <div class="block top">
       <span class="txt">您好！您想要</span>
-      <span class="grade" style="margin-right: 0.3rem"><i class="icon">&#xe6bc;</i>个人发布点 35</span>
-      <span class="grade"><i class="icon">&#xeb19;</i>企业发布点 35</span>
+      <span class="grade" style="margin-right: 0.3rem"><i class="icon">&#xe6bc;</i>个人发布点 {{selfMoney}}</span>
+      <span class="grade"><i class="icon">&#xeb19;</i>企业发布点 {{enterpriseMoney}}</span>
     </div>
     <div class="block action">
       <div class="btn blue" @click="demandBox_open=true">
@@ -76,10 +76,17 @@ export default {
     return {
       supplyBox_open: false,
       demandBox_open: false,
+      selfMoney:0,
+      enterpriseMoney:0
     };
   },
-  mounted(){
+  async mounted(){
     this.getMyShop();
+      var rep1 = await this.$SupplyAndDemandAPI.HallMoney_Balance();
+      if (rep1.ret == 0) {
+        this.selfMoney= rep1.data.selfMoney;
+        this.enterpriseMoney = rep1.data.enterpriseMoney
+      }
   }
 };
 </script>

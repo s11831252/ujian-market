@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-12-14 18:08:13
- * @LastEditTime: 2021-12-21 16:27:57
+ * @LastEditTime: 2021-12-22 15:32:25
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\selectGoods-item.vue
@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-import { mapState,mapMutations} from "vuex";
+import { mapState} from "vuex";
 
 export default {
   props: {

@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-10-19 16:14:52
- * @LastEditTime: 2021-11-24 17:30:29
+ * @LastEditTime: 2022-01-06 17:15:55
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\post-ok.vue
@@ -21,7 +21,6 @@
 </template>
 <script>
 export default {
-    
 }
 </script>
 <style lang="scss" scoped>

@@ -96,7 +96,7 @@ export default {
       ...mapActions(["GetConfig"])
   },
   created(){
-    // this.GetConfig();
+    this.getArea();
     var that = this;
     WebIM.conn.listen({
       onOpened: function(message) {

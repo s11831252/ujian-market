@@ -1,7 +1,7 @@
 <!--
  * @Author: SuChonghua
  * @Date: 2021-12-14 16:56:02
- * @LastEditTime: 2021-12-21 16:34:50
+ * @LastEditTime: 2021-12-22 16:12:55
  * @LastEditors: SuChonghua
  * @Description: 
  * @FilePath: \ujian-market\src\pages\supply-demand\selectGoods.vue
@@ -9,9 +9,11 @@
 <template>
   <div class="shop-detail" v-if="shopDetail">
     <div class="shop-detail-head">
-      <div class="shop-simple-info">
         <p class="shop-detail-name">{{ shopDetail.sName }}</p>
-      </div>
+        <div class="searchbox">
+          <i class="icon">&#xe6e3;</i>
+          <input placeholder="搜索店内商品">
+        </div>
     </div>
     <div class="shop-detail-tab">
       <div class="navbar-body">
@@ -32,13 +34,14 @@
     <div class="select-box">
       <i class="icon">&#xe60e;</i>
       <span class="txt">已选择<small>{{selectGoods.length}}</small>件商品</span>
-      <button>确定</button>
+      <button class="clear" @click="clear">取消</button>
+      <button @click="$router.back()">确定</button>
     </div>
   </div>
 </template>
 <script>
 import indexGoodDetail from "./selectGoods-item.vue";
-import { mapState,mapMutations} from "vuex";
+import { mapState,mapActions,mapMutations} from "vuex";
 
 export default {
   data() {
@@ -90,11 +93,21 @@ export default {
     changeGoodsType(typeid) {
       this.activeType = typeid;
     },
-    selected(item){
+    async selected(item){
       var that = this;
-      that.setSelecGoods(item);
+      var isok = await that.setSelecGoods(item)
+      if(!isok)
+      {
+        that.toast("最多可选择3个商品")
+      }
     },
-    ...mapMutations(["setSelecGoods"])
+    clear(){
+      var that = this;
+      that.clearSelecGoods();
+      this.$router.back();
+    },
+    ...mapMutations(['clearSelecGoods']),
+    ...mapActions(["setSelecGoods"])
   },
   async mounted() {
     let that = this;
@@ -126,53 +139,40 @@ export default {
 .shop-detail {
   padding-bottom: 65px;
   .shop-detail-head {
-    padding: 0.59rem 0.29rem;
-    color: #fff;
-    .shop-detail-logo {
-      width: 2.46rem;
-      position: relative;
-      img {
-        // width: 100%;
-        // height: 80px;
-        width: 2.46rem;
-        height: 2.46rem;
-        position: absolute;
-        border-radius: 10%;
-      }
-    }
-    .shop-simple-info {
-      padding-left: 10px;
-      width: 70%;
+    padding: 0.59rem 0.38rem 0.25rem 0.34rem;
       .shop-detail-name {
         font-family: PingFangSC-Regular, sans-serif;
-        font-size: 20px;
+        font-size: 0.44rem;
         font-weight: bold;
+        color: #1a1a1a;
       }
-      .shop-detail-notice {
-        font-size: 14px;
-        // overflow-y: hidden;
-        // height: 0.84rem;
-        // text-overflow: ellipsis;
-        // white-space: nowrap;
-      }
-      .shop-detail-statistics {
-        font-size: 14px;
-        p {
-          display: inline-block;
-          span {
-            color: #fffc00;
-          }
+      .searchbox{
+        margin-top: 0.36rem;
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border-radius: 0.46rem;
+        border: solid 0.01rem #e4e4e4;
+        height: 0.91rem;
+        i.icon{
+          font-size: 0.4rem;
+          width: 0.4rem;
+          height: 0.4rem;
+          flex-shrink:0;
+          color: #898989;
+          margin-right: 0.25rem;
+          margin-left: 0.31rem;
         }
-        .shop-detail-statistics-goods {
-          padding-left: 20px;
+        input{
+          font-size: 0.36rem;
+          color: #1b1b1b;
+          flex-grow:1
         }
+        input::-webkit-input-placeholder {color: #999;}
+        input:-moz-placeholder {color: #999;}
+        input::-moz-placeholder {color: #999; opacity: 1;}
+        input:-ms-input-placeholder {color: #999;}
       }
-    }
-    .shop-detail-logo,
-    .shop-simple-info {
-      display: inline-block;
-      vertical-align: top;
-    }
   }
 
   .shop-detail-tab {
@@ -289,11 +289,15 @@ export default {
       flex-shrink:0;
       width: 1.4rem;
       height: 0.67rem;
+      line-height: 0.67rem;
       border-radius: 0.15rem;
       border: solid 0.02rem #f19149;
       color: #ffffff;
       font-size: 0.36rem;
       margin-right: 0.54rem;
+    }
+    button.clear{
+      border: solid 0.02rem #898989;
     }
   }
 }
